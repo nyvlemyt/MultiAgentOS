@@ -1,21 +1,46 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "jsx": "preserve",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noEmit": true,
     "incremental": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@mas/db": ["../../packages/db/src/index.ts"],
-      "@mas/db/*": ["../../packages/db/src/*"],
-      "@mas/core": ["../../packages/core/src/index.ts"],
-      "@mas/core/*": ["../../packages/core/src/*"],
-      "@mas/agents": ["../../packages/agents/src/index.ts"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@mas/db": [
+        "../../packages/db/src/index.ts"
+      ],
+      "@mas/db/*": [
+        "../../packages/db/src/*"
+      ],
+      "@mas/core": [
+        "../../packages/core/src/index.ts"
+      ],
+      "@mas/core/*": [
+        "../../packages/core/src/*"
+      ],
+      "@mas/agents": [
+        "../../packages/agents/src/index.ts"
+      ]
+    },
+    "allowJs": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -24,8 +24,7 @@ export async function GET(_req: NextRequest) {
           controller.close();
         } catch {}
       };
-      // @ts-expect-error close hook on AbortSignal exists at runtime
-      _req.signal?.addEventListener?.('abort', onClose);
+      _req.signal.addEventListener('abort', onClose);
     },
   });
 

@@ -42,3 +42,12 @@ data/mission-summaries/
 
 # --- Tauri later ---
 src-tauri/target/
+
+# --- Plugin-managed skill repos (installed via Claude Code plugin marketplace) ---
+# These are each their own git repo. Tracking them as gitlinks would break
+# `git push` without a .gitmodules. They are not vendored here on purpose —
+# users reinstall via their plugin manager. See SKILLS_REGISTRY.md.
+.claude/skills/caveman/
+.claude/skills/superpowers/
+.claude/skills/ui-ux-pro-max/
+

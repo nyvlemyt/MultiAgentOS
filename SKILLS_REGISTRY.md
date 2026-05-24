@@ -15,6 +15,18 @@ When **building MultiAgentOS** (i.e. Claude Code working in this repo on the coc
 
 These are **not** the same as the runtime tiering below — the runtime tiers apply to MultiAgentOS's own agents when they execute against the user's external projects.
 
+## A. Plugin-managed skills (not vendored in this repo)
+
+Three skill directories under `.claude/skills/` are **plugin-managed git repositories** that are NOT tracked in this repo. They live in `.gitignore` because tracking them as gitlinks would break `git push` without a `.gitmodules` file, and vendoring their contents would bloat the repo and create update drift.
+
+| Skill                          | Upstream                                                   | Reinstall command (Claude Code) |
+|--------------------------------|------------------------------------------------------------|---------------------------------|
+| `.claude/skills/superpowers`   | https://github.com/obra/superpowers                        | install from the `superpowers-dev` plugin (obra/superpowers) |
+| `.claude/skills/caveman`       | https://github.com/JuliusBrussee/caveman                   | install from the `caveman` plugin (JuliusBrussee/caveman)    |
+| `.claude/skills/ui-ux-pro-max` | https://github.com/nextlevelbuilder/ui-ux-pro-max-skill    | install from the `ui-ux-pro-max-skill` plugin                |
+
+After cloning the MultiAgentOS repo on a fresh machine, install the three plugins via the Claude Code marketplace (`/plugin`) — they will repopulate those folders. Everything else under `.claude/skills/` is vendored as plain files and committed normally.
+
 ## 1. Source of truth
 
 The runtime auto-discovers skills from `.claude/skills/*` (and nested `superpowers/skills/*`) at boot. This file is the **policy layer**: when each skill loads, who uses it, and how its short summary is produced.
