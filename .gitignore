@@ -51,3 +51,5 @@ src-tauri/target/
 .claude/skills/superpowers/
 .claude/skills/ui-ux-pro-max/
 
+# --- Settings claude user ---
+.claude/settings.local.json
