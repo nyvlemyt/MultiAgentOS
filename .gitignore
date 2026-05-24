@@ -53,3 +53,16 @@ src-tauri/target/
 
 # --- Settings claude user ---
 .claude/settings.local.json
+
+# --- AI tool mirrors (machine-local, not for this repo) ---
+# Codex CLI and tools that read the AGENTS.md convention auto-mirror
+# .claude/{skills,agents} into these dirs. Local-only — never commit.
+.agents/
+.codex/
+
+# --- Playwright artifacts (per-run, never committed) ---
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/blob-report/
+**/.last-run.json
+

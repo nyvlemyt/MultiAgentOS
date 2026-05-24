@@ -17,7 +17,13 @@
     "smoke": "pnpm --filter @mas/web smoke"
   },
   "devDependencies": {
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.7"
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "better-sqlite3": "12.10.0",
+      "drizzle-orm": "0.36.4"
+    }
   }
 }

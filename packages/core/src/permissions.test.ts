@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PermissionsFile, EMPTY_PERMISSIONS } from './permissions.js';
+import { PermissionsFile, EMPTY_PERMISSIONS } from './permissions';
 
 describe('PermissionsFile', () => {
   it('accepts the empty skeleton', () => {

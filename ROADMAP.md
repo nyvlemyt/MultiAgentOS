@@ -2,6 +2,14 @@
 
 Each phase has hard exit criteria. **Do not start phase N+1 without explicit user green light.** Budgets in tokens are guidance for the build sessions themselves (i.e. how much it costs us to *build* MultiAgentOS, not what MultiAgentOS spends at runtime).
 
+## Branching rule (permanent)
+
+Every phase from Phase 1 onward is developed on a **dedicated git branch** named `phase/N-short-name` (e.g. `phase/1-mission-lifecycle`, `phase/2-real-claude`). Phase work never lands directly on `main`.
+
+After all checks pass (`pnpm lint`, `pnpm test`, `pnpm build`, `pnpm smoke`), the branch is pushed to `origin`. **Merging into `main` requires explicit user approval.** No fast-forward auto-merge, no PR auto-merge.
+
+Phase 0 was the bootstrap exception and lives on `main` directly because the repo did not yet exist when it ran.
+
 ---
 
 ## Phase 0 · Foundations + visual vision  (≈ 3–4 sessions, ~ 90 k tokens)

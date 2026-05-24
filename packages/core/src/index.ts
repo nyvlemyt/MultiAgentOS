@@ -1,3 +1,3 @@
-export * from './types.js';
-export * from './llm.js';
-export * from './permissions.js';
+export * from './types';
+export * from './llm';
+export * from './permissions';

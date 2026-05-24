@@ -8,12 +8,14 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "tsc --noEmit",
-    "smoke": "playwright test"
+    "smoke:reset": "pnpm --filter @mas/db seed",
+    "smoke": "pnpm smoke:reset && playwright test"
   },
   "dependencies": {
     "@mas/agents": "workspace:*",
     "@mas/core": "workspace:*",
     "@mas/db": "workspace:*",
+    "better-sqlite3": "12.10.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.36.0",

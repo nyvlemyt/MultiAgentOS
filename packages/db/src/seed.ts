@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import { getDb, closeDb } from './client.js';
+import { resolve, dirname } from 'node:path';
+import { existsSync } from 'node:fs';
+import { getDb, closeDb } from './client';
 import {
   projects,
   agents,
@@ -7,19 +9,79 @@ import {
   tasks,
   events,
   memoryItems,
+  memoryCandidates,
+  validations,
   skills,
   budgets,
-} from './schema.js';
+  contextPacks,
+  projectLinks,
+  permissions,
+} from './schema';
 
-const now = () => new Date();
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000);
 
+function findRepoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(resolve(dir, 'pnpm-workspace.yaml'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
+
+function resolveDbPath(): string {
+  const envPath = process.env.MAS_DB_PATH;
+  if (envPath && envPath.length > 0) return resolve(envPath);
+  return resolve(findRepoRoot(), 'data/mas.db');
+}
+
+function assertSafeToWipe(dbPath: string) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      '[seed] refusing to run in NODE_ENV=production. ' +
+        'This seed wipes every app-owned table. Set NODE_ENV=development or run against a dev DB.',
+    );
+  }
+  const expectedDefault = resolve(findRepoRoot(), 'data/mas.db');
+  const allowOverride = process.env.MAS_ALLOW_DESTRUCTIVE_SEED === 'true';
+  if (dbPath !== expectedDefault && !allowOverride) {
+    throw new Error(
+      `[seed] refusing to wipe a non-default DB path.\n` +
+        `  target : ${dbPath}\n` +
+        `  default: ${expectedDefault}\n` +
+        `  If this is intentional, set MAS_ALLOW_DESTRUCTIVE_SEED=true.`,
+    );
+  }
+}
+
 async function main() {
-  const db = getDb();
+  const dbPath = resolveDbPath();
+  assertSafeToWipe(dbPath);
+  console.log(`[seed] target DB: ${dbPath}`);
+  const db = getDb(dbPath);
 
   console.log('seeding…');
 
   const projectId = 'proj_otakugo';
+
+  // Deterministic reset: every table the seed owns gets wiped, then rewritten.
+  // FK cascades cover most of the chain but we wipe explicitly so reseeds are
+  // idempotent regardless of prior mutations from the lifecycle tests.
+  await db.delete(events);
+  await db.delete(validations);
+  await db.delete(memoryCandidates);
+  await db.delete(memoryItems);
+  await db.delete(contextPacks);
+  await db.delete(projectLinks);
+  await db.delete(tasks);
+  await db.delete(missions);
+  await db.delete(projects);
+  await db.delete(agents);
+  await db.delete(skills);
+  await db.delete(budgets);
+  await db.delete(permissions);
   await db
     .insert(projects)
     .values({

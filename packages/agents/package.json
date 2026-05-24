@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@mas/core": "workspace:*",
+    "@mas/db": "workspace:*",
+    "drizzle-orm": "^0.36.0",
     "gray-matter": "^4.0.3"
   },
   "devDependencies": {

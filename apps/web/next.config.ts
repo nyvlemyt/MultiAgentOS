@@ -7,6 +7,7 @@ const config: NextConfig = {
     root: __dirname + '/../..',
   },
   transpilePackages: ['@mas/db', '@mas/core', '@mas/agents'],
+  serverExternalPackages: ['better-sqlite3'],
 };
 
 export default config;

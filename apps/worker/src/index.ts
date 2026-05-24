@@ -1,51 +1,40 @@
-import { randomUUID } from 'node:crypto';
-import { getDb } from '@mas/db/client';
-import { events, tasks } from '@mas/db/schema';
-import { bus, type WorkerEvent } from './sse-bus.js';
-import { eq } from 'drizzle-orm';
+import { listDispatchableMissions, executeNextTask } from '@mas/agents';
+import { getDb } from '@mas/db';
 
-const TICK_MS = 5_000;
-const POLL_MS = 2_000;
+const TICK_MS = 1500;
+
+let busy = false;
 
 async function tick() {
-  const db = getDb();
-  const evt: WorkerEvent = {
-    id: `evt_${randomUUID()}`,
-    type: 'tick',
-    payload: { source: 'worker', at: new Date().toISOString() },
-    createdAt: new Date().toISOString(),
-  };
-  bus.publish(evt);
-  await db.insert(events).values({
-    id: evt.id,
-    type: evt.type,
-    payloadJson: JSON.stringify(evt.payload),
-    tokensIn: 0,
-    tokensOut: 0,
-    cacheRead: 0,
-    cacheCreation: 0,
-    costCents: 0,
-    risk: 'low',
-    createdAt: new Date(),
-  });
-}
-
-async function pollTasks() {
-  const db = getDb();
-  const pending = await db.select().from(tasks).where(eq(tasks.status, 'todo')).limit(1);
-  if (pending.length > 0) {
-    console.log(`[worker] ${pending.length} pending task(s) — Phase 1 will pick these up.`);
+  if (busy) return;
+  busy = true;
+  try {
+    const dispatchable = await listDispatchableMissions();
+    if (dispatchable.length === 0) return;
+    for (const m of dispatchable) {
+      const res = await executeNextTask(m.id);
+      if (res.kind === 'task_done') {
+        console.log(`[worker] task done in ${m.id}: ${res.taskId}`);
+      } else if (res.kind === 'paused_for_validation') {
+        console.log(`[worker] mission ${m.id} paused — task ${res.taskId} needs validation`);
+      } else if (res.kind === 'mission_complete') {
+        console.log(`[worker] mission ${m.id} complete (validated)`);
+      }
+    }
+  } catch (e) {
+    console.error('[worker:tick]', e);
+  } finally {
+    busy = false;
   }
 }
 
 async function main() {
   console.log('[worker] alive');
+  // touch the DB once to surface init errors early
+  getDb();
   setInterval(() => {
-    tick().catch((e) => console.error('[worker:tick]', e));
+    void tick();
   }, TICK_MS);
-  setInterval(() => {
-    pollTasks().catch((e) => console.error('[worker:poll]', e));
-  }, POLL_MS);
 }
 
 main().catch((e) => {

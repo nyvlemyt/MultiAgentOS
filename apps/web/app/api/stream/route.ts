@@ -1,33 +1,56 @@
 import type { NextRequest } from 'next/server';
+import { getDb, events } from '@mas/db';
+import { gt } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(_req: NextRequest) {
+const POLL_MS = 1500;
+
+export async function GET(req: NextRequest) {
   const encoder = new TextEncoder();
+  const db = getDb();
+  let cursor = new Date();
   const stream = new ReadableStream({
     async start(controller) {
-      let n = 0;
       const send = (type: string, payload: unknown) => {
-        const data = JSON.stringify(payload);
-        controller.enqueue(encoder.encode(`event: ${type}\ndata: ${data}\n\n`));
+        controller.enqueue(encoder.encode(`event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`));
       };
       send('hello', { ok: true, at: new Date().toISOString() });
-      const interval = setInterval(() => {
-        n += 1;
-        send('tick', { id: `web_tick_${n}`, type: 'tick', at: new Date().toISOString() });
-      }, 5000);
-
-      const onClose = () => {
+      const interval = setInterval(async () => {
+        try {
+          const rows = await db
+            .select()
+            .from(events)
+            .where(gt(events.createdAt, cursor))
+            .orderBy(events.createdAt)
+            .limit(50);
+          for (const r of rows) {
+            cursor = r.createdAt > cursor ? r.createdAt : cursor;
+            send('event', {
+              id: r.id,
+              missionId: r.missionId,
+              taskId: r.taskId,
+              agentId: r.agentId,
+              type: r.type,
+              tokens: r.tokensIn + r.tokensOut,
+              risk: r.risk,
+              at: r.createdAt.toISOString(),
+              payload: JSON.parse(r.payloadJson),
+            });
+          }
+        } catch (e) {
+          send('error', { message: (e as Error).message });
+        }
+      }, POLL_MS);
+      req.signal.addEventListener('abort', () => {
         clearInterval(interval);
         try {
           controller.close();
         } catch {}
-      };
-      _req.signal.addEventListener('abort', onClose);
+      });
     },
   });
-
   return new Response(stream, {
     headers: {
       'Content-Type': 'text/event-stream',
