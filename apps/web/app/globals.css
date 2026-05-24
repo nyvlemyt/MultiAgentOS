@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root,
+[data-theme='dark'] {
+  --bg-base: #0b0d12;
+  --bg-surface: #11141b;
+  --bg-elevated: #161a24;
+  --bg-hover: #1c2230;
+  --border-subtle: #1f2533;
+  --border-default: #2a3142;
+  --text-primary: #e8ecf4;
+  --text-secondary: #a5adbf;
+  --text-muted: #6b7388;
+  --accent: #7c8cff;
+  --accent-soft: #2c3260;
+  --success: #4ade80;
+  --warning: #f9a23a;
+  --danger: #ef4458;
+  --status-idle: #6b7388;
+  --status-running: #7c8cff;
+  --status-blocked: #ef4458;
+  --status-waiting: #f9a23a;
+  --status-done: #4ade80;
+}
+
+[data-theme='light'] {
+  --bg-base: #fafbfd;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-hover: #f1f3f8;
+  --border-subtle: #e5e8f0;
+  --border-default: #d3d8e4;
+  --text-primary: #0e1320;
+  --text-secondary: #4a5168;
+  --text-muted: #7a8094;
+  --accent: #5161e7;
+  --accent-soft: #dde1ff;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --status-idle: #94a3b8;
+  --status-running: #5161e7;
+  --status-blocked: #dc2626;
+  --status-waiting: #d97706;
+  --status-done: #16a34a;
+}
+
+html,
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+.surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+}
+
+.surface-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 0.75rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.status-ring {
+  --ring-color: var(--status-idle);
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--ring-color);
+}
+.status-ring[data-status='running'] {
+  --ring-color: var(--status-running);
+}
+.status-ring[data-status='blocked'] {
+  --ring-color: var(--status-blocked);
+}
+.status-ring[data-status='waiting'] {
+  --ring-color: var(--status-waiting);
+}
+.status-ring[data-status='done'] {
+  --ring-color: var(--status-done);
+}
+
+@keyframes orbit-dash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.orbit-edge {
+  stroke-dasharray: 6 6;
+  animation: orbit-dash 1.6s linear infinite;
+}

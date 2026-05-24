@@ -1,0 +1,65 @@
+import { missions, allAgents } from '@/lib/fixtures';
+import { MissionCard } from '@/components/MissionCard';
+import { AgentCard } from '@/components/AgentCard';
+import { BudgetBar } from '@/components/BudgetBar';
+
+export default async function ProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const projectName = slug === 'otakugo' ? 'OtakuGO_UP' : slug;
+  const projectPath = slug === 'otakugo' ? '/Users/melvyn/Documents/03_PROFESSIONNEL/OtakuGO_UP' : '—';
+  const stack = slug === 'otakugo' ? ['next', 'ts', 'tailwind', 'prisma', 'postgres'] : [];
+
+  return (
+    <div className="flex flex-col gap-6">
+      <header className="surface flex flex-col gap-3 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>{projectName}</h1>
+            <div className="mono mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>{projectPath}</div>
+          </div>
+          <button type="button" className="rounded-md border px-3 py-1.5 text-xs" style={{ borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}>Reveal in Finder</button>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {stack.map((s) => (
+            <span key={s} className="rounded-sm px-1.5 py-0.5 text-[10px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-secondary)' }}>{s}</span>
+          ))}
+        </div>
+      </header>
+
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <article className="surface p-4">
+          <h3 className="mb-2 text-sm font-semibold">Context pack health</h3>
+          <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>v3 · 3,420 tokens · 142 files · indexed 18 h ago</p>
+          <button className="mt-3 w-full rounded-md px-3 py-1.5 text-xs text-white" style={{ background: 'var(--accent)' }}>Rebuild</button>
+        </article>
+        <article className="surface p-4">
+          <h3 className="mb-2 text-sm font-semibold">Budget · this month</h3>
+          <BudgetBar spent={240} cap={500} label="€2.40 / €5.00" />
+          <p className="mt-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>cap raises require a logged event</p>
+        </article>
+        <article className="surface p-4">
+          <h3 className="mb-2 text-sm font-semibold">Settings</h3>
+          <ul className="space-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            <li>Autonomy: <span className="mono">manual</span></li>
+            <li>Mode: <span className="mono">eco</span></li>
+            <li>Default model: <span className="mono">claude-haiku-4-5</span></li>
+          </ul>
+        </article>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Recent missions</h2>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {missions.slice(0, 5).map((m) => <MissionCard key={m.id} m={m} />)}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Active agents on this project</h2>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {allAgents.filter((a) => a.status !== 'idle').map((a) => <AgentCard key={a.id} a={a} />)}
+        </div>
+      </section>
+    </div>
+  );
+}
