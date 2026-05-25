@@ -9,13 +9,9 @@ import {
   type Task,
   type Mission,
 } from '@mas/db';
-import type { ReviewerVerdict } from '@mas/core';
-import {
-  mockMissionPlanner,
-  mockSkillRouter,
-  mockReviewer,
-  mockSecReviewer,
-} from '@mas/core';
+import type { ReviewerVerdict, Mode } from '@mas/core';
+import { runMissionPlanner, runSkillRouter, runReviewer, runSecReviewer } from './agent-runner.js';
+import { ensureMissionBudgetRow } from './budget.js';
 
 export type Db = ReturnType<typeof getDb>;
 
@@ -46,19 +42,42 @@ function logEvent(db: Db, evt: {
   });
 }
 
+async function getEffectiveMode(missionId: string): Promise<Mode> {
+  const db = getDb();
+  const [m] = await db
+    .select({ modeOverride: missions.modeOverride, projectId: missions.projectId })
+    .from(missions)
+    .where(eq(missions.id, missionId));
+  if (!m) return 'eco';
+  if (m.modeOverride) return m.modeOverride as Mode;
+  const { projects } = await import('@mas/db');
+  const [p] = await db
+    .select({ defaultMode: projects.defaultMode })
+    .from(projects)
+    .where(eq(projects.id, m.projectId));
+  return (p?.defaultMode ?? 'eco') as Mode;
+}
+
 export async function planMission(missionId: string) {
   const db = getDb();
   const [m] = await db.select().from(missions).where(eq(missions.id, missionId));
   if (!m) throw new Error(`mission ${missionId} not found`);
   if (m.status !== 'draft') return m;
 
-  const plan = mockMissionPlanner({ missionId: m.id, title: m.title, objective: m.objective });
+  const mode = await getEffectiveMode(m.id);
+  const plan = await runMissionPlanner({ missionId: m.id, title: m.title, objective: m.objective, mode });
 
   // Wipe and rewrite task list for an idempotent plan.
   await db.delete(tasks).where(eq(tasks.missionId, m.id));
 
   for (const t of plan.tasks) {
-    const router = mockSkillRouter(t.id, t.skillsHint);
+    const router = await runSkillRouter({
+      taskId: t.id,
+      skillsHint: t.skillsHint,
+      description: t.description,
+      mode,
+      missionId: m.id,
+    });
     await db.insert(tasks).values({
       id: t.id,
       missionId: m.id,
@@ -82,6 +101,8 @@ export async function planMission(missionId: string) {
       payload: { rationale: router.rationale, skills: router.favoriteSkills, agents: router.tierBAgents },
     });
   }
+
+  await ensureMissionBudgetRow({ missionId: m.id, budgetTokens: plan.estimatedTokens || m.budgetTokens });
 
   await db
     .update(missions)
@@ -160,17 +181,32 @@ export async function executeNextTask(missionId: string): Promise<
     await logEvent(db, { missionId: m.id, type: 'mission_review_started' });
 
     // Run sec-reviewer on every high/blocking-risk task; run reviewer on the last task.
+    const mode = await getEffectiveMode(m.id);
     const verdicts: ReviewerVerdict[] = [];
     for (const t of all) {
       if (t.risk === 'high' || t.risk === 'blocking') {
-        const sec = mockSecReviewer(t.id, { risk: t.risk });
+        const sec = await runSecReviewer({
+          taskId: t.id,
+          taskTitle: t.title,
+          taskDescription: t.description,
+          risk: t.risk,
+          mode,
+          missionId: m.id,
+        });
         await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
         verdicts.push(sec);
       }
     }
     const last = all.at(-1);
     if (last) {
-      const rev = mockReviewer(last.id, { risk: last.risk });
+      const rev = await runReviewer({
+        taskId: last.id,
+        taskTitle: last.title,
+        taskDescription: last.description,
+        risk: last.risk,
+        mode,
+        missionId: m.id,
+      });
       await logEvent(db, { missionId: m.id, taskId: last.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
       verdicts.push(rev);
     }
