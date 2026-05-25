@@ -1,3 +1,5 @@
+import { initLLM } from '@mas/agents';
+import { realLLM, mockLLM } from '@mas/core';
 import { listDispatchableMissions, executeNextTask } from '@mas/agents';
 import { getDb } from '@mas/db';
 
@@ -29,8 +31,16 @@ async function tick() {
 }
 
 async function main() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (apiKey) {
+    initLLM(realLLM(apiKey));
+    console.log('[worker] real LLM initialized (claude API)');
+  } else {
+    initLLM(mockLLM());
+    console.log('[worker] mock LLM active (set ANTHROPIC_API_KEY to use real Claude)');
+  }
+
   console.log('[worker] alive');
-  // touch the DB once to surface init errors early
   getDb();
   setInterval(() => {
     void tick();
