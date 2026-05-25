@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { isAbsolute, resolve, dirname, sep } from 'node:path';
+import { isAbsolute, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb } from './client';
+import { assertSafeToWipe } from './seed-safety';
 import {
   projects,
   agents,
@@ -41,32 +42,16 @@ function resolveDbPath(): string {
   return resolve(findRepoRoot(), 'data/mas.db');
 }
 
-function assertSafeToWipe(dbPath: string) {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      '[seed] refusing to run in NODE_ENV=production. ' +
-        'This seed wipes every app-owned table. Set NODE_ENV=development or run against a dev DB.',
-    );
-  }
-  const repoRoot = findRepoRoot();
-  const dataDir = resolve(repoRoot, 'data');
-  const allowOverride = process.env.MAS_ALLOW_DESTRUCTIVE_SEED === 'true';
-  const isUnderDataDir = dbPath.startsWith(dataDir + sep);
-  if (!isUnderDataDir && !allowOverride) {
-    throw new Error(
-      `[seed] refusing to wipe a DB outside <repo>/data/.\n` +
-        `  target  : ${dbPath}\n` +
-        `  data dir: ${dataDir}\n` +
-        `  If this is intentional, set MAS_ALLOW_DESTRUCTIVE_SEED=true.`,
-    );
-  }
-}
-
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../migrations');
 
 async function main() {
+  const repoRoot = findRepoRoot();
   const dbPath = resolveDbPath();
-  assertSafeToWipe(dbPath);
+  assertSafeToWipe(dbPath, {
+    repoRoot,
+    allowOverride: process.env.MAS_ALLOW_DESTRUCTIVE_SEED === 'true',
+    nodeEnv: process.env.NODE_ENV,
+  });
   console.log(`[seed] target DB: ${dbPath}`);
   const db = getDb(dbPath);
 
