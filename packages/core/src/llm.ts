@@ -221,3 +221,25 @@ export function mockSecReviewer(taskId: string, prior: { risk: Risk }): Reviewer
     ],
   };
 }
+
+// ---- Phase 2: model selection + Caveman gate ----------------------------------
+
+export function selectModel(mode: Mode, retry = false): string {
+  if (mode === 'eco') return 'claude-haiku-4-5-20251001';
+  if (mode === 'standard') return retry ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
+  return 'claude-sonnet-4-6';
+}
+
+export type CavemanRoute = 'planner_to_router' | 'router_to_tierb' | 'reviewer_to_sec' | 'trace_event';
+
+// Routes where Caveman activates under eco (internal agent-to-agent prose only).
+// Reviewer/SecReviewer outputs feed validation modals — never Caveman.
+const CAVEMAN_ROUTES = new Set<CavemanRoute>(['planner_to_router', 'router_to_tierb', 'trace_event']);
+
+const CAVEMAN_SUFFIX =
+  '\n\n[CAVEMAN MODE: internal prose only. Drop articles, filler, pleasantries. Technical terms exact. Max 80 tokens response prose.]';
+
+export function applyCaveman(system: string, mode: Mode, route: CavemanRoute | null): string {
+  if (mode !== 'eco' || route === null || !CAVEMAN_ROUTES.has(route)) return system;
+  return system + CAVEMAN_SUFFIX;
+}
