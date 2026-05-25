@@ -114,3 +114,24 @@ Note: **all MultiAgentOS state lives inside this repo's `data/` folder.** The ex
 ## 10. Building MultiAgentOS itself
 
 When building features of MultiAgentOS, follow `ROADMAP.md` phase by phase. Do not start phase N+1 without explicit user green light at the phase-N exit criteria. The "Future Build Prompt" at the end of `ROADMAP.md` is the canonical kick-off for each phase.
+
+## 11. Billing isolation (CRITICAL — Claude Code vs Anthropic API)
+
+Claude Code CLI has **two billing modes**. Mixing them silently causes unexpected charges.
+
+| Mode | Trigger | Cost |
+|------|---------|------|
+| Subscription (Pro/Max) | `claude login` auth, no API key in env | Fixed monthly |
+| API PAYG | `ANTHROPIC_API_KEY` present in shell env | Per token, ~$3/$15 per 1M |
+
+**Rules — enforce always, never override:**
+
+1. `ANTHROPIC_API_KEY` must **never** be exported in global shell config (`~/.zshrc`, `~/.bashrc`, `~/.zshenv`, `~/.profile`). Verify: `echo $ANTHROPIC_API_KEY` in a fresh terminal must be empty.
+2. The key must only be injected per-process: via `.env` loaded by the app (`dotenv`/`tsx --env-file`), never `source`d globally.
+3. Claude Code authenticates exclusively via `claude login` (subscription). If it prompts for an API key, something is wrong — investigate before entering one.
+4. `.env` files are gitignored and must stay that way. Never commit a file containing `ANTHROPIC_API_KEY`.
+5. Any agent or script that needs to call the Anthropic API must receive the key via the app's runtime environment, not from the shell.
+
+**In MultiAgentOS code:** the `packages/core/llm.ts` LLM wrapper is the single injection point. It reads `process.env.ANTHROPIC_API_KEY` at call time. No other file may read this variable directly.
+
+**Guard against runaway cost:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard caps. The worker must check the active budget row before every LLM call and return `budget_exceeded` without calling the API if the cap is reached.

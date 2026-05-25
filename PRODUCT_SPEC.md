@@ -104,6 +104,49 @@ Per-project gauges + per-mission breakdowns. Three mode pills (eco / standard / 
 
 Append-only event log. Each row: timestamp · agent · action · skill(s) used · files touched · tokens · cost · risk. Filter by mission, by agent, by file path. Export to JSON.
 
+### 4.6b Ideas Inbox (route `/ideas`)
+
+Rapid capture for raw ideas, global or project-scoped.
+
+- **Kanban**: `Inbox → To clarify → Prioritized → Converted → Archived`.
+- Each card: title, project tag (or "Global"), priority score, estimated effort, estimated token cost.
+- **"Convert to mission" CTA**: one click creates a `missions` row in `draft` state, pre-filled from the idea body.
+- Ideas visible in Command Center (count badge) and in `/projects/[slug]` (project-filtered).
+- Ideas with no project tag are global.
+
+### 4.6c Decision Log (embedded, not a separate route)
+
+Stores important decisions — product, architecture, delegation, user override.
+
+- Logged from: Command Center quick-add, mission detail page, validation modal (auto-log on approve/reject of a `blocking` task).
+- Fields: title, body, scope (global / project), source (user / mission / validation / agent), date.
+- Visible in: **Command Center** (last 5 global decisions widget) + `/projects/[slug]` dedicated section + `/missions/[id]` related decisions.
+- Memory Keeper may propose a decision candidate via the same `proposeMemory` path (type = `decision`).
+
+### 4.6d Planning & Deadlines (embedded in Mission Board + Command Center)
+
+- `deadline` (optional date) and `milestone` (optional free-form label) fields on missions.
+- Command Center: missions with deadline within 7 days → yellow badge; overdue → red badge.
+- Per-project calendar widget in `/projects/[slug]`: timeline of upcoming deadlines and milestones.
+- Alert (arithmetic, no LLM): if `deadline < today + estimated_remaining_days_at_current_burn_rate` → flag "deadline may be unrealistic given remaining budget".
+
+### 4.6e Prioritization (route `/priorities`)
+
+- Priority score (0–100) on missions and ideas. Computed from four user-set sliders: **Impact** (0–100), **Urgency** (0–100), **Effort** (0–100, inverted), **Risk** (0–100, inverted).
+- Formula: `impact × 0.35 + urgency × 0.30 + (100 − effort) × 0.20 + (100 − risk) × 0.15`. Fully deterministic, no LLM.
+- `/priorities`: board view sorted by score, filterable by project. Shows score breakdown on hover.
+- **Top 3 priorities** card in Command Center replaces the static Recommendations placeholder.
+
+### 4.6f Project Health (widget embedded in `/projects/[slug]` header)
+
+Compact computed overview, no dedicated route:
+
+```
+missions: X done / Y total  ·  blocked: Z  ·  budget: N%  ·  next deadline: DD MMM  ·  open ideas: N  ·  pending validations: N
+```
+
+Computed at read time from existing DB rows. No separate table.
+
 ### 4.7 Memory Center (route `/memory`)
 
 Two columns: **Global memory** · **Project memory**. Each item: title, type (`user` / `feedback` / `project` / `reference`), source mission, age, "still relevant?" voting. Separate **Inbox** of memory candidates proposed by agents but not yet accepted/rejected by the user.
@@ -209,8 +252,24 @@ project_links(                       -- M:N links between projects + Tier A agen
   project_id, kind, ref_id,
   pinned, weight                     -- weight feeds the Skill Router's relevance score
 )
-missions(id, project_id, title, objective, status, risk, budget_tokens, spent_tokens, autonomy_override, mode_override, created_at, updated_at)
+missions(id, project_id, title, objective, status, risk, budget_tokens, spent_tokens, autonomy_override, mode_override,
+         deadline date,              -- optional, for planning/calendar
+         milestone text,             -- optional free-form label
+         priority_score int,         -- 0-100, computed or user-set
+         idea_id text,               -- FK to ideas.id if converted from an idea
+         created_at, updated_at)
 tasks(id, mission_id, parent_task_id, title, description, status, risk, agent_id, skills_json, depends_on_json, budget_tokens, spent_tokens, output_path, created_at, updated_at)
+ideas(id, title, body, scope enum(global|project), project_id,
+      status enum(inbox|to_clarify|prioritized|converted|archived),
+      priority_score int,            -- 0-100
+      impact int, urgency int, effort_est int,  -- 0-100 sliders
+      cost_est_tokens int,           -- estimated LLM cost if converted to mission
+      created_at, updated_at)
+decisions(id, scope enum(global|project), project_id,
+          source enum(user|mission|validation|agent),
+          source_mission_id text, source_task_id text,
+          title text, body text,
+          created_at)
 agents(id, tier, fiche_path, name, emoji, avatar_path, model, enabled, total_runs, total_tokens, success_rate)
 skills(id, source, path, summary_path, tags_json, tier, auto_load, last_used_at)
 events(id, mission_id, task_id, agent_id, type, payload_json, tokens_in, tokens_out, cache_read, cache_creation, cost_cents, risk, created_at)
@@ -240,15 +299,16 @@ Indices: `(mission_id, status)`, `(task_id, created_at)`, `(agent_id, created_at
 - Trace timeline & Memory Center read-only at MVP.
 - Generic `permissions` table + a minimal `config/permissions.json` (no hardcoded email/finance/trading actions).
 
-**Out (deferred):**
+**Out (deferred to Phase 4.5+):**
 
-- Autonomous + autopilot levels (UI present, execution gated).
-- Bots / website / personal-automation project templates.
-- Claude Code CLI integration.
-- Tauri packaging.
-- Memory candidate auto-acceptance.
-- Multi-project parallel execution (single concurrent mission at MVP).
-- Finance / trading agents.
+- Ideas Inbox, Decision Log, Planning/Deadlines, Prioritization board (Phase 4.5).
+- Autonomous + autopilot levels (UI present, execution gated) (Phase 6).
+- Bots / website / personal-automation project templates (Phase 7).
+- Claude Code CLI integration (Phase 8).
+- Tauri packaging (Phase 8).
+- Memory candidate auto-acceptance (Phase 4+).
+- Multi-project parallel execution (single concurrent mission at MVP) (Phase 8).
+- Finance / trading agents (post-MVP).
 
 ## 10. Success criteria for MVP
 

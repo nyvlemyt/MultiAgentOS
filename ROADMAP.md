@@ -132,6 +132,69 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 ---
 
+## Phase 4.5 · Ideas, Decisions, Planning & Prioritization  (≈ 2–3 sessions, ~ 60 k tokens)
+
+**Goal:** close the loop between "I have an idea" and "this became a mission". Add the three missing planning surfaces: Ideas Inbox, Decision Log, and deadline-aware prioritization.
+
+**No new agents. No LLM calls for the core features. Pure UI + schema + lightweight scoring.**
+
+### Ideas Inbox (`/ideas`)
+
+- New `ideas` table: `id, title, body, scope (global|project), project_id, status (inbox|to_clarify|prioritized|converted|archived), priority_score, impact, urgency, effort_est, cost_est_tokens, created_at, updated_at`.
+- Kanban: `Inbox → To clarify → Prioritized → Converted → Archived`.
+- "Convert to mission" button: creates a `missions` row in `draft`, links back via `idea_id`, marks idea `converted`.
+- Ideas visible in Command Center (Inbox count card) and in `/projects/[slug]` (project-scoped view).
+- Global Ideas = ideas with `scope = global` or no `project_id`.
+
+### Decision Log
+
+- New `decisions` table: `id, scope (global|project), project_id, source (user|mission|validation|agent), source_mission_id, source_task_id, title, body, created_at`.
+- Memory Keeper may propose a decision candidate (same `proposeMemory` path, distinct `type = decision`).
+- User can also log a decision manually from any context (Command Center, project page, mission page).
+- Visible in: Command Center sidebar widget (last 5 global decisions) + `/projects/[slug]` section + `/missions/[id]` section.
+- No dedicated `/decisions` route at MVP — embedded in existing pages.
+
+### Deadlines & milestones on missions
+
+- Add `deadline date` (nullable) and `milestone text` (nullable, free-form label) to `missions` table via new migration.
+- Deadline input in mission creation form and on the mission detail page.
+- Command Center: missions with `deadline < now + 7 days` flagged with a warning badge.
+- Alert logic (no LLM): `if deadline < created_at + (spentTokens / monthlyRate * 30 days) → flag as unrealistic`. Purely arithmetic.
+
+### Prioritization
+
+- `priority_score integer` added to `missions` and `ideas` tables (0–100, user-editable or auto-computed).
+- Score formula (deterministic, no LLM): `impact * 0.35 + urgency * 0.30 + (100 - effort_est) * 0.20 + (100 - risk_score) * 0.15`. All inputs are 0–100 sliders set by the user.
+- `/priorities` route: top-N board, sortable by score, filterable by project. Shows: title, score breakdown, deadline, estimated tokens.
+- Top 3 priorities surfaced in Command Center "Top priorities" card (replaces the static Recommendations placeholder from Phase 0).
+
+### Project Health widget
+
+- New server-computed `health` object per project (no table — computed at read time from existing rows):
+  ```ts
+  { missionsTotal, missionsDone, missionsBlocked, lastActivity, budgetUsedPct, nextDeadline, openIdeas, pendingValidations }
+  ```
+- Rendered as a compact status bar in `/projects/[slug]` header and as a row in `/projects` list.
+
+### Budget: pre-launch cost estimate + projection
+
+- Mission detail page: before "Run", show estimated token cost (from `missions.budget_tokens`, set during `planned` FSM state) with a €-equivalent label.
+- `/tokens` page: add "Remaining capacity" widget — `(monthlyCapCents - moneySpentCents) / avgMissionCostCents → N missions estimated remaining this month`. Uses rolling 30-day average, shows "~X missions" or "< 1 mission".
+
+**Schema migration:** one migration adding `ideas`, `decisions` tables + `deadline`, `milestone`, `priority_score` columns to `missions`.
+
+**Exit criteria:**
+
+1. `/ideas` kanban renders; creating an idea, moving it to Prioritized, and converting it to a mission all work end-to-end.
+2. A decision can be logged manually from the Command Center and appears in `/projects/[slug]`.
+3. Setting a `deadline` on a mission shows a warning badge on Command Center when within 7 days.
+4. `/priorities` page lists missions sorted by `priority_score`; editing a score via sliders persists.
+5. Project Health widget shows correct aggregated values after seed + lifecycle smoke test.
+6. `/tokens` "Remaining capacity" widget shows a non-zero mission estimate.
+7. `pnpm lint` + `pnpm test` + `pnpm build` + `pnpm smoke` green.
+
+---
+
 ## Phase 5 · Tier B wrapping  (≈ 2–3 sessions, ~ 90 k tokens)
 
 **Goal:** real specialized work via the 58 library agents.
@@ -197,8 +260,9 @@ For subsequent phases, swap the phase number and the budget (see the per-phase e
 | 2     | 80 k                   | Some live Claude calls to validate token meter.            |
 | 3     | 40 k                   | Heavy on summaries (cheap haiku calls).                    |
 | 4     | 40 k                   | Memory store + Keeper agent.                               |
+| 4.5   | 60 k                   | Ideas, Decisions, Planning, Prioritization — no LLM calls. |
 | 5     | 90 k                   | Real delegated runs against real Tier B fiches.            |
 | 6     | 40 k                   | Mostly rules + UI for validations.                         |
 | 7     | 80 k                   | Templates + onboarding polish.                             |
 
-Cumulative budget to MVP-complete (through Phase 7): **≈ 550 k build tokens**. At Sonnet 4.6 input rates this should land well under the 20 € envelope provided runtime missions stay in `eco` mode.
+Cumulative budget to MVP-complete (through Phase 7): **≈ 610 k build tokens**. At Sonnet 4.6 input rates this should land well under the 20 € envelope provided runtime missions stay in `eco` mode.
