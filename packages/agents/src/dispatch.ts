@@ -9,6 +9,7 @@ import {
   type Task,
   type Mission,
 } from '@mas/db';
+import type { ReviewerVerdict } from '@mas/core';
 import {
   mockMissionPlanner,
   mockSkillRouter,
@@ -149,19 +150,39 @@ export async function executeNextTask(missionId: string): Promise<
 
   const allDone = all.every((t) => t.status === 'done');
   if (allDone) {
-    await db.update(missions).set({ status: 'review', updatedAt: new Date() }).where(eq(missions.id, m.id));
+    // Atomic: only one executor enters the review phase
+    const reviewClaimed = await db
+      .update(missions)
+      .set({ status: 'review', updatedAt: new Date() })
+      .where(and(eq(missions.id, m.id), inArray(missions.status, ['executing', 'dispatched'])))
+      .returning({ id: missions.id });
+    if (reviewClaimed.length === 0) return { kind: 'mission_complete' };
     await logEvent(db, { missionId: m.id, type: 'mission_review_started' });
 
-    // auto-run reviewer + sec-reviewer aggregate verdict
+    // Run sec-reviewer on every high/blocking-risk task; run reviewer on the last task.
+    const verdicts: ReviewerVerdict[] = [];
+    for (const t of all) {
+      if (t.risk === 'high' || t.risk === 'blocking') {
+        const sec = mockSecReviewer(t.id, { risk: t.risk });
+        await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
+        verdicts.push(sec);
+      }
+    }
     const last = all.at(-1);
     if (last) {
       const rev = mockReviewer(last.id, { risk: last.risk });
-      const sec = mockSecReviewer(last.id, { risk: last.risk });
       await logEvent(db, { missionId: m.id, taskId: last.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
-      await logEvent(db, { missionId: m.id, taskId: last.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
+      verdicts.push(rev);
     }
-    await db.update(missions).set({ status: 'validated', updatedAt: new Date() }).where(eq(missions.id, m.id));
-    await logEvent(db, { missionId: m.id, type: 'mission_validated' });
+
+    const blocked = verdicts.some((v) => v.verdict === 'BLOCK');
+    if (blocked) {
+      await db.update(missions).set({ status: 'blocked', updatedAt: new Date() }).where(eq(missions.id, m.id));
+      await logEvent(db, { missionId: m.id, type: 'mission_blocked', payload: { reason: 'review_block' } });
+    } else {
+      await db.update(missions).set({ status: 'validated', updatedAt: new Date() }).where(eq(missions.id, m.id));
+      await logEvent(db, { missionId: m.id, type: 'mission_validated' });
+    }
     return { kind: 'mission_complete' };
   }
 
@@ -174,7 +195,13 @@ export async function executeNextTask(missionId: string): Promise<
     await logEvent(db, { missionId: m.id, type: 'mission_executing' });
   }
 
-  await db.update(tasks).set({ status: 'running', updatedAt: new Date() }).where(eq(tasks.id, next.id));
+  // Atomic claim: only one executor can move this task from todo to running.
+  const claimed = await db
+    .update(tasks)
+    .set({ status: 'running', updatedAt: new Date() })
+    .where(and(eq(tasks.id, next.id), eq(tasks.status, 'todo')))
+    .returning({ id: tasks.id });
+  if (claimed.length === 0) return { kind: 'no_runnable' };
   await logEvent(db, {
     missionId: m.id,
     taskId: next.id,
@@ -237,35 +264,48 @@ export async function executeNextTask(missionId: string): Promise<
   return { kind: 'task_done', taskId: next.id };
 }
 
-export async function resumeAfterValidation(taskId: string, approved: boolean): Promise<void> {
+export async function resumeAfterValidation(
+  taskId: string,
+  approved: boolean,
+): Promise<{ acted: boolean; missionId: string }> {
   const db = getDb();
   const [t] = await db.select().from(tasks).where(eq(tasks.id, taskId));
   if (!t) throw new Error(`task ${taskId} not found`);
 
-  await db
+  // Idempotent: only act if a pending validation row exists for this task.
+  const updated = await db
     .update(validations)
     .set({ status: approved ? 'approved' : 'rejected', decidedAt: new Date(), decidedByUser: 'me' })
-    .where(and(eq(validations.taskId, taskId), eq(validations.status, 'pending')));
+    .where(and(eq(validations.taskId, taskId), eq(validations.status, 'pending')))
+    .returning({ id: validations.id });
+
+  if (updated.length === 0) {
+    return { acted: false, missionId: t.missionId };
+  }
 
   if (!approved) {
     await db.update(tasks).set({ status: 'blocked', updatedAt: new Date() }).where(eq(tasks.id, taskId));
     await db.update(missions).set({ status: 'blocked', updatedAt: new Date() }).where(eq(missions.id, t.missionId));
     await logEvent(db, { missionId: t.missionId, taskId: t.id, type: 'validation_rejected', risk: t.risk });
-    return;
+    return { acted: true, missionId: t.missionId };
   }
 
-  // Approved: mark task done and account budget
+  // Approved: mark task done, account budget in both task and mission.
   const inTok = 220;
   const outTok = 80;
+  const spend = inTok + outTok;
   await db
     .update(tasks)
-    .set({
-      status: 'done',
-      spentTokens: inTok + outTok,
-      outputPath: `data/outputs/${t.id}.md`,
-      updatedAt: new Date(),
-    })
+    .set({ status: 'done', spentTokens: spend, outputPath: `data/outputs/${t.id}.md`, updatedAt: new Date() })
     .where(eq(tasks.id, t.id));
+  const [currentMission] = await db
+    .select({ spentTokens: missions.spentTokens })
+    .from(missions)
+    .where(eq(missions.id, t.missionId));
+  await db
+    .update(missions)
+    .set({ spentTokens: (currentMission?.spentTokens ?? 0) + spend, updatedAt: new Date() })
+    .where(eq(missions.id, t.missionId));
   await logEvent(db, {
     missionId: t.missionId,
     taskId: t.id,
@@ -275,6 +315,7 @@ export async function resumeAfterValidation(taskId: string, approved: boolean): 
     tokensOut: outTok,
     risk: t.risk,
   });
+  return { acted: true, missionId: t.missionId };
 }
 
 export async function listDispatchableMissions(): Promise<Mission[]> {

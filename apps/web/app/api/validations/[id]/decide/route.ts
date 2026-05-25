@@ -15,22 +15,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const [v] = await db.select().from(validations).where(eq(validations.id, id));
   if (!v) return NextResponse.json({ ok: false, error: 'validation not found' }, { status: 404 });
 
+  // Idempotent: if already decided, return without re-applying side effects.
+  if (v.status !== 'pending') {
+    return NextResponse.json({ ok: true, approved: v.status === 'approved', idempotent: true });
+  }
+
   try {
-    await resumeAfterValidation(v.taskId, approved);
-    if (approved) {
-      // continue the mission inline
-      const taskRow = await db.select().from(validations).where(eq(validations.id, id));
-      const missionId = taskRow[0]?.taskId
-        ? (await db.query.tasks.findFirst({ where: (t, { eq }) => eq(t.id, taskRow[0]!.taskId) }))?.missionId
-        : undefined;
-      if (missionId) {
-        for (let i = 0; i < 20; i++) {
-          const r = await executeNextTask(missionId);
-          if (r.kind !== 'task_done') break;
-        }
+    const { acted, missionId } = await resumeAfterValidation(v.taskId, approved);
+    if (approved && acted && missionId) {
+      for (let i = 0; i < 20; i++) {
+        const r = await executeNextTask(missionId);
+        if (r.kind !== 'task_done') break;
       }
     }
-    return NextResponse.json({ ok: true, approved });
+    return NextResponse.json({ ok: true, approved, acted });
   } catch (e) {
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
   }

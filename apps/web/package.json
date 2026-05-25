@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "tsc --noEmit",
-    "smoke:reset": "pnpm --filter @mas/db seed",
+    "smoke:reset": "MAS_DB_PATH=data/test/mas-smoke.db pnpm --filter @mas/db seed",
     "smoke": "pnpm smoke:reset && playwright test"
   },
   "dependencies": {

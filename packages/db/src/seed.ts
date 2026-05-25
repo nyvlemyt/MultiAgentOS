@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { resolve, dirname } from 'node:path';
+import { isAbsolute, resolve, dirname, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
+import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb } from './client';
 import {
   projects,
@@ -33,7 +35,9 @@ function findRepoRoot(): string {
 
 function resolveDbPath(): string {
   const envPath = process.env.MAS_DB_PATH;
-  if (envPath && envPath.length > 0) return resolve(envPath);
+  if (envPath && envPath.length > 0) {
+    return isAbsolute(envPath) ? envPath : resolve(findRepoRoot(), envPath);
+  }
   return resolve(findRepoRoot(), 'data/mas.db');
 }
 
@@ -44,17 +48,21 @@ function assertSafeToWipe(dbPath: string) {
         'This seed wipes every app-owned table. Set NODE_ENV=development or run against a dev DB.',
     );
   }
-  const expectedDefault = resolve(findRepoRoot(), 'data/mas.db');
+  const repoRoot = findRepoRoot();
+  const dataDir = resolve(repoRoot, 'data');
   const allowOverride = process.env.MAS_ALLOW_DESTRUCTIVE_SEED === 'true';
-  if (dbPath !== expectedDefault && !allowOverride) {
+  const isUnderDataDir = dbPath.startsWith(dataDir + sep);
+  if (!isUnderDataDir && !allowOverride) {
     throw new Error(
-      `[seed] refusing to wipe a non-default DB path.\n` +
-        `  target : ${dbPath}\n` +
-        `  default: ${expectedDefault}\n` +
+      `[seed] refusing to wipe a DB outside <repo>/data/.\n` +
+        `  target  : ${dbPath}\n` +
+        `  data dir: ${dataDir}\n` +
         `  If this is intentional, set MAS_ALLOW_DESTRUCTIVE_SEED=true.`,
     );
   }
 }
+
+const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../migrations');
 
 async function main() {
   const dbPath = resolveDbPath();
@@ -62,6 +70,7 @@ async function main() {
   console.log(`[seed] target DB: ${dbPath}`);
   const db = getDb(dbPath);
 
+  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
   console.log('seeding…');
 
   const projectId = 'proj_otakugo';

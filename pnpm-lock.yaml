@@ -123,9 +123,15 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
     devDependencies:
+      better-sqlite3:
+        specifier: 12.10.0
+        version: 12.10.0
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
+      vitest:
+        specifier: ^2.0.0
+        version: 2.1.9(@types/node@25.9.1)(lightningcss@1.32.0)
 
   packages/core:
     dependencies:

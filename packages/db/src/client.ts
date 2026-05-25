@@ -1,7 +1,7 @@
 import { createRequire } from 'module';
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
-import { dirname, resolve } from 'path';
+import { dirname, isAbsolute, resolve } from 'path';
 import type BetterSqlite3 from 'better-sqlite3';
 import * as schema from './schema';
 
@@ -22,7 +22,9 @@ function findRepoRoot(): string {
 
 function resolveDbPath(): string {
   const envPath = process.env.MAS_DB_PATH;
-  if (envPath && envPath.length > 0) return resolve(envPath);
+  if (envPath && envPath.length > 0) {
+    return isAbsolute(envPath) ? envPath : resolve(findRepoRoot(), envPath);
+  }
   return resolve(findRepoRoot(), 'data/mas.db');
 }
 

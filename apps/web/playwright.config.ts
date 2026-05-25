@@ -12,6 +12,9 @@ export default defineConfig({
     url: 'http://localhost:3000',
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
+    env: {
+      MAS_DB_PATH: 'data/test/mas-smoke.db',
+    },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
