@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { getDb, closeDb } from './client.js';
+import { isAbsolute, resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
+import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
+import { getDb, closeDb } from './client';
+import { assertSafeToWipe } from './seed-safety';
 import {
   projects,
   agents,
@@ -7,19 +12,70 @@ import {
   tasks,
   events,
   memoryItems,
+  memoryCandidates,
+  validations,
   skills,
   budgets,
-} from './schema.js';
+  contextPacks,
+  projectLinks,
+  permissions,
+} from './schema';
 
-const now = () => new Date();
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000);
 
-async function main() {
-  const db = getDb();
+function findRepoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(resolve(dir, 'pnpm-workspace.yaml'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
 
+function resolveDbPath(): string {
+  const envPath = process.env.MAS_DB_PATH;
+  if (envPath && envPath.length > 0) {
+    return isAbsolute(envPath) ? envPath : resolve(findRepoRoot(), envPath);
+  }
+  return resolve(findRepoRoot(), 'data/mas.db');
+}
+
+const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../migrations');
+
+async function main() {
+  const repoRoot = findRepoRoot();
+  const dbPath = resolveDbPath();
+  assertSafeToWipe(dbPath, {
+    repoRoot,
+    allowOverride: process.env.MAS_ALLOW_DESTRUCTIVE_SEED === 'true',
+    nodeEnv: process.env.NODE_ENV,
+  });
+  console.log(`[seed] target DB: ${dbPath}`);
+  const db = getDb(dbPath);
+
+  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
   console.log('seeding…');
 
   const projectId = 'proj_otakugo';
+
+  // Deterministic reset: every table the seed owns gets wiped, then rewritten.
+  // FK cascades cover most of the chain but we wipe explicitly so reseeds are
+  // idempotent regardless of prior mutations from the lifecycle tests.
+  await db.delete(events);
+  await db.delete(validations);
+  await db.delete(memoryCandidates);
+  await db.delete(memoryItems);
+  await db.delete(contextPacks);
+  await db.delete(projectLinks);
+  await db.delete(tasks);
+  await db.delete(missions);
+  await db.delete(projects);
+  await db.delete(agents);
+  await db.delete(skills);
+  await db.delete(budgets);
+  await db.delete(permissions);
   await db
     .insert(projects)
     .values({

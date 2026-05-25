@@ -1,13 +1,16 @@
-import Database from 'better-sqlite3';
+import { createRequire } from 'module';
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { existsSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import * as schema from './schema.js';
+import { existsSync, mkdirSync } from 'fs';
+import { dirname, isAbsolute, resolve } from 'path';
+import type BetterSqlite3 from 'better-sqlite3';
+import * as schema from './schema';
+
+const require_ = createRequire(import.meta.url);
+type DatabaseCtor = new (filename: string, options?: BetterSqlite3.Options) => BetterSqlite3.Database;
+const Database: DatabaseCtor = require_('better-sqlite3');
 
 function findRepoRoot(): string {
-  // walk up from this file looking for pnpm-workspace.yaml
-  let dir = dirname(fileURLToPath(import.meta.url));
+  let dir = process.cwd();
   for (let i = 0; i < 10; i++) {
     if (existsSync(resolve(dir, 'pnpm-workspace.yaml'))) return dir;
     const parent = dirname(dir);
@@ -17,17 +20,22 @@ function findRepoRoot(): string {
   return process.cwd();
 }
 
-const DEFAULT_DB_PATH = process.env.MAS_DB_PATH
-  ? resolve(process.env.MAS_DB_PATH)
-  : resolve(findRepoRoot(), 'data/mas.db');
+function resolveDbPath(): string {
+  const envPath = process.env.MAS_DB_PATH;
+  if (envPath && envPath.length > 0) {
+    return isAbsolute(envPath) ? envPath : resolve(findRepoRoot(), envPath);
+  }
+  return resolve(findRepoRoot(), 'data/mas.db');
+}
 
 let _db: BetterSQLite3Database<typeof schema> | undefined;
-let _sqlite: Database.Database | undefined;
+let _sqlite: BetterSqlite3.Database | undefined;
 
-export function getDb(dbPath: string = DEFAULT_DB_PATH) {
+export function getDb(dbPath?: string) {
   if (_db) return _db;
-  mkdirSync(dirname(dbPath), { recursive: true });
-  _sqlite = new Database(dbPath);
+  const p = dbPath ?? resolveDbPath();
+  mkdirSync(dirname(p), { recursive: true });
+  _sqlite = new Database(p);
   _sqlite.pragma('journal_mode = WAL');
   _sqlite.pragma('foreign_keys = ON');
   _db = drizzle(_sqlite, { schema });

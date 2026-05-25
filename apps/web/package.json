@@ -8,12 +8,15 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "tsc --noEmit",
-    "smoke": "playwright test"
+    "test": "vitest run playwright.config.test.ts",
+    "smoke:reset": "MAS_DB_PATH=data/test/mas-smoke.db pnpm --filter @mas/db seed",
+    "smoke": "pnpm smoke:reset && MAS_DB_PATH=data/test/mas-smoke.db playwright test"
   },
   "dependencies": {
     "@mas/agents": "workspace:*",
     "@mas/core": "workspace:*",
     "@mas/db": "workspace:*",
+    "better-sqlite3": "12.10.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.36.0",
@@ -32,6 +35,7 @@
     "@types/react-dom": "^19.0.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^4.0.0-beta.4",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.0"
   }
 }

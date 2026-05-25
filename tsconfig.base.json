@@ -21,8 +21,7 @@
       "@mas/core": ["packages/core/src/index.ts"],
       "@mas/core/*": ["packages/core/src/*"],
       "@mas/agents": ["packages/agents/src/index.ts"],
-      "@mas/agents/*": ["packages/agents/src/*"],
-      "@mas/skills": ["packages/skills/src/index.ts"]
+      "@mas/agents/*": ["packages/agents/src/*"]
     }
   },
   "exclude": ["node_modules", "dist", ".next", "build"]

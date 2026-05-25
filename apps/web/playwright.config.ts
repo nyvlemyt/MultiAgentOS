@@ -11,7 +11,10 @@ export default defineConfig({
     command: 'pnpm dev',
     url: 'http://localhost:3000',
     timeout: 120_000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
+    env: {
+      MAS_DB_PATH: 'data/test/mas-smoke.db',
+    },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
