@@ -4,7 +4,7 @@ Each phase has hard exit criteria. **Do not start phase N+1 without explicit use
 
 ## Branching rule (permanent)
 
-Every phase from Phase 1 onward is developed on a **dedicated git branch** named `phase/N-short-name` (e.g. `phase/1-mission-lifecycle`, `phase/2-real-claude`). Phase work never lands directly on `main`.
+Every phase from Phase 1 onward is developed on a **dedicated git branch** named `phase/N-short-name` (e.g. `phase/1-mission-lifecycle`, `phase/2-claude-code-bridge`). Phase work never lands directly on `main`.
 
 After all checks pass (`pnpm lint`, `pnpm test`, `pnpm build`, `pnpm smoke`), the branch is pushed to `origin`. **Merging into `main` requires explicit user approval.** No fast-forward auto-merge, no PR auto-merge.
 
@@ -88,33 +88,47 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 ---
 
-## Phase 2 · Real Claude integration  (≈ 2–3 sessions, ~ 80 k tokens)
+## Phase 2 · Claude Code bridge (Agent SDK)  (≈ 2–3 sessions, ~ 80 k tokens)
 
-**Goal:** swap the mock for `@anthropic-ai/sdk`. Token meter live.
+**Branch:** `phase/2-claude-code-bridge` (cut from `main`; supersedes the abandoned `phase/2-real-claude`).
 
-- `@anthropic-ai/sdk` wired in `packages/core/llm.ts` behind the same interface.
-- Token meter records `input_tokens`, `output_tokens`, `cache_read`, `cache_creation`, `cost_cents` per call.
+**Goal:** drive Claude Code via the Agent SDK (Voie 3, billing against subscription). Zero PAYG spend. See `docs/decisions/0001-claude-code-engine-over-api-sdk.md`.
+
+- `@anthropic-ai/claude-agent-sdk` wired in `packages/core/src/llm.real.ts` behind the existing `LLMClient` interface.
+- `ANTHROPIC_API_KEY` presence at worker init triggers warning + refusal to start.
+- Session model: one long-lived Claude Code session per project (`sessionId` stored in `projects` table). Each mission is a new *prompt turn* on that session, not a new session (`cwd = project.path`).
+- `costCents` renamed to `quotaUnits` across `LLMResponse` and all call sites — **atomic commit with `/tokens` page copy migration** (no intermediate state with mismatched types).
+- Token meter records `input_tokens`, `output_tokens`, `cache_read`, `cache_creation`, `quotaUnits` per call. No € figures.
 - Mode pill in topbar (`eco` / `standard` / `expert`) drives model choice + Caveman gate.
-- Caveman system-prompt suffix applied only on the routes listed in `TOKEN_STRATEGY.md §6`.
 - Context Manager builds the first real context pack for the manga seed project (≤ 4 k tokens).
-- Anthropic prompt cache enabled with `cache_control: ephemeral` on the system blocks.
-- `/tokens` page shows live spend + cache hit ratio.
+- `/tokens` page shows **messages used in current 5-hour window / week** (not €). Window quota key: `(subscriptionUserId, windowStart)`.
+- CI guard: `pnpm lint` fails on `import … from '@anthropic-ai/sdk'` outside `packages/core/src/api-fallback/`.
 
-**Exit criteria.** Same seed mission runs against real Claude under 30 k tokens total. Token meter accurate within ±5 %. Cache hit rate ≥ 50 % on a 2-mission rerun.
+**Exit criteria.**
+
+1. Same seed mission runs end-to-end under the Claude Code engine via Agent SDK.
+2. Anthropic Console usage graph shows **zero API spend** during the run window.
+3. Claude subscription dashboard shows the run consumed messages there.
+4. Screenshots of both dashboards saved to `docs/decisions/0001-proof/`.
+5. `quotaUnits` meter accurate within ±5 % vs SDK-reported token counts.
+6. Cache hit rate ≥ 30 % on a 2-mission rerun.
 
 ---
 
 ## Phase 3 · Skill Registry  (≈ 1–2 sessions, ~ 40 k tokens)
 
-**Goal:** skills become first-class citizens.
+**Goal:** skills become first-class citizens. **Scope narrowed by ADR 0001 Q3 decision (option b).**
 
-- Auto-discovery scanner reads `.claude/skills/*/SKILL.md` and any nested `superpowers/skills/*`.
-- For each skill, the Skill Router calls `skill-creator` once to produce a `summary.md` (≤ 200 tokens) and a tag set in `data/skill-cache/<id>/`.
-- Skill Router pulls summaries, not bodies, by default. `requireSkill(id)` hydrates bodies on demand.
-- `/skills` page: searchable table, per-project relevance toggle, "promote to project-pinned" action.
+**What Phase 3 covers:**
+- Summariser for the **6 orchestrator skills** only (mission-planner, skill-router, context-manager, memory-keeper, reviewer, sec-reviewer). These skills live in the MultiAgentOS repo's `.claude/skills/` and are injected at the prompt layer because the execution session runs with `cwd = project.path` (which loads the *target project's* skills, not MultiAgentOS's).
+- Auto-discovery scanner for those 6 skills: reads `.claude/skills/<id>/SKILL.md`, calls `skill-creator` once to produce `data/skill-cache/<id>/summary.md` (≤ 200 tokens) and a tag set.
+- Skill Router pulls summaries at prompt-assembly time, never full bodies. `requireSkill(id)` hydrates bodies on demand for the orchestrator tier.
+- `/skills` page: searchable table listing all discovered skills (orchestrator + any skills from the active external project loaded natively by the engine), per-project relevance toggle, "promote to project-pinned" action.
 - Skill policy persisted in `config/skills.policy.json` and editable from the UI.
 
-**Exit criteria.** All 20 top-level skills + 14 superpowers sub-skills indexed. Each has a `summary.md`. Filter + promote actions work and persist across reload.
+**What Phase 3 does NOT need to build:** a summariser for execution-session skills (the engine loads those natively from the target project's `.claude/skills/`).
+
+**Exit criteria.** All 6 orchestrator skills have a `summary.md`. Skill Router injects summaries (not bodies) in mission prompts. Filter + promote actions work and persist across reload.
 
 ---
 
