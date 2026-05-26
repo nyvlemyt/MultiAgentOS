@@ -103,6 +103,7 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 - Context Manager builds the first real context pack for the manga seed project (≤ 4 k tokens).
 - `/tokens` page shows **messages used in current 5-hour window / week** (not €). Window quota key: `(subscriptionUserId, windowStart)`.
 - CI guard: `pnpm lint` fails on `import … from '@anthropic-ai/sdk'` outside `packages/core/src/api-fallback/`.
+- Drizzle migration: rename `events.cost_cents` → `events.quota_units` + backfill (lands in the same atomic commit as the `LLMResponse.quotaUnits` rename — see atomic rename requirement in ADR 0001 amendments).
 
 **Exit criteria.**
 
