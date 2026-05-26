@@ -47,7 +47,7 @@ In other words: **the moment any non-mock mission runs, MultiAgentOS leaks token
    - spawn `claude --print --output-format=stream-json …` headless (fallback for shell-heavy missions, already mentioned as "later" in `CLAUDE.md §2`).
 3. **Authentication is `claude login` only.** `ANTHROPIC_API_KEY` is no longer read by any runtime path. The variable is treated as a *forbidden* signal in `packages/core/src/llm.real.ts`: if it is present in the worker's process env when the LLM client initialises, the worker **logs a warning and refuses to start** until it is unset.
 4. **Voie 2 is the architectural reference.** We mirror the wiring of the leading open-source webui (`siteboon/claudecodeui` ≈ 4 k stars; alternates: `sugyan/claude-code-webui`, `winfunc/opcode`, `KyleAMathews/claude-code-ui`). Concretely: a Node bridge process exposes a streaming session to the Next.js cockpit over WebSocket / SSE; the bridge owns the `claude` subprocess (or the Agent SDK client) and translates UI events into Claude Code session events. We are not copying their code — we are copying their **transport pattern**, because it is the proven way to drive the engine without paying API tokens.
-5. **`packages/core/src/llm.ts` interface stays.** What changes is the *implementation* of `realLLM`. From the rest of the codebase's point of view, `LLMClient.call(req)` keeps the same shape. The cost meter is rebadged: `costCents` is renamed to `subscriptionTokens` (or kept as a *non-binding estimate*), because under the abonnement there is no per-token bill — only a quota of messages per 5-hour rolling window and a weekly quota. The hard money cap in `TOKEN_STRATEGY.md §8` becomes a **quota cap** (messages-per-window) instead of a **euro cap**.
+5. **`packages/core/src/llm.ts` interface stays.** What changes is the *implementation* of `realLLM`. From the rest of the codebase's point of view, `LLMClient.call(req)` keeps the same shape. The cost meter is rebadged: `costCents` is renamed to `quotaUnits`, because under the abonnement there is no per-token bill — only a quota of messages per 5-hour rolling window and a weekly quota. The hard money cap in `TOKEN_STRATEGY.md §8` becomes a **quota cap** (messages-per-window) instead of a **euro cap**.
 6. **The "Inspiration Voie 2" principle is permanent.** Whenever a question arises that the Claude Agent SDK docs don't answer cleanly — session resume, file-context injection, tool gating, streaming back-pressure, image attachments, stop reasons — the first reflex is *"how do the open-source webuis do it?"*. We read their code, we steal their pattern, we do not invent. This is logged here so future agents working on the repo treat it as policy, not as a one-off shortcut.
 
 ## Consequences
@@ -139,6 +139,12 @@ The Claude Code session engine maintains its own in-session memory (conversation
 - The Memory Keeper agent is the **sole disk writer** for `data/memory/<projectId>/` and `data/memory/_global/`. No other agent or the session engine may write there.
 - At the start of each mission turn, MultiAgentOS injects a compact summary of relevant memory items (≤ 5 items, ≤ 200 tokens total) as a prompt-side prefix. The session engine does not "know" about the disk store — it sees only what is injected.
 - Memory candidates produced during a mission are queued as `MemoryProposal` tasks (existing pattern in `CLAUDE.md §8`) and processed by Memory Keeper after the mission ends, not during.
+
+### Cache hit target reduction: Phase 2 50 % → 30 % (deliberate)
+
+Original Phase 2 exit criteria required ≥ 50 % cache hit rate. The new target is ≥ 30 %.
+
+**Reason:** the raw `@anthropic-ai/sdk` lets you set `cache_control: ephemeral` on specific message blocks explicitly — giving precise control over what gets cached and when. The Agent SDK handles caching through session-level mechanism; it does not expose per-block `cache_control` directly. The cache hit ratio is therefore lower and harder to tune in Phase 2. 30 % is an honest target for the Agent SDK transport. Phase 3+ can push back toward 60 % once the session wiring is mature and the orchestrator-skill injection pattern is stable (see Q3 decision above).
 
 ### `/tokens` page — atomic rename requirement
 
