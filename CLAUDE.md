@@ -143,7 +143,7 @@ MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). P
 
 **Rules — enforce always, never override:**
 
-1. **No runtime code may `import` from `@anthropic-ai/sdk`** in `apps/` or `packages/*/src/`. The only legal location is an opt-in `packages/core/src/api-fallback/` behind an explicit config flag. Any commit introducing such an import outside that path is **blocked at CI** (`pnpm lint` fails).
+1. **No runtime code may `import` from `@anthropic-ai/sdk`** in `apps/` or `packages/*/src/`. The only legal location is an opt-in `packages/core/src/api-fallback/` behind an explicit config flag. Enforcement: **CI lint guard added in Phase 2 step F** (see `ROADMAP.md` Phase 2) — not yet active until that step lands.
 2. `ANTHROPIC_API_KEY` presence at worker init triggers a **warning log + refusal to start**. The key is treated as a smell, not a feature.
 3. `ANTHROPIC_API_KEY` must never be exported in global shell config (`~/.zshrc`, `~/.bashrc`, `~/.zshenv`, `~/.profile`). Verify: `echo $ANTHROPIC_API_KEY` in a fresh terminal must be empty.
 4. Claude Code authenticates exclusively via `claude login`. If it prompts for an API key, something is wrong — investigate before entering one.
