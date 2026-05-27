@@ -27,7 +27,7 @@ import type { LLMClient, LLMRequest, LLMResponse } from './llm.js';
 
 export type AutonomyLevel = 'manual' | 'assisted' | 'autonomous' | 'autopilot';
 
-const AUTONOMY_TO_PERMISSION: Record<AutonomyLevel, PermissionMode> = {
+export const AUTONOMY_TO_PERMISSION: Record<AutonomyLevel, PermissionMode> = {
   manual: 'plan',
   assisted: 'default',
   autonomous: 'acceptEdits',
