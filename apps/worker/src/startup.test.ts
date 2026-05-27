@@ -1,0 +1,23 @@
+import { describe, it, expect } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const workerEntry = join(__dirname, 'index.ts');
+
+describe('worker startup guard', () => {
+  it('refuses to start when ANTHROPIC_API_KEY is set', () => {
+    const result = spawnSync(
+      'node',
+      ['--import', 'tsx/esm', workerEntry],
+      {
+        env: { ...process.env, ANTHROPIC_API_KEY: 'sk-fake-should-fail' },
+        timeout: 5000,
+        encoding: 'utf8',
+      },
+    );
+    expect(result.status).toBe(1);
+    expect(result.stderr).toMatch(/ANTHROPIC_API_KEY/);
+  });
+});
