@@ -14,7 +14,7 @@ export interface LLMResponse {
   outputTokens: number;
   cacheReadTokens: number;
   cacheCreationTokens: number;
-  costCents: number;
+  quotaUnits: number;
   model: string;
 }
 
@@ -32,7 +32,7 @@ export function mockLLM(): LLMClient {
         outputTokens: 60,
         cacheReadTokens: 120,
         cacheCreationTokens: 80,
-        costCents: 0,
+        quotaUnits: 0,
         model: req.model,
       };
     },
@@ -63,7 +63,7 @@ export interface PlannerOutput {
   objective: string;
   tasks: PlannerTask[];
   estimatedTokens: number;
-  estimatedCostCents: number;
+  estimatedQuotaUnits: number;
 }
 
 export function mockMissionPlanner(input: PlannerInput): PlannerOutput {
@@ -136,7 +136,7 @@ export function mockMissionPlanner(input: PlannerInput): PlannerOutput {
     objective: input.objective || input.title,
     tasks,
     estimatedTokens: total,
-    estimatedCostCents: Math.ceil((total / 1_000_000) * 25),
+    estimatedQuotaUnits: Math.ceil((total / 1_000_000) * 25),
   };
 }
 

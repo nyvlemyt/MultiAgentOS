@@ -40,7 +40,7 @@ function logEvent(db: Db, evt: {
     tokensOut: evt.tokensOut ?? 0,
     cacheRead: 0,
     cacheCreation: 0,
-    costCents: 0,
+    quotaUnits: 0,
     risk: evt.risk ?? 'low',
     createdAt: new Date(),
   });

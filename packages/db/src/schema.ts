@@ -135,7 +135,7 @@ export const events = sqliteTable(
     tokensOut: integer('tokens_out').notNull().default(0),
     cacheRead: integer('cache_read').notNull().default(0),
     cacheCreation: integer('cache_creation').notNull().default(0),
-    costCents: integer('cost_cents').notNull().default(0),
+    quotaUnits: integer('quota_units').notNull().default(0),
     risk: text('risk', { enum: ['low', 'medium', 'high', 'blocking'] }).notNull().default('low'),
     createdAt: epoch().notNull(),
   },

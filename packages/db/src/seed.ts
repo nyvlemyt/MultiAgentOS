@@ -213,7 +213,7 @@ async function main() {
         tokensOut: Math.floor(Math.random() * 400),
         cacheRead: Math.floor(Math.random() * 500),
         cacheCreation: Math.floor(Math.random() * 200),
-        costCents: Math.floor(Math.random() * 10),
+        quotaUnits: Math.floor(Math.random() * 10),
         risk: 'low',
         createdAt: minutesAgo(30 - e),
       })

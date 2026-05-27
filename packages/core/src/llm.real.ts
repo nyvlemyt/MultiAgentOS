@@ -105,8 +105,8 @@ export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
 
       const u = success.usage;
       // total_cost_usd is an estimation heuristic under subscription billing, not a real bill.
-      // Stored as costCents (integer cents) for the quota meter. See ADR 0001 §Decision clause 5.
-      const costCents = Math.round(success.total_cost_usd * 100);
+      // Stored as quotaUnits (integer cents-equivalent) for the quota meter. See ADR 0001 §Decision clause 5.
+      const quotaUnits = Math.round(success.total_cost_usd * 100);
 
       return {
         text: success.result,
@@ -114,7 +114,7 @@ export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
         outputTokens: u.output_tokens,
         cacheReadTokens: u.cache_read_input_tokens,
         cacheCreationTokens: u.cache_creation_input_tokens,
-        costCents,
+        quotaUnits,
         model: req.model,
       };
     },
