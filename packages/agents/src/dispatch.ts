@@ -3,6 +3,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 import {
   getDb,
   missions,
+  projects,
   tasks,
   events,
   validations,
@@ -15,6 +16,8 @@ import {
   mockSkillRouter,
   mockReviewer,
   mockSecReviewer,
+  claudeCodeLLM,
+  type AutonomyLevel,
 } from '@mas/core';
 
 export type Db = ReturnType<typeof getDb>;
@@ -27,6 +30,9 @@ function logEvent(db: Db, evt: {
   payload?: unknown;
   tokensIn?: number;
   tokensOut?: number;
+  cacheRead?: number;
+  cacheCreation?: number;
+  quotaUnits?: number;
   risk?: 'low' | 'medium' | 'high' | 'blocking';
 }) {
   return db.insert(events).values({
@@ -38,9 +44,9 @@ function logEvent(db: Db, evt: {
     payloadJson: JSON.stringify(evt.payload ?? {}),
     tokensIn: evt.tokensIn ?? 0,
     tokensOut: evt.tokensOut ?? 0,
-    cacheRead: 0,
-    cacheCreation: 0,
-    costCents: 0,
+    cacheRead: evt.cacheRead ?? 0,
+    cacheCreation: evt.cacheCreation ?? 0,
+    quotaUnits: evt.quotaUnits ?? 0,
     risk: evt.risk ?? 'low',
     createdAt: new Date(),
   });
@@ -234,31 +240,66 @@ export async function executeNextTask(missionId: string): Promise<
     return { kind: 'paused_for_validation', taskId: next.id };
   }
 
-  // Simulated execution: instantly done with deterministic mock cost
-  const inTok = 220;
-  const outTok = 80;
+  // Look up project to build the real LLM client.
+  const [proj] = await db
+    .select({
+      id: projects.id,
+      path: projects.path,
+      autonomy: projects.autonomy,
+      sessionId: projects.sessionId,
+      defaultModel: projects.defaultModel,
+    })
+    .from(projects)
+    .innerJoin(missions, eq(missions.projectId, projects.id))
+    .where(eq(missions.id, missionId));
+
+  const llm = claudeCodeLLM({
+    cwd: proj?.path,
+    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
+    sessionId: proj?.sessionId ?? undefined,
+  });
+
+  const resp = await llm.call({
+    system: `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
+    user: `Task: ${next.title}\n\n${next.description}`,
+    model: proj?.defaultModel ?? 'claude-haiku-4-5',
+    mode: 'standard',
+  });
+
+  // Persist new session_id back to project on first successful call.
+  if (proj && resp.sessionId && !proj.sessionId) {
+    await db
+      .update(projects)
+      .set({ sessionId: resp.sessionId })
+      .where(eq(projects.id, proj.id));
+  }
+
+  const spend = resp.inputTokens + resp.outputTokens;
   await db
     .update(tasks)
     .set({
       status: 'done',
-      spentTokens: inTok + outTok,
+      spentTokens: spend,
       outputPath: `data/outputs/${next.id}.md`,
       updatedAt: new Date(),
     })
     .where(eq(tasks.id, next.id));
   await db
     .update(missions)
-    .set({ spentTokens: (m.spentTokens ?? 0) + inTok + outTok, updatedAt: new Date() })
+    .set({ spentTokens: (m.spentTokens ?? 0) + spend, updatedAt: new Date() })
     .where(eq(missions.id, m.id));
   await logEvent(db, {
     missionId: m.id,
     taskId: next.id,
     agentId: next.agentId ?? undefined,
     type: 'task_done',
-    tokensIn: inTok,
-    tokensOut: outTok,
+    tokensIn: resp.inputTokens,
+    tokensOut: resp.outputTokens,
+    cacheRead: resp.cacheReadTokens,
+    cacheCreation: resp.cacheCreationTokens,
+    quotaUnits: resp.quotaUnits,
     risk: next.risk,
-    payload: { title: next.title },
+    payload: { title: next.title, sessionId: resp.sessionId },
   });
 
   return { kind: 'task_done', taskId: next.id };
@@ -290,10 +331,40 @@ export async function resumeAfterValidation(
     return { acted: true, missionId: t.missionId };
   }
 
-  // Approved: mark task done, account budget in both task and mission.
-  const inTok = 220;
-  const outTok = 80;
-  const spend = inTok + outTok;
+  // Approved: execute the task via real LLM and record actual token spend.
+  const [proj] = await db
+    .select({
+      id: projects.id,
+      path: projects.path,
+      autonomy: projects.autonomy,
+      sessionId: projects.sessionId,
+      defaultModel: projects.defaultModel,
+    })
+    .from(projects)
+    .innerJoin(missions, eq(missions.projectId, projects.id))
+    .where(eq(missions.id, t.missionId));
+
+  const llm = claudeCodeLLM({
+    cwd: proj?.path,
+    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
+    sessionId: proj?.sessionId ?? undefined,
+  });
+
+  const resp = await llm.call({
+    system: `You are executing a validated high-risk task inside project at path ${proj?.path ?? '.'}.`,
+    user: `Task: ${t.title}\n\n${t.description}`,
+    model: proj?.defaultModel ?? 'claude-haiku-4-5',
+    mode: 'standard',
+  });
+
+  if (proj && resp.sessionId && !proj.sessionId) {
+    await db
+      .update(projects)
+      .set({ sessionId: resp.sessionId })
+      .where(eq(projects.id, proj.id));
+  }
+
+  const spend = resp.inputTokens + resp.outputTokens;
   await db
     .update(tasks)
     .set({ status: 'done', spentTokens: spend, outputPath: `data/outputs/${t.id}.md`, updatedAt: new Date() })
@@ -311,8 +382,11 @@ export async function resumeAfterValidation(
     taskId: t.id,
     agentId: t.agentId ?? undefined,
     type: 'validation_approved',
-    tokensIn: inTok,
-    tokensOut: outTok,
+    tokensIn: resp.inputTokens,
+    tokensOut: resp.outputTokens,
+    cacheRead: resp.cacheReadTokens,
+    cacheCreation: resp.cacheCreationTokens,
+    quotaUnits: resp.quotaUnits,
     risk: t.risk,
   });
   return { acted: true, missionId: t.missionId };

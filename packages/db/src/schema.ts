@@ -20,6 +20,7 @@ export const projects = sqliteTable('projects', {
     enum: ['eco', 'standard', 'expert'],
   }).notNull().default('eco'),
   monthlyBudgetCents: integer('monthly_budget_cents').notNull().default(500),
+  sessionId: text('session_id'),
   createdAt: epoch().notNull(),
   lastActiveAt: epoch().notNull(),
 });
@@ -135,7 +136,10 @@ export const events = sqliteTable(
     tokensOut: integer('tokens_out').notNull().default(0),
     cacheRead: integer('cache_read').notNull().default(0),
     cacheCreation: integer('cache_creation').notNull().default(0),
-    costCents: integer('cost_cents').notNull().default(0),
+    // Per-event weight (proxy: round(total_cost_usd * 100)).
+    // The §8 5-hour window cap reads COUNT(*) on llm_call events, NOT SUM(quota_units).
+    // Treat quota_units as a routing/telemetry signal, not as a quota counter.
+    quotaUnits: integer('quota_units').notNull().default(0),
     risk: text('risk', { enum: ['low', 'medium', 'high', 'blocking'] }).notNull().default('low'),
     createdAt: epoch().notNull(),
   },

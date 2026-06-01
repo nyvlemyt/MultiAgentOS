@@ -2,7 +2,7 @@
 
 ## 1. Premise
 
-Anthropic credit pool ≈ 20 €. Tokens are cash. Default to the cheapest path; escalate only when the task genuinely needs it. Every LLM call goes through `packages/core/llm.ts`, which is the single enforcement point for every rule below.
+Claude Code subscription = fixed monthly cost (Pro/Max). The budget envelope is **not** a cash pool — it is a 5-hour rolling message window and a weekly cap per subscription. Tokens are **quota signals**, not cash. Default to the most efficient path; escalate only when the task genuinely needs it. Every LLM call goes through `packages/core/llm.ts`, the single enforcement point for every rule below.
 
 ## 2. Three operating modes
 
@@ -18,7 +18,7 @@ The cockpit shows the current mode in the topbar. Mode switches are logged as ev
 
 Lower wins.
 
-1. **Project monthly budget** — default 5 € / month.
+1. **Project window share** — default: no single project may consume > 40 % of the current 5-hour window without user confirmation. The window is shared across all projects under the subscription (key: `subscriptionUserId + windowStart`).
 2. **Mission budget** — estimated by Skill Router on `planned`; enforced as a hard cap.
 3. **Task budget** — per Tier A fiche default (see `AGENTS.md §3`).
 
@@ -62,14 +62,16 @@ Per call:
 
 Target ≥ 60 % cache hit rate across all calls in a 5-min window. Track `cache_creation_input_tokens` vs `cache_read_input_tokens` in `events` and surface the ratio in `/tokens`.
 
-## 8. Money cap (hard)
+## 8. Subscription quota cap (hard)
 
-`/tokens` page shows `€ spent today / week / month` live.
+`/tokens` page shows **messages used in current 5-hour window / week** live. No € figures — the subscription cost is fixed.
 
-- Default daily cap: **3 €**.
-- Default monthly cap: **15 €** (≤ 75 % of the 20 € envelope; the remaining 25 % is reserve).
+- Default window margin: **leave ≥ 30 % of the 5-hour window free at all times**. When margin is breached, ALL execution pauses and a modal surfaces.
+- Weekly soft cap: **≤ 70 % of estimated weekly quota** consumed by automated missions (reserve 30 % for interactive use).
 
-Crossing the cap pauses ALL execution and surfaces a modal. **Autopilot cannot bypass.** The user can raise the cap from `/tokens` (logged as an event).
+Crossing either cap pauses ALL execution and surfaces a modal. **Autopilot cannot bypass.** The user can raise caps from `/tokens` (logged as an event).
+
+The quota counter in `budgets` is keyed on `(subscriptionUserId, windowStart)` — the 5-hour window is shared across all projects. Per-project breakdown on `/tokens` is a **read-only view**, not a separate quota bucket.
 
 ## 9. Telemetry
 
@@ -83,7 +85,7 @@ Every LLM call logs to `events`:
   output_tokens,
   cache_read_input_tokens,
   cache_creation_input_tokens,
-  cost_cents,
+  quota_units,       // renamed from cost_cents — subscription quota consumed (not cash)
   mission_id,
   task_id,
   agent_id
@@ -110,10 +112,10 @@ Aggregations:
 
 The strictness of these rules can ramp up across phases:
 
-| Phase | Hard ceiling per call | Daily money cap | Cache hit target |
-|-------|-----------------------|-----------------|------------------|
-| 1     | 16 k tokens           | 1 €             | n/a (mocked)     |
-| 2     | 24 k tokens           | 2 €             | ≥ 30 %           |
-| 3+    | 32 k tokens           | 3 €             | ≥ 60 %           |
+| Phase | Hard ceiling per call | Window margin | Cache hit target |
+|-------|-----------------------|---------------|------------------|
+| 1     | 16 k tokens           | n/a (mocked)  | n/a (mocked)     |
+| 2     | 24 k tokens           | ≥ 40 %        | ≥ 30 %           |
+| 3+    | 32 k tokens           | ≥ 30 %        | ≥ 60 %           |
 
 Defaults above are MVP baselines; the user can override per-project from `/tokens`.

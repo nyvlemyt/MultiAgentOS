@@ -22,7 +22,7 @@ The product surface and detailed scope live in `PRODUCT_SPEC.md`. The agent rost
 - **Frontend**: Next.js 15 (App Router) + TypeScript + Tailwind + shadcn/ui
 - **Orchestrator worker**: separate Node process (`apps/worker`) using `tsx`, communicating with Next.js via the SQLite job table + an SSE channel
 - **DB**: SQLite via Drizzle ORM (file: `data/mas.db`)
-- **AI**: `@anthropic-ai/sdk` (later: Claude Agent SDK and/or headless `claude` CLI for shell-heavy missions)
+- **AI**: `@anthropic-ai/claude-agent-sdk` (primary — drives Claude Code engine via subscription); headless `claude --print` (fallback for shell-heavy missions and risk-gated `manual` autonomy tasks only)
 - **Packaging (later)**: Tauri desktop wrapper
 - Node ≥ 20, pnpm workspaces (`apps/web`, `apps/worker`, `packages/*`)
 
@@ -111,27 +111,44 @@ Note: **all MultiAgentOS state lives inside this repo's `data/` folder.** The ex
 3. Check `SKILLS_REGISTRY.md` for the right skill.
 4. If still unclear → ask the user. Never invent product behavior.
 
+## 9.bis. Inspiration Voie 2 (permanent design principle)
+
+Whenever the Claude Agent SDK docs are vague — session resume, file-context injection, tool gating, streaming back-pressure, image attachments, stop reasons, error recovery, rate-limit signalling — the first reflex is *"how do the open-source webuis do it?"*
+
+Reference repos (in priority order):
+
+- **[siteboon/claudecodeui](https://github.com/siteboon/claudecodeui)** — primary reference (project picker, session list, file tree, terminal, mobile UX).
+- **[sugyan/claude-code-webui](https://github.com/sugyan/claude-code-webui)** — minimalist; best for reading the streaming-chat layer alone.
+- **[winfunc/opcode](https://github.com/winfunc/opcode)** — Tauri desktop; reference for Phase 8 packaging.
+- **[KyleAMathews/claude-code-ui](https://github.com/KyleAMathews/claude-code-ui)** — session tracker; reference for `/trace`.
+
+**Workflow:** before writing a new piece of bridge code, clone the relevant reference, grep for the equivalent feature, and port the **pattern** (not the code). Cite the source file in a leading code comment: `// pattern from siteboon/claudecodeui src/lib/claude.ts:142`.
+
+**Why this matters:** the Agent SDK is young; the open-source webuis already absorbed the rough edges (Windows quoting, session-id format, partial JSON streams, rate-limit signalling). Do not reinvent those.
+
+See `docs/decisions/0001-claude-code-engine-over-api-sdk.md` §Decision clause 6 for the full rationale.
+
 ## 10. Building MultiAgentOS itself
 
 When building features of MultiAgentOS, follow `ROADMAP.md` phase by phase. Do not start phase N+1 without explicit user green light at the phase-N exit criteria. The "Future Build Prompt" at the end of `ROADMAP.md` is the canonical kick-off for each phase.
 
-## 11. Billing isolation (CRITICAL — Claude Code vs Anthropic API)
+## 11. Billing isolation (CRITICAL)
 
-Claude Code CLI has **two billing modes**. Mixing them silently causes unexpected charges.
+MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). PAYG via API key is a **forbidden** mode.
 
-| Mode | Trigger | Cost |
-|------|---------|------|
-| Subscription (Pro/Max) | `claude login` auth, no API key in env | Fixed monthly |
-| API PAYG | `ANTHROPIC_API_KEY` present in shell env | Per token, ~$3/$15 per 1M |
+| Mode | Trigger | Billing |
+|------|---------|---------|
+| **Subscription** *(only legal mode)* | `claude login` + `@anthropic-ai/claude-agent-sdk` | Fixed monthly |
+| ~~API PAYG~~ *(forbidden)* | `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY` | Per token — facture salée |
 
 **Rules — enforce always, never override:**
 
-1. `ANTHROPIC_API_KEY` must **never** be exported in global shell config (`~/.zshrc`, `~/.bashrc`, `~/.zshenv`, `~/.profile`). Verify: `echo $ANTHROPIC_API_KEY` in a fresh terminal must be empty.
-2. The key must only be injected per-process: via `.env` loaded by the app (`dotenv`/`tsx --env-file`), never `source`d globally.
-3. Claude Code authenticates exclusively via `claude login` (subscription). If it prompts for an API key, something is wrong — investigate before entering one.
-4. `.env` files are gitignored and must stay that way. Never commit a file containing `ANTHROPIC_API_KEY`.
-5. Any agent or script that needs to call the Anthropic API must receive the key via the app's runtime environment, not from the shell.
+1. **No runtime code may `import` from `@anthropic-ai/sdk`** in `apps/` or `packages/*/src/`. The only legal location is an opt-in `packages/core/src/api-fallback/` behind an explicit config flag. Enforcement: **CI lint guard added in Phase 2 step F** (see `ROADMAP.md` Phase 2) — not yet active until that step lands.
+2. `ANTHROPIC_API_KEY` presence at worker init triggers a **warning log + refusal to start**. The key is treated as a smell, not a feature.
+3. `ANTHROPIC_API_KEY` must never be exported in global shell config (`~/.zshrc`, `~/.bashrc`, `~/.zshenv`, `~/.profile`). Verify: `echo $ANTHROPIC_API_KEY` in a fresh terminal must be empty.
+4. Claude Code authenticates exclusively via `claude login`. If it prompts for an API key, something is wrong — investigate before entering one.
+5. `.env` files are gitignored and must stay that way. Never commit a file containing `ANTHROPIC_API_KEY`.
 
-**In MultiAgentOS code:** the `packages/core/llm.ts` LLM wrapper is the single injection point. It reads `process.env.ANTHROPIC_API_KEY` at call time. No other file may read this variable directly.
+**In MultiAgentOS code:** `packages/core/src/llm.ts` is the single LLM injection point. It drives the Claude Code engine via `@anthropic-ai/claude-agent-sdk`. No other file may instantiate an LLM client.
 
-**Guard against runaway cost:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard caps. The worker must check the active budget row before every LLM call and return `budget_exceeded` without calling the API if the cap is reached.
+**Guard against runaway quota:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard window caps. The worker checks the active budget row before every LLM call and returns `budget_exceeded` if the cap is reached.
