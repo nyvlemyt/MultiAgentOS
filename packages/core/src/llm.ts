@@ -16,6 +16,7 @@ export interface LLMResponse {
   cacheCreationTokens: number;
   quotaUnits: number;
   model: string;
+  sessionId?: string;
 }
 
 export interface LLMClient {

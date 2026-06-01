@@ -131,6 +131,46 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 **Exit criteria.** All 6 orchestrator skills have a `summary.md`. Skill Router injects summaries (not bodies) in mission prompts. Filter + promote actions work and persist across reload.
 
+**Phase 3 domain-tagging addendum (feeds Phase 3.5):** During skill discovery, each skill gets a `domain` tag from a fixed taxonomy: `research | code-execution | code-review | planning | memory | security | ux | writing | search`. The tag is stored in `data/skill-cache/<id>/summary.md` frontmatter and in the `skills` DB table. No routing logic yet — just the taxonomy. The tag set is the input to Phase 3.5 routing rules.
+
+---
+
+## Phase 3.5 · Multi-model Router  (≈ 1–2 sessions, ~ 40 k tokens)
+
+**Goal:** route tasks to the best available model/provider based on task domain and cost policy. Preserve Claude quota for high-value tasks.
+
+**Context:** user has Claude Pro (subscription, limited), ChatGPT (subscription), Gemini (free student), Perplexity (subscription). Skills and agents are provider-agnostic for *cognition* tasks; *execution* tasks (file I/O, bash, git) remain Claude-only via Agent SDK.
+
+**ADR required before coding:** `docs/decisions/0002-multi-model-router.md`. Must amend CLAUDE.md §11 to allow non-Anthropic providers in `packages/core/src/providers/`.
+
+**What Phase 3.5 covers:**
+
+- Provider abstraction: `packages/core/src/providers/` — one `LLMClient` impl per provider:
+  - `claude-code.ts` (existing `claudeCodeLLM`, execution tasks only)
+  - `openai.ts` (ChatGPT / GPT-4o / o1 via `openai` SDK)
+  - `gemini.ts` (Gemini via `@google/generative-ai`)
+  - `perplexity.ts` (OpenAI-compatible endpoint, search tasks)
+- Routing config: `config/model-routing.json` — maps `domain → provider + model`, with a `fallback` chain. Editable from UI.
+- `RouterLLMClient` in `packages/core/src/llm.router.ts` — reads `LLMRequest.domain`, resolves provider, delegates call. Falls back to Claude if provider unavailable.
+- `LLMRequest` gains a `domain` field (optional, from the skill's tag). Dispatcher sets it from the task's skill tags.
+- Provider credentials stored in `.env.local` (gitignored). Loader in `packages/core/src/providers/credentials.ts` validates presence at startup (warn, not crash, if a non-Claude provider key is missing).
+- `/tokens` page: per-provider breakdown (Claude quota units + OpenAI tokens + Gemini tokens).
+- Initial routing rules (best-effort, iterable):
+
+| Domain | Primary | Fallback |
+|--------|---------|---------|
+| `search` | Perplexity | Gemini |
+| `code-execution` | Claude Code | — (Claude-only) |
+| `code-review` | o1-mini or GPT-4o | Claude |
+| `planning` | Claude | GPT-4o |
+| `memory` | Gemini | GPT-4o |
+| `security` | Claude | o1-mini |
+| `ux` | GPT-4o | Claude |
+| `writing` | GPT-4o | Gemini |
+| `research` | Perplexity | Gemini |
+
+**Exit criteria.** Router resolves `domain → provider` correctly for all 9 domains. A `research` task hits Perplexity (verified via trace log provider field). A `code-execution` task stays on Claude Code. Claude quota drops measurably vs a baseline run with routing disabled.
+
 ---
 
 ## Phase 4 · Memory  (≈ 1–2 sessions, ~ 40 k tokens)

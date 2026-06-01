@@ -116,6 +116,7 @@ export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
         cacheCreationTokens: u.cache_creation_input_tokens,
         quotaUnits,
         model: req.model,
+        sessionId: success.session_id,
       };
     },
   };

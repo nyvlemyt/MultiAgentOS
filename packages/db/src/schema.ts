@@ -20,6 +20,7 @@ export const projects = sqliteTable('projects', {
     enum: ['eco', 'standard', 'expert'],
   }).notNull().default('eco'),
   monthlyBudgetCents: integer('monthly_budget_cents').notNull().default(500),
+  sessionId: text('session_id'),
   createdAt: epoch().notNull(),
   lastActiveAt: epoch().notNull(),
 });
