@@ -122,18 +122,21 @@ MAX DEPTH : 1 subagent depuis le coordinateur principal
 
 ---
 
-## Contrôle des coûts — Formule de budget
+## Contrôle du quota subscription
 
+MultiAgentOS utilise exclusivement la subscription Claude (Pro/Max) via l'Agent SDK — pas de billing PAYG (CLAUDE.md §11). Le quota est mesuré en `quotaUnits` (unité interne, pas de €), voir TOKEN_STRATEGY.md.
+
+### Estimation de consommation quota
 ```
-monthly_tokens = sessions × turns × (input_tokens + output_tokens × 3..5)
+sessions × turns × context_size → quota window mensuel
 ```
+Les agents consomment environ 4× plus de quota que le chat normal. Multi-agent research = ~15×.
+→ Les missions en mode `eco` (`effort: medium`) réduisent la consommation.
 
-Output tokens coûtent 3-5× les input tokens sur Sonnet-class.
-
-### Seuils d'alerte recommandés
-- 70% budget → badge discret dans topbar
-- 90% budget → banner rouge + notification
-- 100% budget → action `budget_exceeded` → pause + ask
+### Seuils d'alerte recommandés (% quota window mensuel)
+- 70% → badge discret dans topbar
+- 90% → banner rouge + notification
+- 100% → action `budget_exceeded` → pause + ask
 
 ### Hiérarchie de circuit breakers
 1. Per-task: `maxTurns` dans `AgentDefinition`
