@@ -67,18 +67,35 @@ JSON schema of the expected response, common failure modes with fixes.
 | `reviewer`        | Code Reviewer 🔍    | Diff + artifact review before `review → validated`          | sonnet-4-6    | 3000           |
 | `sec-reviewer`    | Security Reviewer 🛡️ | Risk gate; mandatory before any `high` or `blocking` action | sonnet-4-6    | 3000           |
 
-## 4. Tier A roster — Phase 2 (8 more)
+## 4. Tier A roster — Phase 2 (9 more)
 
-| ID                    | Name                 | Role                                                  |
-|-----------------------|----------------------|-------------------------------------------------------|
-| `project-manager`     | Project Manager 📋   | Cross-mission planning, batching, deadlines           |
-| `architect`           | Architect 🏛️         | Domain modelling, ADR authoring                       |
-| `frontend-builder`    | Frontend Builder 🎨  | Wraps Tier B frontend agents; produces diffs          |
-| `backend-builder`     | Backend Builder 🛠️   | Wraps Tier B backend agents                           |
-| `ux-critic`           | UX/UI Critic ✨      | Pre-merge UX gate                                     |
-| `researcher`          | Researcher 🔭        | External research, link curation, source ranking      |
-| `automation-designer` | Automation Designer ⚙️ | Pipelines, cron/autopilot specs                       |
-| `docs-writer`         | Docs Writer 📝       | README, ADRs, runbooks, technical writeups            |
+| ID                    | Name                 | Role                                                  | Provider hint |
+|-----------------------|----------------------|-------------------------------------------------------|---------------|
+| `project-manager`     | Project Manager 📋   | Cross-mission planning, batching, deadlines           | Claude |
+| `architect`           | Architect 🏛️         | Domain modelling, ADR authoring                       | Claude |
+| `quality-controller`  | Quality Controller 🎯 | Vérifie que les règles, conventions et architecture sont respectées par tous les agents. Gate post-exécution avant Reviewer. | Claude / o1-mini |
+| `frontend-builder`    | Frontend Builder 🎨  | Wraps Tier B frontend agents; produces diffs          | Claude |
+| `backend-builder`     | Backend Builder 🛠️   | Wraps Tier B backend agents                           | Claude |
+| `ux-critic`           | UX/UI Critic ✨      | Pre-merge UX gate                                     | GPT-4o |
+| `researcher`          | Researcher 🔭        | External research, link curation, source ranking      | Perplexity |
+| `automation-designer` | Automation Designer ⚙️ | Pipelines, cron/autopilot specs                       | Claude |
+| `docs-writer`         | Docs Writer 📝       | README, ADRs, runbooks, technical writeups            | GPT-4o |
+
+### Quality Controller — détail
+
+Pipeline :
+```
+[agents d'exécution] → Quality Controller → Reviewer → SecReviewer → archive
+```
+
+Responsabilités :
+- Vérifier que les outputs respectent CLAUDE.md (conventions, architecture, no PAYG)
+- Vérifier que les commits sont Conventional Commits ≤ 60 chars
+- Signaler toute dérive d'architecture (nouveau framework sans ADR)
+- Contrôler que le token spend est justifié par la qualité produite
+- Langue de sortie cohérente avec le mode projet (FR/EN)
+
+Différence avec Reviewer : le Reviewer vérifie le CODE. Le Quality Controller vérifie que le PROCESSUS et les RÈGLES ont été respectés.
 
 ## 5. Tier A roster — Project-specialized (later, on demand)
 

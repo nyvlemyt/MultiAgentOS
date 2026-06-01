@@ -171,6 +171,12 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 **Exit criteria.** Router resolves `domain → provider` correctly for all 9 domains. A `research` task hits Perplexity (verified via trace log provider field). A `code-execution` task stays on Claude Code. Claude quota drops measurably vs a baseline run with routing disabled.
 
+**Features additionnelles dans Phase 3.5 :**
+
+- **Token fallback automatique** : si Claude renvoie `rate_limit` ou `quota_exhausted`, le RouterLLMClient retente automatiquement avec le provider fallback de la chaîne. Log dans `/trace` : `provider_fallback { from: 'claude', to: 'gpt-4o', reason: 'quota' }`.
+- **Mode langue** : `config/project.json` ajoute `language: 'fr' | 'en'`. Tous les system prompts des agents sont générés dans la langue du projet. Mode FR par défaut pour MultiAgentOS. Cockpit UI adapte ses labels. Toggle visible dans le topbar (à côté du mode eco/standard/expert).
+- **Quality Controller agent** : ajouté au pipeline (voir AGENTS.md §4). Gate entre exécution et Reviewer. Provider hint : Claude ou o1-mini.
+
 ---
 
 ## Phase 4 · Memory  (≈ 1–2 sessions, ~ 40 k tokens)
