@@ -66,3 +66,8 @@ apps/web/playwright-report/
 apps/web/blob-report/
 **/.last-run.json
 
+
+# docs/claude doc — ignore binaries, commit .md sources
+docs/claude\ doc/*.pdf
+docs/claude\ doc/*.webloc
+docs/claude\ doc/.DS_Store

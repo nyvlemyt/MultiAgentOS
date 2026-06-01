@@ -22,8 +22,15 @@
 //   autopilot  → 'acceptEdits'  (bypassPermissions withheld — requires explicit user opt-in)
 
 import { query } from '@anthropic-ai/claude-agent-sdk';
-import type { PermissionMode, SDKResultSuccess } from '@anthropic-ai/claude-agent-sdk';
+import type { EffortLevel, PermissionMode, SDKResultSuccess } from '@anthropic-ai/claude-agent-sdk';
 import type { LLMClient, LLMRequest, LLMResponse } from './llm.js';
+import type { Mode } from './types.js';
+
+const MODE_TO_EFFORT: Record<Mode, EffortLevel> = {
+  eco: 'medium',      // cost-sensitive, short tasks
+  standard: 'high',   // default — balances quota/intelligence
+  expert: 'xhigh',    // coding and agentic use cases
+};
 
 export type AutonomyLevel = 'manual' | 'assisted' | 'autonomous' | 'autopilot';
 
@@ -68,6 +75,7 @@ export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
           resume: opts.sessionId,
           model: req.model,
           permissionMode,
+          effort: MODE_TO_EFFORT[req.mode],
           // Append orchestrator context to Claude Code's default system prompt.
           // preset keeps native skill loading, tool definitions, and memory injection intact.
           systemPrompt: req.system

@@ -248,6 +248,7 @@ export async function executeNextTask(missionId: string): Promise<
       autonomy: projects.autonomy,
       sessionId: projects.sessionId,
       defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode,
     })
     .from(projects)
     .innerJoin(missions, eq(missions.projectId, projects.id))
@@ -263,7 +264,7 @@ export async function executeNextTask(missionId: string): Promise<
     system: `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
     user: `Task: ${next.title}\n\n${next.description}`,
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
-    mode: 'standard',
+    mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
   });
 
   // Persist new session_id back to project on first successful call.
@@ -339,6 +340,7 @@ export async function resumeAfterValidation(
       autonomy: projects.autonomy,
       sessionId: projects.sessionId,
       defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode,
     })
     .from(projects)
     .innerJoin(missions, eq(missions.projectId, projects.id))
@@ -354,7 +356,7 @@ export async function resumeAfterValidation(
     system: `You are executing a validated high-risk task inside project at path ${proj?.path ?? '.'}.`,
     user: `Task: ${t.title}\n\n${t.description}`,
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
-    mode: 'standard',
+    mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
   });
 
   if (proj && resp.sessionId && !proj.sessionId) {
