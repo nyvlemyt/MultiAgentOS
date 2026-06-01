@@ -133,6 +133,16 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 **Phase 3 domain-tagging addendum (feeds Phase 3.5):** During skill discovery, each skill gets a `domain` tag from a fixed taxonomy: `research | code-execution | code-review | planning | memory | security | ux | writing | search`. The tag is stored in `data/skill-cache/<id>/summary.md` frontmatter and in the `skills` DB table. No routing logic yet — just the taxonomy. The tag set is the input to Phase 3.5 routing rules.
 
+**Phase 3 effort-mapping addendum (quick win, Anthropic best practice):** `project.defaultMode` maps directly to the Claude effort parameter. Wire in `claudeCodeLLM` before Phase 3.5:
+
+| Mode | Effort | Usage |
+|------|--------|-------|
+| `eco` | `medium` | Tâches courtes, non intelligence-intensive |
+| `standard` | `high` | Défaut — équilibre token/intelligence |
+| `expert` | `xhigh` | Coding et agentic — meilleur réglage |
+
+Implémenter dans `packages/core/src/llm.real.ts` : passer `effort` dans les options `query()` depuis `LLMRequest.mode`. Voir `docs/knowledge/prompting-anthropic.md §2`.
+
 ---
 
 ## Phase 3.5 · Multi-model Router  (≈ 1–2 sessions, ~ 40 k tokens)

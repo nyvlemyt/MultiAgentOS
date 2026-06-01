@@ -6,8 +6,8 @@
 |-----------|-----|--------|
 | Tutorial prompt interactif Anthropic | https://github.com/anthropics/prompt-eng-interactive-tutorial | ✅ indexé |
 | System prompts officiels Claude | https://platform.claude.com/docs/en/release-notes/system-prompts | ✅ indexé |
-| Best practices PDF | `docs/claude doc/prompt_best_practice.pdf` | ⏳ poppler requis |
-| Console prompting tools PDF | `docs/claude doc/Console_prompting_tools.pdf` | ⏳ poppler requis |
+| Best practices PDF | `docs/claude doc/prompt_best_practice.pdf` | ✅ indexé (effort params, XML, few-shot, Opus 4.8) |
+| Console prompting tools PDF | `docs/claude doc/Console_prompting_tools.pdf` | ✅ indexé (generator, improver, templates) |
 | Template prompt (Agentic Academy) | https://agentic-academy.fr/discover/watch/dff520ae-f05a-45c7-9b88-34c0e6e96195 | 🔐 auth requise |
 
 ## Mémoire & Contexte
