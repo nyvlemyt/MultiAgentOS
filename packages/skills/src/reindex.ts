@@ -5,7 +5,7 @@ import { getDb, closeDb, skills } from '@mas/db';
 import { scanOrchestratorSkills, writeSummaryCache } from './scanner.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const REPO_ROOT = resolve(__dirname, '../../../..');
+const REPO_ROOT = resolve(__dirname, '../../..');
 const CACHE_DIR = resolve(REPO_ROOT, 'data', 'skill-cache');
 
 async function main() {
