@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { and, eq, inArray } from 'drizzle-orm';
 import {
   getDb,
@@ -19,8 +21,15 @@ import {
   claudeCodeLLM,
   type AutonomyLevel,
 } from '@mas/core';
+import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
 
 export type Db = ReturnType<typeof getDb>;
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const _REPO_ROOT = resolve(__dirname, '../../..');
+
+// L1 skill summaries loaded once at module load for prompt injection.
+const _skillRouter = new SkillRouter(scanOrchestratorSkills(_REPO_ROOT));
 
 function logEvent(db: Db, evt: {
   missionId?: string;
@@ -260,8 +269,14 @@ export async function executeNextTask(missionId: string): Promise<
     sessionId: proj?.sessionId ?? undefined,
   });
 
+  const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
+  const skillContext = _skillRouter.buildPromptContext(taskSkillIds);
+
   const resp = await llm.call({
-    system: `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
+    system: [
+      `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
+      skillContext,
+    ].filter(Boolean).join('\n\n'),
     user: `Task: ${next.title}\n\n${next.description}`,
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
     mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
@@ -352,8 +367,14 @@ export async function resumeAfterValidation(
     sessionId: proj?.sessionId ?? undefined,
   });
 
+  const taskSkillIds: string[] = JSON.parse(t.skillsJson ?? '[]');
+  const skillContext = _skillRouter.buildPromptContext(taskSkillIds);
+
   const resp = await llm.call({
-    system: `You are executing a validated high-risk task inside project at path ${proj?.path ?? '.'}.`,
+    system: [
+      `You are executing a validated high-risk task inside project at path ${proj?.path ?? '.'}.`,
+      skillContext,
+    ].filter(Boolean).join('\n\n'),
     user: `Task: ${t.title}\n\n${t.description}`,
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
     mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
