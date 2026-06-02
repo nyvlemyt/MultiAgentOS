@@ -14,7 +14,8 @@
     "lint": "bash scripts/lint-no-sdk-payg.sh && pnpm -r lint",
     "db:migrate": "pnpm --filter @mas/db migrate",
     "db:seed": "pnpm --filter @mas/db seed",
-    "smoke": "pnpm --filter @mas/web smoke"
+    "smoke": "pnpm --filter @mas/web smoke",
+    "skills:reindex": "pnpm --filter @mas/skills reindex"
   },
   "devDependencies": {
     "typescript": "^5.5.4",

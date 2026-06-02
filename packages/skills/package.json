@@ -14,7 +14,8 @@
     "reindex": "tsx src/reindex.ts"
   },
   "dependencies": {
-    "@mas/db": "workspace:*"
+    "@mas/db": "workspace:*",
+    "drizzle-orm": "0.36.4"
   },
   "devDependencies": {
     "tsx": "^4.19.0",
