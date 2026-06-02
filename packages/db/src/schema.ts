@@ -57,6 +57,9 @@ export const skills = sqliteTable('skills', {
   path: text('path').notNull(),
   summaryPath: text('summary_path'),
   tagsJson: text('tags_json').notNull().default('[]'),
+  domain: text('domain', {
+    enum: ['research', 'code-execution', 'code-review', 'planning', 'memory', 'security', 'ux', 'writing', 'search'],
+  }),
   tier: text('tier', { enum: ['pinned', 'project-pinned', 'on-demand', 'methodology'] })
     .notNull()
     .default('on-demand'),
