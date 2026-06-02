@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "orchestratorPinned": [
+    "mas-mission-planner",
+    "mas-skill-router",
+    "mas-context-manager",
+    "mas-memory-keeper",
+    "mas-reviewer",
+    "mas-sec-reviewer"
+  ],
+  "autoLoad": {
+    "domains": ["planning", "memory", "security"],
+    "tiers": ["pinned"]
+  },
+  "projectOverrides": {}
+}
