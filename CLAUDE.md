@@ -152,3 +152,29 @@ MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). P
 **In MultiAgentOS code:** `packages/core/src/llm.ts` is the single LLM injection point. It drives the Claude Code engine via `@anthropic-ai/claude-agent-sdk`. No other file may instantiate an LLM client.
 
 **Guard against runaway quota:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard window caps. The worker checks the active budget row before every LLM call and returns `budget_exceeded` if the cap is reached.
+
+## 12. Knowledge Base — mandatory consultation rules
+
+`docs/knowledge/` contains curated research on agents, prompting, memory, and production patterns. **Ignoring it produces mediocre work.** These rules are non-negotiable:
+
+### Before creating or modifying any SKILL.md file
+1. Read `docs/knowledge/prompting-anthropic.md` — apply XML tags, chain-of-thought, effort mapping
+2. Read `docs/knowledge/skills-reference.md` — use the lifecycle structure (Overview → When to Use → Process → Rationalizations → Red Flags → Verification Criteria)
+3. Read the relevant domain file (`agent-patterns.md`, `memory-patterns.md`, `production-patterns.md`, or `project-doctrine.md`)
+4. SKILL.md body must include: Principles section (citing source), Process (numbered steps), Rationalizations Table, Red Flags, Verification Criteria (binary pass/fail)
+5. `summary:` field (L1, ≤200 tokens) = one-paragraph précis for prompt injection. Body (L2) = full operational guide.
+
+### Before creating or modifying any agent fiche
+1. Check `AGENTS.md` for the correct tier, domain, and responsibility
+2. Read `docs/knowledge/agent-patterns.md` for the relevant patterns
+3. Apply ≤7 tools per agent rule (MLOps Community research)
+
+### Before implementing a memory feature
+1. Read `docs/knowledge/memory-patterns.md` — use the 5-register architecture from `project-doctrine.md`
+2. Apply signal-density test to every piece of context injected
+3. Never inject more than 5 global memory items per mission
+
+### Red flag phrases — stop and consult docs/knowledge/ if you think any of these
+- "The skill is just instructions, it doesn't need much content" → wrong, see §12.1
+- "I'll keep the summary short for now" → summary=L1 brief, body=L2 rich — both required
+- "I don't need to look at the knowledge base for this" → always do
