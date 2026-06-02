@@ -25,11 +25,16 @@ import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
 
 export type Db = ReturnType<typeof getDb>;
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const _REPO_ROOT = resolve(__dirname, '../../..');
-
-// L1 skill summaries loaded once at module load for prompt injection.
-const _skillRouter = new SkillRouter(scanOrchestratorSkills(_REPO_ROOT));
+// Lazy singleton — deferred so Next.js static analysis doesn't eval import.meta.url at bundle time.
+let _skillRouterInstance: SkillRouter | undefined;
+function getSkillRouter(): SkillRouter {
+  if (!_skillRouterInstance) {
+    const __dirname = fileURLToPath(new URL('.', import.meta.url));
+    const repoRoot = resolve(__dirname, '../../..');
+    _skillRouterInstance = new SkillRouter(scanOrchestratorSkills(repoRoot));
+  }
+  return _skillRouterInstance;
+}
 
 function logEvent(db: Db, evt: {
   missionId?: string;
@@ -270,7 +275,7 @@ export async function executeNextTask(missionId: string): Promise<
   });
 
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
-  const skillContext = _skillRouter.buildPromptContext(taskSkillIds);
+  const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
 
   const resp = await llm.call({
     system: [
@@ -368,7 +373,7 @@ export async function resumeAfterValidation(
   });
 
   const taskSkillIds: string[] = JSON.parse(t.skillsJson ?? '[]');
-  const skillContext = _skillRouter.buildPromptContext(taskSkillIds);
+  const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
 
   const resp = await llm.call({
     system: [
