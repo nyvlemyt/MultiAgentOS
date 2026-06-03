@@ -13,6 +13,7 @@ Fichiers de recherche curatée — patterns validés par la recherche académiqu
 | Fichier | Couvre | Autorité |
 |---------|--------|----------|
 | `anthropic-ecosystem.md` | SDK, hooks 27 events, depth=1, effort param, billing June 15, Dynamic Workflows | Doc officielle Anthropic |
+| `claude-code-context-and-modes.md` | 3 couches contexte, `.claude/rules/` paths, 6 modes permission, mode `auto` classifier, protected paths | Doc Claude Code + ressources |
 | `frameworks-comparison.md` | LangGraph, CrewAI, claude-mpm, Agent Teams, quota multipliers | Frameworks open-source |
 | `agent-patterns.md` | Orchestrator-Workers, Quality Controller, routing domaine, test binaire, 3 modes audit | Recherche + VibeFlow |
 | `memory-patterns.md` | memweave, mem0, **QMD**, **Graphify**, 5 registres, prompt caching | Recherche + outils |

@@ -78,7 +78,7 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012
 | 038 | Poor Man's Ultraplan (3 fichiers 30min) | WF | ref | ❌ 404 | superpowers:writing-plans |
 | 032 | Superpowers : stack + doctrine | WF | ref | 📁 local | workflows.md |
 | 031 | 3 checks avant upgrade modèle | WF | 3.5 | 📁 local | workflows.md |
-| 030 | Les 6 modes de Claude Code | WF | 3.5 | ❌ 404 | à ré-exporter |
+| 030 | Les 6 modes de Claude Code | WF | 3.5 | ✅ récupéré | `../claude-code-context-and-modes.md` |
 | 028 | Du vibe coding à la gouvernance | WF | ref | ❌ 404 | à ré-exporter |
 | 012 | Checklist DON'T / DO | WF | 3 | ❌ 404 | à ré-exporter |
 
