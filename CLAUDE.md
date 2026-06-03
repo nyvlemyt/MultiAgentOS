@@ -180,3 +180,21 @@ MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). P
 - "The skill is just instructions, it doesn't need much content" → wrong, see §12.1
 - "I'll keep the summary short for now" → summary=L1 brief, body=L2 rich — both required
 - "I don't need to look at the knowledge base for this" → always do
+
+## 13. Learning bootstrap — pre-flight, intake-audit & persistence (mandatory)
+
+The tool that builds great projects must itself be built with the best knowledge — learned *before* each phase, never last. Full doctrine: `docs/workflows/knowledge-bootstrap.md`.
+
+### Before building any ROADMAP phase N
+1. **Pre-flight** — run a targeted intake-audit of the resources relevant to phase N (`docs/ressources/`, `docs/knowledge/`), method in `docs/workflows/intake-audit-template.md`. Scope to the phase, not the whole batch.
+2. **Distill** the kept items into the existing `docs/knowledge/` files (and CLAUDE.md / skills only if it becomes a rule).
+3. **Then** build. Resources are a per-phase input, not an end-of-project block.
+
+### Adding anything (resource / skill / agent / idea / memory / principle)
+Run the intake-audit (`docs/workflows/intake-audit-template.md`): identity → fit → 3 costs (install/maintenance/removal) → score → **KILL criteria** (the audit must be able to say `reject`) → decision enum → adaptation → integration plan → re-audit date. The audit *decides*; implementation reuses the mission lifecycle.
+
+### Self-audit (at every phase gate)
+Re-audit already-built artifacts (`CLAUDE.md`, `AGENTS.md`, Tier A fiches, `mas-*` skills, ADRs) against current best knowledge. Fix or backlog the debt.
+
+### Persistence bridge (anti-oubli — firm requirement)
+Phase 4 memory MUST seed from `docs/knowledge/` + `vibeflow/INDEX.md`, so build-time knowledge flows into the runtime second brain instead of diverging. In Phase 4 exit criteria. See `docs/backlog/second-brain-cross-project.md` and `knowledge-bootstrap.md §5.bis` (the enrichment spiral).

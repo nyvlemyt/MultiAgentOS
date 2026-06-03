@@ -65,6 +65,29 @@ L'intake-audit regarde les **nouveaux** ajouts. Il faut aussi ré-auditer **l'ex
 
 Source à distiller pour formaliser ça : `docs/ressources/DURCIR gouverner ses règles capitalisées dans la durée.pdf` + `Le Registre Learning Records...` + `Le rituel de consolidation memoire...`.
 
+## 5.bis La spirale d'enrichissement & le pont de persistance (anti-oubli)
+
+Le bootstrap n'est pas linéaire, c'est une **spirale** : chaque passe nourrit la suivante, et chaque tour fait monter l'ensemble d'un cran.
+
+```
+Passe 0 : Ressources ──distille──▶ docs/knowledge/ (savoir build-time)
+Passe 1 : on construit les MODULES avec ce savoir (skills, agents, skill intake-audit)
+Passe 2 : le skill intake-audit ──ré-audite──▶ savoir + modules existants (durcissement, §5)
+Passe 3 : on construit la MÉMOIRE (Phase 4) ⮕ SEMÉE depuis docs/knowledge/  (LE PONT)
+Passe 4+: missions ──produisent──▶ mémoire ──Memory Keeper──▶ promue ──enrichit──▶ modules ──▶ retour Passe 1
+```
+
+**Garantie « rien d'appris n'est oublié »** = 3 couches durables + 1 pont explicite :
+
+| Couche | Rôle | Garantie |
+|--------|------|----------|
+| `vibeflow/INDEX.md` | Catalogue : chaque ressource + statut | Rien hors radar ; non distillé = marqué |
+| `docs/knowledge/` | Savoir distillé (build-time) | Durable, versionné git |
+| Mémoire Phase 4 (second cerveau) | Savoir runtime cross-projet | Durable en base |
+| **🌉 Pont** | Phase 4 **sème** sa mémoire **depuis** `docs/knowledge/` | Sans lui, build-time et runtime divergent |
+
+**Exigence ferme (sinon le savoir se perd)** : la construction de la mémoire (Phase 4) doit prendre `docs/knowledge/` (+ `vibeflow/INDEX.md`) comme **corpus de seed**. Le savoir distillé maintenant remonte alors automatiquement dans le second cerveau runtime. Le Memory Keeper (seul écrivain) entretient ensuite la boucle. → exigence portée par [`../backlog/second-brain-cross-project.md`](../backlog/second-brain-cross-project.md).
+
 ## 6. Ce qui change concrètement (proposition — requiert green light)
 
 Cette doctrine implique un **resequencing du ROADMAP** : ajouter un **pré-vol d'apprentissage par phase** en tête de chaque phase, au lieu d'un bloc « ressources » en fin de parcours. Changement de discipline de phase → **validation utilisateur explicite requise** avant d'éditer `ROADMAP.md` (cf. `feedback_phase-gates`).
