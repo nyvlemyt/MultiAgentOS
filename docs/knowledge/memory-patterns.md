@@ -176,6 +176,62 @@ Humain VISUALISE    → Obsidian sur le même dossier (Phase 6+)
 
 ---
 
+## Graphify — Knowledge Graph Layer (Audit 2026-06-03)
+
+Source: Google Doc @le_gouverneur_ia + repo `graphifyy` (~35k⭐, ~230k downloads). Outil open-source qui transforme un dossier projet en **knowledge graph** interrogeable par Claude.
+
+**⚠️ Correction d'une sous-estimation antérieure** : l'audit initial classait Graphify comme "visualisation humaine, optionnelle Phase 6". **Faux.** C'est un outil de compréhension de codebase sérieux, pas juste un graph viewer. Il mérite une vraie place dans l'architecture Context Manager.
+
+### Ce que Graphify fait
+
+Pipeline 3 passes :
+1. **AST extraction (zéro-AI)** : tree-sitter parse classes/fonctions/imports/call-graphs de façon déterministe (25 langages)
+2. **Multimodal** : Whisper transcrit audio/vidéo ; PDFs/images/markdown ingérés ; cache local
+3. **Claude sub-agents** : extraction parallèle de concepts depuis docs/images/transcriptions → clustering Leiden. Relations taggées `EXTRACTED | INFERRED (confidence) | AMBIGUOUS`
+
+Sorties dans `graphify-out/` : graph HTML interactif, rapport markdown (nœuds clés + communautés), JSON queryable, cache incrémental.
+
+**Métriques annoncées** : -71.5× consommation tokens/requête, compréhension codebase de ~3 semaines → ~4 min.
+
+Commandes : `graphify watch` (monitoring continu), `graphify merge-graphs` (combine projets), `.graphifyignore`. Install : `uv tool install graphifyy && graphify install` (supporte Claude Code, Cursor, OpenClaw).
+
+### QMD vs Graphify vs codegraph vs Obsidian — positionnement
+
+Quatre couches distinctes, **complémentaires, pas concurrentes** :
+
+| Couche | Sur quoi | Force | Place MAS |
+|--------|---------|-------|-----------|
+| **QMD** | docs/mémoire Markdown | retrieval texte (BM25+vector+rerank) | `data/memory/` + `docs/` — "trouve la bonne entrée" |
+| **Graphify** | **codebase + docs multimodal** | graph relations + AST + blast radius | **Context Manager sur projets externes** — "comprends la structure d'OtakuGO_UP" |
+| **codegraph** (colbymchenry) | symboles code (SQLite) | léger, -62% tool calls | alternative légère à Graphify si pas de multimodal |
+| **Obsidian** | `data/memory/` Markdown | graph view humain | visualisation humaine de la mémoire (Melvyn) |
+
+### Application MAS
+
+- **Context Manager Phase 4/5** : au lieu de recharger l'arbre source d'un projet externe à chaque mission (interdit par TOKEN_STRATEGY §6), Graphify produit `graphify-out/` une fois → le Context Manager query le graph. C'est l'implémentation concrète de "context pack" (`data/context-packs/<projectId>.md`) en version graph.
+- Le rapport markdown Graphify = un context pack riche (nœuds clés + communautés) généré déterministe + Claude sub-agents.
+- **Blast radius** (refactoring impact) → directement utile pour que Reviewer estime l'impact d'un diff avant exécution.
+- **Multimodal** : OtakuGO_UP a des assets (images manga, specs) → Graphify les intègre, QMD non.
+- **Sécurité** : Graphify spawn des Claude sub-agents (consomme quota Agent SDK — voir billing §11) + télécharge tree-sitter/Whisper. Audit sécu avant install (CLAUDE.md §5). ADR à prévoir.
+
+### Décision
+
+Graphify = candidat **Context Manager codebase indexing** (Phase 4/5), pas mémoire projet. QMD = retrieval mémoire/docs. Les deux coexistent. ADR `0006-context-indexing` à écrire : Graphify vs codegraph vs context-pack statique. Tester Graphify sur OtakuGO_UP en proof-of-concept avant de l'adopter.
+
+---
+
+## Instagram × Obsidian (Loucash) — pattern d'ingestion (référence)
+
+Source: Google Doc @le_gouverneur_ia (guide Loucash). Sync les saves Instagram → vault Obsidian en markdown (sync.py 2×/jour via cookies session, enrich.py transcripts ScrapeCreators, slash command `/instagram-sync ideate`).
+
+**Pertinence MAS** : faible pour le core, mais illustre **2 patterns réutilisables** :
+1. **Ingestion → markdown + frontmatter YAML** : toute source externe (web, API) → fichiers markdown indexables. Même pattern que Memory Keeper écrivant les registres.
+2. **`state.json` déduplication** : tracker les IDs déjà synchronisés pour éviter les doublons. Pattern pour les MemoryProposal (ne pas re-proposer une mémoire déjà acceptée).
+
+Pas d'intégration directe. Référence pour Phase 4/5 si MAS ingère des sources externes (RSS, docs Drive).
+
+---
+
 ## vrai-memoire-agent-claude.md — Prompts Phase 4 Ready-to-Use
 
 Source: `docs/claude doc/vrai-memoire-agent-claude.md`
