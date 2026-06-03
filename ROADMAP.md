@@ -12,6 +12,24 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 ---
 
+## Learning pre-flight & self-audit (permanent)
+
+Résout le paradoxe de bootstrap : l'outil qui doit créer des projets parfaits doit lui-même être construit avec le meilleur savoir possible — pas en apprenant à la fin. Doctrine complète : [`docs/workflows/knowledge-bootstrap.md`](docs/workflows/knowledge-bootstrap.md).
+
+**Avant de construire chaque phase N (pré-vol obligatoire) :**
+
+1. **Intake-audit ciblé** des ressources pertinentes pour N (`docs/ressources/` + sources), méthode [`docs/workflows/intake-audit-template.md`](docs/workflows/intake-audit-template.md). Cibler la phase, pas tout le lot.
+2. **Distiller** le retenu dans `docs/knowledge/` (et `CLAUDE.md` / skills `mas-*` si ça devient une règle).
+3. **Puis** construire la phase N.
+
+Les ressources sont un **input par phase**, pas un bloc de fin. Le pré-vol applique l'intake-audit au projet lui-même (bootstrap récursif). Budget : scoper au strict pertinent (cf. `TOKEN_STRATEGY.md`).
+
+**À chaque gate de phase (self-audit / durcissement) :** ré-auditer les artefacts de base déjà construits (`CLAUDE.md`, `AGENTS.md`, fiches Tier A, skills `mas-*`, ADRs) contre le meilleur savoir courant. Corriger ou backloguer la dette — « ce qui a été fait avant n'est pas forcément optimal ».
+
+**Distinction clé** : ce pré-vol nourrit **Claude en build-time** (savoir dans `docs/knowledge/`). Le « second cerveau » runtime cross-projet — même source, consommateur différent — est une feature Phase 4+ ([`docs/backlog/second-brain-cross-project.md`](docs/backlog/second-brain-cross-project.md)).
+
+---
+
 ## Phase 0 · Foundations + visual vision  (≈ 3–4 sessions, ~ 90 k tokens)
 
 **Goal:** a walkable skeleton **plus the full visual vision rendered with mocked data**. After Phase 0, opening the cockpit must immediately communicate "this is a premium agent studio", even though no real agent executes anything yet.

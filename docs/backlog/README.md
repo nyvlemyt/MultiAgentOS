@@ -89,6 +89,8 @@ spec-kit, taste-skill, impeccable, superpowers, build-your-own-x, awesome-design
 
 ## Cartes "pour plus tard"
 
+- [`second-brain-cross-project.md`](second-brain-cross-project.md) — **second cerveau** : couche savoir/mémoire partagée build-time + cross-projet, extension Phase 4 (candidat ADR). Doctrine de build associée : [`../workflows/knowledge-bootstrap.md`](../workflows/knowledge-bootstrap.md). **Cœur du projet.**
+- [`intake-audit-skill.md`](intake-audit-skill.md) — **skill d'audit universel d'ajout** (ressource/skill/agent/idée/mémoire/principe) → Phase 4.5. Généralise le master-prompt one-shot. Version manuelle dispo : [`../workflows/intake-audit-template.md`](../workflows/intake-audit-template.md). **Anti-dérive + gouvernance.**
 - [`llm-selection-audit.md`](llm-selection-audit.md) — **méthodologie + audit de sélection LLM par tâche/agent/domaine/risk** (→ ADR 0002, prérequis Phase 3.5). **Critique perf+coût.** Réconcilie les 4 dimensions qui se contredisent.
 - [`skill-install-policy.md`](skill-install-policy.md) — méthode d'audit sécu skills externes (→ ADR 0005, Phase 6 prep). **Haute valeur sécurité.**
 - [`frameworks-to-mine.md`](frameworks-to-mine.md) — ruflo + frameworks lourds dont extraire des patterns (pas adopter).
