@@ -153,6 +153,8 @@ MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). P
 
 **Guard against runaway quota:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard window caps. The worker checks the active budget row before every LLM call and returns `budget_exceeded` if the cap is reached.
 
+**⚠️ Billing change effective 2026-06-15:** Agent SDK usage on subscription plans consumes a **separate** monthly credit from Claude.ai conversations. The `budgets` table must track Agent SDK quota independently from interactive Claude.ai usage. Agents consume ~4× quota vs normal chat; multi-agent research missions ~15×. Source: `docs/knowledge/anthropic-ecosystem.md`.
+
 ## 12. Knowledge Base — mandatory consultation rules
 
 `docs/knowledge/` contains curated research on agents, prompting, memory, and production patterns. **Ignoring it produces mediocre work.** These rules are non-negotiable:

@@ -131,20 +131,84 @@ Réduit token usage de 26-54% en pic. Compatible API, gradient-free.
 
 ---
 
+## QMD — Retrieval Layer Phase 4 (Nouveau — Audit 2026-06-03)
+
+Source: https://github.com/tobi/qmd — analysé audit Phase 3
+
+**Remplace** le plan custom `data/memory/<projectId>/index.db` SQLite FTS5 par quelque chose de beaucoup plus puissant, déjà construit et maintenu.
+
+### Pourquoi QMD > custom FTS5
+
+| Dimension | Custom FTS5 | QMD |
+|-----------|------------|-----|
+| Search | BM25 seulement | BM25 + vector + LLM reranking |
+| Agent interface | Tool custom à écrire | MCP server natif (query, get, multi_get) |
+| Query expansion | Non | Oui (Qwen3 local, automatique) |
+| Stack | SQLite natif | TypeScript, Node ≥22 ✓ (v22.16.0) |
+| Maintenance | Notre responsabilité | Maintenu par tobi |
+| Models | Aucun | ~2GB (EmbeddingGemma 300M, Qwen3 Reranker 0.6B, QMD Query-Expansion 1.7B) |
+
+### Architecture avec QMD
+
+```
+Memory Keeper ÉCRIT → data/memory/<projectId>/*.md  (5 registres Markdown)
+QMD INDEXE          → collections MCP (auto re-index)
+Agents LISENT       → qmd.query("...") via MCP tool
+Humain VISUALISE    → Obsidian sur le même dossier (Phase 6+)
+```
+
+### Collections MCP recommandées
+
+```json
+{
+  "mas-knowledge": ["docs/knowledge/", "docs/claude doc/", "docs/workflows/"],
+  "mas-memory":    ["data/memory/"]
+}
+```
+
+### ADR requis avant implémentation
+`docs/decisions/0003-memory-storage-format.md` — décision QMD vs custom FTS5 + format SUMMARY.md.
+
+### Prérequis
+- Node 22+ ✓ (v22.16.0 confirmé)
+- ~2GB disque libre pour modèles dans `~/.cache/qmd/models/`
+- Pas d'API key, entièrement local
+
+---
+
+## vrai-memoire-agent-claude.md — Prompts Phase 4 Ready-to-Use
+
+Source: `docs/claude doc/vrai-memoire-agent-claude.md`
+
+Ce fichier contient les prompts copy-paste complets pour implémenter la mémoire Phase 4 :
+
+1. **Prompt d'initialisation** : crée les 5 registres avec entrées-exemples adaptées au projet. À coller dans Claude Code, pose 3 questions diagnostics, génère tous les fichiers.
+
+2. **Prompt close-out ritual** : 5 min en fin de session. Audite la session, propose des entrées BDR/LRN/BLK formatées, génère journal.md obligatoirement.
+
+**Différence MAS vs usage personnel** : ce guide place la mémoire dans `.claude/memory/` (pour usage personnel). MAS place la mémoire dans `data/memory/<projectId>/` pour la séparation multi-projet. La logique est identique, seul le path change.
+
+**Intégration Obsidian** : ouvrir `data/memory/<projectId>/` comme vault Obsidian (2 clics, rien à convertir). Utiliser `[[BDR-001]]` wikilinks dans les registres pour activer le graph view.
+
+---
+
 ## Architecture cible par phase
 
 ### Phase 4 MVP
-1. **Memory format** : memweave (Markdown + SQLite FTS5, zéro dépendance)
-2. **Context packs** : codex-agent-mem (SQLite, hash-based, retrieval on-demand)
-3. **Prompt caching** : 2 breakpoints dans `claudeCodeLLM` (system + context pack)
-4. **Extraction** : mem0 ADD-only (single LLM call per session end)
+1. **Memory format** : memweave (Markdown + SQLite FTS5, zéro dépendance) — 5 registres dans `data/memory/<projectId>/`
+2. **Retrieval layer** : **QMD MCP server** (remplace custom FTS5 — BM25+vector+LLM reranking)
+3. **Context packs** : codex-agent-mem pattern (SQLite, hash-based, `SUMMARY.md` ≤500 tokens)
+4. **Extraction** : mem0 ADD-only (single LLM call per session end) ou prompt close-out ritual
+5. **Prompt caching** : 2 breakpoints dans `claudeCodeLLM` (system + context pack)
 
 ### Phase 5 — Semantic
-5. Ajouter `sqlite-vec` pour recherche vectorielle
+5. `sqlite-vec` si QMD non retenu ou pour projets >200 memories sans QMD
 6. MemOS ou agentmemory pour hooks Claude Code natifs
 
-### Phase 6 — Temporal
-7. Graphiti/Zep pour temporal knowledge graph sur projets à longue durée
+### Phase 6 — Temporal + Visualization
+7. Obsidian sur `data/memory/` comme visualisation humaine (wikilinks activés)
+8. kepano/obsidian-skills pour que Memory Keeper génère du Markdown Obsidian-compatible
+9. Graphiti/Zep pour temporal knowledge graph sur projets à très longue durée
 
 ---
 
@@ -178,3 +242,6 @@ Réduit token usage de 26-54% en pic. Compatible API, gradient-free.
 - https://context-mode.com
 - https://platform.claude.com/docs/en/build-with-claude/prompt-caching
 - https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+- **https://github.com/tobi/qmd** — retrieval layer Phase 4 (NOUVEAU)
+- **https://github.com/kepano/obsidian-skills** — Phase 6 memory visualization
+- `docs/claude doc/vrai-memoire-agent-claude.md` — prompts Phase 4 ready-to-use

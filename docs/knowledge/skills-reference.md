@@ -170,18 +170,82 @@ Source: https://github.com/gepa-ai/gepa
 
 ---
 
+## Processus 5-Phases pour Créer un Skill (RES-054 @le_gouverneur_ia)
+
+Source: `docs/claude doc/ressources.md` RES-054 "L'usine à compétences sur mesure"
+
+Ce process est utilisé par `pnpm skills:reindex` pour générer les summaries L1 des 6 orchestrator skills. Il est aussi la méthode canonique pour créer tout nouveau skill dans MAS.
+
+### Les 5 phases
+
+1. **Cadrage** : comprendre précisément ce qu'on codifie. Vérifier que ça n'existe pas déjà. Poser la question "Est-ce un skill ou un agent ?" (test binaire).
+
+2. **Découpage en angles** : casser le sujet en 3-10 angles indépendants. Ex pour `mas-skill-router` : routing logic, L1/L2 disclosure, budget enforcement, domain taxonomy, escalation rules.
+
+3. **Recherche en parallèle** : recherches approfondies par angle. Lire les docs/knowledge/ pertinents. Rapide et dense.
+
+4. **Synthèse & rédaction** : écrire le skill complet avec la structure lifecycle (Overview → When to Use → Process → Rationalizations → Red Flags → Verification Criteria). Écrire le summary L1 (≤200 tokens).
+
+5. **Validation** : relecture par le responsable du projet avant activation. Vérifier : negative triggers présents ? Verification Criteria binaires ? Principles section cite une source ?
+
+### Règle absolue
+Un skill générique téléchargé ne connaît pas ton projet. Un skill fabriqué dans ton projet devient une brique fiable réutilisable. Préférer toujours la fabrication à l'import.
+
+---
+
+## Librairies de Design Skills — Phase 7 Reference
+
+### Leonxlnx/taste-skill (31.7k⭐)
+Source: https://github.com/Leonxlnx/taste-skill
+
+11 skills design pour AI agents. Anti-pattern design (élimine les UIs génériques). Installation: `npx skills add https://github.com/Leonxlnx/taste-skill`.
+
+Skills clés :
+- `design-taste-frontend` v2 : paramètres variance/motion/density configurables
+- `redesign-existing-projects` : audit + amélioration UI existante
+- `high-end-visual-design`, `minimalist-ui`, `industrial-brutalist-ui` : variantes
+
+**Usage MAS Phase 7** : cockpit dense et utile. `redesign-existing-projects` pour auditer `/skills` page.
+**Sécurité** : Shell 100%, audit sécu requis avant install.
+
+### pbakaus/impeccable
+Source: https://github.com/pbakaus/impeccable
+
+Design skill Claude Code avec 7 référentiels (typography, color, spatial, motion, interaction, responsive, UX writing) + 23 commandes + 27 règles anti-patterns déterministes.
+
+Commandes clés : `/impeccable audit`, `/impeccable polish`, `/impeccable critique`.
+
+**Usage MAS Phase 7** : cockpit UI polish, élimination "AI tells".
+**Sécurité** : CLI + Playwright optionnel, audit sécu requis avant install.
+
+### VoltAgent/awesome-design-md
+Source: https://github.com/VoltAgent/awesome-design-md
+
+72 fichiers DESIGN.md de marques connues (AI platforms, fintech, dev tools). Format markdown, directement lisible par AI agents.
+
+**Usage MAS Phase 7** : copier 1 DESIGN.md d'inspiration dans `apps/web/` pour guider le cockpit redesign. Zéro installation, zéro dépendance.
+
+### kepano/obsidian-skills
+Source: https://github.com/kepano/obsidian-skills — Steph Ango (CEO Obsidian)
+
+Skills Claude Code qui apprennent à l'agent à écrire du Markdown Obsidian-compatible : wikilinks `[[BDR-001]]`, properties frontmatter, JSON Canvas, Bases.
+
+**Usage MAS Phase 6** : Memory Keeper génère des registres avec wikilinks → Obsidian graph view montre les connexions entre decisions/learnings/blockers.
+
+---
+
 ## Skills à créer pour MultiAgentOS
 
 Basé sur l'audit des ressources. Ces skills n'existent pas encore dans `.claude/skills/` :
 
-| Skill | Domain | Source d'inspiration |
-|-------|--------|---------------------|
-| `quality-controller` | code-review | repowise adversarial verification |
-| `context-pack-builder` | memory | codex-agent-mem pattern |
-| `skill-router-advanced` | planning | wshobson three-tier |
-| `agent-budget-monitor` | planning | 12-Factor factor 3 |
-| `plan-then-execute` | planning | Simon Willison |
-| `multi-agent-coordinator` | planning | LangGraph HITL pattern |
+| Skill | Domain | Phase | Source d'inspiration |
+|-------|--------|-------|---------------------|
+| `quality-controller` | code-review | 3.5 | repowise adversarial verification + RES-037 3 modes |
+| `context-pack-builder` | memory | 4 | codex-agent-mem pattern + RES-056 SUMMARY.md |
+| `skill-router-advanced` | planning | 3.5 | wshobson three-tier + domain routing |
+| `agent-budget-monitor` | planning | 3 | 12-Factor factor 3 |
+| `plan-then-execute` | planning | 3.5 | spec-kit decomposition pattern |
+| `multi-agent-coordinator` | planning | 5 | LangGraph HITL pattern + depth=1 constraint |
 
 ---
 
@@ -193,3 +257,7 @@ Basé sur l'audit des ressources. Ces skills n'existent pas encore dans `.claude
 - Piebald system prompts : https://github.com/Piebald-AI/claude-code-system-prompts
 - repowise prompts : https://github.com/repowise-dev/claude-code-prompts
 - wshobson/agents : https://github.com/wshobson/agents
+- **Leonxlnx/taste-skill** : https://github.com/Leonxlnx/taste-skill (Phase 7, audit sécu d'abord)
+- **pbakaus/impeccable** : https://github.com/pbakaus/impeccable (Phase 7, audit sécu d'abord)
+- **kepano/obsidian-skills** : https://github.com/kepano/obsidian-skills (Phase 6)
+- **VoltAgent/awesome-design-md** : https://github.com/VoltAgent/awesome-design-md (Phase 7)
