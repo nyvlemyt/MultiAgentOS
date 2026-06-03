@@ -71,3 +71,7 @@ apps/web/blob-report/
 docs/claude\ doc/*.pdf
 docs/claude\ doc/*.webloc
 docs/claude\ doc/.DS_Store
+
+# docs/ressources — ignore binaries (Notion exports), distill into .md instead
+docs/ressources/*.pdf
+docs/ressources/.DS_Store
