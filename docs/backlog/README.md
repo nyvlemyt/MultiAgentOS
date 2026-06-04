@@ -95,6 +95,7 @@ spec-kit, taste-skill, impeccable, superpowers, build-your-own-x, awesome-design
 - [`skill-install-policy.md`](skill-install-policy.md) — méthode d'audit sécu skills externes (→ ADR 0005, Phase 6 prep). **Haute valeur sécurité.**
 - [`frameworks-to-mine.md`](frameworks-to-mine.md) — ruflo + frameworks lourds dont extraire des patterns (pas adopter).
 - [`design-stack-phase7.md`](design-stack-phase7.md) — workflow design cockpit Phase 7.
+- [`self-audit-lean-claude-md.md`](self-audit-lean-claude-md.md) — **self-audit Batch 1** : CLAUDE.md > 200 lignes (RES-022/012) + retourner les audits RES-024/008/023/015 sur MAS lui-même au gate Phase 3.5. **Dette réflexive, décision humaine.**
 
 ## Principe (rappel)
 

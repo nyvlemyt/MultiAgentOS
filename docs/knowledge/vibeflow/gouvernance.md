@@ -117,6 +117,127 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 
 ---
 
+## RES-024 — Audite tes agents en 10 min : 4 piliers + verdict PROD/STAGING/BLOQUÉ/ARRÊTER
+
+**Principe** : un agent « qui tourne » n'est pas un agent « sous contrôle ». Avant de laisser un agent décider/agir sans relecture systématique, il doit cocher **4 piliers** ; une case vide = un gap. Le PDF cadre la question par : « si chacun de tes agents partait en vrille demain matin, le saurais-tu dans l'heure ? » (RES-024 = auditer l'existant ; le framework 4-piliers **détaillé** + le chiffre « 40 % Gartner » sont dans le PDF compagnon « Structurer la gouvernance AVANT de déployer », distillé juste après — au Batch 1 ce chiffre avait été attribué à tort à ce PDF-ci.)
+
+**Les 4 piliers** (réponse écrite obligatoire par agent) :
+
+| Pilier | Question | Si manquant |
+|--------|----------|-------------|
+| **Mandat** | mission en 1 phrase (sans le mot « tout ») + ≥3 interdictions + humain décideur nommé ? | l'agent décide seul de son rôle, dérive garantie |
+| **Périmètre** | allowlist tools/fichiers/APIs + budget max (tokens/$/turns) ? | périmètre illimité, coût et dégâts incontrôlables |
+| **Checkpoints** | actions destructives → validation humaine + logs vers une destination regardée ? | accident à l'échelle dès le 1er bug |
+| **Escalade** | conditions d'arrêt auto + humain alerté + **kill switch accessible HORS de la stack qui l'exécute** ? | l'agent continue même en dérive, tu ne peux plus l'arrêter |
+
+**Grille de verdict** (checklist 10-Q : Mandat 2 / Périmètre 3 / Checkpoints 3 / Escalade 2) :
+- **10/10 → PRÊT PROD**
+- **8-9 → PRÊT STAGING** (corriger sous 2 sem., priorité Escalade > Checkpoints > Périmètre > Mandat)
+- **5-7 → BLOQUÉ** (ne doit pas tourner en prod avant correction)
+- **0-4 → À ARRÊTER IMMÉDIATEMENT**
+- **Cas spécial** : pas de kill switch externe (Q10) + agent en prod = **À ARRÊTER** quoi que disent les autres réponses.
+
+**Risques systémiques** (au-delà de l'agent isolé) : agents qui s'invoquent mutuellement sans limite (deadlock), tools/credentials partagés sans isolation, logs qui partent dans le vide, secrets hardcodés, pas de budget global (runaway), pas de kill switch global externe.
+
+**`contract.yaml` minimal** (par agent BLOQUÉ/ARRÊTER) : `name / owner (humain nommé) / status / deployment / mission / prohibitions[≥3] / human_decision_maker / allowed_resources / denied_resources / limits(max_budget, timeout) / human_validation_required_for / logs_go_to / alert_on / stop_conditions / escalation_recipient / kill_switch (procédure externe)`.
+
+**Application MAS** :
+- **Cadre de gouvernance qui sous-tend tout MAS.** Les 4 piliers mappent 1:1 : Mandat = fiche Tier A (role + interdits) ; Périmètre = `tools≤7` + budget mission (TOKEN_STRATEGY §8) + sandbox projet ; Checkpoints = CLAUDE.md §5 (validation humaine actions risquées) + table `events` ; Escalade = `escalate_when` + `budget_exceeded` + kill switch.
+- **La grille PROD/STAGING/BLOQUÉ/ARRÊTER est un verdict plus riche que VALIDÉ/AJUSTÉ/REJETÉ (RES-043).** Le Quality Controller (Phase 3.5) peut l'adopter pour auditer chaque fiche AVANT activation d'un mode autonome.
+- **Kill switch « hors de la stack »** : le worker MAS doit pouvoir être arrêté indépendamment (kill du process, flag DB `paused`), jamais via une commande passant par l'agent lui-même. À vérifier Phase 6 (autonomy gates).
+- **`contract.yaml` = la version par-agent de `config/permissions.json`** (catégories risquées + allowlist hosts = registre central). Candidat enrichissement Phase 6.
+- Risques systémiques déjà couverts : « agents s'invoquent sans limite » → depth=1 (agent-patterns.md, Tier B ne spawn pas) ; « runaway budget » → circuit breaker TOKEN_STRATEGY §8 ; « logs vers le vide » → table `events` + SSE.
+- **Self-audit** : faire tourner cette grille sur les 6 fiches Tier A au gate Phase 3.5 (cf. `docs/backlog/self-audit-lean-claude-md.md`).
+
+---
+
+## Structurer la gouvernance AVANT de déployer — framework 4 piliers détaillé (compagnon RES-024)
+
+**Mapping RES** : PDF `docs/ressources/Structurer la gouvernance AVANT de déployer tes agents IA.pdf` (14 p.). Ne porte pas de numéro RES dans son texte ; **candidat RES-023** au sens de la description INDEX (« governance agents IA, cadrage→monitoring ») ET référencé par RES-024 (« la version longue 100+ lignes du contrat est dans RES-023 »). À ne pas confondre avec le PDF « Gouverner tes Agents IA Templates + Prompts » (4 prompts + 5 patterns de contrats, distillé dans `agents-skills.md`). **Mapping RES-023 entre ces deux PDFs non tranché à 100 %** — voir `docs/learning/2026-06-04-vibeflow-reaudit/build-report.md`. **C'est la source réelle du « 40 % Gartner » mal attribué à RES-024 au Batch 1.**
+
+**Principe** : Managed Agents (beta 8 avril 2026) fournit les murs *techniques* (sandbox, scoped permissions, observabilité) ; la couche *projet* (gouvernance) reste à construire. Avant tout déploiement, répondre par écrit à 4 questions : **qui** décide quoi quand l'agent tourne sans toi · **quel** périmètre exact · **qui** valide à chaque étape critique · **qu'est-ce qui se passe** quand il hésite/se trompe. Chiffre cité : **40 % des initiatives agentiques sont annulées avant la fin (source : Gartner)** — pas par échec technique, par absence de gouvernance.
+
+**Les 4 piliers → 4 fichiers par agent** (version détaillée du tableau condensé de RES-024) :
+
+| Pilier | Fichier généré | Contenu |
+|--------|----------------|---------|
+| Mandat | `MANDATE.md` | mission (1 phrase, sans « tout ») · valeur livrée · interdictions JAMAIS · sources d'autorité · humain décideur · critères de succès |
+| Périmètre | `SCOPE.md` | tools autorisés (allowlist Read/Write/Bash/WebFetch) · tools interdits (denylist) · ressources externes (APIs + rate limits) · limites (max tokens/turns/timeout/budget$) |
+| Checkpoints | `CHECKPOINTS.md` | validations humaines (trigger/validator/format) · logs structurés (event/schema/destination/rétention) · hooks lifecycle (PreToolUse/PostToolUse/OnError/OnComplete) · métriques + seuils · rapport de session |
+| Escalade | `ESCALATION.md` | conditions d'arrêt (technique/sévérité/action) · chemins info/warning/critical · format message · modes dégradés · **stop conditions globales = « dead man's switches »** |
+
+**Checklist pre-deploy (10-Q, AVANT le 1er deploy)** — distincte de la 10-Q d'audit de RES-024 : Mandat 2 (mission 1 phrase sans « tout » / ≥3 interdictions) · Périmètre 2 (liste exhaustive fichiers-APIs écrits / budget max tokens-$-turns) · Checkpoints 2 (action destructive → validation humaine / logs vers un endroit regardé) · **Escalade 4** (3+ conditions d'arrêt à action immédiate / humain nommé reçoit les escalades / mode dégradé si API tombe / **kill switch sans Claude, hors de la stack déployée**). Règle : « l'audit post-déploiement coûte 10× plus cher que la prévention ».
+
+**`contract.yaml` long-form (100+ lignes)** = version canonique du contrat minimal de RES-024. Arbre complet : `mandate{mission, value_delivered, prohibitions[], authority_sources, human_decision_maker, success_criteria[]}` · `scope{allowed_tools{read,write,bash,web_fetch,subagents}, denied_tools[], resource_limits{max_tokens, max_turns, timeout, max_budget}}` · `checkpoints{human_validation_required, structured_logs{event,schema,destination,retention}, lifecycle_hooks{pre_tool_use,post_tool_use,on_error,on_complete}, metrics, alert_threshold}` · `escalation{stop_conditions[], escalation_paths{warning,critical}, degraded_modes, global_stop_conditions[]}` · `metadata{deployment, kill_switch, rollback_procedure, review{last_audit_date, next_audit_date, audit_frequency}}`.
+
+**Application MAS** :
+- **Le contract.yaml long-form = le super-set de `config/permissions.json` + fiche Tier A + budget.** Mapping : `mandate` → fiche (role + interdits + escalate_when) ; `scope.allowed_tools/denied_tools` → `tools≤7` + permissions.json (allowlist hosts) ; `resource_limits` → TOKEN_STRATEGY §8 (budget mission) ; `checkpoints.human_validation_required` → CLAUDE.md §5 ; `lifecycle_hooks` → hooks Phase 6 ; `escalation.global_stop_conditions` (dead man's switch) → kill switch worker ; `metadata.review.audit_frequency` → cadence EVAL-XXX (RES-040). **Candidat enrichissement schema permissions Phase 6** (à valider en ADR, pas adopter tel quel).
+- **Découpage 4 fichiers (MANDATE/SCOPE/CHECKPOINTS/ESCALATION.md) vs notre fiche unique** : MAS garde **une fiche par agent** (RES-048, ≤200 lignes) — le multi-fichier est plus verbeux et n'apporte rien pour un single-user ; on extrait la **structure des champs**, pas le découpage. Pas de changement d'archi.
+- **Pre-deploy 10-Q (poids Escalade ×4)** confirme que l'escalade/kill switch est le point faible le plus dangereux → à prioriser dans l'audit self (gate Phase 3.5, cf. backlog self-audit).
+- ⚠️ Le doc cible **Managed Agents** (cloud, PAYG) comme destination de déploiement — **interdit §11** ; MAS applique le framework **en local uniquement** (cf. RES-016, agents-skills.md). Framework adopté, cible cloud rejetée — pas d'intégration silencieuse.
+
+---
+
+## RES-008 — Audit des 3 dettes invisibles : documentaire / technique / cognitive
+
+**Principe** : « ça tourne » ≠ « c'est sain ». 3 dettes s'accumulent en silence dans tout projet piloté par l'IA et se révèlent quand le projet grossit. Chacune a un prompt d'audit, une checklist 7-questions et un score /10 (0-3 sain, 4-6 attention, 7-10 critique). Score global /30.
+
+| Dette | Ce qui s'accumule | Symptôme visible | Note |
+|-------|-------------------|------------------|------|
+| **Documentaire** | décisions prises jamais tracées | l'IA contredit une décision d'il y a 2 semaines | fondation des 2 autres |
+| **Technique** | code/config sans structure | un changement anodin casse 3 autres choses | — |
+| **Cognitive** | complexité que personne ne comprend | « pourquoi on a fait ça déjà ? » chaque semaine | ⚠️ **la pire** : écart entre ce que le projet fait et ce que les humains en comprennent |
+
+**Ordre de réduction** : documentaire d'abord (la fondation), technique ensuite, cognitive en dernier. Plan : CLAUDE.md + registre décisions (EDR) → mémoire active → hook PreToolUse destructif → glossaire projet → documenter le « pourquoi » des décisions majeures.
+
+**Application MAS** :
+- **MAS est conçu contre ces 3 dettes.** Documentaire = ADRs (`docs/decisions/`) + `docs/backlog/` + Decision Log (Phase 4.5). Technique = filet Vitest + structure packages (RES-057). Cognitive = `docs/knowledge/` + CLAUDE.md + le présent travail de distillation.
+- La checklist documentaire valide notre discipline (décisions tracées ADR/EDR, conventions écrites, onboarding < 30 min) ; la checklist technique valide nos garde-fous (tests sur fonctions critiques, pas de duplication, hook destructif Phase 6, dépendances à jour).
+- **Self-audit** : faire tourner les 3 prompts d'audit sur MAS lui-même au gate Phase 3.5 — score /30 attendu en zone « sain » si la discipline tient (cf. backlog self-audit).
+- ⚠️ **Dette cognitive = argument pour le pont de persistance** (`knowledge-bootstrap.md §5.bis`) : sans le pont docs/knowledge → mémoire Phase 4, le savoir build-time devient dette cognitive runtime.
+
+---
+
+## RES-012 — Checklist 5 DON'T/DO (les habitudes qui scalent)
+
+**Principe** : 95 % des projets Claude Code fonctionnent en « question-réponse » et s'effondrent quand ils grossissent. Les 5 % qui scalent **gouvernent AVANT d'automatiser**.
+
+| # | DON'T | DO | MAS |
+|---|-------|----|-----|
+| 1 | coder sans CLAUDE.md | constitution avant le code (**< 200 lignes, chaque instruction vérifiable**) | ✅ CLAUDE.md — ⚠️ longueur à auditer (backlog lean-claude-md) |
+| 2 | un agent par tâche | skills d'abord, agents si isolation requise | ✅ matrice agent/skill (RES-048/035) |
+| 3 | auto mode sans filet | hooks de sécurité avant de lâcher la bride | ⏳ Phase 6 (PreToolUse bloque rm/force push/drop) |
+| 4 | chaque session repart de zéro | mémoire auto + capitalisation | ⏳ Phase 4 (Memory Keeper) |
+| 5 | 10 MCP « au cas où » (50k+ tokens) | CLI par défaut, MCP si justifié (connexion persistante/équipe) | ✅ token discipline + Tool Search lazy |
+
+**Application MAS** :
+- DON'T#1 énonce la règle **CLAUDE.md < 200 lignes, instructions vérifiables** — notre CLAUDE.md la dépasse → **candidat self-audit** (backlog). Ne pas éditer CLAUDE.md ici.
+- DON'T#5 « CLI > MCP » valide la discipline token (TOKEN_STRATEGY) et l'usage de Tool Search (chargement paresseux des schémas d'outils).
+- DON'T#3 (hooks avant auto mode) cadre les autonomy gates Phase 6 : `--dangerously-skip-permissions` interdit, PreToolUse obligatoire.
+- Ordre RES-012 « constitution → skills → hooks → mémoire ». MAS place la mémoire (Phase 4) avant les hooks (Phase 6) — choix de séquençage assumé, sans contradiction de fond (la constitution reste première).
+
+---
+
+## RES-013 — Starter kit : les 3 types de fichiers (Constitution / Agents / Mémoire)
+
+**Principe** : tout projet piloté par l'IA tient sur 3 types de fichiers texte — pas du code, pas un framework : de l'infrastructure documentaire.
+
+| Type | Fichier(s) | Rôle | Quand lu |
+|------|-----------|------|----------|
+| **1. Constitution** | CLAUDE.md | règles du jeu : organisation, conventions, contraintes | à chaque session, en premier |
+| **2. Agents** | `.claude/agents/*.md` | qui fait quoi : mandat, territoire, contrats | quand une tâche est déléguée |
+| **3. Mémoire** | `.claude/memory/*.md` | ce que le projet a appris : décisions, blocages, itérations | à la demande, via un index |
+
+**Les 5 registres mémoire** (Type 3) : `EDR.md` (décisions), `LEARNINGS.md` (apprentissages), `BLOCKERS.md` (blocages + résolution), `ITERATION_LOG.md` (journal de session), `CONTEXT.md` (état/priorités). **`MEMORY.md` = index** : chargé à chaque session, contient liens + résumés d'une ligne (**pas** le contenu) → charge le minimum, détail à la demande.
+
+**Application MAS** :
+- Valide notre triple structure : Constitution = CLAUDE.md (+ AGENTS.md, PRODUCT_SPEC.md…) ; Agents = `packages/agents/fiches/` ; Mémoire = `data/memory/<projectId>/` (Phase 4).
+- **Les 5 registres = corpus de seed pour la mémoire Phase 4** (cf. `knowledge-bootstrap.md §5.bis`, le pont de persistance). À aligner avec les 5 registres de `project-doctrine.md` et la mémoire 4-niveaux (agent-patterns.md / agentmemory).
+- **`MEMORY.md` = index (liens + 1 ligne), pas le contenu** : exactement le pattern du sommaire RES-056 (vibeflow/memoire.md) ET de notre propre auto-mémoire (`MEMORY.md` + cartes). Convergence forte → conforter en Phase 4.
+- Différence agent vs skill (« exécutant » vs « livre de connaissance ») : redondant avec RES-035 (déjà intégré), non re-distillé.
+
+---
+
 ## Synthèse — Mapping Gouvernance
 
 | Pattern | Composant MAS | Phase |
@@ -125,5 +246,12 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 | OWASP 3 risques (042) | Sec Reviewer audit + ASI04 install policy | 3.5, 6 |
 | EVAL-XXX 8 champs + 3 dérives (040) | Quality Controller output format + multi-model cross-check | 3.5 |
 | DURCIR 3 niveaux (036) | pipeline LRN→rules→CLAUDE.md + drift-log + circuit breaker | 4, 6 |
+| 4 piliers + verdict PROD/STAGING/BLOQUÉ/ARRÊTER (024) | QC audit fiches + kill switch worker + contract.yaml ↔ permissions.json | 3.5, 6 |
+| Framework 4 piliers détaillé + contract.yaml long-form (Structurer AVANT) | contract ↔ permissions.json + fiche + budget ; cible cloud rejetée §11 | 3.5, 6 |
+| 3 dettes invisibles + score /30 (008) | ADR/EDR + filet test + docs/knowledge ; self-audit MAS | 3.5 |
+| 5 DON'T/DO (012) | constitution<200l (self-audit) + CLI>MCP + hooks avant auto | 3.5, 6 |
+| 3 types fichiers + 5 registres (013) | triple structure + seed mémoire Phase 4 | 4 |
 
-**Ressources 404 à récupérer** : RES-024 (audit 10 min), RES-023 (governance cadrage→monitoring), RES-022 (lean CLAUDE.md), RES-008 (3 dettes), RES-013 (starter kit), RES-006/004/003. Voir INDEX.md.
+**Distillation Batch 1 (2026-06-04)** : RES-024, 008, 012, 013 ✅ intégrés ici depuis `docs/ressources/`. RES-022 (lean CLAUDE.md) : **PDF absent** → `docs/backlog/self-audit-lean-claude-md.md`. RES-006/004/003 : superseded (cf. INDEX.md). RES-023/015/016 → `agents-skills.md`.
+
+**Ré-audit cycle `2026-06-04-vibeflow-reaudit`** : (1) « 40 % Gartner » **re-sourcé** — il vient du PDF « Structurer AVANT », pas de RES-024 ; corrigé dans l'ouverture RES-024. (2) Framework 4 piliers **détaillé** + checklist pre-deploy 10-Q + **contract.yaml long-form** distillés (lus mais non distillés au Batch 1). Mapping RES-023 entre « Gouverner Templates+Prompts » et « Structurer AVANT » signalé non tranché.

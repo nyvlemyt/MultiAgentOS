@@ -118,6 +118,89 @@ Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Agents/Skills
 
 ---
 
+## RES-023 — Gouverner tes agents : 3 principes + 5 patterns de contrats + fiche template
+
+**Principe** : un agent est un multiplicateur — de structure ou de chaos. Ajouter des agents sans gouvernance = ajouter des moteurs sans châssis. 3 principes fondateurs + des contrats explicites entre agents.
+
+> **Source / mapping** : cette section distille le PDF **« Gouverner tes Agents IA Templates + Prompts »** (4 prompts + 5 patterns de contrats). Le **framework 4-piliers détaillé + contract.yaml long-form** est dans le PDF compagnon **« Structurer la gouvernance AVANT de déployer »** → `vibeflow/gouvernance.md`. Lequel des deux PDFs est le « vrai » RES-023 n'est **pas tranché à 100 %** (RES-024 nomme RES-023 « le guide Gouverner tes agents IA » → ce PDF-ci ; mais l'INDEX décrit RES-023 « cadrage→monitoring » + le contrat 100+ lignes → l'autre PDF). Voir `docs/learning/2026-06-04-vibeflow-reaudit/build-report.md`.
+
+**3 principes de gouvernance** :
+1. **Un agent = un mandat** — chaque agent fait UNE chose (le rédacteur rédige, le relecteur relit).
+2. **Territoire défini** — chaque agent sait où il peut agir et où non (l'analyste observe, ne modifie rien).
+3. **Contrats d'interaction explicites** — qui valide quoi, qui passe le relais à qui (jamais implicite).
+
+**Les 5 patterns de contrats inter-agents** (le net-new vs RES-035/048) :
+
+| Pattern | Quand | Exemple |
+|---------|-------|---------|
+| Chaîne séquentielle | le travail passe d'un agent à l'autre | Rédaction → Relecture → Publication |
+| Autorité de domaine | un agent a le dernier mot sur un sujet | Qualité valide avant mise en prod |
+| Séparation des pouvoirs | empêcher qu'un agent fasse tout | celui qui écrit ne publie pas |
+| Escalation | un agent ne sait pas quoi faire | si doute, remonter au coordinateur |
+| Parallélisme | agents en même temps sur tâches indépendantes | recherche + rédaction en parallèle |
+
+**Prompt d'audit (6 checks)** : Mandat clair / Territoire défini / Contraintes explicites / Chevauchements / Zones grises / Escalation → rapport avec score gouvernance /10 + problèmes par gravité + 3 actions prioritaires.
+
+**Template fiche agent** : `name / description / tools / model (haiku|sonnet|opus) / memory: project / skills[]` + corps Markdown (mission / territoire / contraintes / escalade / format de sortie).
+
+**Application MAS** :
+- **Les 5 patterns de contrats = le cœur de la communication Tier A↔B (Phase 5).** Le dispatcher implémente déjà : chaîne séquentielle (DAG), autorité de domaine (un décideur par territoire, RES-035), séparation des pouvoirs (exécutant ≠ Reviewer ≠ Sec Reviewer), escalation (`escalate_when`), parallélisme (tâches DAG indépendantes). **À formaliser explicitement en `contracts` dans AGENTS.md.**
+- Le prompt d'audit 6-checks + score /10 = capacité Quality Controller (complète RES-043 4 champs + RES-024 4 piliers).
+- **« Zones grises = responsabilité que personne ne couvre »** : garde-fou Mission Planner — toute tâche du DAG doit avoir un agent assigné, sinon escalade.
+- Template fiche aligné Claude Code sub-agent format ; nos fiches ajoutent `budget`, `escalate_when`, `output_format`, `tools≤7`.
+
+---
+
+## RES-015 — Guide vrais agents : test 3-Q automatisation vs agent + 10-Q gouverné + 6 erreurs
+
+**Principe** : 90 % des « agents IA » sont des automatisations déguisées. Une automatisation suit un chemin fixe (pas besoin de gouvernance) ; un agent **décide** (s'effondre sans gouvernance). Le test précède toute structuration. (Complète RES-035 : même logique, framing « chemin fixe vs décide ».)
+
+**Test en 3 questions** :
+
+| # | Question | Automatisation | Agent |
+|---|----------|----------------|-------|
+| 1 | chemin fixe ou décide ? | A→B→C, aucune variation | perçoit le contexte, choisit le chemin |
+| 2 | mandat clair ? | pas besoin, le chemin EST la gouvernance | DOIT avoir mandat + territoire + limites |
+| 3 | peut escalader ? | non, échoue/plante hors chemin | oui, remonte à un orchestrateur |
+
+→ 3× automatisation = automatisation (très bien, ne pas sur-gouverner). **Mix = hybride** (la partie qui décide a besoin de gouvernance, la partie fixe non). 3× agent = vrai agent.
+
+**Checklist « Mon agent est-il gouverné ? » (10-Q)** : mission 1 phrase non-ambiguë / territoire délimité / outils au strict nécessaire / contraintes absolues listées / règles d'escalade / format de sortie standardisé / contrats si 2+ agents / territoires disjoints / mémoire persistante / **testé sur un cas limite**. Score : 10 gouverné, 7-9 trous, 4-6 fondations sans cadre, 0-3 automatisation déguisée.
+
+**Les 6 erreurs classiques** : (1) agent couteau suisse (fait tout → travail moyen partout) ; (2) pas d'escalade (tourne en rond) ; + chevauchements, pas de contraintes, pas de format de sortie, jamais testé sur cas limite.
+
+**Format de sortie exemplaire** (fiche « analyst ») : `Fait (observation factuelle) / Evidence (données précises) / Impact (conséquence concrète) / Recommandation (action suggérée)` — sortie structurée, pas de texte libre.
+
+**Application MAS** :
+- **Le test 3-Q + « Mix/hybride » affine notre test binaire RES-035** : une tâche du DAG peut être partiellement déterministe (scoring sans LLM) + partiellement décisionnelle. Le risk classifier peut router la partie fixe en logique pure, la partie décisionnelle en agent.
+- **« Testé sur un cas limite » (Q10)** = critère absent de nos fiches actuelles → ajouter aux Verification Criteria des SKILL.md / fiches.
+- **Format Fait/Evidence/Impact/Recommandation** = excellent `output_format` par défaut pour les agents d'analyse (Reviewer, Quality Controller). À adopter.
+- « Agent couteau suisse » → confirme `tools≤7` + « un mandat = une chose » (RES-048).
+
+---
+
+## RES-016 — Managed Agents vs Local : matrice de décision (⚠️ valide le local-first MAS)
+
+**Principe** : Anthropic Managed Agents (beta publique 8 avril 2026) = agents qui tournent dans le cloud Anthropic, facturés **$0.08/heure de session + tokens standard** (donc PAYG). 5 questions de gouvernance décident local vs cloud. **Dès qu'une réponse pointe « Local obligatoire », la question est réglée.**
+
+| Question | Local obligatoire si | Managed OK si |
+|----------|----------------------|---------------|
+| 1. Autonomie | (supervise en direct) | tourne sans toi, la nuit, async |
+| 2. **Accès local** | besoin filesystem / réseau privé | données cloud / API externes |
+| 3. Maturité | (déjà gouverné = pas urgent) | part de zéro = accélération |
+| 4. Coût | >1000 sessions/jour = calcule | <50 sessions/jour = négligeable |
+| 5. **Compliance** | données sensibles / réglementées | données non sensibles |
+
+**Architecture Managed (Brain / Hands / Session)** : Brain (Claude + harness : prompt caching, compaction) ; Hands (sandboxes + outils, interface `execute(name, input)`) ; Session (event log durable append-only, reprise via `wake(sessionId)`). **Ce qui N'EXISTE PAS en Managed** : CLAUDE.md auto-chargé, hooks déterministes, `.claude/rules/`, mémoire fichier versionnée Git.
+
+**⚠️ Conclusion pour MAS — contradiction billing résolue par éviction** :
+- **Managed Agents = mode PAYG facturé à l'heure + tokens → INTERDIT par CLAUDE.md §11** (subscription only). MAS n'utilise PAS Managed Agents. Cette ressource ne s'intègre pas comme « feature à adopter ».
+- **MAIS la matrice VALIDE le choix local-first** : MAS lit des projets externes par chemin absolu (Q2 « accès filesystem » → **toujours Local obligatoire**) ; single-user local-first (Q5 données locales → Local). Les 5 questions pointent toutes vers « Local » pour notre cas d'usage. RES-016 est donc une **preuve externe de la doctrine**, pas une feature.
+- Le pattern **Session event log durable + `wake(sessionId)`** reste intéressant pour la reprise de mission MAS (cf. Inspiration Voie 2, session resume) — à miner sans adopter Managed.
+- « Ce qui n'existe pas en Managed (CLAUDE.md auto, hooks, mémoire Git) » = exactement ce que MAS garde en local → notre valeur est dans la couche gouvernance locale, pas dans l'exécution cloud.
+
+---
+
 ## Synthèse — Comment ces patterns informent MAS
 
 | Pattern | Fichier MAS | Phase |
@@ -127,5 +210,8 @@ Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Agents/Skills
 | Template auditeur 4 champs (RES-043) | quality-controller.md fiche | 3.5 |
 | 3 modes STRICT/AUDIT/SHADOW (RES-037) | risk enum → mode QC ; risk classifier | 3.5, 6 |
 | Test binaire skill/agent (RES-035) | mas-skill-router Verification Criteria | 3 (fait) |
+| 3 principes + 5 patterns contrats (RES-023) | `contracts` AGENTS.md (Tier A↔B) ; QC audit /10 | 5, 3.5 |
+| Test 3-Q + Mix/hybride + 10-Q gouverné (RES-015) | affine risk classifier ; output Fait/Evidence/Impact/Reco ; « cas limite » → Verification Criteria | 3.5 |
+| Managed vs Local (RES-016) | ⚠️ Managed = PAYG interdit §11 ; matrice valide local-first ; pattern session-resume à miner | doctrine |
 
-**Ressources 404 à récupérer pour compléter cette catégorie** : RES-015 (guide agents), RES-016 (managed agents : sub-agents vs teams), RES-024 (audit 10 min : stop/validation/logs/kill switch/budget). Voir INDEX.md.
+**Distillation Batch 1 (2026-06-04)** : RES-023, 015, 016 ✅ intégrés ici depuis `docs/ressources/`. RES-024 (4 piliers + verdict) → `vibeflow/gouvernance.md`. RES-009a/009b : superseded (cf. INDEX.md).

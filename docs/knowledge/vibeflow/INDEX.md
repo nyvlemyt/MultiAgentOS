@@ -40,11 +40,11 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012
 | 042 | OWASP Readiness Toolkit | Gouv | 3.5 | ✅ | gouvernance.md |
 | 040 | 3 dérives silencieuses + EVAL-XXX | Gouv | 3.5 | ✅ | gouvernance.md |
 | 036 | Durcir règles (3 niveaux mémoire→contract→doctrine) | Gouv | 4/6 | ✅ | gouvernance.md |
-| 024 | Audite tes agents 10 min | Gouv | 3.5 | ❌ 404 | à ré-exporter |
-| 023 | Governance agents IA (cadrage→monitoring) | Gouv | ref | ❌ 404 | à ré-exporter |
-| 022 | Lean CLAUDE.md | Gouv | 3 | ❌ 404 | à ré-exporter |
-| 013 | Starter kit 3 fichiers | Gouv | ref | ❌ 404 | à ré-exporter |
-| 008 | Audit 3 dettes IA cachées | Gouv | ref | ❌ 404 | à ré-exporter |
+| 024 | Audite tes agents 10 min | Gouv | 3.5 | ✅ PDF | gouvernance.md (4 piliers+verdict) |
+| 023 | Governance agents IA (cadrage→monitoring) | Gouv | ref | ✅ PDF | agents-skills.md (Gouverner Templates) + gouvernance.md (Structurer AVANT, 4 piliers) ⚠️ mapping 2 PDFs non tranché |
+| 022 | Lean CLAUDE.md | Gouv | 3 | ❌ PDF absent | backlog/self-audit-lean-claude-md.md |
+| 013 | Starter kit 3 fichiers | Gouv | ref | ✅ PDF | gouvernance.md (3 types fichiers) |
+| 008 | Audit 3 dettes IA cachées | Gouv | ref | ✅ PDF | gouvernance.md (3 dettes /30) |
 | 006 | Structure projet IA universelle | Gouv | ref | ❌ 404 | superseded |
 | 004 | Agents et gouvernance : 4 piliers | Gouv | ref | ❌ 404 | superseded |
 | 003 | Architecture du contexte | Gouv | ref | ❌ 404 | superseded |
@@ -62,8 +62,8 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012
 | 037 | 3 modes audit STRICT/AUDIT/SHADOW | Ag | 3.5 | ✅ | agents-skills.md |
 | 035 | Skill ou Agent : test binaire | Ag | 3 | ✅ | agent-patterns.md |
 | 048 | Architecture agent qui tient (matrice agent/skill) | Ag | 3 | ✅ | agents-skills.md |
-| 015 | Guide agents IA | Ag | ref | ❌ 404 | à ré-exporter |
-| 016 | Managed Agents : décision sub-agents vs teams | Ag | 3.5 | ❌ 404 | à ré-exporter |
+| 015 | Guide agents IA | Ag | ref | ✅ PDF | agents-skills.md (test 3-Q+10-Q+6 erreurs) |
+| 016 | Managed Agents : décision sub-agents vs teams | Ag | 3.5 | ✅ PDF | agents-skills.md (⚠️ Managed=PAYG, valide local-first) |
 | 009a | Template .claude/ folder | Ag | ref | ❌ 404 | superseded |
 | 009b | Starter kit gouvernance | Ag | ref | ❌ 404 | superseded |
 | 025 | 3 chemins hors du terminal | Hooks | 6 | ❌ 404 | hooks.md (à ré-exporter) |
@@ -80,7 +80,7 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012
 | 031 | 3 checks avant upgrade modèle | WF | 3.5 | 📁 local | workflows.md |
 | 030 | Les 6 modes de Claude Code | WF | 3.5 | ✅ récupéré | `../claude-code-context-and-modes.md` |
 | 028 | Du vibe coding à la gouvernance | WF | ref | ❌ 404 | à ré-exporter |
-| 012 | Checklist DON'T / DO | WF | 3 | ❌ 404 | à ré-exporter |
+| 012 | Checklist DON'T / DO | WF | 3 | ✅ PDF | gouvernance.md (5 DON'T/DO) |
 
 **Note** : RES-051, 050, 049 mentionnés dans la catégorie Workflows par l'utilisateur ; leur contenu clé est référencé dans le tableau 23 de RES-052 (workflows.md). RES-051 (doctrine trio) fetchée en entier.
 
@@ -88,16 +88,22 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012
 
 L'utilisateur peut ré-exporter ces pages depuis Notion (markdown) pour intégration complète :
 
+**Note (Batch 1, 2026-06-04)** : les ressources « à ré-exporter » étaient en fait disponibles en PDF dans `docs/ressources/`. Batch 1 Gouvernance+Agents distillé directement depuis ces PDFs (RES-024/023/013/008/012/015/016 ✅). Seule RES-022 (lean CLAUDE.md) n'a pas de PDF correspondant.
+
+**Ré-audit (cycle `2026-06-04-vibeflow-reaudit`)** : 1 PDF supplémentaire identifié dans `docs/ressources/` et distillé — « Structurer la gouvernance AVANT de déployer tes agents IA » (4 piliers détaillé + contract.yaml long-form), candidat RES-023 mais mapping non tranché vs « Gouverner Templates+Prompts ». Correction de fidélité : « 40 % Gartner » re-sourcé (vient de ce PDF, pas de RES-024). Détail : `docs/learning/2026-06-04-vibeflow-reaudit/build-report.md`.
+
 | Priorité | RES | Pour |
 |----------|-----|------|
-| **Phase 3.5** | 024 (audit 10min), 016 (managed agents), 030 (6 modes) | Quality Controller + multi-model router |
-| **Phase 6** | 025, 026, 027 (hooks) | Autonomy gates + settings.json hooks |
-| Phase 3 | 022 (lean CLAUDE.md), 012 (DON'T/DO), 014 (prompt context) | Verification Criteria, anti-patterns |
-| ref | 023, 015, 028, 039, 008 | enrichissement |
+| **Phase 3.5** | 024 ✅, 016 ✅, 030 ✅ (tous distillés) | Quality Controller + multi-model router |
+| **Phase 6** | 025, 026, 027 (hooks) — PDF dispo, **prochain batch** | Autonomy gates + settings.json hooks |
+| Phase 3 | 012 ✅, 022 (PDF absent → backlog), 014 (reste 404) | Verification Criteria, anti-patterns |
+| ref | 023 ✅, 015 ✅, 008 ✅, 028/039 (reste 404) | enrichissement |
 
 ## Total intégré
 
-- **17 ressources fetchées + intégrées** (contenu réel extrait)
+- **17 ressources fetchées + intégrées** (contenu réel extrait, MCP)
+- **+7 distillées depuis PDF** (Batch 1 Gouvernance+Agents : RES-024/023/013/008/012/015/016)
 - **6 locales** (docs/claude doc/)
 - **2 Google Docs** (Graphify, Instagram×Obsidian)
-- **~20 à ré-exporter** (404 via intégration MCP)
+- **1 PDF absent** (RES-022 lean CLAUDE.md → backlog self-audit)
+- **~12 restantes** (hooks 025/026/027 PDF dispo prochain batch ; 014/028/039 + superseded)
