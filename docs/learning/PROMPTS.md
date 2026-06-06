@@ -68,22 +68,34 @@ CONTRAINTES : ne modifie pas les fichiers knowledge (c'est le rôle du Doer). Co
 ---
 
 
-## Cycle courant : `2026-06-04-vibeflow-index-reconciliation`
+## Cycle courant : `2026-06-06-vibeflow-memoire-reaudit`
 
-**{{SCOPE}}** = Réconcilier INDEX.md ↔ les **44 PDF** de `docs/ressources/` (inclut `RES-058`). **Catalogage seul, ZÉRO distillation profonde** (la distillation reste juste-à-temps par phase, cf. knowledge-bootstrap §3). But : rendre le radar exact AVANT les pré-vols par phase. L'INDEX porte encore le statut ère-MCP (`❌ 404 / à ré-exporter`) alors que beaucoup de PDFs existent maintenant.
+**Type** : cycle de **distillation** (intake-audit COMPLET par ressource, pas catalogage). Pré-vol Phase 4 (Mémoire) + durcissement du pont de persistance (knowledge-bootstrap §5.bis : Phase 4 sème le second cerveau DEPUIS `docs/knowledge/`).
 
-**INPUTS RÉSOLUS (utilisateur, 2026-06-05) — à appliquer dans le cycle :**
-- **RES-023 = `023-Structurer la gouvernance AVANT...pdf`** (tranché, fichier préfixé). Donc : (a) corriger INDEX L53 « non tranché » → tranché ; (b) **re-titrer** `agents-skills.md` L121/L125 qui labellise encore RES-023 le PDF « Gouverner tes Agents IA Templates + Prompts » — ce PDF devient un **orphelin sans n°** → lui attribuer un RES libre ou marquer « nouveau ». (relabel = correction de catalogage, autorisé ; pas une re-distillation.)
-- **RES-022 = `022-Lean claude.pdf`** présent, renvoie l'overview de la doc Claude → `distilled`/couvert (INDEX L54 déjà ✅). Vérifier cohérence.
-- **RES-058 = `🏗️ Le setup qui fait tourner mes SaaS avec Claude Code.pdf`** (re-téléchargé en PDF, format OK). Catégorie probable Workflows (voisin RES-053). Catalogue net-new → nouvelle ligne INDEX RES-058.
+**{{SCOPE}}** = Ré-auditer + compléter la distillation **MÉMOIRE** (`docs/knowledge/vibeflow/memoire.md`, `docs/knowledge/memory-patterns.md`, `docs/knowledge/project-doctrine.md` §5 registres), faite en partie sur sources MCP/404, contre les **PDFs mémoire réels** de `docs/ressources/`. Même profil de risque que le cycle gouvernance (stats inventées, sur-interprétation). **BONUS si budget < 80 %** : RES-061 « 3 Paradigmes de la Gouvernance IA » (Phase 3.5).
 
-MÉTHODE (cataloguing, léger) :
+**RES ↔ PDF (mémoire) :**
+- RES-029 = `La vraie mémoire de ton agent Claude Code 5 registres + rituel + Obsidian.pdf` → memoire.md (distilled, **re-vérifier fidélité**)
+- RES-056 = `Le sommaire que ton IA lit avant de fouiller sa mémoire.pdf` → memoire.md (re-vérifier)
+- RES-044 = `Rituel close-out de session 3 champs 5 minutes 1 an de mémoire.pdf` → memoire.md (re-vérifier)
+- RES-034 = `Le rituel de consolidation memoire 4 actions 30 min-mois.pdf` → memoire.md (re-vérifier)
+- RES-045 = `Le cadre mental pour savoir par ou commencer.pdf` → memoire.md (re-vérifier)
+- **RES-041** = `Mémoire d'un système IA les 3 niveaux + mapping outil.pdf` → memory-patterns.md **PARTIEL → COMPLÉTER** (3 niveaux + mapping outil)
+- **RES-007** = `La Memoire Projet pour ton IA.pdf` → marqué « superseded by 029 » : **ouvrir le PDF, confirmer** vraiment superseded OU contenu unique à récupérer
+- **RES-003** = `L'Architecture Complete du Contexte dans Claude Code.pdf` → statut `watch` : **trancher** distill (Phase 4) vs garder watch
+- **NET-NEW RES-060** = `Le Registre Learning Records le Fichier que 95% des Builders IA n'ont Pas.pdf` → **distiller** (registre learning = pont knowledge-bootstrap §5). ⚠️ **VÉRIFIER la stat « 95 % »** contre le PDF (piège type « 40 % Gartner » du cycle gouvernance).
+- RES-014 (`Prompt context agentic`) = orphelin (pas de PDF) → laisser.
+- **BONUS RES-061** = `Les 3 Paradigmes de la Gouvernance IA Du Prompt à l'Orchestre.pdf` → gouvernance.md ou agent-patterns.md (Phase 3.5).
 
-1. Lister les 44 PDF de `docs/ressources/`. Pour chacun : mapper au RES par TITRE (les noms de fichiers ne portent pas le n° RES sauf RES-040). 3 cas : (a) **mappé** à une ligne RES existante → corriger le statut (`404`→`✅ PDF`, `à ré-exporter`→`✅ PDF`) ; (b) **superseded à re-vérifier** — le PDF existe maintenant (ex RES-006 « Structurer Ton Projet IA Le Guide Universel », RES-003 « Architecture du Contexte ») → vérifier d'1 coup d'œil si vraiment superseded ou à re-promouvoir `watch/backlog_next` ; (c) **net-new non catalogué** (« Le Registre Learning Records », « Les 3 Paradigmes de la Gouvernance », « Comment rendre tes projets IA portables »…) → nouvelle ligne INDEX, n° RES si déductible sinon marqué « nouveau / non mappé ».
-2. PDFs sans correspondance RES + lignes RES sans PDF : tabuler explicitement (les 2 sens). « Ressources Accueil Notion.pdf » = la page catalogue elle-même, pas une ressource → marquer méta.
-3. Pour chaque PDF, décision enum LÉGÈRE (intake-audit allégé) : `distilled` (déjà fait) / `backlog_next:<phase>` (à distiller au pré-vol de cette phase) / `watch` / `reject` / `superseded`. PAS de distillation de contenu — juste le verdict de catalogage + phase cible.
-4. RES-023 **déjà tranché** par l'utilisateur (= « Structurer AVANT », cf. INPUTS RÉSOLUS) : appliquer le relabel, ne pas ré-ouvrir le débat. Reste à trancher : le n°/statut du PDF orphelin « Gouverner Templates+Prompts ».
+(N°s 060/061 = **locaux**, source Notion 404, à confirmer au ré-export — convention RES-058/059.)
 
-CONTRAINTES : INDEX.md (+ éventuellement docs/backlog/ pour net-new à distiller plus tard) UNIQUEMENT. NE distille AUCUN contenu dans gouvernance/agents-skills/memoire/etc. (c'est le rôle des cycles par phase). Ne touche PAS CLAUDE.md. Aucun code/.env. §11. Pause à 80% budget. Toute ressource qui révèle une contradiction archi → signaler, pas intégrer.
+MÉTHODE (intake-audit COMPLET par ressource, cf. `intake-audit-template.md`) :
+1. Pour chaque RES ci-dessus : ouvre le **PDF source** + le **passage distillé existant**. Vérifie fidélité ligne-à-ligne. Corrige toute invention/sur-interprétation/stat non sourcée. Enrichis les trous (ex RES-041 partiel).
+2. **Scan anti-stat-inventée** sur TOUTES les sections mémoire (5 registres, 3 niveaux, sommaire, close-out, consolidation) : chaque chiffre présenté comme sourcé doit exister dans son PDF. Liste-les avec preuve (comme le cycle gouvernance).
+3. Distille le net-new (RES-060 Registre Learning Records ; bonus RES-061) dans les fichiers `docs/knowledge/` EXISTANTS — structure §12 (Principes + source citée, jamais de chiffre absent du PDF présenté comme sourcé).
+4. **Pont de persistance (§5.bis)** : aligne explicitement la connaissance mémoire distillée avec (a) les 5 registres de `project-doctrine.md`, (b) le modèle mémoire runtime visé Phase 4 (`data/memory/<projectId>/`). Signale tout écart entre la doctrine vibeflow et l'archi MAS — NE l'intègre PAS en silence.
+5. Mets à jour les statuts INDEX (041 partiel→distilled, 007 tranché, 003 tranché, +060, +061 ; catégorie Mém +1, WF/Gouv pour 061).
 
-SORTIE OBLIGATOIRE : `docs/learning/2026-06-04-vibeflow-index-reconciliation/build-report.md` — table complète 44 PDF ↔ RES (statut avant/après) · net-new (nouvelles lignes, dont RES-058) · lignes RES orphelines (sans fichier) · décisions catalogage (phase cible) · relabel RES-023 appliqué + n° du PDF orphelin « Gouverner Templates+Prompts » · commit proposé. NE COMMITE PAS.
+CONTRAINTES : docs/knowledge/ (memoire.md, memory-patterns.md, project-doctrine.md, INDEX.md, +gouvernance/agent-patterns pour 061) + docs/backlog/. Ne touche PAS CLAUDE.md (idée touchant la constitution → backlog candidat self-audit). **AUCUN code / schéma `data/memory/` / config / .env** (c'est le BUILD Phase 4, pas ce cycle). §11 (aucun PAYG). Structure §12 (pas de stub ; jamais de chiffre inventé présenté comme sourcé). Pause à 80 % budget (le bonus RES-061 saute en premier). Toute contradiction avec l'archi MAS → signaler, pas intégrer.
+
+SORTIE OBLIGATOIRE : `docs/learning/2026-06-06-vibeflow-memoire-reaudit/build-report.md` (format build-report de README.md) — périmètre · table RES↔PDF · table décisions (implement/adapt/backlog/watch/reject) · **scan anti-stat-inventée (chiffre · PDF · présent ?)** · fichiers touchés · fidélité/écarts corrigés · RES-041 complété · RES-007/003 tranchés (preuve) · net-new RES-060 (+061 bonus) distillé · **alignement pont de persistance §5.bis** · contradictions signalées · questions ouvertes · commit proposé. NE COMMITE PAS. Laisse le working tree modifié.

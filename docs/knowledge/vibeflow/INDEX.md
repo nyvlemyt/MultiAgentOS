@@ -8,7 +8,7 @@ Source : Notion database wiki @le_gouverneur_ia (`collection://37424138-fc8c-80d
 
 **Réconciliation 2026-06-04 → mise à jour 2026-06-05** (cycle `vibeflow-index-reconciliation`) : **44 PDFs présents** dans `docs/ressources/` ré-appariés à l'INDEX. Le statut « ❌ 404 / à ré-exporter » de l'ère MCP est **caduc**. Détail : `docs/learning/2026-06-04-vibeflow-index-reconciliation/build-report.md`.
 
-- **44 PDFs** → **40 mappés à un n° RES** (`+RES-058`, `+RES-059` nouveaux), **3 nouveaux sans n°** (portables, registre learning, 3 paradigmes), 1 méta (page catalogue Notion).
+- **44 PDFs** → **42 mappés à un n° RES** (`+RES-058/059/060/061` nouveaux locaux), **1 nouveau sans n°** (« Comment rendre tes projets IA portables »), 1 méta (page catalogue Notion).
 - **RES-023 TRANCHÉ (2026-06-05, utilisateur)** = `023-Structurer la gouvernance AVANT...pdf`. Le PDF « Gouverner tes Agents IA Templates+Prompts » **renuméroté RES-059** (n° local, source Notion 404) — distillation dans agents-skills.md.
 - **RES-022** : `022-Lean claude.pdf` = en réalité la page **Overview Claude Code Docs** (**doc de référence, NON distillée** — son contenu propre n'est repris nulle part) ; la règle « <200 lignes » provient de **RES-012**, pas de ce PDF.
 - **4 PDFs portent un préfixe RES** : `022-`, `023-`, `024-`, `RES-040-`.
@@ -21,11 +21,11 @@ Source : Notion database wiki @le_gouverneur_ia (`collection://37424138-fc8c-80d
 
 ## Catégorisation autoritaire (5 catégories)
 
-### 🏛️ Gouvernance & Architecture IA (13)
-RES-057, 055, 042, 040, 036, 024, 023, 022, 013, 008, 006, 004, 003
+### 🏛️ Gouvernance & Architecture IA (14)
+RES-057, 055, 042, 040, 036, 024, 023, 022, 013, 008, 006, 004, 003, **061** (n° local : 3 Paradigmes)
 
-### 🧠 Mémoire & Contexte (9)
-RES-056, 045, 044, 041, 034, 029, 014, 007, 011
+### 🧠 Mémoire & Contexte (10)
+RES-056, 045, 044, 041, 034, 029, 014, 007, 011, **060** (n° local : Registre Learning Records)
 
 ### 🤖 Agents & Skills (9)
 RES-046, 043, 037, 035, 015, 016, 009a, 009b, **059** (n° local : Gouverner Templates+Prompts)
@@ -58,15 +58,15 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012, **058** (nouveau : setup SaaS)
 | 008 | Audit 3 dettes IA cachées | Gouv | ref | ✅ PDF | distilled gouvernance.md (3 dettes /30) |
 | 006 | Structure projet IA universelle (« Guide Universel, peu importe l'outil ») | Gouv | ref | ✅ PDF | **superseded confirmé** (glance 2026-06-05 : synthèse tool-agnostic des primitives 013+012+051+057 ; garder réf cross-tool) |
 | 004 | Agents et gouvernance : 4 piliers | Gouv | ref | ❌ pas de PDF | superseded (orphelin ; 4 piliers couverts par 024/Structurer AVANT) |
-| 003 | Architecture du contexte (« L'Architecture Complète du Contexte ») | Gouv | 4/5 | ✅ PDF | **watch** (glance 2026-06-05 : fichiers/prompts/arborescence « prêt à copier » ; overlaps 013/057/030 — miner si design context-pack Phase 4/5) |
+| 003 | Architecture du contexte (« L'Architecture Complète du Contexte ») | Gouv | 4/5 | ✅ PDF | **watch — confirmé 2026-06-06** (fichiers/prompts/arborescence « prêt à copier » ; overlaps 013/057/030 ; distill au pré-vol Phase 4/5 si design context-pack) |
 | 056 | Le sommaire que ton IA lit avant | Mém | 4 | ✅ PDF + 📁 | distilled memoire.md |
 | 045 | Cadre mental : par où commencer | Mém | ref | ✅ PDF | distilled memoire.md |
 | 044 | Rituel close-out 3 champs | Mém | 4 | ✅ PDF | distilled memoire.md |
-| 041 | Mémoire 3 niveaux + mapping outil | Mém | 4 | ✅ PDF | backlog_next:Phase4 (compléter le partiel memory-patterns.md) |
+| 041 | Mémoire 3 niveaux + mapping outil | Mém | 4 | ✅ PDF | **distilled memory-patterns.md §RES-041** (3 niveaux stockage/rappel/décision ; N3=jugement non-pluginnable ; ⚠️ Mem0 cloud rejeté §11) |
 | 034 | Rituel consolidation mémoire (4 actions) | Mém | 4 | ✅ PDF | distilled memoire.md |
 | 029 | Mémoire agent : 5 registres | Mém | 4 | ✅ PDF + 📁 | distilled memoire.md |
 | 014 | Prompt context agentic | Mém | 3 | ❌ pas de PDF | orphelin (reste à ré-exporter) |
-| 007 | Mémoire projet IA v2 | Mém | ref | ✅ PDF (`La Memoire Projet pour ton IA`) | superseded by 029 |
+| 007 | Mémoire projet IA v2 (« La Mémoire Projet pour ton IA ») | Mém | ref | ✅ PDF | **superseded confirmé** (glance 2026-06-06 : intro générique « pourquoi mémoire » + compat outils ; zéro contenu unique vs 029+041) |
 | 011 | Mémoire projet IA v1 | Mém | ref | ❌ pas de PDF distinct | superseded by 029 (orphelin) |
 | 046 | Critère de succès agent (3 formes) | Ag | 3 | ✅ PDF | distilled agents-skills.md |
 | 043 | Agent-auditeur : template 4 champs | Ag | 3.5 | ✅ PDF | distilled agents-skills.md |
@@ -94,8 +94,8 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012, **058** (nouveau : setup SaaS)
 | 012 | Checklist DON'T / DO | WF | 3 | ✅ PDF | distilled gouvernance.md (5 DON'T/DO) |
 | 058 | 🏗️ Le setup qui fait tourner mes SaaS avec Claude Code (10 briques) | WF | ref/5 | ✅ PDF **NOUVEAU** | **nouveau** → backlog_next:Phase5 (setup/prod SaaS, voisin RES-053) |
 | — | **Comment rendre tes projets IA portables** | Gouv/transv. | 5 | ✅ PDF | **nouveau** → backlog_next:Phase5 (portabilité projet — MAS référence par chemin absolu) |
-| — | **Le Registre Learning Records (95% builders n'ont pas)** | Mém | 4 | ✅ PDF | **nouveau** → backlog_next:Phase4 (registre learning, cf. knowledge-bootstrap §5) |
-| — | **Les 3 Paradigmes de la Gouvernance IA (Du Prompt à l'Orchestre)** | Gouv | 3.5/5 | ✅ PDF | **nouveau** → backlog_next:Phase3.5 (paradigmes orchestration) |
+| 060 | **Le Registre Learning Records** (LRN détaillé) | Mém | 4 | ✅ PDF | **distilled memoire.md** (n° local) — 8 champs · 4 déclencheurs · archivage 50. ⚠️ « 95 % » = headline NON sourcé ; « 50 % précision/3j » non sourcé |
+| 061 | **Les 3 Paradigmes de la Gouvernance IA (Du Prompt à l'Orchestre)** | Gouv | 3.5 | ✅ PDF | **backlog_next:Phase3.5** (n° local) — **non distillé ce cycle (budget)** |
 | 059 | **Gouverner tes Agents IA Templates + Prompts** (3 principes + 5 patterns contrats) | Ag | 5 | ✅ PDF | distilled agents-skills.md — **RES-059 (n° local, ex-candidat RES-023)** ; source Notion 404, à confirmer au ré-export |
 | — | Ressources Accueil Notion | — | — | ✅ PDF | **méta** (la page catalogue elle-même, pas une ressource) |
 
@@ -114,8 +114,8 @@ L'utilisateur peut ré-exporter ces pages depuis Notion (markdown) pour intégra
 | Phase cible | RES / PDF prêts | Pour |
 |-------------|-----------------|------|
 | **Phase 3** | — (RES-022 = Overview, **référence non distillée** ; self-audit constitution « <200 lignes » = RES-012, carte backlog) | self-audit lean CLAUDE.md |
-| **Phase 3.5** | NEW « 3 Paradigmes de la Gouvernance IA » | paradigmes orchestration (QC / router) |
-| **Phase 4** | 041 (Mémoire 3 niveaux, compléter partiel) · NEW « Registre Learning Records » | mémoire + registre learning (pont knowledge-bootstrap §5) |
+| **Phase 3.5** | **061** « 3 Paradigmes » + **stat-sweep mémoire** (044/034/045) — **1 cycle combiné** | paradigmes orchestration + dette stats (cf. backlog/self-audit-memoire-reaudit-debt.md) |
+| **Phase 4** | ✅ 041 + 060 **distillés** (cycle mémoire 06-06) ; reste 003 (watch, si context-pack) | mémoire — voir memoire.md / memory-patterns.md |
 | **Phase 5** | NEW « Projets portables » · **058 setup SaaS** | portabilité + setup prod (RES-059 contrats = déjà distillé) |
 | **Phase 6** | 025, 026, 027 (hooks) | autonomy gates + settings.json hooks |
 | ref | 028, 039 | enrichissement |
@@ -125,9 +125,9 @@ Orphelins (pas de PDF, à ré-exporter si besoin) : 014 (prompt context agentic)
 
 ## Total catalogué (2026-06-05)
 
-- **44 PDFs** dans `docs/ressources/` : **40 mappés à un n° RES** (dont RES-058 + RES-059 nouveaux ; RES-023 = 1 PDF après arbitrage) · **3 sans n°** (3 nouveaux) · **1 méta**.
-- **distilled / couvert** : ~27 RES (gouvernance/agents-skills/memoire/workflows + claude-code-context-and-modes + CLAUDE.md §11 ; inclut RES-059=Gouverner Templates). **RES-022 = Overview = référence NON distillée** (hors compte).
-- **backlog_next (PDF prêt)** : 041, 025, 026, 027, 028, 039, **058** + 3 nouveaux sans-n° = ~10, à distiller au pré-vol de leur phase.
+- **44 PDFs** dans `docs/ressources/` : **42 mappés à un n° RES** (dont 058/059/060/061 nouveaux locaux ; RES-023 = 1 PDF après arbitrage) · **1 sans n°** (portables) · **1 méta**.
+- **distilled / couvert** : ~29 RES (gouvernance/agents-skills/memoire/memory-patterns/workflows + claude-code-context-and-modes + CLAUDE.md §11 ; inclut RES-059, **RES-060 LRN, RES-041 3 niveaux**). **RES-022 = Overview = référence NON distillée** (hors compte).
+- **backlog_next (PDF prêt)** : 025, 026, 027, 028, 039, **058**, **061** + portables = ~8, à distiller au pré-vol de leur phase.
 - **watch** : 003 (contexte, re-promouvable Phase 4/5).
 - **superseded** : 006, 004, 007, 011, 009a, 009b, 038.
 - **orphelins** (pas de PDF) : 004, 009a, 011, 014, 048, 049, 050 + 047 archivée.

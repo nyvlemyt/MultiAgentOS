@@ -19,6 +19,32 @@ Ajouter `sqlite-vec` quand >200 memories par projet.
 
 ---
 
+## RES-041 — Les 3 niveaux de mémoire (stockage / rappel / décision) + mapping outil
+
+**Principe** : la mémoire d'un système IA n'est pas une couche, c'en est **trois**. Ce cadre conceptuel ordonne les outils listés plus bas. (Source : PDF « Mémoire d'un système IA : les 3 niveaux + mapping outil », distillé cycle `2026-06-06-vibeflow-memoire-reaudit`.)
+
+| Niveau | Définition | Métaphore | Couvert par |
+|--------|-----------|-----------|-------------|
+| **1. Stockage** | ce qui est archivé (faits, contexte, conversations) | le coffre-fort | plugins Mem0 / Graphiti / OpenMemory |
+| **2. Rappel** | ce qui remonte au bon moment (semantic search, relations) | le documentaliste | plugins (idem) + retrieval |
+| **3. Décision** | pourquoi tu as choisi, ce que tu as appris, ce qui a dérivé | le conseil d'administration | **aucun plugin** — fichiers que TOI tu écris |
+
+**Insight clé** : « le niveau 3 n'est pas du **signal** (qu'on peut indexer/embedder/ranker), c'est du **jugement** ». Une décision = un fait + un raisonnement + des alternatives refusées + un contexte. Un plugin peut *archiver* (N1) et *rappeler* (N2) le texte d'une décision ; il ne peut **pas** générer le raisonnement initial.
+
+**Les 3 registres niveau 3** (PDF) : `decisions.md` (**ADR-XXX**), `learnings.md` (LRN-XXX), `evals.md` (EVAL-XXX) + rituel de fermeture 5 min / 3 questions (Décidé→ADR · Appris→LRN · Dérivé→EVAL).
+
+**Mapping outil niveau 1-2 (chiffres du PDF)** :
+- **Mem0** : hybride vector+KV+graph optionnel ; « **90 % moins de tokens, 91 % plus rapide** » — **sourcé** (le PDF lui-même cite arxiv **2504.19413** + benchmarks publics dans son exemple EVAL) ; MCP officiel, setup 5 min, 24+ vector stores.
+- **Graphiti** : knowledge graph **bi-temporel** (valid_from / valid_until), P95 latency 300 ms, 20K+ stars GitHub.
+- **OpenMemory** : mémoire locale, cross-tool, privacy-first.
+
+**Application MAS (= cœur du pont §5.bis)** :
+- **Les 3 niveaux mappent 1:1 l'archi mémoire MAS** : N1-2 (stockage/rappel) = **QMD / FTS5** sur les registres Markdown (voir §QMD + §Architecture cible) ; **N3 (jugement) = les 5 registres `data/memory/<projectId>/`** écrits par le Memory Keeper. MAS ne délègue **jamais** le niveau 3 à un plugin.
+- ⚠️ **§11 / local-first** : Mem0 par défaut requiert des embeddings OpenAI (cf. §mem0ai/mem0) → **PAYG, interdit §11**. MAS prend **QMD (100 % local)** pour N1-2 ; **Mem0 cloud rejeté**. Graphiti / OpenMemory (locaux) = à auditer Phase 5, pas adoptés ici.
+- ⚠️ **Écart de nommage signalé (pas intégré en silence)** : décision = `ADR-XXX` (RES-041) vs `EDR` (RES-013 starter kit) vs **`BDR-XXX` (project-doctrine MAS, retenu)**. Même artefact ; garder `BDR-XXX` dans le code Phase 4.
+
+---
+
 ## Systèmes de mémoire — Classement
 
 | Système | Stars | Coût tokens | Priorité | Usage |
