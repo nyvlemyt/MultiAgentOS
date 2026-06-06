@@ -161,3 +161,12 @@ Le `knowledge-bootstrap.md §5.bis` exige que la mémoire Phase 4 **sème** depu
 | 3 niveaux + mapping outil (041) | QMD (N1-2) + 5 registres (N3) | voir `memory-patterns.md §RES-041` ; Mem0 cloud rejeté §11 |
 
 **Distillation cycle `2026-06-06-vibeflow-memoire-reaudit`** : RES-060 (LRN détaillé) ✅ distillé ici ; RES-041 (3 niveaux) ✅ complété dans `memory-patterns.md` ; RES-007 superseded confirmé (couvert 029+041) ; RES-003 reste `watch` (Phase 4/5). Pont §5.bis réconcilié (modèle RES-029 canonique). ⚠️ scan stats des sections **045/044/034/029/056 non re-vérifié ce cycle (budget)** — distillées sous ère MCP, à re-vérifier prochaine passe (priorité : « friction n°9/n°10 » de RES-044). Bonus RES-061 non distillé (budget). Détail : `docs/learning/2026-06-06-vibeflow-memoire-reaudit/build-report.md`.
+
+**✅ Stat-sweep cycle `2026-06-07-vibeflow-paradigmes-statsweep`** : les sections distillées sous ère-MCP **re-confrontées au PDF** — **0 statistique fabriquée présentée comme sourcée** (pas de profil « 40 % Gartner » dormant). Vérifs verbatim :
+- **RES-044** : « friction n°9 » (sub-agents Claude Code sans accès aux MCP tools du parent, « 1 heure à debugger ») = PDF **Exemple 9** p8 ✅ ; « friction n°10 » (registres illisibles « après 3 mois, 200+ entrées ») = **Exemple 10** p8-9 ✅. *Nuance de label* : le PDF numérote « Exemple 9/10 » (les exemples 8-9-10 sont tous dans la section Frictions) — appeler « friction n°9/n°10 » est exact (ce sont les frictions n°9 et n°10 du décompte global), pas une invention.
+- **RES-034** : « promouvoir 3 » (p8 « 3 occurrences = règle. Pas 2, pas 5 ») ✅ · « index > 50 lignes » (p9) ✅ · « 30 min/mois » (p5) ✅ · FUSIONNER 3→1 (p6) ✅ · ARCHIVER jamais-supprimer (p7) ✅.
+- **RES-045** : 3 couches Exécution/Jugement/Ce-qui-s'accumule (p4-5) ✅ · diagnostic 3 questions + « si paumé → #2 decisions » (p6-7) ✅.
+- **RES-029** (recoup) : « 95 % » est un **headline du PDF** (p1, « l'ordre faux chez 95 % ») **non répercuté** dans memoire.md → pas de propagation. « 5 registres » ✅.
+- **RES-056** (recoup) : le « ≤500 tokens » de SUMMARY.md (§RES-056 ci-dessus) **n'est pas dans le PDF** (le PDF parle de « 150 lignes » comme seuil de réorganisation, « 800 lignes » comme symptôme) — c'est un **choix de budget MAS**, présenté comme tel, donc pas une stat-sourcée fabriquée. Observation mineure, pas une correction.
+
+→ Dette §1 de `docs/backlog/self-audit-memoire-reaudit-debt.md` **apurée**. Détail : `docs/learning/2026-06-07-vibeflow-paradigmes-statsweep/build-report.md`.

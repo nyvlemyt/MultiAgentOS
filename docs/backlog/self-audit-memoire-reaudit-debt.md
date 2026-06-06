@@ -6,17 +6,19 @@
 
 ---
 
-## 1. Re-vérification anti-stat-inventée des distillations ère-MCP (priorité haute)
+## 1. Re-vérification anti-stat-inventée des distillations ère-MCP (priorité haute) — ✅ RÉSOLU (2026-06-07)
 
-Les sections mémoire **distillées sous l'ère MCP** (sources 404, jamais re-confrontées au PDF) n'ont **pas** été re-vérifiées ce cycle. Risque = chiffre fabriqué présenté comme sourcé (exactement le piège « 40 % Gartner » du cycle gouvernance).
+> **✅ APURÉ — cycle `2026-06-07-vibeflow-paradigmes-statsweep`.** Stat-sweep ciblé exécuté contre les PDFs. **Résultat : 0 statistique fabriquée présentée comme sourcée** — aucun « 40 % Gartner » dormant dans les distillations mémoire. Toutes les valeurs citées comme sourcées sont présentes verbatim (avec page) dans les PDFs. Détail + table complète : `docs/learning/2026-06-07-vibeflow-paradigmes-statsweep/build-report.md` ; trace dans `memoire.md` (note de clôture). Ci-dessous = la cible historique, conservée pour traçabilité.
 
-À re-vérifier contre PDF (par priorité de risque) :
-- **RES-044** (`Rituel close-out 3 champs`) — la **friction « n°9 / n°10 »** (sub-agents MCP / 200+ entrées) → memoire.md. **Priorité 1** (claim numéroté, profil « 40 % Gartner »).
-- **RES-034** (`Rituel consolidation 4 actions`) — seuils « promouvoir 3 / index > 50 / 30 min/mois ».
-- **RES-045** (`Cadre mental par où commencer`) — « 3 couches / diagnostic ».
-- **RES-029 / RES-056** — re-confronter (déjà 📁 local, risque plus faible).
+Les sections mémoire **distillées sous l'ère MCP** (sources 404, jamais re-confrontées au PDF) n'avaient **pas** été re-vérifiées au cycle 06-06. Risque = chiffre fabriqué présenté comme sourcé (piège « 40 % Gartner » du cycle gouvernance).
 
-**Méthode** : glance ciblé sur les chiffres (pas une re-distillation complète). **Folder dans le pré-vol Phase 4** OU dans le cycle RES-061 (3 Paradigmes, déjà `backlog_next:Phase3.5`) → 1 cycle combiné « distill 061 + verify stats mémoire », pas un sous-cycle isolé (économie budget, cf. `user_token-budget`).
+Re-vérifié contre PDF (par priorité de risque) :
+- **RES-044** (`Rituel close-out 3 champs`) — friction « n°9 / n°10 » (sub-agents MCP p8 / 200+ entrées-3 mois p8-9) → **verbatim ✅**. Nuance : PDF dit « Exemple 9/10 » (tous deux frictions).
+- **RES-034** (`Rituel consolidation 4 actions`) — « promouvoir 3 » (p8) / « index > 50 » (p9) / « 30 min/mois » (p5) → **verbatim ✅**.
+- **RES-045** (`Cadre mental par où commencer`) — 3 couches (p4-5) / diagnostic 3 questions (p6-7) → **verbatim ✅**.
+- **RES-029 / RES-056** (recoup) — RES-029 « 95 % » = headline PDF **non propagé** ✅ ; RES-056 « ≤500 tokens » = choix budget MAS (pas dans le PDF, mais présenté comme MAS, pas comme sourcé) → observation mineure, pas une correction.
+
+**Méthode appliquée** : glance ciblé sur les chiffres (pas une re-distillation), via `pdftotext -layout` (couche texte présente sur les 6 PDFs). Cycle combiné « distill 061 + verify stats mémoire » comme prévu (économie budget, cf. `user_token-budget`).
 
 ## 2. Harmonisation des modèles de registres mémoire (RES-013 ↔ RES-029)
 
@@ -34,7 +36,7 @@ Trois modèles de registres coexistent ; MAS en a tranché un mais la doc n'est 
 
 ## 3. Items déjà tracés ailleurs (pas dans cette carte)
 
-- **RES-061** (3 Paradigmes) : `backlog_next:Phase3.5` dans l'INDEX — à distiller au pré-vol Phase 3.5 (combinable avec §1).
+- **RES-061** (3 Paradigmes) : ✅ **distillé** `gouvernance.md §RES-061` (cycle 06-07, en même temps que §1) + cross-ref `agent-patterns.md`. ⚠️ a fait émerger une contradiction interne vibeflow : « CLAUDE.md < 150 lignes » (RES-061) vs « < 200 lignes » (RES-012) — à trancher dans `self-audit-lean-claude-md.md`, non résolu ici.
 - **RES-003** (Architecture du contexte) : `watch` dans l'INDEX — distill vs watch tranché définitivement au pré-vol Phase 4 (besoin lecture profonde, design context-pack).
 
 ---

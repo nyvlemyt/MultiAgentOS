@@ -131,6 +131,22 @@ Pour les missions nécessitant >16 agents : utiliser **Dynamic Workflows** (Clau
 
 ---
 
+## Cadrage : MAS = palier 3 « Agentic Engineering » (RES-061)
+
+Source : `docs/knowledge/vibeflow/gouvernance.md §RES-061` (3 Paradigmes : Prompt → Context → Agentic Engineering).
+
+L'échelle de maturité de gouvernance IA situe MAS au **palier 3** : on ne pilote plus UN assistant, on **gouverne un système d'agents** (mandat + territoire + outils + contrats d'interaction). L'orchestration = *qui fait quoi, qui valide qui, dans quel ordre* — exactement le pipeline `Mission Planner → Tier B → Manager QC → Reviewer → SecReviewer`.
+
+Les 4 principes imposés au palier 3 par RES-061 sont déjà nos invariants d'archi :
+- **Progressive Disclosure** → skills L1→L2→L3 (le router lit les summaries, jamais les bodies).
+- **Isolate Context** → `last_message` handoff + sandbox projet (pas de contamination inter-agents).
+- **Résultat structuré** (pas de texte libre) → `output_format` JSON des fiches Tier A/B.
+- **Escalader plutôt que deviner** → `escalate_when` + Socratic questioning (cf. « Contrôle d'Escalade »).
+
+→ **Usage** : vocabulaire de maturité pour positionner un projet externe. Un projet sans `CLAUDE.md` (palier < 2) ⇒ poser la constitution avant d'orchestrer ; heuristique candidate du Planner (Phase 5) : pas de mode `autonomous` sous palier 2. Détail + contradiction « <150 vs <200 lignes » dans gouvernance.md.
+
+---
+
 ## Pattern : bobmatnyc/claude-mpm — Implémentation de Référence
 
 Source: https://github.com/bobmatnyc/claude-mpm (129 stars) — `docs/knowledge/frameworks-comparison.md`

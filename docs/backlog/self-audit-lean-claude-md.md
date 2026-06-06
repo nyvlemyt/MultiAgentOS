@@ -16,6 +16,7 @@
   - cible : noyau exécutoire court + renvois, sans perdre les règles non-négociables (§5 risky actions, §11 billing).
 - **Ne PAS faire** : raccourcir mécaniquement en supprimant des garde-fous. Le but est densité de signal, pas suppression. La décision finale est humaine (Melvyn), pas l'agent (anti Delegation Feedback Loop, RES-036).
 - **Lien** : c'est un cas d'application de DURCIR (RES-036, gouvernance.md) — une règle de niveau 3 (doctrine) doit être lue et appliquée, donc visible et vérifiable.
+- **⚠️ Contradiction de seuil dans le corpus vibeflow (signalée 2026-06-07, cycle paradigmes-statsweep)** : **RES-061** (« 3 Paradigmes », p5) impose *« le `CLAUDE.md` doit faire moins de **150 lignes** »*, alors que **RES-012** (DON'T#1) dit *« < **200 lignes** »*. **Même auteur** (@le_gouverneur_ia), deux seuils. À trancher *à cet audit* : MAS retient lequel comme cible ? (Recommandation conservatrice : viser ≤150 comme objectif d'hygiène, garder 200 comme plafond dur — mais c'est une décision humaine.) Ne pas répercuter « 150 » comme « la règle » tant que non tranché ; les deux sont des consignes d'hygiène, pas des règles exécutoires §5/§11.
 
 ## 2. Audits réflexifs à faire tourner sur MAS lui-même (gate Phase 3.5)
 

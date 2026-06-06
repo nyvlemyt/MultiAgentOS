@@ -95,7 +95,7 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012, **058** (nouveau : setup SaaS)
 | 058 | 🏗️ Le setup qui fait tourner mes SaaS avec Claude Code (10 briques) | WF | ref/5 | ✅ PDF **NOUVEAU** | **nouveau** → backlog_next:Phase5 (setup/prod SaaS, voisin RES-053) |
 | — | **Comment rendre tes projets IA portables** | Gouv/transv. | 5 | ✅ PDF | **nouveau** → backlog_next:Phase5 (portabilité projet — MAS référence par chemin absolu) |
 | 060 | **Le Registre Learning Records** (LRN détaillé) | Mém | 4 | ✅ PDF | **distilled memoire.md** (n° local) — 8 champs · 4 déclencheurs · archivage 50. ⚠️ « 95 % » = headline NON sourcé ; « 50 % précision/3j » non sourcé |
-| 061 | **Les 3 Paradigmes de la Gouvernance IA (Du Prompt à l'Orchestre)** | Gouv | 3.5 | ✅ PDF | **backlog_next:Phase3.5** (n° local) — **non distillé ce cycle (budget)** |
+| 061 | **Les 3 Paradigmes de la Gouvernance IA (Du Prompt à l'Orchestre)** | Gouv | 3.5 | ✅ PDF | **distilled gouvernance.md §RES-061** (n° local) — échelle maturité Prompt→Context→Agentic ; MAS = palier 3 ; cross-ref agent-patterns.md ; ⚠️ « <150 lignes » conflit RES-012 « <200 » signalé |
 | 059 | **Gouverner tes Agents IA Templates + Prompts** (3 principes + 5 patterns contrats) | Ag | 5 | ✅ PDF | distilled agents-skills.md — **RES-059 (n° local, ex-candidat RES-023)** ; source Notion 404, à confirmer au ré-export |
 | — | Ressources Accueil Notion | — | — | ✅ PDF | **méta** (la page catalogue elle-même, pas une ressource) |
 
@@ -114,7 +114,7 @@ L'utilisateur peut ré-exporter ces pages depuis Notion (markdown) pour intégra
 | Phase cible | RES / PDF prêts | Pour |
 |-------------|-----------------|------|
 | **Phase 3** | — (RES-022 = Overview, **référence non distillée** ; self-audit constitution « <200 lignes » = RES-012, carte backlog) | self-audit lean CLAUDE.md |
-| **Phase 3.5** | **061** « 3 Paradigmes » + **stat-sweep mémoire** (044/034/045) — **1 cycle combiné** | paradigmes orchestration + dette stats (cf. backlog/self-audit-memoire-reaudit-debt.md) |
+| **Phase 3.5** | ✅ **061** « 3 Paradigmes » **distillé** + **stat-sweep mémoire** (044/034/045) **fait** (cycle 06-07, 0 stat fabriquée) — reste rien | paradigmes orchestration + dette stats résolue (cf. backlog/self-audit-memoire-reaudit-debt.md §1) |
 | **Phase 4** | ✅ 041 + 060 **distillés** (cycle mémoire 06-06) ; reste 003 (watch, si context-pack) | mémoire — voir memoire.md / memory-patterns.md |
 | **Phase 5** | NEW « Projets portables » · **058 setup SaaS** | portabilité + setup prod (RES-059 contrats = déjà distillé) |
 | **Phase 6** | 025, 026, 027 (hooks) | autonomy gates + settings.json hooks |
@@ -126,8 +126,8 @@ Orphelins (pas de PDF, à ré-exporter si besoin) : 014 (prompt context agentic)
 ## Total catalogué (2026-06-05)
 
 - **44 PDFs** dans `docs/ressources/` : **42 mappés à un n° RES** (dont 058/059/060/061 nouveaux locaux ; RES-023 = 1 PDF après arbitrage) · **1 sans n°** (portables) · **1 méta**.
-- **distilled / couvert** : ~29 RES (gouvernance/agents-skills/memoire/memory-patterns/workflows + claude-code-context-and-modes + CLAUDE.md §11 ; inclut RES-059, **RES-060 LRN, RES-041 3 niveaux**). **RES-022 = Overview = référence NON distillée** (hors compte).
-- **backlog_next (PDF prêt)** : 025, 026, 027, 028, 039, **058**, **061** + portables = ~8, à distiller au pré-vol de leur phase.
+- **distilled / couvert** : ~30 RES (gouvernance/agents-skills/memoire/memory-patterns/workflows + claude-code-context-and-modes + CLAUDE.md §11 ; inclut RES-059, **RES-060 LRN, RES-041 3 niveaux, RES-061 3 paradigmes**). **RES-022 = Overview = référence NON distillée** (hors compte).
+- **backlog_next (PDF prêt)** : 025, 026, 027, 028, 039, **058** + portables = ~7, à distiller au pré-vol de leur phase.
 - **watch** : 003 (contexte, re-promouvable Phase 4/5).
 - **superseded** : 006, 004, 007, 011, 009a, 009b, 038.
 - **orphelins** (pas de PDF) : 004, 009a, 011, 014, 048, 049, 050 + 047 archivée.

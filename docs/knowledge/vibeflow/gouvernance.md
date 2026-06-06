@@ -238,6 +238,42 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 
 ---
 
+## RES-061 — Les 3 Paradigmes de la Gouvernance IA : Prompt → Context → Agentic Engineering [n° local]
+
+**Source** : `docs/ressources/Les 3 Paradigmes de la Gouvernance IA Du Prompt à l'Orchestre.pdf` (9 p., distillé cycle `2026-06-07-vibeflow-paradigmes-statsweep`). Catégorie INDEX = Gouvernance & Architecture.
+
+**Principe** : les modèles sont devenus *trop puissants pour être pilotés par un simple prompt*. « La qualité de la sortie dépend de la qualité du **contexte**, pas de la qualité de la question » (PDF p3). La gouvernance IA est une **échelle de maturité à 3 paliers** — chaque palier englobe le précédent et ajoute une couche.
+
+| | **1. Prompt Engineering** | **2. Context Engineering** | **3. Agentic Engineering** |
+|---|---|---|---|
+| **Définition** | écrire la bonne instruction pour la bonne réponse | structurer tout le contexte que l'IA connaît AVANT la question | orchestrer un système d'agents spécialisés |
+| **Rôle humain** | rédacteur de prompts | **architecte de contexte** | **gouverneur** |
+| **Ce qui est structuré** | la question | l'environnement (fichiers, règles, mémoire) | le système (agents + contrats) |
+| **Persistance** | aucune — chaque session repart de zéro | `CLAUDE.md` + mémoire — la session reprend où l'autre s'arrête | + orchestration dans le temps |
+| **Fichiers clés** | aucun | `CLAUDE.md`, `.claude/rules/`, `.claude/memory/` | + `.claude/agents/`, `contracts.md`, `.claude/skills/` |
+| **Risque principal** | incohérence entre sessions | contexte mal structuré = **bruit** | **sur-ingénierie** pour tâches simples |
+| **Maturité** | débutant | intermédiaire | avancé |
+
+**Palier 2 — Context Engineering** (le saut majeur) : « donner à l'IA le bon contexte au bon moment. Pas tout (trop de bruit), pas trop peu (manque d'info). Le juste nécessaire. » Le PDF cite la définition Anthropic du context engineering : *« trouver le plus petit ensemble de tokens à haute valeur qui maximise la probabilité du résultat souhaité »* (p5, attribué à Anthropic). Registres proposés : `MEMORY.md` (index) · `EDR.md` · `LEARNINGS.md` · `BLOCKERS.md` · `ITERATION_LOG.md` (= modèle RES-013, cf. réconciliation [memoire.md §Pont]).
+
+**Palier 3 — Agentic Engineering** : « tu ne pilotes plus UN assistant, tu gouvernes un SYSTÈME d'agents spécialisés. » Chaque agent = **mandat** (ce qu'il fait) + **territoire** (où il agit) + **outils** (ce qu'il peut utiliser) + **contrats d'interaction** (comment il communique). Reprend tout le Context Engineering et y ajoute la couche d'orchestration : *qui fait quoi, qui valide qui, dans quel ordre*. Principes imposés par le PDF (p7) : **Progressive Disclosure** (chaque agent ne reçoit que le contexte nécessaire) · **Isolate Context** (pas de contamination entre agents) · résultat **structuré** (pas de texte libre) · **escalader plutôt que deviner** en cas de doute.
+
+**Checklist « où en es-tu » (5 questions, p7-8)** : (1) le projet a un `CLAUDE.md` ? (2) l'IA se souvient des décisions de la session précédente ? (3) règles qui se chargent auto selon le fichier touché (scoped rules) ? (4) délégation à des agents spécialisés ? (5) les agents ont des **contrats entre eux** (qui valide qui, dans quel ordre) ? — 5× OUI = Agentic Engineering gouverné. Garde-fou explicite du PDF : *« ce n'est pas une course. Si le projet est simple, le Context Engineering suffit. L'Agentic a du sens quand le projet a plusieurs domaines de responsabilité. »*
+
+**Application MAS** :
+- **MAS *est* le palier 3 incarné.** L'échelle valide rétroactivement toute l'architecture : Tier A/B + dispatcher + `contracts` = Agentic Engineering ; `CLAUDE.md` + `.claude/rules/` + `data/memory/` = Context Engineering hérité ; le prompt unitaire (un agent, une réponse) = palier 1 dépassé. Les 4 attributs d'agent (mandat/territoire/outils/contrats) mappent 1:1 sur la fiche Tier A (RES-024 4 piliers, RES-035 test binaire) et `config/permissions.json`.
+- **Les 3 principes du palier 3 sont déjà nos invariants** : Progressive Disclosure = skills L1→L2→L3 (TOKEN_STRATEGY) ; Isolate Context = `last_message` handoff + sandbox projet (agent-patterns.md) ; résultat structuré = `output_format` JSON des fiches ; escalader plutôt que deviner = `escalate_when` + Socratic questioning (RES-035, agent-patterns.md « Contrôle d'Escalade »).
+- **Valeur de cadrage** : l'échelle donne un **vocabulaire de maturité** pour positionner un projet externe enregistré dans MAS. Un projet « palier 1 » (pas de `CLAUDE.md`) ⇒ le Context Manager doit d'abord poser la constitution avant d'orchestrer. Candidat heuristique du Mission Planner (Phase 5) : refuser le mode `autonomous` sur un projet sans `CLAUDE.md` (palier < 2).
+- **Garde-fou anti-sur-ingénierie** (risque palier 3) : aligne CLAUDE.md §10 « ne pas démarrer N+1 sans green light » et la discipline de phase de l'intake-audit (§Étape 0). Ne pas imposer le multi-agent à une mission triviale.
+
+⚠️ **Contradiction interne au corpus vibeflow signalée (pas intégrée en silence)** : RES-061 (p5) impose *« le `CLAUDE.md` doit faire moins de **150 lignes** »*, tandis que **RES-012** (DON'T#1, gouvernance.md) et la carte self-audit lean-claude posent le seuil à *« < **200 lignes** »*. Deux seuils du **même auteur** (@le_gouverneur_ia). MAS ne tranche pas ici (les deux sont des consignes d'hygiène, pas des règles exécutoires) — la valeur 200 reste celle du self-audit constitution en cours (`docs/backlog/self-audit-lean-claude-md.md`). À mentionner dans cette carte backlog, pas répercuter comme « la règle est 150 ».
+
+**Scan anti-stat RES-061** : aucune statistique de headline non sourcée (pas de profil « 40 % Gartner » / « 95 % »). Le seul chiffre normatif = « < 150 lignes » (sourcé p5, mais en conflit avec RES-012 — voir ci-dessus). La citation Anthropic (« plus petit ensemble de tokens à haute valeur ») est attribuée comme telle dans le PDF. RES-061 = **clean**.
+
+**Décision intake-audit** : **`adapt_now`** (distillé, adapté MAS). Type = doc/principe de cadrage. Pas `implement_now` (c'est du savoir build-time, pas une feature). Fit : valide et nomme l'architecture existante ; surface = docs/knowledge + heuristique Planner future. Coût retrait = nul (markdown isolé). KILL check : aucun veto (pas de clé API, pas de code exécutable). Phase cible : Gouvernance / 3.5 (cadrage), heuristique Planner = Phase 5. Ré-audit : si le corpus tranche 150 vs 200 lignes, ou au pré-vol Phase 5 (heuristique maturité projet).
+
+---
+
 ## Synthèse — Mapping Gouvernance
 
 | Pattern | Composant MAS | Phase |
@@ -251,7 +287,10 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 | 3 dettes invisibles + score /30 (008) | ADR/EDR + filet test + docs/knowledge ; self-audit MAS | 3.5 |
 | 5 DON'T/DO (012) | constitution<200l (self-audit) + CLI>MCP + hooks avant auto | 3.5, 6 |
 | 3 types fichiers + 5 registres (013) | triple structure + seed mémoire Phase 4 | 4 |
+| 3 paradigmes Prompt→Context→Agentic (061) | MAS = palier 3 ; échelle de maturité projet ; heuristique Planner | 3.5, 5 |
 
 **Distillation Batch 1 (2026-06-04)** : RES-024, 008, 012, 013 ✅ intégrés ici depuis `docs/ressources/`. RES-022 (lean CLAUDE.md) : **PDF absent** → `docs/backlog/self-audit-lean-claude-md.md`. RES-006/004/003 : superseded (cf. INDEX.md). RES-023/015/016 → `agents-skills.md`.
 
 **Ré-audit cycle `2026-06-04-vibeflow-reaudit`** : (1) « 40 % Gartner » **re-sourcé** — il vient du PDF « Structurer AVANT », pas de RES-024 ; corrigé dans l'ouverture RES-024. (2) Framework 4 piliers **détaillé** + checklist pre-deploy 10-Q + **contract.yaml long-form** distillés (lus mais non distillés au Batch 1). Mapping RES-023 **tranché (2026-06-05)** = « Structurer AVANT » (préfixe `023-`) ; « Gouverner Templates+Prompts » renuméroté **RES-059**.
+
+**Distillation cycle `2026-06-07-vibeflow-paradigmes-statsweep`** : **RES-061** (3 Paradigmes Prompt→Context→Agentic) distillé ici — échelle de maturité gouvernance, MAS = palier 3. Décision `adapt_now`. Scan anti-stat : **clean** (aucune stat headline ; seul « <150 lignes CLAUDE.md » sourcé p5 mais **en conflit avec RES-012 « <200 lignes »** — signalé, non tranché). Cross-ref léger ajouté dans `agent-patterns.md` (Agentic = Tier A/B). Stat-sweep mémoire (partie B du cycle) = RES-044/034/045 re-confrontés au PDF, **0 stat fabriquée** — détail `docs/learning/2026-06-07-vibeflow-paradigmes-statsweep/build-report.md`.
