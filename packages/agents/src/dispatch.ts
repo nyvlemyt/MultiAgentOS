@@ -19,6 +19,7 @@ import {
   mockReviewer,
   mockSecReviewer,
   claudeCodeLLM,
+  mockLLM,
   type AutonomyLevel,
 } from '@mas/core';
 import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
@@ -29,11 +30,33 @@ export type Db = ReturnType<typeof getDb>;
 let _skillRouterInstance: SkillRouter | undefined;
 function getSkillRouter(): SkillRouter {
   if (!_skillRouterInstance) {
-    const __dirname = fileURLToPath(new URL('.', import.meta.url));
-    const repoRoot = resolve(__dirname, '../../..');
-    _skillRouterInstance = new SkillRouter(scanOrchestratorSkills(repoRoot));
+    try {
+      const __dirname = fileURLToPath(new URL('.', import.meta.url));
+      const repoRoot = resolve(__dirname, '../../..');
+      _skillRouterInstance = new SkillRouter(scanOrchestratorSkills(repoRoot));
+    } catch {
+      // Under a bundler (Next webpack RSC) import.meta.url is not a file: URL,
+      // so fileURLToPath rejects it (TypeError: ... Received an instance of URL).
+      // Skill-summary injection is a best-effort prompt enhancement, not required
+      // for correctness — degrade to an empty router rather than crash the run.
+      // Native execution (apps/worker, tsx) resolves the path fine and gets full
+      // injection. Moving the inline-Next run path to the worker is tracked in
+      // docs/backlog/run-inline-execution-in-next.md.
+      _skillRouterInstance = new SkillRouter([]);
+    }
   }
   return _skillRouterInstance;
+}
+
+// LLM selection. MAS_MOCK_LLM=1 short-circuits the real Agent SDK with a
+// deterministic, zero-cost mock (e2e smoke, offline dev, token budget). The §5
+// risk gate fires BEFORE any LLM call (executeNextTask), so gate behavior is
+// identical either way. Both branches go through @mas/core factories — no raw
+// SDK client is instantiated here (CLAUDE.md §11). The real path also keeps the
+// vi.mock('@mas/core') seam in dispatch.test.ts working unchanged.
+function selectLLM(opts: { cwd?: string; autonomyLevel?: AutonomyLevel; sessionId?: string }) {
+  if (process.env.MAS_MOCK_LLM === '1') return mockLLM();
+  return claudeCodeLLM(opts);
 }
 
 function logEvent(db: Db, evt: {
@@ -268,7 +291,7 @@ export async function executeNextTask(missionId: string): Promise<
     .innerJoin(missions, eq(missions.projectId, projects.id))
     .where(eq(missions.id, missionId));
 
-  const llm = claudeCodeLLM({
+  const llm = selectLLM({
     cwd: proj?.path,
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
@@ -366,7 +389,7 @@ export async function resumeAfterValidation(
     .innerJoin(missions, eq(missions.projectId, projects.id))
     .where(eq(missions.id, t.missionId));
 
-  const llm = claudeCodeLLM({
+  const llm = selectLLM({
     cwd: proj?.path,
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
