@@ -33,7 +33,21 @@ Dans `docs/ressources/` : « Mémoire d'un système IA — 3 niveaux + mapping o
 
 ## Pont de persistance (exigence ferme — anti-oubli)
 
-La mémoire Phase 4 doit prendre `docs/knowledge/` + `vibeflow/INDEX.md` comme **corpus de seed**. C'est ce qui garantit que tout le savoir distillé en build-time remonte dans le second cerveau runtime au lieu de diverger. Sans ce pont, on a deux stores qui s'ignorent. Détail + spirale d'enrichissement : [`../workflows/knowledge-bootstrap.md`](../workflows/knowledge-bootstrap.md) §5.bis. À acter dans l'ADR + dans les critères de sortie Phase 4.
+La mémoire Phase 4 doit prendre `docs/knowledge/` + `vibeflow/INDEX.md` comme **corpus de seed**. C'est ce qui garantit que tout le savoir distillé en build-time remonte dans le second cerveau runtime au lieu de diverger. Sans ce pont, on a deux stores qui s'ignorent. Détail + spirale d'enrichissement : [`../workflows/knowledge-bootstrap.md`](../workflows/knowledge-bootstrap.md) §5.bis. **Acté dans les critères de sortie Phase 4 du ROADMAP (2026-06-06)** + à acter dans l'ADR.
+
+### Test d'acceptation du pont (pré-écrit — à exécuter au gate Phase 4)
+
+Le pont n'est « fait » que si **tous** ces points passent :
+
+1. **Import idempotent** : un script seed (owned Memory Keeper) lit chaque fichier de `docs/knowledge/` + `vibeflow/INDEX.md` et crée des entrées dans `data/memory/_global/`. Re-run = pas de doublon (idempotent).
+2. **Traçabilité** : chaque entrée seedée porte sa provenance (`source: docs/knowledge/<fichier>`), de sorte qu'on peut prouver « 1 entrée ≥ par fichier knowledge + INDEX ».
+3. **Récupérabilité (le vrai test)** : une requête retrieval (FTS5 d'abord, QMD ensuite) sur des **faits build-time connus** retourne l'entrée seedée. Cas de test concrets (vérités présentes dans `docs/knowledge/` à ce jour) :
+   - `"BDR"` → registre de décisions canonique (project-doctrine §5).
+   - `"Mem0 cloud"` → rejeté §11 (PAYG), QMD local retenu (memory-patterns.md §RES-041).
+   - `"95% builders"` → headline marketing **non sourcé**, ne pas répercuter (memoire.md §RES-060).
+   - `"40% Gartner"` → vient de « Structurer AVANT », pas de RES-024 (gouvernance.md).
+4. **Anti-régression** : un fait distillé dans `docs/knowledge/` mais **non récupérable** depuis `data/memory/_global/` = **échec du pont** = phase non terminée.
+5. **Cap respecté** : l'injection en mission garde le plafond ≤5 items mémoire globale/call (CLAUDE.md §12) — le seed remplit le store, le retrieval reste sélectif.
 
 ## Action
 

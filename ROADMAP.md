@@ -216,8 +216,11 @@ Implémenter dans `packages/core/src/llm.real.ts` : passer `effort` dans les opt
 - Per-project memory summary auto-injected into Mission Planner prompts.
 - Global memory available cross-project under a strict cap (≤ 5 items per call).
 - Memory write path locked to Memory Keeper only.
+- **Persistence bridge (anti-oubli — CLAUDE.md §13 / `docs/workflows/knowledge-bootstrap.md §5.bis`):** a one-shot, idempotent seed import populates `data/memory/_global/` **from `docs/knowledge/` + `vibeflow/INDEX.md`** — the build-time distilled knowledge becomes the first entries of the runtime second brain. Memory Keeper owns the import (sole writer). Re-runnable when `docs/knowledge/` changes. Without it, build-time and runtime knowledge diverge and everything learned during the build is invisible at runtime.
 
-**Exit criteria.** A second mission on the same project visibly leverages the first mission's memory in its plan (verify via Trace diff of system prompts).
+**Exit criteria.**
+1. A second mission on the same project visibly leverages the first mission's memory in its plan (verify via Trace diff of system prompts).
+2. **Bridge test (hard gate):** `data/memory/_global/` holds a seeded entry traceable to each `docs/knowledge/` file + the INDEX, and a retrieval query (FTS5/QMD) for a known build-time fact — e.g. *"BDR is the canonical decision-register name"* or *"Mem0 cloud is rejected (§11)"* — returns that seeded entry. If a build-time fact in `docs/knowledge/` is not retrievable from runtime memory, the bridge failed → phase not done.
 
 ---
 
