@@ -11,7 +11,7 @@ const routes = [
   { path: '/agents/mission-planner', heading: 'Mission Planner' },
   { path: '/studio', heading: 'Agent Studio' },
   { path: '/skills', heading: 'Skills Registry' },
-  { path: '/tokens', heading: 'Tokens & Budget' },
+  { path: '/tokens', heading: 'Quota & Cache' },
   { path: '/trace', heading: 'Trace' },
   { path: '/memory', heading: 'Memory Center' },
 ];
