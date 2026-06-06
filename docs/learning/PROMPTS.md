@@ -68,34 +68,26 @@ CONTRAINTES : ne modifie pas les fichiers knowledge (c'est le rôle du Doer). Co
 ---
 
 
-## Cycle courant : `2026-06-06-vibeflow-memoire-reaudit`
+## Cycle courant : `2026-06-07-vibeflow-paradigmes-statsweep`
 
-**Type** : cycle de **distillation** (intake-audit COMPLET par ressource, pas catalogage). Pré-vol Phase 4 (Mémoire) + durcissement du pont de persistance (knowledge-bootstrap §5.bis : Phase 4 sème le second cerveau DEPUIS `docs/knowledge/`).
+> Ajuste le préfixe date au jour réel où tu lances (convention `YYYY-MM-DD`).
 
-**{{SCOPE}}** = Ré-auditer + compléter la distillation **MÉMOIRE** (`docs/knowledge/vibeflow/memoire.md`, `docs/knowledge/memory-patterns.md`, `docs/knowledge/project-doctrine.md` §5 registres), faite en partie sur sources MCP/404, contre les **PDFs mémoire réels** de `docs/ressources/`. Même profil de risque que le cycle gouvernance (stats inventées, sur-interprétation). **BONUS si budget < 80 %** : RES-061 « 3 Paradigmes de la Gouvernance IA » (Phase 3.5).
+**Type** : cycle MIXTE = (A) distillation net-new RES-061 + (B) stat-sweep léger de la dette mémoire ère-MCP. Pré-vol Phase 3.5 + apurement de [self-audit-memoire-reaudit-debt.md](../backlog/self-audit-memoire-reaudit-debt.md). **Ordre : B d'abord (cheap, haute intégrité), A ensuite (droppe en premier si budget 80 %).**
 
-**RES ↔ PDF (mémoire) :**
-- RES-029 = `La vraie mémoire de ton agent Claude Code 5 registres + rituel + Obsidian.pdf` → memoire.md (distilled, **re-vérifier fidélité**)
-- RES-056 = `Le sommaire que ton IA lit avant de fouiller sa mémoire.pdf` → memoire.md (re-vérifier)
-- RES-044 = `Rituel close-out de session 3 champs 5 minutes 1 an de mémoire.pdf` → memoire.md (re-vérifier)
-- RES-034 = `Le rituel de consolidation memoire 4 actions 30 min-mois.pdf` → memoire.md (re-vérifier)
-- RES-045 = `Le cadre mental pour savoir par ou commencer.pdf` → memoire.md (re-vérifier)
-- **RES-041** = `Mémoire d'un système IA les 3 niveaux + mapping outil.pdf` → memory-patterns.md **PARTIEL → COMPLÉTER** (3 niveaux + mapping outil)
-- **RES-007** = `La Memoire Projet pour ton IA.pdf` → marqué « superseded by 029 » : **ouvrir le PDF, confirmer** vraiment superseded OU contenu unique à récupérer
-- **RES-003** = `L'Architecture Complete du Contexte dans Claude Code.pdf` → statut `watch` : **trancher** distill (Phase 4) vs garder watch
-- **NET-NEW RES-060** = `Le Registre Learning Records le Fichier que 95% des Builders IA n'ont Pas.pdf` → **distiller** (registre learning = pont knowledge-bootstrap §5). ⚠️ **VÉRIFIER la stat « 95 % »** contre le PDF (piège type « 40 % Gartner » du cycle gouvernance).
-- RES-014 (`Prompt context agentic`) = orphelin (pas de PDF) → laisser.
-- **BONUS RES-061** = `Les 3 Paradigmes de la Gouvernance IA Du Prompt à l'Orchestre.pdf` → gouvernance.md ou agent-patterns.md (Phase 3.5).
+**{{SCOPE}}** =
+- **PARTIE B — stat-sweep (priorité, cheap)** : re-vérifier contre PDF les chiffres des distillations mémoire faites sous ère-MCP, JAMAIS re-confrontées (risque « 40 % Gartner » dormant dans `memoire.md`). Glance ciblé sur les NOMBRES, pas une re-distillation. Cibles, par priorité :
+  - **RES-044** (`Rituel close-out de session 3 champs...pdf`) → la friction **« n°9 / n°10 »** (sub-agents MCP / 200+ entrées). PRIORITÉ 1.
+  - **RES-034** (`Le rituel de consolidation memoire 4 actions...pdf`) → seuils « promouvoir 3 / index > 50 / 30 min·mois ».
+  - **RES-045** (`Le cadre mental pour savoir par ou commencer.pdf`) → « 3 couches / diagnostic ».
+  - **RES-029 / RES-056** → recoupe si budget (risque plus faible, déjà 📁 local).
+  Chaque chiffre présenté comme sourcé dans `memoire.md` DOIT exister dans son PDF → sinon corrige/neutralise (comme « 95 % » / « 40 % Gartner »).
+- **PARTIE A — distiller RES-061** (`Les 3 Paradigmes de la Gouvernance IA Du Prompt à l'Orchestre.pdf`) → fichier knowledge le plus adapté (`gouvernance.md` pour le cadrage gouvernance, ou `agent-patterns.md` pour l'angle orchestration — choisis selon le contenu réel, cross-ref si besoin). RES-061 = n° **local** (déjà dans INDEX, Gouv→14, `backlog_next:Phase3.5` → `distilled`). ⚠️ scan anti-stat sur ce PDF aussi.
 
-(N°s 060/061 = **locaux**, source Notion 404, à confirmer au ré-export — convention RES-058/059.)
+MÉTHODE :
+1. **(B)** Pour RES-044/034/045 (+029/056) : ouvre le PDF, localise chaque chiffre cité dans `memoire.md`, confirme verbatim OU corrige/neutralise + flag. Table « chiffre · PDF · page · présent ? · action ».
+2. **(A)** Intake-audit COMPLET de RES-061 (cf. `intake-audit-template.md`) : ouvre le PDF, distille les 3 paradigmes dans le fichier existant choisi — structure §12 (Principes + source citée, jamais de chiffre absent du PDF présenté comme sourcé). Décision enum + justif. Cross-ref archi MAS (orchestrator-workers RES-035, modes audit RES-037) ; contradiction → signaler, pas intégrer.
+3. Mets à jour INDEX : RES-061 `distilled`, et la dette stat (clear les ⏳ de RES-044/034/045 si vérifiés). Mets à jour [self-audit-memoire-reaudit-debt.md](../backlog/self-audit-memoire-reaudit-debt.md) §1 (résolu ou reste).
 
-MÉTHODE (intake-audit COMPLET par ressource, cf. `intake-audit-template.md`) :
-1. Pour chaque RES ci-dessus : ouvre le **PDF source** + le **passage distillé existant**. Vérifie fidélité ligne-à-ligne. Corrige toute invention/sur-interprétation/stat non sourcée. Enrichis les trous (ex RES-041 partiel).
-2. **Scan anti-stat-inventée** sur TOUTES les sections mémoire (5 registres, 3 niveaux, sommaire, close-out, consolidation) : chaque chiffre présenté comme sourcé doit exister dans son PDF. Liste-les avec preuve (comme le cycle gouvernance).
-3. Distille le net-new (RES-060 Registre Learning Records ; bonus RES-061) dans les fichiers `docs/knowledge/` EXISTANTS — structure §12 (Principes + source citée, jamais de chiffre absent du PDF présenté comme sourcé).
-4. **Pont de persistance (§5.bis)** : aligne explicitement la connaissance mémoire distillée avec (a) les 5 registres de `project-doctrine.md`, (b) le modèle mémoire runtime visé Phase 4 (`data/memory/<projectId>/`). Signale tout écart entre la doctrine vibeflow et l'archi MAS — NE l'intègre PAS en silence.
-5. Mets à jour les statuts INDEX (041 partiel→distilled, 007 tranché, 003 tranché, +060, +061 ; catégorie Mém +1, WF/Gouv pour 061).
+CONTRAINTES : docs/knowledge/ (memoire.md, gouvernance.md OU agent-patterns.md, INDEX.md) + docs/backlog/. Ne touche PAS CLAUDE.md. **AUCUN code / config / .env**. §11 (aucun PAYG). Structure §12. **Pause à 80 % budget — la PARTIE A (RES-061) saute en premier ; la PARTIE B (stat-sweep) est prioritaire car elle protège du savoir déjà committé.** Contradiction archi → signaler.
 
-CONTRAINTES : docs/knowledge/ (memoire.md, memory-patterns.md, project-doctrine.md, INDEX.md, +gouvernance/agent-patterns pour 061) + docs/backlog/. Ne touche PAS CLAUDE.md (idée touchant la constitution → backlog candidat self-audit). **AUCUN code / schéma `data/memory/` / config / .env** (c'est le BUILD Phase 4, pas ce cycle). §11 (aucun PAYG). Structure §12 (pas de stub ; jamais de chiffre inventé présenté comme sourcé). Pause à 80 % budget (le bonus RES-061 saute en premier). Toute contradiction avec l'archi MAS → signaler, pas intégrer.
-
-SORTIE OBLIGATOIRE : `docs/learning/2026-06-06-vibeflow-memoire-reaudit/build-report.md` (format build-report de README.md) — périmètre · table RES↔PDF · table décisions (implement/adapt/backlog/watch/reject) · **scan anti-stat-inventée (chiffre · PDF · présent ?)** · fichiers touchés · fidélité/écarts corrigés · RES-041 complété · RES-007/003 tranchés (preuve) · net-new RES-060 (+061 bonus) distillé · **alignement pont de persistance §5.bis** · contradictions signalées · questions ouvertes · commit proposé. NE COMMITE PAS. Laisse le working tree modifié.
+SORTIE OBLIGATOIRE : `docs/learning/2026-06-07-vibeflow-paradigmes-statsweep/build-report.md` (format README.md) — périmètre · **(B) table stat-sweep (chiffre · PDF · page · présent ? · action)** · **(A) RES-061 distillé (décision + fichier + fidélité)** · scan anti-stat RES-061 · fichiers touchés · dette §1 apurée ou restante · contradictions signalées · questions ouvertes · commit proposé. NE COMMITE PAS. Laisse le working tree modifié.
