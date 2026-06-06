@@ -67,8 +67,23 @@ CONTRAINTES : ne modifie pas les fichiers knowledge (c'est le rôle du Doer). Co
 
 ---
 
-## Cycle courant : `2026-06-04-vibeflow-reaudit`
 
-**{{SCOPE}}** = Reconcilier + ré-auditer la distillation vibeflow (faite avant sur sources MCP incomplètes, beaucoup en 404) contre les 43 PDFs maintenant présents. Non-exhaustif : priorise où un PDF existe ET la distillation précédente était partielle/absente. Inclut 2 corrections Batch 1 confirmées par un vérificateur :
-- **gouvernance.md §RES-024** : stat « 40% Gartner » présentée comme sourcée mais ABSENTE du PDF "Audite tes agents IA en 10 minutes" → retirer/re-sourcer. Vérifier qu'aucune autre stat inventée ne traîne.
-- **RES-023** : PDF "Structurer la gouvernance AVANT de déployer tes agents IA.pdf" lu mais NON distillé (4 piliers + checklist pré-deploy + contrat d'agent long-form / contract.yaml 100+ lignes). Trancher le mapping RES et distiller le net-new, ou justifier le skip.
+## Cycle courant : `2026-06-04-vibeflow-index-reconciliation`
+
+**{{SCOPE}}** = Réconcilier INDEX.md ↔ les **44 PDF** de `docs/ressources/` (inclut `RES-058`). **Catalogage seul, ZÉRO distillation profonde** (la distillation reste juste-à-temps par phase, cf. knowledge-bootstrap §3). But : rendre le radar exact AVANT les pré-vols par phase. L'INDEX porte encore le statut ère-MCP (`❌ 404 / à ré-exporter`) alors que beaucoup de PDFs existent maintenant.
+
+**INPUTS RÉSOLUS (utilisateur, 2026-06-05) — à appliquer dans le cycle :**
+- **RES-023 = `023-Structurer la gouvernance AVANT...pdf`** (tranché, fichier préfixé). Donc : (a) corriger INDEX L53 « non tranché » → tranché ; (b) **re-titrer** `agents-skills.md` L121/L125 qui labellise encore RES-023 le PDF « Gouverner tes Agents IA Templates + Prompts » — ce PDF devient un **orphelin sans n°** → lui attribuer un RES libre ou marquer « nouveau ». (relabel = correction de catalogage, autorisé ; pas une re-distillation.)
+- **RES-022 = `022-Lean claude.pdf`** présent, renvoie l'overview de la doc Claude → `distilled`/couvert (INDEX L54 déjà ✅). Vérifier cohérence.
+- **RES-058 = `🏗️ Le setup qui fait tourner mes SaaS avec Claude Code.pdf`** (re-téléchargé en PDF, format OK). Catégorie probable Workflows (voisin RES-053). Catalogue net-new → nouvelle ligne INDEX RES-058.
+
+MÉTHODE (cataloguing, léger) :
+
+1. Lister les 44 PDF de `docs/ressources/`. Pour chacun : mapper au RES par TITRE (les noms de fichiers ne portent pas le n° RES sauf RES-040). 3 cas : (a) **mappé** à une ligne RES existante → corriger le statut (`404`→`✅ PDF`, `à ré-exporter`→`✅ PDF`) ; (b) **superseded à re-vérifier** — le PDF existe maintenant (ex RES-006 « Structurer Ton Projet IA Le Guide Universel », RES-003 « Architecture du Contexte ») → vérifier d'1 coup d'œil si vraiment superseded ou à re-promouvoir `watch/backlog_next` ; (c) **net-new non catalogué** (« Le Registre Learning Records », « Les 3 Paradigmes de la Gouvernance », « Comment rendre tes projets IA portables »…) → nouvelle ligne INDEX, n° RES si déductible sinon marqué « nouveau / non mappé ».
+2. PDFs sans correspondance RES + lignes RES sans PDF : tabuler explicitement (les 2 sens). « Ressources Accueil Notion.pdf » = la page catalogue elle-même, pas une ressource → marquer méta.
+3. Pour chaque PDF, décision enum LÉGÈRE (intake-audit allégé) : `distilled` (déjà fait) / `backlog_next:<phase>` (à distiller au pré-vol de cette phase) / `watch` / `reject` / `superseded`. PAS de distillation de contenu — juste le verdict de catalogage + phase cible.
+4. RES-023 **déjà tranché** par l'utilisateur (= « Structurer AVANT », cf. INPUTS RÉSOLUS) : appliquer le relabel, ne pas ré-ouvrir le débat. Reste à trancher : le n°/statut du PDF orphelin « Gouverner Templates+Prompts ».
+
+CONTRAINTES : INDEX.md (+ éventuellement docs/backlog/ pour net-new à distiller plus tard) UNIQUEMENT. NE distille AUCUN contenu dans gouvernance/agents-skills/memoire/etc. (c'est le rôle des cycles par phase). Ne touche PAS CLAUDE.md. Aucun code/.env. §11. Pause à 80% budget. Toute ressource qui révèle une contradiction archi → signaler, pas intégrer.
+
+SORTIE OBLIGATOIRE : `docs/learning/2026-06-04-vibeflow-index-reconciliation/build-report.md` — table complète 44 PDF ↔ RES (statut avant/après) · net-new (nouvelles lignes, dont RES-058) · lignes RES orphelines (sans fichier) · décisions catalogage (phase cible) · relabel RES-023 appliqué + n° du PDF orphelin « Gouverner Templates+Prompts » · commit proposé. NE COMMITE PAS.

@@ -8,8 +8,8 @@
 
 ## 1. Lean CLAUDE.md (signal principal)
 
-- **Origine** : RES-022 « Lean CLAUDE.md » (PDF **absent** de `docs/ressources/`, donc non distillé) + **RES-012 DON'T#1** qui énonce la règle opérationnelle : *« Le CLAUDE.md doit faire moins de 200 lignes pour rester efficace. Chaque instruction doit être assez précise pour être vérifiable. »*
-- **Constat** : notre `CLAUDE.md` dépasse largement 200 lignes (13 sections + sous-sections 9.bis, 12, 13). Risque : dilution du signal, instructions non toutes « vérifiables » au sens binaire.
+- **Origine** : **RES-012 DON'T#1** énonce la règle opérationnelle : *« Le CLAUDE.md doit faire moins de 200 lignes pour rester efficace. Chaque instruction doit être assez précise pour être vérifiable. »* (NB : le PDF `022-Lean claude.pdf` s'avère être la page **Overview des Claude Code Docs**, pas un guide « lean CLAUDE.md » — la règle provient donc de RES-012, vérifié au cycle index-reconciliation 2026-06-05.)
+- **Constat** : notre `CLAUDE.md` est à **200 lignes pile** (`wc -l`, 2026-06-04). La règle RES-012 dit « < 200 » → **au seuil, pas largement au-dessus**, mais déjà non conforme à la cible et en croissance (13 sections + sous-sections 9.bis, 12, 13). Risque : dilution du signal, instructions non toutes « vérifiables » au sens binaire.
 - **À auditer (Phase 3.5)** :
   - chaque instruction de CLAUDE.md est-elle **vérifiable** (binaire pass/fail) ou seulement déclarative ?
   - quelles sections peuvent migrer vers un fichier référencé (ex. §12 règles knowledge → déjà dans `docs/knowledge/`, §9.bis Inspiration → ADR 0001) en ne gardant que le pointeur ?

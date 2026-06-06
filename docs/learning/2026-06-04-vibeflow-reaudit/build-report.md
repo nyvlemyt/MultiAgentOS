@@ -30,7 +30,7 @@ Ré-auditer la distillation vibeflow (Batch 1, faite avant sur sources MCP incom
 
 | Ressource | Décision | Justification |
 |-----------|----------|---------------|
-| Fix #1 « 40 % Gartner » | **adapt_now (correction)** | stat réelle mais d'un autre PDF (« Structurer AVANT » p.4) ; retirée de l'ouverture RES-024, re-sourcée dans la section compagnon |
+| Fix #1 « 40 % Gartner » | **adapt_now (correction)** | stat réelle mais d'un autre PDF (« Structurer AVANT » p.5) ; retirée de l'ouverture RES-024, re-sourcée dans la section compagnon |
 | « Structurer AVANT » (net-new) | **adapt_now** | net-new réel : 4 piliers détaillés (MANDATE/SCOPE/CHECKPOINTS/ESCALATION.md), pre-deploy 10-Q (Escalade ×4), contract.yaml long-form 100+ lignes. Mappe permissions.json + fiche + budget. Cible cloud (Managed) rejetée §11 |
 | Découpage 4-fichiers par agent | **reject (archi)** | verbeux, inutile pour single-user ; MAS garde 1 fiche/agent (RES-048). On extrait la structure des champs, pas le multi-fichier |
 
@@ -45,7 +45,7 @@ Ré-auditer la distillation vibeflow (Batch 1, faite avant sur sources MCP incom
 
 ## Fidélité — écarts corrigés / vérifiés
 
-- **40 % Gartner** : confirmé absent du PDF RES-024 (« Audite 10 min »), présent dans « Structurer AVANT » p.4 (« 40 % des initiatives agentiques sont annulées avant la fin (source : Gartner) »). Misattribution corrigée.
+- **40 % Gartner** : confirmé absent du PDF RES-024 (« Audite 10 min »), présent dans « Structurer AVANT » p.5 (« 40 % des initiatives agentiques sont annulées avant la fin (source : Gartner) »). Misattribution corrigée.
 - **Scan anti-stat-inventée des sections Batch 1** (ouvert PDF + passage) : 95 %/5 %/200 lignes/50k tokens (RES-012), score /30 + seuils 0-3/4-6/7-10 (RES-008), $0.08/h + 8 avril 2026 + Brain/Hands/Session (RES-016), 90 % automatisations déguisées (RES-015), score /10 + 5 patterns (RES-023). **Toutes présentes dans leurs PDFs respectifs.** Seul le 40 % était mal attribué.
 - Contenu RES-024 (4 piliers condensé, verdict PROD/STAGING/BLOQUÉ/ARRÊTER, contract.yaml minimal 30 lignes, risques systémiques, cas spécial Q10 kill switch) : re-vérifié présent dans le PDF RES-024 — distillation Batch 1 fidèle, hors le 40 %.
 - Net-new « Structurer AVANT » distillé fidèlement depuis les 14 pages (4 fichiers par pilier, pre-deploy 10-Q avec poids Escalade ×4 et Q9 mode dégradé / Q10 kill switch hors stack, arbre contract.yaml complet).
@@ -59,6 +59,20 @@ Ré-auditer la distillation vibeflow (Batch 1, faite avant sur sources MCP incom
 
 1. **Mapping RES-023** : trancher A (« Gouverner Templates+Prompts ») vs B (« Structurer AVANT ») ? Preuves contradictoires documentées ci-dessus. Option propre possible : assigner B = RES-023 (lifecycle cadrage→monitoring + contrat 100+ lignes) et A = un autre n° / doc compagnon non numéroté. Je n'ai pas renuméroté pour éviter la churn avant ton arbitrage.
 2. Le PDF « Structurer AVANT » n'est dans **aucune ligne RES de l'INDEX** (table RES-keyée). Le laisser comme « compagnon RES-024 / candidat RES-023 » documenté, ou lui créer une entrée propre une fois le mapping tranché ?
+
+## Passe de correction post-verify (2026-06-04, Doer pass 2)
+
+Verify-report rendu **PASS** (que des 🟡, zéro 🔴/🟠). Findings 🟡 corrigés dans la limite du scope Doer :
+
+| Finding verify | Action | Fichier |
+|----------------|--------|---------|
+| 🟡 label « compagnon RES-024 » (header) vs « candidat RES-023 » (corps/INDEX) | header neutralisé → « candidat RES-023 / compagnon RES-024 » (les 2 labels portés ensemble, ambiguïté reste explicite, mapping toujours escaladé à l'orchestrateur) | gouvernance.md (header section) |
+| 🟡 « 40 % Gartner » cité « p.4 » | corrigé **p.4 → p.5** (2 occurrences) | build-report.md (ce fichier) |
+| 🟡 self-audit « dépasse largement 200 lignes » | corrigé : `wc -l CLAUDE.md` = **200 pile** → « au seuil (règle < 200), pas largement au-dessus » | self-audit-lean-claude-md.md |
+| 🟡 RES-015 « 6 erreurs » tableau tronqué | softener fidélité §12 : (1)(2) marquées **confirmées verbatim**, (3)-(6) marquées **à confirmer** (recoupent les thèmes du doc). Re-lecture page 10 = tableau toujours tronqué au rendu PDF, non résoluble | agents-skills.md |
+| 🟡 `pnpm-lock.yaml` working tree | no-op : déjà exclu du commit proposé (carry-over Batch 1) | — |
+
+Aucun nouveau finding introduit. Aucune édition CLAUDE.md / code / .env. Working tree toujours non commité.
 
 ## Commit proposé (NE PAS exécuter avant verdict Checker + arbitrage orchestrateur)
 

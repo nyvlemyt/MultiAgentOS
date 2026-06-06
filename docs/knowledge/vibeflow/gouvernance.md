@@ -151,9 +151,9 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 
 ---
 
-## Structurer la gouvernance AVANT de déployer — framework 4 piliers détaillé (compagnon RES-024)
+## RES-023 — Structurer la gouvernance AVANT de déployer (framework 4 piliers détaillé, compagnon RES-024)
 
-**Mapping RES** : PDF `docs/ressources/Structurer la gouvernance AVANT de déployer tes agents IA.pdf` (14 p.). Ne porte pas de numéro RES dans son texte ; **candidat RES-023** au sens de la description INDEX (« governance agents IA, cadrage→monitoring ») ET référencé par RES-024 (« la version longue 100+ lignes du contrat est dans RES-023 »). À ne pas confondre avec le PDF « Gouverner tes Agents IA Templates + Prompts » (4 prompts + 5 patterns de contrats, distillé dans `agents-skills.md`). **Mapping RES-023 entre ces deux PDFs non tranché à 100 %** — voir `docs/learning/2026-06-04-vibeflow-reaudit/build-report.md`. **C'est la source réelle du « 40 % Gartner » mal attribué à RES-024 au Batch 1.**
+**Mapping RES (tranché 2026-06-05)** : PDF `docs/ressources/023-Structurer la gouvernance AVANT de déployer tes agents IA.pdf` (14 p., préfixe `023-`) = **RES-023**. Compagnon de RES-024 (« Audite 10 min ») qui le référence (« la version longue 100+ lignes du contrat est dans RES-023 »), cohérent avec la description INDEX « governance agents IA, cadrage→monitoring ». Le PDF « Gouverner tes Agents IA Templates + Prompts » (4 prompts + 5 patterns de contrats, distillé dans `agents-skills.md`) **n'est PAS RES-023** → renuméroté **RES-059**. **C'est la source réelle du « 40 % Gartner » mal attribué à RES-024 au Batch 1.**
 
 **Principe** : Managed Agents (beta 8 avril 2026) fournit les murs *techniques* (sandbox, scoped permissions, observabilité) ; la couche *projet* (gouvernance) reste à construire. Avant tout déploiement, répondre par écrit à 4 questions : **qui** décide quoi quand l'agent tourne sans toi · **quel** périmètre exact · **qui** valide à chaque étape critique · **qu'est-ce qui se passe** quand il hésite/se trompe. Chiffre cité : **40 % des initiatives agentiques sont annulées avant la fin (source : Gartner)** — pas par échec technique, par absence de gouvernance.
 
@@ -254,4 +254,4 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 
 **Distillation Batch 1 (2026-06-04)** : RES-024, 008, 012, 013 ✅ intégrés ici depuis `docs/ressources/`. RES-022 (lean CLAUDE.md) : **PDF absent** → `docs/backlog/self-audit-lean-claude-md.md`. RES-006/004/003 : superseded (cf. INDEX.md). RES-023/015/016 → `agents-skills.md`.
 
-**Ré-audit cycle `2026-06-04-vibeflow-reaudit`** : (1) « 40 % Gartner » **re-sourcé** — il vient du PDF « Structurer AVANT », pas de RES-024 ; corrigé dans l'ouverture RES-024. (2) Framework 4 piliers **détaillé** + checklist pre-deploy 10-Q + **contract.yaml long-form** distillés (lus mais non distillés au Batch 1). Mapping RES-023 entre « Gouverner Templates+Prompts » et « Structurer AVANT » signalé non tranché.
+**Ré-audit cycle `2026-06-04-vibeflow-reaudit`** : (1) « 40 % Gartner » **re-sourcé** — il vient du PDF « Structurer AVANT », pas de RES-024 ; corrigé dans l'ouverture RES-024. (2) Framework 4 piliers **détaillé** + checklist pre-deploy 10-Q + **contract.yaml long-form** distillés (lus mais non distillés au Batch 1). Mapping RES-023 **tranché (2026-06-05)** = « Structurer AVANT » (préfixe `023-`) ; « Gouverner Templates+Prompts » renuméroté **RES-059**.

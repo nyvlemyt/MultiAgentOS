@@ -118,11 +118,11 @@ Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Agents/Skills
 
 ---
 
-## RES-023 — Gouverner tes agents : 3 principes + 5 patterns de contrats + fiche template
+## RES-059 — Gouverner tes agents : 3 principes + 5 patterns de contrats + fiche template *(PDF « Gouverner Templates+Prompts », ex-candidat RES-023)*
 
 **Principe** : un agent est un multiplicateur — de structure ou de chaos. Ajouter des agents sans gouvernance = ajouter des moteurs sans châssis. 3 principes fondateurs + des contrats explicites entre agents.
 
-> **Source / mapping** : cette section distille le PDF **« Gouverner tes Agents IA Templates + Prompts »** (4 prompts + 5 patterns de contrats). Le **framework 4-piliers détaillé + contract.yaml long-form** est dans le PDF compagnon **« Structurer la gouvernance AVANT de déployer »** → `vibeflow/gouvernance.md`. Lequel des deux PDFs est le « vrai » RES-023 n'est **pas tranché à 100 %** (RES-024 nomme RES-023 « le guide Gouverner tes agents IA » → ce PDF-ci ; mais l'INDEX décrit RES-023 « cadrage→monitoring » + le contrat 100+ lignes → l'autre PDF). Voir `docs/learning/2026-06-04-vibeflow-reaudit/build-report.md`.
+> **Source / mapping (résolu 2026-06-05)** : cette section distille le PDF **« Gouverner tes Agents IA Templates + Prompts »** (4 prompts + 5 patterns de contrats). **RES-023 a été tranché par l'utilisateur = « Structurer la gouvernance AVANT de déployer » (`023-…pdf`)**, distillé dans `vibeflow/gouvernance.md` (framework 4-piliers + contract.yaml long-form). Le présent PDF « Gouverner Templates+Prompts » **n'est donc PAS RES-023** : il a été **renuméroté RES-059** (n° local attribué 2026-06-05, source Notion en 404 — à confirmer au ré-export). Sa distillation ci-dessous reste valable. Voir `docs/learning/2026-06-04-vibeflow-index-reconciliation/build-report.md`.
 
 **3 principes de gouvernance** :
 1. **Un agent = un mandat** — chaque agent fait UNE chose (le rédacteur rédige, le relecteur relit).
@@ -167,7 +167,7 @@ Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Agents/Skills
 
 **Checklist « Mon agent est-il gouverné ? » (10-Q)** : mission 1 phrase non-ambiguë / territoire délimité / outils au strict nécessaire / contraintes absolues listées / règles d'escalade / format de sortie standardisé / contrats si 2+ agents / territoires disjoints / mémoire persistante / **testé sur un cas limite**. Score : 10 gouverné, 7-9 trous, 4-6 fondations sans cadre, 0-3 automatisation déguisée.
 
-**Les 6 erreurs classiques** : (1) agent couteau suisse (fait tout → travail moyen partout) ; (2) pas d'escalade (tourne en rond) ; + chevauchements, pas de contraintes, pas de format de sortie, jamais testé sur cas limite.
+**Les 6 erreurs classiques** (titre du PDF ; tableau **tronqué au rendu PDF**) — **confirmées verbatim** : (1) agent couteau suisse = fait tout → travail moyen partout ; (2) pas d'escalade = tourne en rond. Les 4 autres non lisibles au rendu ; **à confirmer** (recoupent les thèmes du doc : chevauchements de territoire, absence de contraintes, pas de format de sortie standardisé, jamais testé sur cas limite).
 
 **Format de sortie exemplaire** (fiche « analyst ») : `Fait (observation factuelle) / Evidence (données précises) / Impact (conséquence concrète) / Recommandation (action suggérée)` — sortie structurée, pas de texte libre.
 
@@ -210,8 +210,8 @@ Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Agents/Skills
 | Template auditeur 4 champs (RES-043) | quality-controller.md fiche | 3.5 |
 | 3 modes STRICT/AUDIT/SHADOW (RES-037) | risk enum → mode QC ; risk classifier | 3.5, 6 |
 | Test binaire skill/agent (RES-035) | mas-skill-router Verification Criteria | 3 (fait) |
-| 3 principes + 5 patterns contrats (RES-023) | `contracts` AGENTS.md (Tier A↔B) ; QC audit /10 | 5, 3.5 |
+| 3 principes + 5 patterns contrats (RES-059, ex-candidat RES-023) | `contracts` AGENTS.md (Tier A↔B) ; QC audit /10 | 5, 3.5 |
 | Test 3-Q + Mix/hybride + 10-Q gouverné (RES-015) | affine risk classifier ; output Fait/Evidence/Impact/Reco ; « cas limite » → Verification Criteria | 3.5 |
 | Managed vs Local (RES-016) | ⚠️ Managed = PAYG interdit §11 ; matrice valide local-first ; pattern session-resume à miner | doctrine |
 
-**Distillation Batch 1 (2026-06-04)** : RES-023, 015, 016 ✅ intégrés ici depuis `docs/ressources/`. RES-024 (4 piliers + verdict) → `vibeflow/gouvernance.md`. RES-009a/009b : superseded (cf. INDEX.md).
+**Distillation Batch 1 (2026-06-04)** : RES-015, 016 + **RES-059** (« Gouverner Templates+Prompts », ex-candidat RES-023) ✅ intégrés ici depuis `docs/ressources/`. **RES-023 tranché (2026-06-05) = « Structurer la gouvernance AVANT de déployer »** → `vibeflow/gouvernance.md` (4 piliers + verdict). RES-009a/009b : superseded (cf. INDEX.md).
