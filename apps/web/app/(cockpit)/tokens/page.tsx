@@ -2,30 +2,11 @@ import { Sparkline } from '@/components/Sparkline';
 import { BudgetBar } from '@/components/BudgetBar';
 import { ModePill } from '@/components/ModePill';
 import { dailyTokens, monthlySpend } from '@/lib/fixtures';
+import { getTokenSnapshot } from '@/lib/tokens';
 
-interface TokenData {
-  window5h: { messagesUsed: number };
-  day: { tokensSpent: number; tokensCap: number };
-  week: { tokensSpent: number; tokensCap: number };
-  cacheHitRatio: number;
-}
-
-async function getTokenData(): Promise<TokenData> {
-  try {
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-    const res = await fetch(`${base}/api/tokens`, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`/api/tokens returned ${res.status}`);
-    return res.json() as Promise<TokenData>;
-  } catch {
-    // Fallback to zero-state values when API is unavailable (SSG build time)
-    return {
-      window5h: { messagesUsed: 0 },
-      day: { tokensSpent: 0, tokensCap: 1_000_000 },
-      week: { tokensSpent: 0, tokensCap: 5_000_000 },
-      cacheHitRatio: 0,
-    };
-  }
-}
+// Reads the DB directly (server component) — no HTTP self-fetch, which would be
+// port/origin-fragile and silently fall back to zeros (see PR review).
+export const dynamic = 'force-dynamic';
 
 function fmtTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -34,7 +15,7 @@ function fmtTokens(n: number): string {
 }
 
 export default async function TokenManager() {
-  const data = await getTokenData();
+  const data = await getTokenSnapshot();
 
   return (
     <div className="flex flex-col gap-6">

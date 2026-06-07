@@ -8,8 +8,9 @@ const workerEntry = join(__dirname, 'index.ts');
 
 describe('worker startup guard', () => {
   it('refuses to start when ANTHROPIC_API_KEY is set', () => {
+    // process.execPath = absolute path to the running node binary (no PATH lookup).
     const result = spawnSync(
-      'node',
+      process.execPath,
       ['--import', 'tsx/esm', workerEntry],
       {
         env: { ...process.env, ANTHROPIC_API_KEY: 'sk-fake-should-fail' },

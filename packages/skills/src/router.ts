@@ -1,5 +1,14 @@
 import type { SkillMeta, Domain } from './types.js';
 
+/** Escape XML so skill metadata can't smuggle tags into the injected prompt block. */
+function escapeXml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 export class SkillRouter {
   private readonly skills: Map<string, SkillMeta>;
 
@@ -39,7 +48,7 @@ export class SkillRouter {
       .map((id) => {
         const meta = this.skills.get(id);
         if (!meta) return null;
-        return `<skill id="${id}" domain="${meta.domain}">\n${meta.summary}\n</skill>`;
+        return `<skill id="${escapeXml(id)}" domain="${escapeXml(meta.domain)}">\n${escapeXml(meta.summary)}\n</skill>`;
       })
       .filter((b): b is string => b !== null);
     if (blocks.length === 0) return '';

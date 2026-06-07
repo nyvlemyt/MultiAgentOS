@@ -48,6 +48,12 @@ Résultat : `lifecycle.spec` vert (Plan→Run→modal §5→Approve→archived +
 - Ne pas « réparer » le path en bricolant `import.meta.url` dans le bundle Next sans déplacer l'exécution vers le worker — ce serait soigner le symptôme.
 - Ne pas câbler `selectLLM` dans `@mas/core` tant que le seam `vi.mock` des unit tests n'est pas migré (sinon le mock interne contourne le mock des tests). Le selector reste dans `dispatch.ts`.
 
+## 6. Écart de typage d'event : `task_done` vs `llm_call` (révélé par la review PR #1)
+
+Le compteur `/tokens` (fenêtre 5h + cache ratio) filtre désormais `events.type = 'llm_call'` — le type **canonique** documenté (`schema.ts:143`, `TOKEN_STRATEGY.md §8/L82`, `seed.ts`). Or `dispatch.ts` `logEvent` émet les données de tokens/cache sous le type **`task_done`**, jamais `llm_call`. Conséquence : en **runtime réel**, le compteur lira **0** (les données de seed/smoke utilisent bien `llm_call`, donc l'UI et les tests sont corrects ; seul le runtime live diverge).
+
+**À faire (Phase 5, avec le déplacement vers `apps/worker`)** : faire émettre par le chemin d'exécution un event `llm_call` par appel LLM (portant `tokensIn/Out`, `cacheRead/Creation`, `quotaUnits`), OU réconcilier le type canonique. **Ne pas** élargir le filtre du compteur à `task_done` en douce — ça compterait des tâches sans appel LLM. Décision de typage à acter (proche de la réconciliation registres §RES-029).
+
 ---
 
 **Référence** : `docs/learning/` (debug session 2026-06-07, gate Phase 3→3.5), `packages/agents/src/dispatch.ts` (`getSkillRouter`, `selectLLM`), `apps/web/app/api/missions/[id]/run/route.ts`, `apps/web/playwright.config.ts`, CLAUDE.md §2 (worker séparé) + §11 (billing), `docs/knowledge/vibeflow/gouvernance.md §RES-061` (palier maturité).

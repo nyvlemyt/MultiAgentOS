@@ -3,7 +3,10 @@
 # See CLAUDE.md §11 and ADR 0001.
 set -euo pipefail
 
-FORBIDDEN=$(grep -rn "from '@anthropic-ai/sdk'" apps/ packages/ \
+# Match the package in any import form: single/double quotes, dynamic import(),
+# require(), and subpath imports (@anthropic-ai/sdk/...). A quote or slash must
+# follow the name so '@anthropic-ai/sdk-foo' (unrelated) doesn't false-positive.
+FORBIDDEN=$(grep -rnE "['\"]@anthropic-ai/sdk['\"/]" apps/ packages/ \
   --include="*.ts" --include="*.tsx" \
   | grep -v "node_modules" \
   | grep -v "packages/core/src/api-fallback/" \

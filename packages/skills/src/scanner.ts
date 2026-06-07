@@ -11,6 +11,23 @@ export const ORCHESTRATOR_SKILL_IDS = [
   'mas-sec-reviewer',
 ] as const;
 
+const VALID_DOMAINS: readonly Domain[] = [
+  'research', 'code-execution', 'code-review', 'planning',
+  'memory', 'security', 'ux', 'writing', 'search',
+];
+
+/** Validate a frontmatter domain against the fixed taxonomy; warn + fall back instead of casting blindly. */
+function coerceDomain(raw: unknown, id: string): Domain {
+  if (typeof raw === 'string' && (VALID_DOMAINS as readonly string[]).includes(raw)) {
+    return raw as Domain;
+  }
+  console.warn(`[scanner] ${id}: invalid/missing domain "${String(raw)}" — defaulting to 'planning'`);
+  return 'planning';
+}
+
+// L1 summary budget is ≤200 tokens (CLAUDE.md §6/§12); ~800 chars is a safe ceiling.
+const SUMMARY_MAX_CHARS = 800;
+
 /** Parse YAML frontmatter between --- markers without external deps. */
 function parseFrontmatter(raw: string): Record<string, unknown> {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -44,8 +61,8 @@ export function scanOrchestratorSkills(repoRoot: string): SkillMeta[] {
       id,
       name: String(fm['name'] ?? id),
       description: String(fm['description'] ?? ''),
-      domain: (fm['domain'] as Domain) ?? 'planning',
-      summary: String(fm['summary'] ?? fm['description'] ?? '').slice(0, 1200),
+      domain: coerceDomain(fm['domain'], id),
+      summary: String(fm['summary'] ?? fm['description'] ?? '').slice(0, SUMMARY_MAX_CHARS),
       tags: Array.isArray(fm['tags']) ? fm['tags'].map(String) : [],
       path: skillPath,
     });
