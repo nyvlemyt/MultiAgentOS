@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      # §11 PAYG import guard + per-package tsc --noEmit.
+      - name: Lint (PAYG guard + typecheck)
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm -r test
+
+      - name: Install Playwright browser
+        run: pnpm --filter @mas/web exec playwright install --with-deps chromium
+
+      # Seeds an isolated smoke DB and runs smoke + lifecycle + skills e2e.
+      # MAS_MOCK_LLM is set in playwright.config.ts webServer env (no real SDK).
+      - name: E2E (Playwright)
+        run: pnpm --filter @mas/web smoke
