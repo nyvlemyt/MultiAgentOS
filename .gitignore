@@ -66,3 +66,15 @@ apps/web/playwright-report/
 apps/web/blob-report/
 **/.last-run.json
 
+
+# docs/claude doc — ignore binaries, commit .md sources
+docs/claude\ doc/*.pdf
+docs/claude\ doc/*.webloc
+docs/claude\ doc/.DS_Store
+
+# docs/ressources — ignore binaries (Notion exports), distill into .md instead
+docs/ressources/*.pdf
+docs/ressources/.DS_Store
+# raw markitdown full-text dumps = local read-cache for cheap reads (Grep + partial Read).
+# Curated, cited distillation goes to docs/knowledge/ — don't commit raw third-party content.
+docs/ressources/md/

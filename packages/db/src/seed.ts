@@ -213,7 +213,7 @@ async function main() {
         tokensOut: Math.floor(Math.random() * 400),
         cacheRead: Math.floor(Math.random() * 500),
         cacheCreation: Math.floor(Math.random() * 200),
-        costCents: Math.floor(Math.random() * 10),
+        quotaUnits: Math.floor(Math.random() * 10),
         risk: 'low',
         createdAt: minutesAgo(30 - e),
       })
@@ -246,42 +246,54 @@ async function main() {
     ])
     .onConflictDoNothing();
 
-  const installedSkillIds = [
-    'caveman',
-    'claude-api',
-    'frontend-design',
-    'ui-ux-pro-max',
-    'webapp-testing',
-    'mcp-builder',
-    'theme-factory',
-    'brand-guidelines',
-    'canvas-design',
-    'algorithmic-art',
-    'slack-gif-creator',
-    'pdf',
-    'docx',
-    'pptx',
-    'xlsx',
-    'internal-comms',
-    'doc-coauthoring',
-    'skill-creator',
-    'web-artifacts-builder',
-    'superpowers',
+  // Library skills carry domain + tags so the Phase 3.5 router can route to them.
+  // domain ∈ research|code-execution|code-review|planning|memory|security|ux|writing|search
+  const installedSkills: Array<{
+    id: string;
+    domain: (typeof skills.$inferInsert)['domain'];
+    tags: string[];
+  }> = [
+    { id: 'caveman', domain: 'writing', tags: ['compression', 'style', 'eco'] },
+    { id: 'claude-api', domain: 'code-execution', tags: ['anthropic', 'api', 'sdk'] },
+    { id: 'frontend-design', domain: 'ux', tags: ['frontend', 'design', 'ui'] },
+    { id: 'ui-ux-pro-max', domain: 'ux', tags: ['ui', 'ux', 'design'] },
+    { id: 'webapp-testing', domain: 'code-review', tags: ['testing', 'webapp', 'qa'] },
+    { id: 'mcp-builder', domain: 'code-execution', tags: ['mcp', 'server', 'integration'] },
+    { id: 'theme-factory', domain: 'ux', tags: ['theme', 'design', 'branding'] },
+    { id: 'brand-guidelines', domain: 'ux', tags: ['brand', 'design', 'style'] },
+    { id: 'canvas-design', domain: 'ux', tags: ['design', 'canvas', 'visual'] },
+    { id: 'algorithmic-art', domain: 'ux', tags: ['art', 'generative', 'p5'] },
+    { id: 'slack-gif-creator', domain: 'ux', tags: ['gif', 'slack', 'media'] },
+    { id: 'pdf', domain: 'writing', tags: ['pdf', 'document'] },
+    { id: 'docx', domain: 'writing', tags: ['docx', 'document', 'word'] },
+    { id: 'pptx', domain: 'writing', tags: ['pptx', 'presentation', 'slides'] },
+    { id: 'xlsx', domain: 'writing', tags: ['xlsx', 'spreadsheet', 'data'] },
+    { id: 'internal-comms', domain: 'writing', tags: ['communication', 'writing', 'internal'] },
+    { id: 'doc-coauthoring', domain: 'writing', tags: ['documentation', 'writing', 'collaboration'] },
+    { id: 'skill-creator', domain: 'planning', tags: ['skill', 'authoring', 'meta'] },
+    { id: 'web-artifacts-builder', domain: 'ux', tags: ['web', 'artifacts', 'frontend'] },
+    { id: 'superpowers', domain: 'planning', tags: ['methodology', 'workflow', 'tdd'] },
   ];
-  for (const id of installedSkillIds) {
+  for (const skill of installedSkills) {
     await db
       .insert(skills)
       .values({
-        id,
+        id: skill.id,
         source: '.claude/skills',
-        path: `.claude/skills/${id}`,
+        path: `.claude/skills/${skill.id}`,
         summaryPath: null,
-        tagsJson: '[]',
+        tagsJson: JSON.stringify(skill.tags),
+        domain: skill.domain,
         tier: 'on-demand',
         autoLoad: false,
         lastUsedAt: null,
       })
-      .onConflictDoNothing();
+      // domain + tags are system-managed: refresh them on reseed.
+      // tier + autoLoad are user-managed (promote action): never overwrite.
+      .onConflictDoUpdate({
+        target: skills.id,
+        set: { domain: skill.domain, tagsJson: JSON.stringify(skill.tags) },
+      });
   }
 
   await db

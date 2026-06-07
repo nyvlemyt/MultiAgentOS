@@ -1,4 +1,23 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+vi.mock('@mas/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@mas/core')>();
+  return {
+    ...actual,
+    claudeCodeLLM: vi.fn(() => ({
+      call: vi.fn(async () => ({
+        text: '[test-mock] task executed',
+        inputTokens: 220,
+        outputTokens: 80,
+        cacheReadTokens: 60,
+        cacheCreationTokens: 20,
+        quotaUnits: 0,
+        model: 'claude-haiku-4-5',
+        sessionId: 'test-session-id',
+      })),
+    })),
+  };
+});
 import { unlinkSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
@@ -14,7 +33,6 @@ import {
   missions,
   tasks,
   events,
-  validations,
 } from '@mas/db';
 import {
   planMission,

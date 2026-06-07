@@ -1,8 +1,11 @@
 import { randomUUID } from 'node:crypto';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { and, eq, inArray } from 'drizzle-orm';
 import {
   getDb,
   missions,
+  projects,
   tasks,
   events,
   validations,
@@ -15,9 +18,46 @@ import {
   mockSkillRouter,
   mockReviewer,
   mockSecReviewer,
+  claudeCodeLLM,
+  mockLLM,
+  type AutonomyLevel,
 } from '@mas/core';
+import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
 
 export type Db = ReturnType<typeof getDb>;
+
+// Lazy singleton — deferred so Next.js static analysis doesn't eval import.meta.url at bundle time.
+let _skillRouterInstance: SkillRouter | undefined;
+function getSkillRouter(): SkillRouter {
+  if (!_skillRouterInstance) {
+    try {
+      const __dirname = fileURLToPath(new URL('.', import.meta.url));
+      const repoRoot = resolve(__dirname, '../../..');
+      _skillRouterInstance = new SkillRouter(scanOrchestratorSkills(repoRoot));
+    } catch {
+      // Under a bundler (Next webpack RSC) import.meta.url is not a file: URL,
+      // so fileURLToPath rejects it (TypeError: ... Received an instance of URL).
+      // Skill-summary injection is a best-effort prompt enhancement, not required
+      // for correctness — degrade to an empty router rather than crash the run.
+      // Native execution (apps/worker, tsx) resolves the path fine and gets full
+      // injection. Moving the inline-Next run path to the worker is tracked in
+      // docs/backlog/run-inline-execution-in-next.md.
+      _skillRouterInstance = new SkillRouter([]);
+    }
+  }
+  return _skillRouterInstance;
+}
+
+// LLM selection. MAS_MOCK_LLM=1 short-circuits the real Agent SDK with a
+// deterministic, zero-cost mock (e2e smoke, offline dev, token budget). The §5
+// risk gate fires BEFORE any LLM call (executeNextTask), so gate behavior is
+// identical either way. Both branches go through @mas/core factories — no raw
+// SDK client is instantiated here (CLAUDE.md §11). The real path also keeps the
+// vi.mock('@mas/core') seam in dispatch.test.ts working unchanged.
+function selectLLM(opts: { cwd?: string; autonomyLevel?: AutonomyLevel; sessionId?: string }) {
+  if (process.env.MAS_MOCK_LLM === '1') return mockLLM();
+  return claudeCodeLLM(opts);
+}
 
 function logEvent(db: Db, evt: {
   missionId?: string;
@@ -27,6 +67,9 @@ function logEvent(db: Db, evt: {
   payload?: unknown;
   tokensIn?: number;
   tokensOut?: number;
+  cacheRead?: number;
+  cacheCreation?: number;
+  quotaUnits?: number;
   risk?: 'low' | 'medium' | 'high' | 'blocking';
 }) {
   return db.insert(events).values({
@@ -38,9 +81,9 @@ function logEvent(db: Db, evt: {
     payloadJson: JSON.stringify(evt.payload ?? {}),
     tokensIn: evt.tokensIn ?? 0,
     tokensOut: evt.tokensOut ?? 0,
-    cacheRead: 0,
-    cacheCreation: 0,
-    costCents: 0,
+    cacheRead: evt.cacheRead ?? 0,
+    cacheCreation: evt.cacheCreation ?? 0,
+    quotaUnits: evt.quotaUnits ?? 0,
     risk: evt.risk ?? 'low',
     createdAt: new Date(),
   });
@@ -234,31 +277,73 @@ export async function executeNextTask(missionId: string): Promise<
     return { kind: 'paused_for_validation', taskId: next.id };
   }
 
-  // Simulated execution: instantly done with deterministic mock cost
-  const inTok = 220;
-  const outTok = 80;
+  // Look up project to build the real LLM client.
+  const [proj] = await db
+    .select({
+      id: projects.id,
+      path: projects.path,
+      autonomy: projects.autonomy,
+      sessionId: projects.sessionId,
+      defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode,
+    })
+    .from(projects)
+    .innerJoin(missions, eq(missions.projectId, projects.id))
+    .where(eq(missions.id, missionId));
+
+  const llm = selectLLM({
+    cwd: proj?.path,
+    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
+    sessionId: proj?.sessionId ?? undefined,
+  });
+
+  const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
+  const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
+
+  const resp = await llm.call({
+    system: [
+      `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
+      skillContext,
+    ].filter(Boolean).join('\n\n'),
+    user: `Task: ${next.title}\n\n${next.description}`,
+    model: proj?.defaultModel ?? 'claude-haiku-4-5',
+    mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
+  });
+
+  // Persist new session_id back to project on first successful call.
+  if (proj && resp.sessionId && !proj.sessionId) {
+    await db
+      .update(projects)
+      .set({ sessionId: resp.sessionId })
+      .where(eq(projects.id, proj.id));
+  }
+
+  const spend = resp.inputTokens + resp.outputTokens;
   await db
     .update(tasks)
     .set({
       status: 'done',
-      spentTokens: inTok + outTok,
+      spentTokens: spend,
       outputPath: `data/outputs/${next.id}.md`,
       updatedAt: new Date(),
     })
     .where(eq(tasks.id, next.id));
   await db
     .update(missions)
-    .set({ spentTokens: (m.spentTokens ?? 0) + inTok + outTok, updatedAt: new Date() })
+    .set({ spentTokens: (m.spentTokens ?? 0) + spend, updatedAt: new Date() })
     .where(eq(missions.id, m.id));
   await logEvent(db, {
     missionId: m.id,
     taskId: next.id,
     agentId: next.agentId ?? undefined,
     type: 'task_done',
-    tokensIn: inTok,
-    tokensOut: outTok,
+    tokensIn: resp.inputTokens,
+    tokensOut: resp.outputTokens,
+    cacheRead: resp.cacheReadTokens,
+    cacheCreation: resp.cacheCreationTokens,
+    quotaUnits: resp.quotaUnits,
     risk: next.risk,
-    payload: { title: next.title },
+    payload: { title: next.title, sessionId: resp.sessionId },
   });
 
   return { kind: 'task_done', taskId: next.id };
@@ -290,10 +375,47 @@ export async function resumeAfterValidation(
     return { acted: true, missionId: t.missionId };
   }
 
-  // Approved: mark task done, account budget in both task and mission.
-  const inTok = 220;
-  const outTok = 80;
-  const spend = inTok + outTok;
+  // Approved: execute the task via real LLM and record actual token spend.
+  const [proj] = await db
+    .select({
+      id: projects.id,
+      path: projects.path,
+      autonomy: projects.autonomy,
+      sessionId: projects.sessionId,
+      defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode,
+    })
+    .from(projects)
+    .innerJoin(missions, eq(missions.projectId, projects.id))
+    .where(eq(missions.id, t.missionId));
+
+  const llm = selectLLM({
+    cwd: proj?.path,
+    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
+    sessionId: proj?.sessionId ?? undefined,
+  });
+
+  const taskSkillIds: string[] = JSON.parse(t.skillsJson ?? '[]');
+  const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
+
+  const resp = await llm.call({
+    system: [
+      `You are executing a validated high-risk task inside project at path ${proj?.path ?? '.'}.`,
+      skillContext,
+    ].filter(Boolean).join('\n\n'),
+    user: `Task: ${t.title}\n\n${t.description}`,
+    model: proj?.defaultModel ?? 'claude-haiku-4-5',
+    mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
+  });
+
+  if (proj && resp.sessionId && !proj.sessionId) {
+    await db
+      .update(projects)
+      .set({ sessionId: resp.sessionId })
+      .where(eq(projects.id, proj.id));
+  }
+
+  const spend = resp.inputTokens + resp.outputTokens;
   await db
     .update(tasks)
     .set({ status: 'done', spentTokens: spend, outputPath: `data/outputs/${t.id}.md`, updatedAt: new Date() })
@@ -311,8 +433,11 @@ export async function resumeAfterValidation(
     taskId: t.id,
     agentId: t.agentId ?? undefined,
     type: 'validation_approved',
-    tokensIn: inTok,
-    tokensOut: outTok,
+    tokensIn: resp.inputTokens,
+    tokensOut: resp.outputTokens,
+    cacheRead: resp.cacheReadTokens,
+    cacheCreation: resp.cacheCreationTokens,
+    quotaUnits: resp.quotaUnits,
     risk: t.risk,
   });
   return { acted: true, missionId: t.missionId };

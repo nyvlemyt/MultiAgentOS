@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned to full commit SHA (supply-chain hardening, SonarCloud S2245/hotspot).
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      # §11 PAYG import guard + per-package tsc --noEmit.
+      - name: Lint (PAYG guard + typecheck)
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm -r test
+
+      - name: Install Playwright browser
+        run: pnpm --filter @mas/web exec playwright install --with-deps chromium
+
+      # Seeds an isolated smoke DB and runs smoke + lifecycle + skills e2e.
+      # MAS_MOCK_LLM is set in playwright.config.ts webServer env (no real SDK).
+      - name: E2E (Playwright)
+        run: pnpm --filter @mas/web smoke
+
+# SonarCloud is intentionally left on Automatic Analysis (zero-config, covers
+# 100% of this TS/JS/Shell codebase). CI-based Sonar is only needed for compiled
+# languages (Java/Maven, as in the EFREI DevOps course) or to upload test
+# coverage (lcov) — neither applies yet. Re-add a sonar job when we wire vitest
+# coverage; org key is `nyvlem` (per the course project).

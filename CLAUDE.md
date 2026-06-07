@@ -22,7 +22,7 @@ The product surface and detailed scope live in `PRODUCT_SPEC.md`. The agent rost
 - **Frontend**: Next.js 15 (App Router) + TypeScript + Tailwind + shadcn/ui
 - **Orchestrator worker**: separate Node process (`apps/worker`) using `tsx`, communicating with Next.js via the SQLite job table + an SSE channel
 - **DB**: SQLite via Drizzle ORM (file: `data/mas.db`)
-- **AI**: `@anthropic-ai/sdk` (later: Claude Agent SDK and/or headless `claude` CLI for shell-heavy missions)
+- **AI**: `@anthropic-ai/claude-agent-sdk` (primary — drives Claude Code engine via subscription); headless `claude --print` (fallback for shell-heavy missions and risk-gated `manual` autonomy tasks only)
 - **Packaging (later)**: Tauri desktop wrapper
 - Node ≥ 20, pnpm workspaces (`apps/web`, `apps/worker`, `packages/*`)
 
@@ -111,27 +111,90 @@ Note: **all MultiAgentOS state lives inside this repo's `data/` folder.** The ex
 3. Check `SKILLS_REGISTRY.md` for the right skill.
 4. If still unclear → ask the user. Never invent product behavior.
 
+## 9.bis. Inspiration Voie 2 (permanent design principle)
+
+Whenever the Claude Agent SDK docs are vague — session resume, file-context injection, tool gating, streaming back-pressure, image attachments, stop reasons, error recovery, rate-limit signalling — the first reflex is *"how do the open-source webuis do it?"*
+
+Reference repos (in priority order):
+
+- **[siteboon/claudecodeui](https://github.com/siteboon/claudecodeui)** — primary reference (project picker, session list, file tree, terminal, mobile UX).
+- **[sugyan/claude-code-webui](https://github.com/sugyan/claude-code-webui)** — minimalist; best for reading the streaming-chat layer alone.
+- **[winfunc/opcode](https://github.com/winfunc/opcode)** — Tauri desktop; reference for Phase 8 packaging.
+- **[KyleAMathews/claude-code-ui](https://github.com/KyleAMathews/claude-code-ui)** — session tracker; reference for `/trace`.
+
+**Workflow:** before writing a new piece of bridge code, clone the relevant reference, grep for the equivalent feature, and port the **pattern** (not the code). Cite the source file in a leading code comment: `// pattern from siteboon/claudecodeui src/lib/claude.ts:142`.
+
+**Why this matters:** the Agent SDK is young; the open-source webuis already absorbed the rough edges (Windows quoting, session-id format, partial JSON streams, rate-limit signalling). Do not reinvent those.
+
+See `docs/decisions/0001-claude-code-engine-over-api-sdk.md` §Decision clause 6 for the full rationale.
+
 ## 10. Building MultiAgentOS itself
 
 When building features of MultiAgentOS, follow `ROADMAP.md` phase by phase. Do not start phase N+1 without explicit user green light at the phase-N exit criteria. The "Future Build Prompt" at the end of `ROADMAP.md` is the canonical kick-off for each phase.
 
-## 11. Billing isolation (CRITICAL — Claude Code vs Anthropic API)
+## 11. Billing isolation (CRITICAL)
 
-Claude Code CLI has **two billing modes**. Mixing them silently causes unexpected charges.
+MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). PAYG via API key is a **forbidden** mode.
 
-| Mode | Trigger | Cost |
-|------|---------|------|
-| Subscription (Pro/Max) | `claude login` auth, no API key in env | Fixed monthly |
-| API PAYG | `ANTHROPIC_API_KEY` present in shell env | Per token, ~$3/$15 per 1M |
+| Mode | Trigger | Billing |
+|------|---------|---------|
+| **Subscription** *(only legal mode)* | `claude login` + `@anthropic-ai/claude-agent-sdk` | Fixed monthly |
+| ~~API PAYG~~ *(forbidden)* | `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY` | Per token — facture salée |
 
 **Rules — enforce always, never override:**
 
-1. `ANTHROPIC_API_KEY` must **never** be exported in global shell config (`~/.zshrc`, `~/.bashrc`, `~/.zshenv`, `~/.profile`). Verify: `echo $ANTHROPIC_API_KEY` in a fresh terminal must be empty.
-2. The key must only be injected per-process: via `.env` loaded by the app (`dotenv`/`tsx --env-file`), never `source`d globally.
-3. Claude Code authenticates exclusively via `claude login` (subscription). If it prompts for an API key, something is wrong — investigate before entering one.
-4. `.env` files are gitignored and must stay that way. Never commit a file containing `ANTHROPIC_API_KEY`.
-5. Any agent or script that needs to call the Anthropic API must receive the key via the app's runtime environment, not from the shell.
+1. **No runtime code may `import` from `@anthropic-ai/sdk`** in `apps/` or `packages/*/src/`. The only legal location is an opt-in `packages/core/src/api-fallback/` behind an explicit config flag. Enforcement: **CI lint guard active** — `scripts/lint-no-sdk-payg.sh`, wired into `pnpm lint` (matches any import form: quotes, dynamic `import()`, `require`, subpaths).
+2. `ANTHROPIC_API_KEY` presence at worker init triggers a **warning log + refusal to start**. The key is treated as a smell, not a feature.
+3. `ANTHROPIC_API_KEY` must never be exported in global shell config (`~/.zshrc`, `~/.bashrc`, `~/.zshenv`, `~/.profile`). Verify: `echo $ANTHROPIC_API_KEY` in a fresh terminal must be empty.
+4. Claude Code authenticates exclusively via `claude login`. If it prompts for an API key, something is wrong — investigate before entering one.
+5. `.env` files are gitignored and must stay that way. Never commit a file containing `ANTHROPIC_API_KEY`.
 
-**In MultiAgentOS code:** the `packages/core/llm.ts` LLM wrapper is the single injection point. It reads `process.env.ANTHROPIC_API_KEY` at call time. No other file may read this variable directly.
+**In MultiAgentOS code:** `packages/core/src/llm.ts` is the single LLM injection point. It drives the Claude Code engine via `@anthropic-ai/claude-agent-sdk`. No other file may instantiate an LLM client.
 
-**Guard against runaway cost:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard caps. The worker must check the active budget row before every LLM call and return `budget_exceeded` without calling the API if the cap is reached.
+**Guard against runaway quota:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard window caps. The worker checks the active budget row before every LLM call and returns `budget_exceeded` if the cap is reached.
+
+**⚠️ Billing change effective 2026-06-15:** Agent SDK usage on subscription plans consumes a **separate** monthly credit from Claude.ai conversations. The `budgets` table must track Agent SDK quota independently from interactive Claude.ai usage. Agents consume ~4× quota vs normal chat; multi-agent research missions ~15×. Source: `docs/knowledge/anthropic-ecosystem.md`.
+
+## 12. Knowledge Base — mandatory consultation rules
+
+`docs/knowledge/` contains curated research on agents, prompting, memory, and production patterns. **Ignoring it produces mediocre work.** These rules are non-negotiable:
+
+### Before creating or modifying any SKILL.md file
+1. Read `docs/knowledge/prompting-anthropic.md` — apply XML tags, chain-of-thought, effort mapping
+2. Read `docs/knowledge/skills-reference.md` — use the lifecycle structure (Overview → When to Use → Process → Rationalizations → Red Flags → Verification Criteria)
+3. Read the relevant domain file (`agent-patterns.md`, `memory-patterns.md`, `production-patterns.md`, or `project-doctrine.md`)
+4. SKILL.md body must include: Principles section (citing source), Process (numbered steps), Rationalizations Table, Red Flags, Verification Criteria (binary pass/fail)
+5. `summary:` field (L1, ≤200 tokens) = one-paragraph précis for prompt injection. Body (L2) = full operational guide.
+
+### Before creating or modifying any agent fiche
+1. Check `AGENTS.md` for the correct tier, domain, and responsibility
+2. Read `docs/knowledge/agent-patterns.md` for the relevant patterns
+3. Apply ≤7 tools per agent rule (MLOps Community research)
+
+### Before implementing a memory feature
+1. Read `docs/knowledge/memory-patterns.md` — use the 5-register architecture from `project-doctrine.md`
+2. Apply signal-density test to every piece of context injected
+3. Never inject more than 5 global memory items per mission
+
+### Red flag phrases — stop and consult docs/knowledge/ if you think any of these
+- "The skill is just instructions, it doesn't need much content" → wrong, see §12.1
+- "I'll keep the summary short for now" → summary=L1 brief, body=L2 rich — both required
+- "I don't need to look at the knowledge base for this" → always do
+
+## 13. Learning bootstrap — pre-flight, intake-audit & persistence (mandatory)
+
+The tool that builds great projects must itself be built with the best knowledge — learned *before* each phase, never last. Full doctrine: `docs/workflows/knowledge-bootstrap.md`.
+
+### Before building any ROADMAP phase N
+1. **Pre-flight** — run a targeted intake-audit of the resources relevant to phase N (`docs/ressources/`, `docs/knowledge/`), method in `docs/workflows/intake-audit-template.md`. Scope to the phase, not the whole batch.
+2. **Distill** the kept items into the existing `docs/knowledge/` files (and CLAUDE.md / skills only if it becomes a rule).
+3. **Then** build. Resources are a per-phase input, not an end-of-project block.
+
+### Adding anything (resource / skill / agent / idea / memory / principle)
+Run the intake-audit (`docs/workflows/intake-audit-template.md`): identity → fit → 3 costs (install/maintenance/removal) → score → **KILL criteria** (the audit must be able to say `reject`) → decision enum → adaptation → integration plan → re-audit date. The audit *decides*; implementation reuses the mission lifecycle.
+
+### Self-audit (at every phase gate)
+Re-audit already-built artifacts (`CLAUDE.md`, `AGENTS.md`, Tier A fiches, `mas-*` skills, ADRs) against current best knowledge. Fix or backlog the debt.
+
+### Persistence bridge (anti-oubli — firm requirement)
+Phase 4 memory MUST seed from `docs/knowledge/` + `vibeflow/INDEX.md`, so build-time knowledge flows into the runtime second brain instead of diverging. In Phase 4 exit criteria. See `docs/backlog/second-brain-cross-project.md` and `knowledge-bootstrap.md §5.bis` (the enrichment spiral).

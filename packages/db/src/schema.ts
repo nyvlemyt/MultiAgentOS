@@ -1,5 +1,4 @@
 import { sqliteTable, text, integer, real, primaryKey, index } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
 
 const epoch = () => integer({ mode: 'timestamp' }).$defaultFn(() => new Date());
 
@@ -20,6 +19,7 @@ export const projects = sqliteTable('projects', {
     enum: ['eco', 'standard', 'expert'],
   }).notNull().default('eco'),
   monthlyBudgetCents: integer('monthly_budget_cents').notNull().default(500),
+  sessionId: text('session_id'),
   createdAt: epoch().notNull(),
   lastActiveAt: epoch().notNull(),
 });
@@ -56,6 +56,9 @@ export const skills = sqliteTable('skills', {
   path: text('path').notNull(),
   summaryPath: text('summary_path'),
   tagsJson: text('tags_json').notNull().default('[]'),
+  domain: text('domain', {
+    enum: ['research', 'code-execution', 'code-review', 'planning', 'memory', 'security', 'ux', 'writing', 'search'],
+  }),
   tier: text('tier', { enum: ['pinned', 'project-pinned', 'on-demand', 'methodology'] })
     .notNull()
     .default('on-demand'),
@@ -135,7 +138,10 @@ export const events = sqliteTable(
     tokensOut: integer('tokens_out').notNull().default(0),
     cacheRead: integer('cache_read').notNull().default(0),
     cacheCreation: integer('cache_creation').notNull().default(0),
-    costCents: integer('cost_cents').notNull().default(0),
+    // Per-event weight (proxy: round(total_cost_usd * 100)).
+    // The §8 5-hour window cap reads COUNT(*) on llm_call events, NOT SUM(quota_units).
+    // Treat quota_units as a routing/telemetry signal, not as a quota counter.
+    quotaUnits: integer('quota_units').notNull().default(0),
     risk: text('risk', { enum: ['low', 'medium', 'high', 'blocking'] }).notNull().default('low'),
     createdAt: epoch().notNull(),
   },

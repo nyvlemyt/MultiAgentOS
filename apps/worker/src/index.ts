@@ -29,6 +29,13 @@ async function tick() {
 }
 
 async function main() {
+  if (process.env.ANTHROPIC_API_KEY) {
+    console.error(
+      '[worker] ANTHROPIC_API_KEY is set — refusing to start. ' +
+        'MultiAgentOS uses subscription billing only. See CLAUDE.md §11.',
+    );
+    process.exit(1);
+  }
   console.log('[worker] alive');
   // touch the DB once to surface init errors early
   getDb();
