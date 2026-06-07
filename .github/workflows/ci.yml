@@ -43,3 +43,22 @@ jobs:
       # MAS_MOCK_LLM is set in playwright.config.ts webServer env (no real SDK).
       - name: E2E (Playwright)
         run: pnpm --filter @mas/web smoke
+
+  sonarcloud:
+    runs-on: ubuntu-latest
+    # Map the secret to env so the step can skip cleanly when it isn't set yet
+    # (secrets can't be referenced directly in `if:`). No red check before setup.
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so SonarCloud can attribute new-code and blame.
+          fetch-depth: 0
+
+      - name: SonarCloud Scan
+        if: ${{ env.SONAR_TOKEN != '' }}
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
