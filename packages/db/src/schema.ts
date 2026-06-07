@@ -1,5 +1,4 @@
 import { sqliteTable, text, integer, real, primaryKey, index } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
 
 const epoch = () => integer({ mode: 'timestamp' }).$defaultFn(() => new Date());
 
