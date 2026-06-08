@@ -78,3 +78,24 @@ A `MemoryStore.retire()` + write-lock test is backlogged; reject covers stale
 ## Phase gate
 
 Stopping here for review per CLAUDE.md §10. Phase 3.5 / router NOT started. Awaiting explicit "go".
+
+## Checker re-verification — 2026-06-09
+
+Independent Checker run (build prompt §②) against a clean `phase/4-memory` tree. **Verdict: PASS — merge-ready pending human approval.**
+
+| Check | Result | Evidence (fresh run) |
+|---|---|---|
+| 1. 5 registers + `_global`, formats | ✅ | `registers.test.ts`: BDR-001 prefix, per-kind prefixes, `allDocs` across projects+global (9/9) |
+| 2. Write path Keeper-locked | ✅ | `registers.test.ts` "REJECTS writes from any agent other than the Memory Keeper" + `seed.test.ts` "write path is Keeper-locked" |
+| 3. Bridge idempotency + `source:` | ✅ | `seed.test.ts` "imports every docs/knowledge .md (incl. INDEX) with source provenance" + "re-running creates no duplicate docs" |
+| 4. Bridge retrievability (hard gate) | ✅ | `seed.test.ts:46` iterates exactly `['BDR','Mem0 cloud','95% builders','40% Gartner']`, asserts a hit for each |
+| 5. Injection cap ≤5, no auto-inject | ✅ | `context.test.ts` "caps global items at 5 (§12)" + "empty when no memory" + `memory-injection.test.ts` two-mission |
+| 6. No scope creep (QMD/Graphify/router) | ✅ | QMD/mem0/OpenAI appear only in deferral/rejection **comments**; no `providers/`, no `llm.router.ts` |
+| 6b. Capture BDR §11-compliant | ✅ | `capture.ts` `CAPTURE_DECISION`; mem0 rejected for OpenAI-embedding PAYG |
+| 7. Verification green | ✅ | `pnpm -r test` **53/53** · `pnpm lint` PAYG guard PASS + tsc clean (7/8 projects, 8th has no lint script) · `pnpm build` next build OK (incl. 3 new `/api/memory/*` routes) · `pnpm --filter @mas/web smoke` **19/19** |
+
+**All four ROADMAP branching-rule checks green** (`pnpm lint` · `pnpm test` · `pnpm build` · `pnpm smoke`).
+
+### Note — a non-blocking test-hygiene finding (NOT a Phase 4 defect)
+
+Running the suite as `MAS_MOCK_LLM=1 pnpm -r test` (env exported globally) makes **2** `packages/agents/src/dispatch.test.ts` budget/idempotency assertions fail (off-by-40 on `spentTokens`: expects 300, gets 260). Root cause: `dispatch.test.ts` drives the `claudeCodeLLM` branch via `vi.mock('@mas/core')` (fixture 220 in / 80 out = 300) and assumes `MAS_MOCK_LLM` is **unset**; an externally-exported `MAS_MOCK_LLM=1` flips `selectLLM` (`dispatch.ts:80`) to the real `mockLLM()` (200 in / 60 out = 260). The **canonical** command `pnpm -r test` (no exported env; each suite self-configures, memory tests set the flag in their own `beforeEach`) is green. This is a Phase 1/2 test-isolation fragility, out of Phase 4 scope — **not fixed** here per the "only fix Phase 4" mandate. Optional hardening (backlog): add `delete process.env.MAS_MOCK_LLM` to `dispatch.test.ts`'s `beforeEach`.
