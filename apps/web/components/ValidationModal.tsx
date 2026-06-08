@@ -29,11 +29,10 @@ export function ValidationModal({ pending }: Readonly<{ pending: PendingValidati
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
+    <dialog
+      open
       aria-label="Pending validations"
-      className="fixed inset-0 z-50 flex items-end justify-end p-6"
+      className="fixed inset-0 z-50 m-0 flex h-full w-full max-w-none items-end justify-end border-0 bg-transparent p-6"
       style={{ pointerEvents: 'none' }}
     >
       <div className="surface-elevated max-w-md w-full p-4 shadow-2xl" style={{ pointerEvents: 'auto' }}>
@@ -76,6 +75,6 @@ export function ValidationModal({ pending }: Readonly<{ pending: PendingValidati
           ))}
         </ul>
       </div>
-    </div>
+    </dialog>
   );
 }
