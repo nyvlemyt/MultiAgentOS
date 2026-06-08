@@ -13,10 +13,10 @@ FORBIDDEN=$(grep -rnE "['\"]@anthropic-ai/sdk['\"/]" apps/ packages/ \
   || true)
 
 if [[ -n "$FORBIDDEN" ]]; then
-  echo "ERROR: @anthropic-ai/sdk imported outside packages/core/src/api-fallback/"
-  echo "       These imports route billing to PAYG — forbidden by CLAUDE.md §11."
-  echo ""
-  echo "$FORBIDDEN"
+  echo "ERROR: @anthropic-ai/sdk imported outside packages/core/src/api-fallback/" >&2
+  echo "       These imports route billing to PAYG — forbidden by CLAUDE.md §11." >&2
+  echo "" >&2
+  echo "$FORBIDDEN" >&2
   exit 1
 fi
 
