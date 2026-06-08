@@ -197,7 +197,9 @@ async function runReviewPhase(
       verdicts.push(sec);
     }
   }
-  const last = all.at(-1);
+  // Deterministic "last task": sort by createdAt (mirrors selectRunnableTasks)
+  // so the reviewer runs on the actual last-created task, not DB row order.
+  const last = [...all].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).at(-1);
   if (last) {
     const rev = mockReviewer(last.id, { risk: last.risk });
     await logEvent(db, { missionId: m.id, taskId: last.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
