@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export function KanbanColumn({ title, count, children }: { title: string; count: number; children: ReactNode }) {
+export function KanbanColumn({ title, count, children }: Readonly<{ title: string; count: number; children: ReactNode }>) {
   return (
     <section className="flex h-full min-w-[240px] flex-col gap-2">
       <header className="flex items-center justify-between px-1">

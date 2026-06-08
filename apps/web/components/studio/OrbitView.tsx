@@ -14,7 +14,7 @@ export interface OrbitEdge {
   active?: boolean;
 }
 
-export function OrbitView({ nodes, edges, size = 520 }: { nodes: OrbitNode[]; edges: OrbitEdge[]; size?: number }) {
+export function OrbitView({ nodes, edges, size = 520 }: Readonly<{ nodes: OrbitNode[]; edges: OrbitEdge[]; size?: number }>) {
   const cx = size / 2;
   const cy = size / 2;
   const innerR = size * 0.22;
@@ -39,13 +39,13 @@ export function OrbitView({ nodes, edges, size = 520 }: { nodes: OrbitNode[]; ed
       <svg width={size} height={size} className="absolute inset-0">
         <circle cx={cx} cy={cy} r={innerR} fill="none" stroke="var(--border-subtle)" strokeDasharray="2 4" />
         <circle cx={cx} cy={cy} r={outerR} fill="none" stroke="var(--border-subtle)" strokeDasharray="2 4" />
-        {edges.map((e, i) => {
+        {edges.map((e) => {
           const a = positions[e.from];
           const b = positions[e.to];
           if (!a || !b) return null;
           return (
             <line
-              key={i}
+              key={`${e.from}-${e.to}`}
               x1={a.x}
               y1={a.y}
               x2={b.x}

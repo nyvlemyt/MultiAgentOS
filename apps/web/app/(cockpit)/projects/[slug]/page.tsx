@@ -3,7 +3,7 @@ import { MissionCard } from '@/components/MissionCard';
 import { AgentCard } from '@/components/AgentCard';
 import { BudgetBar } from '@/components/BudgetBar';
 
-export default async function ProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProjectDetail({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const projectName = slug === 'otakugo' ? 'OtakuGO_UP' : slug;
   const projectPath = slug === 'otakugo' ? '/Users/melvyn/Documents/03_PROFESSIONNEL/OtakuGO_UP' : '—';

@@ -74,7 +74,7 @@ export default async function TokenManager() {
   );
 }
 
-function Card({ title, value, hint, children }: { title: string; value: string; hint?: string; children?: React.ReactNode }) {
+function Card({ title, value, hint, children }: Readonly<{ title: string; value: string; hint?: string; children?: React.ReactNode }>) {
   return (
     <article className="surface flex flex-col gap-2 p-4">
       <header className="flex items-baseline justify-between">

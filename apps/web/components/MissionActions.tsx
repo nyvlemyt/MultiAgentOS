@@ -13,7 +13,7 @@ type Status =
   | 'archived'
   | 'blocked';
 
-export function MissionActions({ id, status }: { id: string; status: Status }) {
+export function MissionActions({ id, status }: Readonly<{ id: string; status: Status }>) {
   const [pending, start] = useTransition();
   const router = useRouter();
 
@@ -34,7 +34,7 @@ export function MissionActions({ id, status }: { id: string; status: Status }) {
       <Btn
         disabled={pending || status !== 'planned'}
         onClick={() => call(`/api/missions/${id}/run`)}
-        label={status === 'planned' ? 'Run mission' : status === 'dispatched' || status === 'executing' ? 'Running…' : 'Run mission'}
+        label={status === 'dispatched' || status === 'executing' ? 'Running…' : 'Run mission'}
         primary
       />
       <Btn
@@ -49,7 +49,7 @@ export function MissionActions({ id, status }: { id: string; status: Status }) {
   );
 }
 
-function Btn({ label, onClick, disabled, primary }: { label: string; onClick: () => void; disabled?: boolean; primary?: boolean }) {
+function Btn({ label, onClick, disabled, primary }: Readonly<{ label: string; onClick: () => void; disabled?: boolean; primary?: boolean }>) {
   return (
     <button
       type="button"

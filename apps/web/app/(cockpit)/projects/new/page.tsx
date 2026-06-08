@@ -54,7 +54,7 @@ export default function NewProject() {
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({ label, hint, children }: Readonly<{ label: string; hint?: string; children: React.ReactNode }>) {
   return (
     <label className="flex flex-col gap-1">
       <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{label}</span>

@@ -11,7 +11,7 @@ export interface TimelineRow {
   skills?: string[];
 }
 
-export function Timeline({ rows }: { rows: TimelineRow[] }) {
+export function Timeline({ rows }: Readonly<{ rows: TimelineRow[] }>) {
   return (
     <ol className="flex flex-col gap-2">
       {rows.map((r) => (

@@ -13,7 +13,7 @@ export interface MissionCardData {
   budgetCap: number;
 }
 
-export function MissionCard({ m }: { m: MissionCardData }) {
+export function MissionCard({ m }: Readonly<{ m: MissionCardData }>) {
   return (
     <Link
       href={`/missions/${m.id}`}
@@ -32,8 +32,8 @@ export function MissionCard({ m }: { m: MissionCardData }) {
       </div>
       <div className="flex items-center justify-between">
         <div className="flex -space-x-2">
-          {m.agents.slice(0, 3).map((a, i) => (
-            <AgentAvatar key={i} src={a.avatarPath ?? undefined} alt={a.name} status="running" size={22} />
+          {m.agents.slice(0, 3).map((a) => (
+            <AgentAvatar key={a.name} src={a.avatarPath ?? undefined} alt={a.name} status="running" size={22} />
           ))}
         </div>
         <BudgetBar spent={m.budgetSpent} cap={m.budgetCap} />

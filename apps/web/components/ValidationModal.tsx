@@ -11,7 +11,7 @@ export interface PendingValidation {
   actionSummary: string;
 }
 
-export function ValidationModal({ pending }: { pending: PendingValidation[] }) {
+export function ValidationModal({ pending }: Readonly<{ pending: PendingValidation[] }>) {
   const [busy, start] = useTransition();
   const router = useRouter();
 

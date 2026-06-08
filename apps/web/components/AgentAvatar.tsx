@@ -8,13 +8,13 @@ export function AgentAvatar({
   status = 'idle',
   size = 36,
   className,
-}: {
+}: Readonly<{
   src?: string | null;
   alt: string;
   status?: Status;
   size?: number;
   className?: string;
-}) {
+}>) {
   return (
     <span
       className={cn('inline-flex items-center justify-center rounded-full status-ring surface', className)}

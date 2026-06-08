@@ -1,4 +1,4 @@
-export function Sparkline({ data, width = 80, height = 24, stroke }: { data: number[]; width?: number; height?: number; stroke?: string }) {
+export function Sparkline({ data, width = 80, height = 24, stroke }: Readonly<{ data: number[]; width?: number; height?: number; stroke?: string }>) {
   if (data.length < 2) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);

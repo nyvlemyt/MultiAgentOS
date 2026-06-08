@@ -38,7 +38,7 @@ export default function MemoryCenter() {
   );
 }
 
-function Column({ title, items }: { title: string; items: { id: string; type: string; title: string; body: string }[] }) {
+function Column({ title, items }: Readonly<{ title: string; items: { id: string; type: string; title: string; body: string }[] }>) {
   return (
     <article className="surface p-4">
       <h2 className="mb-3 text-sm font-semibold">{title}</h2>

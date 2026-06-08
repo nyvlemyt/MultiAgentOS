@@ -16,7 +16,7 @@ export interface AgentCardData {
   spark?: number[];
 }
 
-export function AgentCard({ a }: { a: AgentCardData }) {
+export function AgentCard({ a }: Readonly<{ a: AgentCardData }>) {
   const href = `/agents/${a.id}`;
   return (
     <Link href={href} className="surface group flex flex-col gap-3 px-4 py-3 transition-colors hover:bg-[color:var(--bg-hover)]">

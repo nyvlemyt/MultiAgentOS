@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Local agent studio — mission control for your projects.',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>

@@ -1,7 +1,7 @@
 import { AgentAvatar } from '../AgentAvatar';
 import type { OrbitNode } from './OrbitView';
 
-export function OrgChartView({ nodes }: { nodes: OrbitNode[] }) {
+export function OrgChartView({ nodes }: Readonly<{ nodes: OrbitNode[] }>) {
   const tierA = nodes.filter((n) => n.tier === 'A');
   const tierB = nodes.filter((n) => n.tier === 'B');
 
