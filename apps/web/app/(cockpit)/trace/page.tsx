@@ -8,9 +8,9 @@ export default function TracePage() {
   useEffect(() => {
     const ev = new EventSource('/api/stream');
 
-    ev.addEventListener('event', (e) => {
+    ev.addEventListener('event', (e: MessageEvent) => {
       try {
-        const p = JSON.parse((e as MessageEvent).data) as {
+        const p = JSON.parse(e.data) as {
           id: string;
           missionId?: string | null;
           taskId?: string | null;

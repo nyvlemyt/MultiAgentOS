@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { resolve } from 'node:path';
+import { tmpdir } from 'node:os';
 import { assertSafeToWipe } from './seed-safety';
 
-const repoRoot = '/tmp/multiagentos';
+const repoRoot = resolve(tmpdir(), 'multiagentos');
 
 describe('seed safety', () => {
   it('refuses the default dev DB unless destructive seed is explicitly allowed', () => {

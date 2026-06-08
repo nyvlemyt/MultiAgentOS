@@ -60,7 +60,7 @@ async function seedMinimal(missionId: string) {
     id: PROJECT_ID,
     name: 'Test Project',
     slug: 'test',
-    path: '/tmp/test',
+    path: join(tmpdir(), 'mas-test-project'),
     type: 'other',
     createdAt: new Date(),
     lastActiveAt: new Date(),
