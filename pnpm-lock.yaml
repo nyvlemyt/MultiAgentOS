@@ -119,6 +119,9 @@ importers:
       '@mas/db':
         specifier: workspace:*
         version: link:../db
+      '@mas/memory':
+        specifier: workspace:*
+        version: link:../memory
       '@mas/skills':
         specifier: workspace:*
         version: link:../skills
