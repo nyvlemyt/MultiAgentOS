@@ -18,3 +18,9 @@ export {
   type NewEntry,
   type MemoryStoreOpts,
 } from './registers';
+export {
+  captureCandidates,
+  CAPTURE_DECISION,
+  type CaptureCandidate,
+  type CandidateType,
+} from './capture';
