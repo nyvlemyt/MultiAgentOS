@@ -30,7 +30,9 @@ const SUMMARY_MAX_CHARS = 800;
 
 /** Coerce an unknown frontmatter value to a string (avoids "[object Object]"). */
 function str(v: unknown, fallback = ''): string {
-  return typeof v === 'string' ? v : fallback;
+  if (typeof v === 'string') return v;
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+  return fallback;
 }
 
 /** Parse YAML frontmatter between --- markers without external deps. */
