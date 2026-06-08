@@ -9,7 +9,9 @@ and hotspots via `.../api/hotspots/search?projectKey=nyvlemyt_MultiAgentOS2&stat
 - §11 no PAYG (no `@anthropic-ai/sdk`), §5 risky actions gated, Conventional Commits ≤60 chars, **no force-push**.
 - **Token budget : eco, batch, pause at 80 %.** PDFs → read the local `docs/ressources/md/*.md` cache, never image-mode.
 - **Sonar line numbers shift** — ALWAYS re-fetch the live issue list before editing; locate by symbol/context, not stale lines.
-- After each batch: `pnpm -r test` + `pnpm --filter @mas/web lint` (tsc). For e2e: free port 3000 (`lsof -ti:3000 | xargs kill`) then `pnpm --filter @mas/web smoke` (MAS_MOCK_LLM is in playwright.config). Don't merge — user decides.
+- **Verify after each batch**: `pnpm install --frozen-lockfile` (if fresh clone) → `pnpm -r test` (28 unit) → `pnpm --filter @mas/web lint` (tsc). These are fast + reliable in any env. **Do NOT depend on running the Playwright e2e locally** — push and let the `build-test` GitHub Actions CI run the e2e for you; read the check result. Only run `pnpm --filter @mas/web smoke` locally if specifically validating the a11y `<dialog>` change and the env supports it.
+- **Commit per batch** (small commits) so a later failure doesn't lose earlier good work. **Push frequently** to the branch (PR auto-updates). **Don't merge** — user decides.
+- **Autonomous-run safety**: if any fix can't be verified (tests/tsc fail, or e2e can't run for the a11y change), **revert that one fix and backlog it** — never leave the branch with failing unit tests or tsc. Partial progress is fine: do what verifies cleanly, defer the rest, and report exactly what was done vs skipped. If the environment can't install deps or push, stop and report — don't thrash.
 
 ## CODE to fix (on chore/sonar-cleanup)
 
