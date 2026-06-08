@@ -56,7 +56,7 @@ export default function CommandCenter() {
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>None right now.</p>
         </Card>
 
-        <Card title="Pending validations" subtitle={`${pendingValidations.length} action${pendingValidations.length !== 1 ? 's' : ''}`} accent={pendingValidations.length > 0 ? 'warning' : undefined}>
+        <Card title="Pending validations" subtitle={`${pendingValidations.length} action${pendingValidations.length === 1 ? '' : 's'}`} accent={pendingValidations.length > 0 ? 'warning' : undefined}>
           {pendingValidations.length === 0 ? (
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Nothing to validate.</p>
           ) : (
@@ -117,8 +117,14 @@ export default function CommandCenter() {
   );
 }
 
-function Card({ title, subtitle, children, accent }: { title: string; subtitle?: string; children: React.ReactNode; accent?: 'warning' | 'danger' }) {
-  const accentBorder = accent === 'danger' ? 'border-l-2 border-l-red-500' : accent === 'warning' ? 'border-l-2 border-l-amber-500' : '';
+function accentBorderFor(accent?: 'warning' | 'danger'): string {
+  if (accent === 'danger') return 'border-l-2 border-l-red-500';
+  if (accent === 'warning') return 'border-l-2 border-l-amber-500';
+  return '';
+}
+
+function Card({ title, subtitle, children, accent }: Readonly<{ title: string; subtitle?: string; children: React.ReactNode; accent?: 'warning' | 'danger' }>) {
+  const accentBorder = accentBorderFor(accent);
   return (
     <article className={`surface p-4 ${accentBorder}`}>
       <header className="mb-3 flex items-baseline justify-between gap-2">

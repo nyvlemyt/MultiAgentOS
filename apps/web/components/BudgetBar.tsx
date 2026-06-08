@@ -1,18 +1,24 @@
 import { cn } from '@/lib/cn';
 
+function toneFor(pct: number): string {
+  if (pct >= 90) return 'bg-red-500';
+  if (pct >= 70) return 'bg-amber-500';
+  return 'bg-[color:var(--accent)]';
+}
+
 export function BudgetBar({
   spent,
   cap,
   label,
   className,
-}: {
+}: Readonly<{
   spent: number;
   cap: number;
   label?: string;
   className?: string;
-}) {
+}>) {
   const pct = Math.min(100, Math.round((spent / Math.max(1, cap)) * 100));
-  const tone = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-[color:var(--accent)]';
+  const tone = toneFor(pct);
   return (
     <div className={cn('flex flex-col gap-1 min-w-32', className)}>
       {label && (

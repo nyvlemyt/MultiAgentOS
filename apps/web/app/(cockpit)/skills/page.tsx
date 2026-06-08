@@ -14,9 +14,9 @@ const DOMAIN_COLORS: Record<string, string> = {
 
 export default async function SkillsRegistry({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<{ domain?: string; q?: string }>;
-}) {
+}>) {
   const { domain, q } = await searchParams;
   const db = getDb();
   let rows = await db.select().from(skills).orderBy(skills.tier, skills.id);
@@ -46,7 +46,7 @@ export default async function SkillsRegistry({
             Skills Registry
           </h1>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            {rows.length} skill{rows.length !== 1 ? 's' : ''} indexed
+            {rows.length} skill{rows.length === 1 ? '' : 's'} indexed
           </p>
         </div>
         <form method="GET" className="flex gap-2 flex-wrap">
@@ -157,7 +157,14 @@ export default async function SkillsRegistry({
                   {(JSON.parse(s.tagsJson) as string[]).join(', ')}
                 </td>
                 <td className="px-3 py-2 text-right">
-                  {s.tier !== 'pinned' ? (
+                  {s.tier === 'pinned' ? (
+                    <span
+                      className="mono text-[10px]"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      pinned
+                    </span>
+                  ) : (
                     <form method="POST" action="/api/skills/promote">
                       <input type="hidden" name="id" value={s.id} />
                       <button
@@ -171,13 +178,6 @@ export default async function SkillsRegistry({
                         Pin
                       </button>
                     </form>
-                  ) : (
-                    <span
-                      className="mono text-[10px]"
-                      style={{ color: 'var(--text-muted)' }}
-                    >
-                      pinned
-                    </span>
                   )}
                 </td>
               </tr>

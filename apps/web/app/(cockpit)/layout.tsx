@@ -1,7 +1,7 @@
 import { Sidebar } from '@/components/Sidebar';
 import { Topbar } from '@/components/Topbar';
 
-export default function CockpitLayout({ children }: { children: React.ReactNode }) {
+export default function CockpitLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />

@@ -8,7 +8,7 @@ const styles: Record<Risk, string> = {
   blocking: 'bg-red-500/25 text-red-300 border border-red-400/40',
 };
 
-export function RiskBadge({ risk, className }: { risk: Risk; className?: string }) {
+export function RiskBadge({ risk, className }: Readonly<{ risk: Risk; className?: string }>) {
   return (
     <span
       className={cn(

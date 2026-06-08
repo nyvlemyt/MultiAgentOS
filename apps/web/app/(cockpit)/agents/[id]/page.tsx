@@ -3,7 +3,7 @@ import { AgentAvatar } from '@/components/AgentAvatar';
 import { Sparkline } from '@/components/Sparkline';
 import { Timeline } from '@/components/Timeline';
 
-export default async function AgentDetail({ params }: { params: Promise<{ id: string }> }) {
+export default async function AgentDetail({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
   const a = allAgents.find((x) => x.id === id) ?? allAgents[0]!;
   return (
@@ -60,7 +60,7 @@ export default async function AgentDetail({ params }: { params: Promise<{ id: st
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
     <article className="surface p-3">
       <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{label}</div>

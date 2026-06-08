@@ -34,7 +34,7 @@ const COLUMNS: { key: string; title: string; statuses: BoardStatus[]; dragTo?: B
   { key: 'done', title: 'Done', statuses: ['archived'] },
 ];
 
-export function MissionsBoardClient({ missions }: { missions: BoardMission[] }) {
+export function MissionsBoardClient({ missions }: Readonly<{ missions: BoardMission[] }>) {
   const router = useRouter();
   const [hoverCol, setHoverCol] = useState<string | null>(null);
 

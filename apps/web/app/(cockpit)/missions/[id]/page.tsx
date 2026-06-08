@@ -11,7 +11,34 @@ export const dynamic = 'force-dynamic';
 
 const fsm = ['draft', 'clarified', 'planned', 'dispatched', 'executing', 'review', 'validated', 'archived'] as const;
 
-export default async function MissionDetail({ params }: { params: Promise<{ id: string }> }) {
+function stageBg(active: boolean, done: boolean): string {
+  if (active) return 'var(--accent)';
+  if (done) return 'var(--accent-soft)';
+  return 'var(--bg-hover)';
+}
+
+function stageColor(active: boolean, done: boolean): string {
+  if (active) return '#fff';
+  if (done) return 'var(--accent)';
+  return 'var(--text-muted)';
+}
+
+function taskStatusColor(status: string): string {
+  switch (status) {
+    case 'running':
+      return 'var(--accent)';
+    case 'done':
+      return 'var(--success)';
+    case 'needs_validation':
+      return 'var(--warning)';
+    case 'blocked':
+      return 'var(--danger)';
+    default:
+      return 'var(--text-muted)';
+  }
+}
+
+export default async function MissionDetail({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
   const db = getDb();
   const [m] = await db.select().from(missionsTable).where(eq(missionsTable.id, id));
@@ -70,8 +97,8 @@ export default async function MissionDetail({ params }: { params: Promise<{ id: 
                   data-stage={s}
                   data-active={active ? '1' : '0'}
                   style={{
-                    background: active ? 'var(--accent)' : done ? 'var(--accent-soft)' : 'var(--bg-hover)',
-                    color: active ? '#fff' : done ? 'var(--accent)' : 'var(--text-muted)',
+                    background: stageBg(active, done),
+                    color: stageColor(active, done),
                   }}
                 >
                   {s}
@@ -99,14 +126,7 @@ export default async function MissionDetail({ params }: { params: Promise<{ id: 
                   </span>
                   <span style={{ color: 'var(--text-secondary)' }}>{t.agentId ?? '—'}</span>
                   <RiskBadge risk={t.risk} />
-                  <span className="mono uppercase text-[10px] tabular-nums" data-task-status={t.status} style={{
-                    color:
-                      t.status === 'running' ? 'var(--accent)' :
-                      t.status === 'done' ? 'var(--success)' :
-                      t.status === 'needs_validation' ? 'var(--warning)' :
-                      t.status === 'blocked' ? 'var(--danger)' :
-                      'var(--text-muted)',
-                  }}>{t.status}</span>
+                  <span className="mono uppercase text-[10px] tabular-nums" data-task-status={t.status} style={{ color: taskStatusColor(t.status) }}>{t.status}</span>
                 </li>
               ))}
             </ol>
