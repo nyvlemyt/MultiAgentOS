@@ -30,6 +30,9 @@ importers:
       '@mas/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@mas/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
       better-sqlite3:
         specifier: 12.10.0
         version: 12.10.0
