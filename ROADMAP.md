@@ -12,6 +12,18 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 ---
 
+## Build order (re-sequenced 2026-06-09, user GO)
+
+The **document** keeps phases in numeric order for readability, but the **build order** from Phase 4 onward is:
+
+> **Phase 4 ✅ (verified) → Phase 4.5 (Memory & Knowledge Intake → Ideas/Decisions/Prioritization) → Phase 3.5 (Multi-model Router) → Phase 5 → …**
+
+**Why 4.5 before 3.5:** Phase 4.5 *feeds* the memory — auto-capture on `mission-complete`, multi-source intake, classification into registers. Phase 3.5's multi-account router *consumes* grounded project memory to ground non-Claude providers and justify routing. Build the producer of memory before its consumer. (The auto-capture explicitly deferred in Phase 4's capture BDR — agentmemory hooks behind the `captureCandidates()` seam — lands in 4.5, not bolted onto Phase 4.) Architecture: **ADR 0004**. Pre-flight pack: `docs/learning/2026-06-09-phase4.5-preflight/`.
+
+**Optional split** (decide at the 4.5 pre-flight gate): if 4.5 is too large, build only the *producer* half (intake + auto-capture + classifier + security gate) before 3.5, and defer the *receptacle* half (Ideas Inbox / Decision Log / prioritization UI) to after 3.5.
+
+---
+
 ## Learning pre-flight & self-audit (permanent)
 
 Résout le paradoxe de bootstrap : l'outil qui doit créer des projets parfaits doit lui-même être construit avec le meilleur savoir possible — pas en apprenant à la fin. Doctrine complète : [`docs/workflows/knowledge-bootstrap.md`](docs/workflows/knowledge-bootstrap.md).
@@ -165,6 +177,8 @@ Implémenter dans `packages/core/src/llm.real.ts` : passer `effort` dans les opt
 
 ## Phase 3.5 · Multi-model Router  (≈ 1–2 sessions, ~ 40 k tokens)
 
+> **Build order note (2026-06-09):** this phase now builds **after Phase 4.5** (see "Build order" at top). The router consumes the project memory that 4.5's intake produces.
+
 **Goal:** route tasks to the best available model/provider based on task domain and cost policy. Preserve Claude quota for high-value tasks.
 
 **Context:** user has Claude Pro (subscription, limited), ChatGPT (subscription), Gemini (free student), Perplexity (subscription). Skills and agents are provider-agnostic for *cognition* tasks; *execution* tasks (file I/O, bash, git) remain Claude-only via Agent SDK.
@@ -224,11 +238,34 @@ Implémenter dans `packages/core/src/llm.real.ts` : passer `effort` dans les opt
 
 ---
 
-## Phase 4.5 · Ideas, Decisions, Planning & Prioritization  (≈ 2–3 sessions, ~ 60 k tokens)
+## Phase 4.5 · Memory & Knowledge Intake → Ideas, Decisions & Prioritization  (≈ 3–4 sessions, ~ 70 k tokens)
 
-**Goal:** close the loop between "I have an idea" and "this became a mission". Add the three missing planning surfaces: Ideas Inbox, Decision Log, and deadline-aware prioritization.
+> **Re-sequenced 2026-06-09 (user GO): builds BEFORE Phase 3.5.** Architecture: **ADR 0004**. Pre-flight pack: `docs/learning/2026-06-09-phase4.5-preflight/`. Title widened from "Ideas, Decisions, Planning & Prioritization" — the planning surfaces are now the **receptacle** half of a phase whose **producer** half (memory/knowledge intake) was specified by the user on 2026-06-08. The backlog already links them: an intake dossier feeds the Ideas Inbox + Decision Log (`docs/backlog/intake-audit-skill.md`, `docs/workflows/intake-audit-template.md`).
 
-**No new agents. No LLM calls for the core features. Pure UI + schema + lightweight scoring.**
+**Goal:** close two loops — (1) **Producer:** a finished mission *or* a new resource (repo / note / course / skill / pattern) becomes durable, well-classified memory; (2) **Receptacle:** an idea or decision becomes a prioritized mission. The producer's intake dossier feeds the receptacle's Ideas Inbox + Decision Log, which converts to a mission.
+
+**Guardrails — non-negotiable (CLAUDE.md §5/§8/§11/§12):**
+- **No direct memory writes.** Everything is a *candidate* → Memory Keeper *promotion* only (the Phase 4 write-lock holds; §8).
+- **Deterministic rules first.** A rule-based classifier (register + scope) runs first; a **light** LLM fallback fires only when rules abstain. Subscription-only, no PAYG (§11).
+- **Mandatory security audit before ingesting any repo or executing any source code** — `mas-sec-reviewer` must PASS; `risk: blocking` → always human (§5).
+- **≤5 selective-injection cap** preserved (§12). Zero memory pollution, zero quota waste.
+
+### A. Producer — Memory & Knowledge Intake (user's 2026-06-08 vision)
+
+- **Auto-capture on `mission-complete`:** a worker hook fires the close-out ritual automatically at mission end, calling the **existing `captureCandidates()` seam** (Phase 4) → `memory_candidates` rows (status=pending). No new write path. This is the auto-capture deferred in Phase 4's capture BDR — wired cleanly here, not bolted onto Phase 4.
+- **agentmemory hooks** (the deferred 4.x option) become the optional auto-capture backend behind that same `captureCandidates()` API.
+- **Multi-source intake:** repo / note / course / skill / pattern. Each produces an **intake dossier** at `docs/intake/<date>-<slug>.md` (skeleton already in `intake-audit-template.md`; `docs/intake/` already holds the graphify + qmd dossiers).
+- **`intake-audit` skill** (`docs/backlog/intake-audit-skill.md`): the universal "should we add this / how to adapt it / what does it cost" audit — token-cheap, progressive disclosure, produces the dossier. Built per CLAUDE.md §12 (Principles → Process → Rationalizations → Red Flags → Verification Criteria).
+- **Classifier (register + scope):** deterministic rules map a candidate/dossier to a register (BDR / LRN / BLK / journal / EVAL) + scope (`project` | `global`). Light LLM only on abstain.
+- **Auto-file for trusted sources:** a configurable trust list lets high-confidence sources skip manual triage and be Keeper-promoted directly (still through the Keeper write-path — auto-triage, not a new writer).
+
+### Memory Center
+
+- The `/memory` page (built in Phase 4) is the **visual repository**: pending candidates (from auto-capture + intake), promoted register entries, seeded knowledge. Add an intake-source filter and a "promote / reject / edit" flow already wired in Phase 4.
+
+### B. Receptacle — Ideas Inbox, Decision Log, Prioritization
+
+*(Existing spec, preserved. The intake dossier from Part A lands here. The deterministic scoring below uses no LLM.)*
 
 ### Ideas Inbox (`/ideas`)
 
@@ -277,6 +314,14 @@ Implémenter dans `packages/core/src/llm.real.ts` : passer `effort` dans les opt
 
 **Exit criteria:**
 
+**Producer (memory & knowledge intake):**
+- P1. A completed mission auto-fires the close-out ritual → `memory_candidates` rows (status=pending) appear with **no manual step**; verify no direct memory write occurred (Keeper-promotion path only).
+- P2. An intake dossier (repo / note / course / skill / pattern) is produced at `docs/intake/<date>-<slug>.md` and, on promotion, becomes a classified register entry (correct register + scope); deterministic rules used first, any LLM fallback logged.
+- P3. Security gate: ingesting a repo / running source code without a `mas-sec-reviewer` PASS is refused (test proves rejection); `risk: blocking` always pauses for human.
+- P4. The `intake-audit` skill exists with the §12 structure (Principles → Process → Rationalizations → Red Flags → Verification Criteria) and produces a dossier for a sample item.
+- P5. Selective injection still caps at ≤5 global items; auto-capture adds zero startup injection.
+
+**Receptacle (planning surfaces):**
 1. `/ideas` kanban renders; creating an idea, moving it to Prioritized, and converting it to a mission all work end-to-end.
 2. A decision can be logged manually from the Command Center and appears in `/projects/[slug]`.
 3. Setting a `deadline` on a mission shows a warning badge on Command Center when within 7 days.
@@ -352,7 +397,7 @@ For subsequent phases, swap the phase number and the budget (see the per-phase e
 | 2     | 80 k                   | Some live Claude calls to validate token meter.            |
 | 3     | 40 k                   | Heavy on summaries (cheap haiku calls).                    |
 | 4     | 40 k                   | Memory store + Keeper agent.                               |
-| 4.5   | 60 k                   | Ideas, Decisions, Planning, Prioritization — no LLM calls. |
+| 4.5   | 70 k                   | Memory/knowledge intake (producer) + Ideas/Decisions/Prioritization (receptacle). Builds **before** 3.5. Deterministic-first; light LLM only on classifier abstain. |
 | 5     | 90 k                   | Real delegated runs against real Tier B fiches.            |
 | 6     | 40 k                   | Mostly rules + UI for validations.                         |
 | 7     | 80 k                   | Templates + onboarding polish.                             |
