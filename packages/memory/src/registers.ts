@@ -137,6 +137,46 @@ export class MemoryStore {
     return created;
   }
 
+  private knowledgeDir(): string {
+    return join(this.opts.root, GLOBAL_PROJECT, 'knowledge');
+  }
+
+  private knowledgeFile(source: string): string {
+    return join(this.knowledgeDir(), `${source.replace(/[/\\]/g, '__')}.md`);
+  }
+
+  hasKnowledge(source: string): boolean {
+    return existsSync(this.knowledgeFile(source));
+  }
+
+  /** Persist one knowledge file under _global/knowledge/ with source provenance. */
+  writeKnowledge(source: string, body: string): void {
+    this.assertWriter();
+    mkdirSync(this.knowledgeDir(), { recursive: true });
+    writeFileSync(this.knowledgeFile(source), `<!-- source: ${source} -->\n${body}`, 'utf8');
+  }
+
+  /** Seeded knowledge as retriever docs (one per file, scope=global). */
+  knowledgeDocs(): MemoryDoc[] {
+    const dir = this.knowledgeDir();
+    if (!existsSync(dir)) return [];
+    return readdirSync(dir)
+      .filter((f) => f.endsWith('.md'))
+      .map((f) => {
+        const raw = readFileSync(join(dir, f), 'utf8');
+        const m = /^<!-- source: (.+?) -->\n?/.exec(raw);
+        const source = m ? m[1]! : f;
+        const body = m ? raw.slice(m[0].length) : raw;
+        return {
+          id: `knowledge/${source}`,
+          scope: 'global' as MemoryScope,
+          source,
+          title: source.split(/[/\\]/).pop() ?? source,
+          body,
+        };
+      });
+  }
+
   /** All register entries of one project as retriever docs. */
   toDocs(projectId: string): MemoryDoc[] {
     const scope: MemoryScope = projectId === GLOBAL_PROJECT ? 'global' : 'project';
@@ -163,9 +203,9 @@ export class MemoryStore {
       .map((d) => d.name);
   }
 
-  /** Every entry across all projects + _global, for a full index rebuild. */
+  /** Every entry across all projects + _global registers + seeded knowledge. */
   allDocs(): MemoryDoc[] {
-    return this.projectIds().flatMap((p) => this.toDocs(p));
+    return [...this.projectIds().flatMap((p) => this.toDocs(p)), ...this.knowledgeDocs()];
   }
 
   /** SHA-256 over all register files — the index is derived & rebuilt when this changes (ADR 0003). */

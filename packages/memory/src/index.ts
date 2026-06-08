@@ -24,3 +24,4 @@ export {
   type CaptureCandidate,
   type CandidateType,
 } from './capture';
+export { seedGlobalKnowledge, type SeedResult } from './seed';
