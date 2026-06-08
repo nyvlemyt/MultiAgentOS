@@ -174,109 +174,80 @@ async function selectRunnableTasks(db: Db, missionId: string): Promise<Task[]> {
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
-export async function executeNextTask(missionId: string): Promise<
-  | { kind: 'no_runnable' }
-  | { kind: 'paused_for_validation'; taskId: string }
-  | { kind: 'task_done'; taskId: string }
-  | { kind: 'mission_complete' }
-> {
-  const db = getDb();
-  const [m] = await db.select().from(missions).where(eq(missions.id, missionId));
-  if (!m) throw new Error(`mission ${missionId} not found`);
-  if (m.status !== 'dispatched' && m.status !== 'executing') return { kind: 'no_runnable' };
+async function runReviewPhase(
+  db: Db,
+  m: Mission,
+  all: Task[],
+): Promise<{ kind: 'mission_complete' }> {
+  // Atomic: only one executor enters the review phase
+  const reviewClaimed = await db
+    .update(missions)
+    .set({ status: 'review', updatedAt: new Date() })
+    .where(and(eq(missions.id, m.id), inArray(missions.status, ['executing', 'dispatched'])))
+    .returning({ id: missions.id });
+  if (reviewClaimed.length === 0) return { kind: 'mission_complete' };
+  await logEvent(db, { missionId: m.id, type: 'mission_review_started' });
 
-  const all = await db.select().from(tasks).where(eq(tasks.missionId, missionId));
-  const anyPendingValidation = all.some((t) => t.status === 'needs_validation');
-  if (anyPendingValidation) {
-    return { kind: 'paused_for_validation', taskId: all.find((t) => t.status === 'needs_validation')!.id };
+  // Run sec-reviewer on every high/blocking-risk task; run reviewer on the last task.
+  const verdicts: ReviewerVerdict[] = [];
+  for (const t of all) {
+    if (t.risk === 'high' || t.risk === 'blocking') {
+      const sec = mockSecReviewer(t.id, { risk: t.risk });
+      await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
+      verdicts.push(sec);
+    }
+  }
+  const last = all.at(-1);
+  if (last) {
+    const rev = mockReviewer(last.id, { risk: last.risk });
+    await logEvent(db, { missionId: m.id, taskId: last.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
+    verdicts.push(rev);
   }
 
-  const allDone = all.every((t) => t.status === 'done');
-  if (allDone) {
-    // Atomic: only one executor enters the review phase
-    const reviewClaimed = await db
-      .update(missions)
-      .set({ status: 'review', updatedAt: new Date() })
-      .where(and(eq(missions.id, m.id), inArray(missions.status, ['executing', 'dispatched'])))
-      .returning({ id: missions.id });
-    if (reviewClaimed.length === 0) return { kind: 'mission_complete' };
-    await logEvent(db, { missionId: m.id, type: 'mission_review_started' });
-
-    // Run sec-reviewer on every high/blocking-risk task; run reviewer on the last task.
-    const verdicts: ReviewerVerdict[] = [];
-    for (const t of all) {
-      if (t.risk === 'high' || t.risk === 'blocking') {
-        const sec = mockSecReviewer(t.id, { risk: t.risk });
-        await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
-        verdicts.push(sec);
-      }
-    }
-    const last = all.at(-1);
-    if (last) {
-      const rev = mockReviewer(last.id, { risk: last.risk });
-      await logEvent(db, { missionId: m.id, taskId: last.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
-      verdicts.push(rev);
-    }
-
-    const blocked = verdicts.some((v) => v.verdict === 'BLOCK');
-    if (blocked) {
-      await db.update(missions).set({ status: 'blocked', updatedAt: new Date() }).where(eq(missions.id, m.id));
-      await logEvent(db, { missionId: m.id, type: 'mission_blocked', payload: { reason: 'review_block' } });
-    } else {
-      await db.update(missions).set({ status: 'validated', updatedAt: new Date() }).where(eq(missions.id, m.id));
-      await logEvent(db, { missionId: m.id, type: 'mission_validated' });
-    }
-    return { kind: 'mission_complete' };
+  const blocked = verdicts.some((v) => v.verdict === 'BLOCK');
+  if (blocked) {
+    await db.update(missions).set({ status: 'blocked', updatedAt: new Date() }).where(eq(missions.id, m.id));
+    await logEvent(db, { missionId: m.id, type: 'mission_blocked', payload: { reason: 'review_block' } });
+  } else {
+    await db.update(missions).set({ status: 'validated', updatedAt: new Date() }).where(eq(missions.id, m.id));
+    await logEvent(db, { missionId: m.id, type: 'mission_validated' });
   }
+  return { kind: 'mission_complete' };
+}
 
-  const runnable = await selectRunnableTasks(db, missionId);
-  const next = runnable[0];
-  if (!next) return { kind: 'no_runnable' };
-
-  if (m.status === 'dispatched') {
-    await db.update(missions).set({ status: 'executing', updatedAt: new Date() }).where(eq(missions.id, m.id));
-    await logEvent(db, { missionId: m.id, type: 'mission_executing' });
-  }
-
-  // Atomic claim: only one executor can move this task from todo to running.
-  const claimed = await db
+async function pauseForRiskGate(
+  db: Db,
+  m: Mission,
+  next: Task,
+): Promise<{ kind: 'paused_for_validation'; taskId: string }> {
+  await db
     .update(tasks)
-    .set({ status: 'running', updatedAt: new Date() })
-    .where(and(eq(tasks.id, next.id), eq(tasks.status, 'todo')))
-    .returning({ id: tasks.id });
-  if (claimed.length === 0) return { kind: 'no_runnable' };
+    .set({ status: 'needs_validation', updatedAt: new Date() })
+    .where(eq(tasks.id, next.id));
+  await db.insert(validations).values({
+    id: `val_${randomUUID()}`,
+    taskId: next.id,
+    requestedByAgent: next.agentId ?? 'dispatcher',
+    actionSummary: `Run high-risk task: ${next.title}`,
+    status: 'pending',
+    payloadJson: JSON.stringify({ risk: next.risk }),
+  });
   await logEvent(db, {
     missionId: m.id,
     taskId: next.id,
-    agentId: next.agentId ?? undefined,
-    type: 'task_start',
-    payload: { title: next.title },
+    type: 'validation_requested',
     risk: next.risk,
+    payload: { reason: 'risk gate' },
   });
+  return { kind: 'paused_for_validation', taskId: next.id };
+}
 
-  if (next.risk === 'high' || next.risk === 'blocking') {
-    await db
-      .update(tasks)
-      .set({ status: 'needs_validation', updatedAt: new Date() })
-      .where(eq(tasks.id, next.id));
-    await db.insert(validations).values({
-      id: `val_${randomUUID()}`,
-      taskId: next.id,
-      requestedByAgent: next.agentId ?? 'dispatcher',
-      actionSummary: `Run high-risk task: ${next.title}`,
-      status: 'pending',
-      payloadJson: JSON.stringify({ risk: next.risk }),
-    });
-    await logEvent(db, {
-      missionId: m.id,
-      taskId: next.id,
-      type: 'validation_requested',
-      risk: next.risk,
-      payload: { reason: 'risk gate' },
-    });
-    return { kind: 'paused_for_validation', taskId: next.id };
-  }
-
+async function executeTaskWithLLM(
+  db: Db,
+  m: Mission,
+  next: Task,
+  missionId: string,
+): Promise<{ kind: 'task_done'; taskId: string }> {
   // Look up project to build the real LLM client.
   const [proj] = await db
     .select({
@@ -347,6 +318,61 @@ export async function executeNextTask(missionId: string): Promise<
   });
 
   return { kind: 'task_done', taskId: next.id };
+}
+
+export async function executeNextTask(missionId: string): Promise<
+  | { kind: 'no_runnable' }
+  | { kind: 'paused_for_validation'; taskId: string }
+  | { kind: 'task_done'; taskId: string }
+  | { kind: 'mission_complete' }
+> {
+  const db = getDb();
+  const [m] = await db.select().from(missions).where(eq(missions.id, missionId));
+  if (!m) throw new Error(`mission ${missionId} not found`);
+  if (m.status !== 'dispatched' && m.status !== 'executing') return { kind: 'no_runnable' };
+
+  const all = await db.select().from(tasks).where(eq(tasks.missionId, missionId));
+  const anyPendingValidation = all.some((t) => t.status === 'needs_validation');
+  if (anyPendingValidation) {
+    return { kind: 'paused_for_validation', taskId: all.find((t) => t.status === 'needs_validation')!.id };
+  }
+
+  if (all.every((t) => t.status === 'done')) {
+    return runReviewPhase(db, m, all);
+  }
+
+  const runnable = await selectRunnableTasks(db, missionId);
+  const next = runnable[0];
+  if (!next) return { kind: 'no_runnable' };
+
+  if (m.status === 'dispatched') {
+    await db.update(missions).set({ status: 'executing', updatedAt: new Date() }).where(eq(missions.id, m.id));
+    await logEvent(db, { missionId: m.id, type: 'mission_executing' });
+  }
+
+  // Atomic claim: only one executor can move this task from todo to running.
+  const claimed = await db
+    .update(tasks)
+    .set({ status: 'running', updatedAt: new Date() })
+    .where(and(eq(tasks.id, next.id), eq(tasks.status, 'todo')))
+    .returning({ id: tasks.id });
+  if (claimed.length === 0) return { kind: 'no_runnable' };
+  await logEvent(db, {
+    missionId: m.id,
+    taskId: next.id,
+    agentId: next.agentId ?? undefined,
+    type: 'task_start',
+    payload: { title: next.title },
+    risk: next.risk,
+  });
+
+  // §5 risk gate — the decision stays in the main flow; the gated body
+  // (mark needs_validation + open a validation row) lives in pauseForRiskGate.
+  if (next.risk === 'high' || next.risk === 'blocking') {
+    return pauseForRiskGate(db, m, next);
+  }
+
+  return executeTaskWithLLM(db, m, next, missionId);
 }
 
 export async function resumeAfterValidation(
