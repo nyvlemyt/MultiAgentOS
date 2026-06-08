@@ -6,12 +6,13 @@
 and hotspots via `.../api/hotspots/search?projectKey=nyvlemyt_MultiAgentOS2&status=TO_REVIEW&ps=100`.
 
 ## Hard rules (read CLAUDE.md first)
-- §11 no PAYG (no `@anthropic-ai/sdk`), §5 risky actions gated, Conventional Commits ≤60 chars, **no force-push**.
-- **Token budget : eco, batch, pause at 80 %.** PDFs → read the local `docs/ressources/md/*.md` cache, never image-mode.
+- §11 no PAYG (no `@anthropic-ai/sdk`), §5 risky actions gated, Conventional Commits ≤60 chars, **no force-push**, **never touch `main`** (work only on `chore/sonar-cleanup`).
+- **Budget**: this is an authorised **full local session** (~5 h window). Use it — keep going until the issue list is cleared or no safe progress remains. **Do NOT pause at a % and do NOT ask the user anything** (they are asleep). Eco style for prose only.
+- PDFs → read the local `docs/ressources/md/*.md` cache, never image-mode.
 - **Sonar line numbers shift** — ALWAYS re-fetch the live issue list before editing; locate by symbol/context, not stale lines.
-- **Verify after each batch**: `pnpm install --frozen-lockfile` (if fresh clone) → `pnpm -r test` (28 unit) → `pnpm --filter @mas/web lint` (tsc). These are fast + reliable in any env. **Do NOT depend on running the Playwright e2e locally** — push and let the `build-test` GitHub Actions CI run the e2e for you; read the check result. Only run `pnpm --filter @mas/web smoke` locally if specifically validating the a11y `<dialog>` change and the env supports it.
-- **Commit per batch** (small commits) so a later failure doesn't lose earlier good work. **Push frequently** to the branch (PR auto-updates). **Don't merge** — user decides.
-- **Autonomous-run safety**: if any fix can't be verified (tests/tsc fail, or e2e can't run for the a11y change), **revert that one fix and backlog it** — never leave the branch with failing unit tests or tsc. Partial progress is fine: do what verifies cleanly, defer the rest, and report exactly what was done vs skipped. If the environment can't install deps or push, stop and report — don't thrash.
+- **Verify after each batch** (local toolchain works): `pnpm -r test` (28 unit) + `pnpm --filter @mas/web lint` (tsc). Then the e2e: `lsof -ti:3000 | xargs kill` (free the user's dev server) → `pnpm --filter @mas/web smoke` (smoke + lifecycle + skills; MAS_MOCK_LLM is in the config). The `build-test` CI also re-runs it on push (double check).
+- **Commit + push per batch** (small commits) so a later failure never loses earlier good work. PR auto-updates. **Don't merge.**
+- **Safety**: if a fix doesn't verify (unit/tsc/e2e fail), **revert that one fix and backlog it** — never leave the branch red on unit/tsc. Partial progress is fine; report exactly what was done vs deferred.
 
 ## CODE to fix (on chore/sonar-cleanup)
 
@@ -39,5 +40,10 @@ and hotspots via `.../api/hotspots/search?projectKey=nyvlemyt_MultiAgentOS2&stat
 ## Backlog (do NOT rush in this PR)
 - **`stream/route.ts` SSE cursor (Copilot #2, High)** — `createdAt`-only `gt` cursor can skip events sharing a millisecond. Real but pre-existing. Proper fix = composite cursor `(createdAt, id)` with matching `orderBy` + `or(gt(createdAt,c), and(eq(createdAt,c), gt(id,lastId)))`. Separate PR. Resolve the Copilot thread with "backlogged here".
 
+## Also handle (this autonomous run)
+- **Copilot PR review comments**: find the open PR for `chore/sonar-cleanup` (`https://api.github.com/repos/nyvlemyt/MultiAgentOS/pulls?head=nyvlemyt:chore/sonar-cleanup&state=open`), read its review comments (`.../pulls/<n>/comments`), and address each remaining one in code — EXCEPT the `stream/route.ts` SSE cursor (that one is backlog, leave it). Verify + commit as above.
+- **Final self-review**: after the waves, review the whole branch diff vs `main` (`git diff main...HEAD`) for anything Sonar/Copilot missed — obvious bugs, dead code, missed readonly. Fix only clear wins; don't refactor for taste.
+- **Final report**: write `docs/learning/<date>-sonar-cleanup/build-report.md` (scope · issues cleared by rule · issues deferred + why · Copilot comments handled · files touched · CI status · commit list). This is the morning summary.
+
 ## Done criteria
-PR `chore/sonar-cleanup` green (CI `build-test` + Sonar gate), main issue count down from ~61, report cleared-vs-deferred. Don't merge — hand back to the user.
+PR `chore/sonar-cleanup` green (CI `build-test`), most code issues cleared, risky ones (a11y `<dialog>`, S3776) either done-and-verified or backlogged with reason, build-report written. **Don't merge** — hand back to the user.
