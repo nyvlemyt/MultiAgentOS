@@ -251,7 +251,7 @@ describe('dispatch — duplicate execution prevention', () => {
     ]);
 
     // Exactly one should claim t1 as task_done; the other no_runnable.
-    const kinds = [r1.kind, r2.kind].sort();
+    const kinds = [r1.kind, r2.kind].sort((a, b) => a.localeCompare(b));
     expect(kinds).toSatisfy((ks: string[]) =>
       (ks[0] === 'no_runnable' && ks[1] === 'task_done') ||
       // Both may be task_done if they raced on different tasks — but there is
