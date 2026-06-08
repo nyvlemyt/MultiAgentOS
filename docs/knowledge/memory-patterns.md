@@ -192,8 +192,8 @@ Humain VISUALISE    → Obsidian sur le même dossier (Phase 6+)
 }
 ```
 
-### ADR requis avant implémentation
-`docs/decisions/0003-memory-storage-format.md` — décision QMD vs custom FTS5 + format SUMMARY.md.
+### ADR — décidé (pré-vol 2026-06-08)
+`docs/decisions/0003-memory-storage-format.md` (Proposed) tranche : **FTS5 d'abord** (MVP Phase 4, derrière une interface `MemoryRetriever`), **QMD en upgrade Phase 4.x** (swap 1 fichier, mini-gate). Raison : le gate de sortie Phase 4 = requêtes par terme exact ("BDR", "Mem0 cloud") → BM25/FTS5 suffit ; les 2 GB de modèles + MCP de QMD ne se justifient pas au MVP. Dossier d'intake : `docs/intake/2026-06-08-qmd.md`.
 
 ### Prérequis
 - Node 22+ ✓ (v22.16.0 confirmé)
@@ -278,7 +278,7 @@ Ce fichier contient les prompts copy-paste complets pour implémenter la mémoir
 
 ### Phase 4 MVP
 1. **Memory format** : memweave (Markdown + SQLite FTS5, zéro dépendance) — 5 registres dans `data/memory/<projectId>/`
-2. **Retrieval layer** : **QMD MCP server** (remplace custom FTS5 — BM25+vector+LLM reranking)
+2. **Retrieval layer** : **SQLite FTS5** derrière l'interface `MemoryRetriever` (MVP, ADR 0003) → **QMD** en upgrade Phase 4.x (BM25+vector+rerank). QMD = cible, pas le chemin critique du gate.
 3. **Context packs** : codex-agent-mem pattern (SQLite, hash-based, `SUMMARY.md` ≤500 tokens)
 4. **Extraction** : mem0 ADD-only (single LLM call per session end) ou prompt close-out ritual
 5. **Prompt caching** : 2 breakpoints dans `claudeCodeLLM` (system + context pack)
