@@ -25,3 +25,4 @@ export {
   type CandidateType,
 } from './capture';
 export { seedGlobalKnowledge, type SeedResult } from './seed';
+export { buildMemoryContext, MAX_GLOBAL_ITEMS, type MemoryContext } from './context';
