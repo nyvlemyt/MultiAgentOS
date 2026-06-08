@@ -12,7 +12,6 @@ import {
   type Task,
   type Mission,
 } from '@mas/db';
-import type { ReviewerVerdict } from '@mas/core';
 import {
   mockMissionPlanner,
   mockSkillRouter,
@@ -21,6 +20,7 @@ import {
   claudeCodeLLM,
   mockLLM,
   type AutonomyLevel,
+  type ReviewerVerdict,
 } from '@mas/core';
 import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
 

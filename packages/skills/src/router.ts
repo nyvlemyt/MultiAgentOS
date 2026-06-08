@@ -3,10 +3,10 @@ import type { SkillMeta, Domain } from './types.js';
 /** Escape XML so skill metadata can't smuggle tags into the injected prompt block. */
 function escapeXml(s: string): string {
   return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
 
 export class SkillRouter {

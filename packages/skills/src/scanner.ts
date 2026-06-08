@@ -28,10 +28,15 @@ function coerceDomain(raw: unknown, id: string): Domain {
 // L1 summary budget is ≤200 tokens (CLAUDE.md §6/§12); ~800 chars is a safe ceiling.
 const SUMMARY_MAX_CHARS = 800;
 
+/** Coerce an unknown frontmatter value to a string (avoids "[object Object]"). */
+function str(v: unknown, fallback = ''): string {
+  return typeof v === 'string' ? v : fallback;
+}
+
 /** Parse YAML frontmatter between --- markers without external deps. */
 function parseFrontmatter(raw: string): Record<string, unknown> {
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match || !match[1]) return {};
+  const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw);
+  if (!match?.[1]) return {};
   const fm: Record<string, unknown> = {};
   for (const line of match[1].split('\n')) {
     const colon = line.indexOf(':');
@@ -59,10 +64,10 @@ export function scanOrchestratorSkills(repoRoot: string): SkillMeta[] {
     const fm = parseFrontmatter(raw);
     results.push({
       id,
-      name: String(fm['name'] ?? id),
-      description: String(fm['description'] ?? ''),
+      name: str(fm['name'], id),
+      description: str(fm['description']),
       domain: coerceDomain(fm['domain'], id),
-      summary: String(fm['summary'] ?? fm['description'] ?? '').slice(0, SUMMARY_MAX_CHARS),
+      summary: (str(fm['summary']) || str(fm['description'])).slice(0, SUMMARY_MAX_CHARS),
       tags: Array.isArray(fm['tags']) ? fm['tags'].map(String) : [],
       path: skillPath,
     });

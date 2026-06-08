@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
             .orderBy(events.createdAt)
             .limit(50);
           for (const r of rows) {
-            cursor = r.createdAt > cursor ? r.createdAt : cursor;
+            cursor = new Date(Math.max(cursor.getTime(), r.createdAt.getTime()));
             send('event', {
               id: r.id,
               missionId: r.missionId,

@@ -1,6 +1,5 @@
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { eq } from 'drizzle-orm';
 import { getDb, closeDb, skills } from '@mas/db';
 import { scanOrchestratorSkills, writeSummaryCache } from './scanner.js';
 
@@ -49,7 +48,9 @@ async function main() {
   console.log(`[reindex] done — ${metas.length} skills indexed.`);
 }
 
-main().catch((e) => {
+try {
+  await main();
+} catch (e) {
   console.error(e);
   process.exit(1);
-});
+}

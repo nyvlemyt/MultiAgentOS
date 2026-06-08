@@ -6,13 +6,13 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
-    const initial = (document.documentElement.getAttribute('data-theme') as 'dark' | 'light') ?? 'dark';
+    const initial = (document.documentElement.dataset.theme as 'dark' | 'light' | undefined) ?? 'dark';
     setTheme(initial);
   }, []);
 
   function toggle() {
     const next = theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
+    document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem('theme', next);
     } catch {}

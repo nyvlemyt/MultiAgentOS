@@ -1,7 +1,7 @@
-import { createRequire } from 'module';
+import { createRequire } from 'node:module';
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { existsSync, mkdirSync } from 'fs';
-import { dirname, isAbsolute, resolve } from 'path';
+import { existsSync, mkdirSync } from 'node:fs';
+import { dirname, isAbsolute, resolve } from 'node:path';
 import type BetterSqlite3 from 'better-sqlite3';
 import * as schema from './schema';
 
