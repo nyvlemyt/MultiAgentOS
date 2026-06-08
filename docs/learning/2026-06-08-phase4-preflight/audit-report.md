@@ -30,7 +30,8 @@ N3 is **judgment, not signal** — a plugin can archive/recall a decision's text
 | **QMD** (BM25+vector+rerank MCP) | **backlog_next (4.x)** | Target retriever, but lands behind `MemoryRetriever` after the MVP. 2 GB models + MCP not justified for the gate. [dossier](../../intake/2026-06-08-qmd.md) · ADR 0003 |
 | **Graphify** (codebase graph) | **backlog_next (5 / PoC)** | Wrong layer (codebase, not memory); executes code + spawns sub-agents → sec-audit + ADR 0006 first. [dossier](../../intake/2026-06-08-graphify.md) |
 | **Prompt caching** (2 breakpoints) | **implement_now** | Cheap win in `claudeCodeLLM` (system + context-pack). |
-| **mem0 / MemOS** (external mem frameworks) | **reject** | Default OpenAI embeddings → PAYG → §11. |
+| **Capture layer** (agentmemory hooks vs ritual vs mem0 ADD-only) | **analyze in build → BDR** | How sessions become `memory_candidates`. Under-specified at pre-flight — the build does a 20-min mini-audit and records the pick as a BDR (§11-compliant, prefer zero/low-LLM). agentmemory's value = auto-capture via Claude Code hooks. |
+| **mem0 / MemOS** (as the *store*) | **reject as store** | Default OpenAI embeddings → PAYG → §11. (mem0's ADD-only *capture* pattern stays a candidate above.) |
 | **Multi-account router** | **backlog (Phase 3.5)** | Captured in **ADR 0002**; built *after* memory (it depends on memory for grounding). |
 
 ## 3. Decided Phase 4 architecture

@@ -29,6 +29,14 @@ Build, in this order, committing + verifying each step:
 2. registers.ts : read/write the 5 registers in data/memory/<projectId>/ (decisions.md=BDR-XXX,
    learnings.md=LRN-XXX, blockers.md=BLK-XXX, journal.md, evals.md) + data/memory/_global/. Memory
    Keeper-owned. Wire promotion from the existing memory_candidates table → a register entry.
+2b. CAPTURE mechanism (how sessions become memory_candidates) — do a 20-min mini-audit BEFORE coding it,
+   pick the BEST local fit, record the choice as a BDR. Compare at least:
+     - agentmemory (rohitg00) — automatic capture via Claude Code hooks (SessionStart/PostToolUse/Stop),
+       RRF retrieval, ~-92% tokens. Read docs/knowledge/memory-patterns.md §agentmemory.
+     - close-out ritual (project-doctrine 5-min / 3 questions) — explicit, zero-LLM.
+     - mem0 ADD-only (single LLM call at session end) — but mem0 default = OpenAI embeddings → §11, reconfigure or drop.
+   Constraints: §11 (no PAYG), local-first, cheap (prefer zero/low-LLM). Likely answer = ritual + optional
+   hooks for auto-capture; but DECIDE it, don't default. The chosen mechanism writes memory_candidates rows.
 3. seed.ts : idempotent bridge importer. Reads each docs/knowledge/* + vibeflow/INDEX.md → entries in
    data/memory/_global/ carrying `source:` provenance. Re-run = no duplicates.
 4. Mission Planner injection: per-project memory summary + ≤5 global items per call (§12). On-demand
@@ -38,6 +46,8 @@ Build, in this order, committing + verifying each step:
 Naming: project decisions = BDR-XXX (NOT ADR — ADR-000X is build-time only, in docs/decisions/).
 
 Definition of Done (all must pass — this is the gate):
+- The CAPTURE mechanism is chosen with a 1-paragraph rationale recorded as a BDR (agentmemory hooks vs
+  close-out ritual vs mem0 ADD-only), §11-compliant, and actually creates memory_candidates rows.
 - A 2nd mission on a project visibly uses the 1st mission's memory in its plan (show it via the Trace
   diff of system prompts).
 - BRIDGE (hard gate): data/memory/_global/ has an entry traceable to each docs/knowledge/* + INDEX, and
@@ -72,6 +82,8 @@ Check and give each a PASS/FAIL with evidence:
    "40% Gartner" → each returns the right seeded entry. List any build-time fact NOT retrievable.
 5. Injection cap: a mission call injects ≤5 global items (§12); no auto-injection at startup.
 6. NO scope creep: confirm QMD / Graphify / router code were NOT added (deferred per ADR 0003 / 0002).
+6b. Capture choice: a BDR records why the chosen capture mechanism (agentmemory vs ritual vs mem0) beat
+    the others, and it's §11-compliant (no PAYG embeddings).
 7. Verification: pnpm -r test, per-package tsc, and `pnpm --filter @mas/web smoke` all green (paste output).
 
 Output a verdict: PASS / NEEDS_WORK / BLOCK with a findings list. Do not modify files.
