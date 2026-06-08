@@ -49,9 +49,29 @@ New package `packages/memory/`:
 
 `packages/agents/dispatch.ts` — read-only memory injection into task system prompts (both `executeTaskWithLLM` and `resumeAfterValidation`); `MAS_MEMORY_ROOT` env override for tests; injection logged to `task_done` events.
 
-## Deferred (NOT done this session — reasons)
+## Follow-up session (2026-06-08, step 5 completed)
 
-- **/memory page interactivity (step 5)** — accept/reject candidates, edit body, retire stale. The page renders (smoke ✅) but remains the stub fixtures; server actions over `memory_candidates` + `promoteCandidate()` not yet wired. **Reason: session token budget reached after the 5 hard gates.** Backlog: wire `/memory` server actions to `promoteCandidate` / candidate status updates. The domain layer it needs is already built and tested.
+**/memory page interactivity — now DONE.** The page reads real `memory_candidates`
+(status=pending) + register/knowledge docs via `MemoryStore.allDocs()` (was the
+fixtures stub). Three web API routes wire the actions:
+- `POST /api/memory/promote` → `promoteCandidate()` behind the Memory Keeper
+  write-lock (`keeperStore()` carries the Keeper identity; §8). Form picks
+  `projectId` + register `kind`.
+- `POST /api/memory/reject` → candidate `status='rejected'` (inbox-only mutation,
+  also serves "retire stale").
+- `POST /api/memory/edit` → candidate body edit before promotion.
+New helper `apps/web/lib/memory.ts` (`readStore` / `keeperStore`, repo-root walk-up
+ported from `packages/db/src/client.ts`). `@mas/memory` added to web deps.
+Verified: web `tsc --noEmit` clean · smoke **19/19** incl `/memory` · PAYG guard PASS.
+Commit `6939554 feat(memory): wire /memory inbox accept/reject/edit`.
+
+Residual within step 5: **retiring an already-promoted register entry** (vs a
+candidate) has no domain API — registers are append-only Markdown by design (§8).
+A `MemoryStore.retire()` + write-lock test is backlogged; reject covers stale
+*candidates* today.
+
+## Deferred (NOT done — reasons)
+
 - **2 prompt-cache breakpoints in `claudeCodeLLM` (step 4 sub-item)** — **Reason: SDK surface limitation, not budget.** `claudeCodeLLM` passes `systemPrompt: { type:'preset', preset:'claude_code', append: <string> }`. The verified Agent SDK surface (see `llm.real.ts` header) exposes no `cache_control` knob on the appended system string; the `claude_code` preset manages caching internally. Setting explicit breakpoints would require abandoning the preset (losing native skill loading / tool defs / memory injection) — not wanted. Deferred pending an SDK affordance; tracked for 4.x.
 - **QMD / Graphify / multi-account router** — out of Phase-4 scope per ADR 0003 / pre-flight (4.x, Phase 5, Phase 3.5).
 
