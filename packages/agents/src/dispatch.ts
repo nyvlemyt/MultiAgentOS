@@ -350,7 +350,7 @@ export async function executeNextTask(missionId: string): Promise<
     await logEvent(db, { missionId: m.id, type: 'mission_executing' });
   }
 
-  // Atomic claim: only one executor can move this task from todo to running.
+  // Atomic claim: only one executor can transition this task into the running state.
   const claimed = await db
     .update(tasks)
     .set({ status: 'running', updatedAt: new Date() })
