@@ -40,6 +40,10 @@ and hotspots via `.../api/hotspots/search?projectKey=nyvlemyt_MultiAgentOS2&stat
 ## Backlog (do NOT rush in this PR)
 - **`stream/route.ts` SSE cursor (Copilot #2, High)** — `createdAt`-only `gt` cursor can skip events sharing a millisecond. Real but pre-existing. Proper fix = composite cursor `(createdAt, id)` with matching `orderBy` + `or(gt(createdAt,c), and(eq(createdAt,c), gt(id,lastId)))`. Separate PR. Resolve the Copilot thread with "backlogged here".
 
+### Deferred during the 2026-06-08 autonomous run (see `docs/learning/2026-06-08-sonar-cleanup/build-report.md`)
+- **S4325 `apps/web/app/(cockpit)/trace/page.tsx:13` (MINOR, new)** — Sonar "unnecessary assertion" on the SSE handler line conflicts with tsc: `e` is typed `Event` (EventSource string-event overload) so `(e as MessageEvent)` is required for `.data`. Fix by typing the listener param `(e: MessageEvent) =>` **iff** it passes `strictFunctionTypes`, else Mark in the Sonar UI. Not worth a tsc-breaking change.
+- **S6848 `apps/web/components/MissionsBoardClient.tsx:56` (MAJOR, a11y)** — the kanban drop-zone `<section>` needs a genuine accessible drag-and-drop redesign (interactive role + keyboard/touch alternative), not a token `role`. Also couples to the `<section>` tag in `lifecycle.spec.ts` (`ancestor::section`, `locator('section')`). Do in a dedicated a11y PR.
+
 ## Also handle (this autonomous run)
 - **Copilot PR review comments**: find the open PR for `chore/sonar-cleanup` (`https://api.github.com/repos/nyvlemyt/MultiAgentOS/pulls?head=nyvlemyt:chore/sonar-cleanup&state=open`), read its review comments (`.../pulls/<n>/comments`), and address each remaining one in code — EXCEPT the `stream/route.ts` SSE cursor (that one is backlog, leave it). Verify + commit as above.
 - **Final self-review**: after the waves, review the whole branch diff vs `main` (`git diff main...HEAD`) for anything Sonar/Copilot missed — obvious bugs, dead code, missed readonly. Fix only clear wins; don't refactor for taste.
