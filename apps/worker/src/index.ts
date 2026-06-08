@@ -44,7 +44,9 @@ async function main() {
   }, TICK_MS);
 }
 
-main().catch((e) => {
+try {
+  await main();
+} catch (e) {
   console.error('[worker] fatal', e);
   process.exit(1);
-});
+}

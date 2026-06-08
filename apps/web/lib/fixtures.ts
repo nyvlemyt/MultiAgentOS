@@ -7,7 +7,7 @@ export const tierAFixture: AgentCardData[] = [
   { id: 'mission-planner', name: 'Mission Planner', emoji: '🗺️', avatarPath: '/avatars/mission-planner.svg', tier: 'A', status: 'running', currentTask: 'Decomposing "polish feed empty-state"', model: 'claude-sonnet-4-6', successRate: 0.94, totalTokens: 42000, spark: [3, 4, 6, 5, 8, 7, 9, 11] },
   { id: 'skill-router', name: 'Skill Router', emoji: '🧭', avatarPath: '/avatars/skill-router.svg', tier: 'A', status: 'waiting', currentTask: 'Awaiting planner output', model: 'claude-haiku-4-5', successRate: 0.97, totalTokens: 12000, spark: [1, 2, 1, 3, 2, 4, 3, 5] },
   { id: 'context-manager', name: 'Context Manager', emoji: '🧠', avatarPath: '/avatars/context-manager.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-haiku-4-5', successRate: 0.91, totalTokens: 24000, spark: [2, 3, 2, 4, 5, 3, 4, 6] },
-  { id: 'memory-keeper', name: 'Memory Keeper', emoji: '📚', avatarPath: '/avatars/memory-keeper.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-haiku-4-5', successRate: 1.0, totalTokens: 3000, spark: [0, 1, 0, 1, 1, 0, 2, 1] },
+  { id: 'memory-keeper', name: 'Memory Keeper', emoji: '📚', avatarPath: '/avatars/memory-keeper.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-haiku-4-5', successRate: 1, totalTokens: 3000, spark: [0, 1, 0, 1, 1, 0, 2, 1] },
   { id: 'reviewer', name: 'Code Reviewer', emoji: '🔍', avatarPath: '/avatars/reviewer.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.89, totalTokens: 18000, spark: [1, 2, 2, 1, 3, 4, 3, 5] },
   { id: 'sec-reviewer', name: 'Security Reviewer', emoji: '🛡️', avatarPath: '/avatars/sec-reviewer.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.96, totalTokens: 9000, spark: [0, 0, 1, 1, 1, 2, 1, 2] },
 ];
@@ -39,6 +39,12 @@ export const kanbanColumns = [
   { key: 'done', title: 'Done', missions: [] },
 ] as const;
 
+function skillsForTrace(i: number): string[] {
+  if (i % 3 === 0) return ['ui-ux-pro-max'];
+  if (i % 3 === 1) return ['frontend-design'];
+  return ['superpowers:writing-plans'];
+}
+
 export const trace: TimelineRow[] = Array.from({ length: 18 }).map((_, i) => {
   const agents = ['mission-planner', 'skill-router', 'engineering-frontend-developer', 'design-ux-architect', 'context-manager'];
   const actions = [
@@ -60,7 +66,7 @@ export const trace: TimelineRow[] = Array.from({ length: 18 }).map((_, i) => {
     action: actions[i % actions.length] ?? 'tick',
     tokens: Math.floor(Math.random() * 1200),
     risk: risks[i % risks.length],
-    skills: i % 3 === 0 ? ['ui-ux-pro-max'] : i % 3 === 1 ? ['frontend-design'] : ['superpowers:writing-plans'],
+    skills: skillsForTrace(i),
   };
 });
 
@@ -77,7 +83,7 @@ export const orbitEdges: OrbitEdge[] = [
 ];
 
 export const dailyTokens = [12, 18, 14, 22, 19, 28, 24, 31, 27, 34, 30, 42];
-export const monthlySpend = [1.2, 2.0, 1.6, 2.8, 2.4, 3.2, 2.9, 3.8, 3.5];
+export const monthlySpend = [1.2, 2, 1.6, 2.8, 2.4, 3.2, 2.9, 3.8, 3.5];
 
 export const memoryGlobal = [
   { id: 'g1', type: 'user', title: '20 € Anthropic envelope', body: 'Default eco mode + haiku-4-5 + prompt cache.' },
