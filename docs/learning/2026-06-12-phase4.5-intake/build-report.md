@@ -35,5 +35,19 @@
 
 ## Phase gate
 
-Stopping here per CLAUDE.md §10. Phase 3.5 NOT started. Branch not pushed.
+Stopping here per CLAUDE.md §10. Phase 3.5 NOT started.
 Checker prompt: `docs/learning/2026-06-09-phase4.5-preflight/build-prompt.md §②` (scope it to the producer half).
+
+## Checker verdict — 2026-06-13
+
+Independent Checker run: **PASS — all 9 checks green, 4/4 canonical verified in-session.**
+Findings (1 warn, 5 info, none blocking) and their disposition:
+
+| Severity | Finding | Disposition |
+|---|---|---|
+| warn | Gate's non-PASS rejection branch (`intake-gate.ts` BLOCK verdict) is dead code under `mockSecReviewer` (PASS for everything except blocking, which short-circuits earlier) — untested | **Backlog**: test it when the real sec-reviewer replaces the mock (Phase 5/6). DoD met via `intake.ts` module-level refusal. |
+| info | `tryAutoFile` swallowed promotion failures silently (no /trace signal) | **Fixed post-checker**: catch now inserts an `auto_file_error` event; test asserts it. |
+| info | Classifier LLM fallback has no production caller yet | Disclosed in §Deferred — wires with the receptacle. §11-positive. |
+| info | Gate built as `intake-gate.ts` instead of plan.md's "in dispatch.ts" | Doc drift only; functionally equivalent + safer (module-level refusal in `intake.ts` as second layer). |
+| info | ADR 0004 still "Proposed" | **Fixed post-checker**: flipped to Accepted. |
+| info | Migration 0004 missing trailing newline | **Fixed post-checker**. |

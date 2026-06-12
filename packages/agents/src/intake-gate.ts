@@ -92,7 +92,15 @@ async function tryAutoFile(
       .set({ autoFiled: true, classifierDecision: `rule:${decision.rule ?? 'unknown'}` })
       .where(eq(memoryCandidates.id, res.candidateId));
     return true;
-  } catch {
+  } catch (e) {
+    // Failure degrades safely to the inbox, but must stay visible in /trace
+    // (a silently misconfigured Keeper store would otherwise look like triage).
+    await db.insert(events).values({
+      id: `evt_${randomUUID()}`,
+      type: 'auto_file_error',
+      payloadJson: JSON.stringify({ candidateId: res.candidateId, message: String(e) }),
+      createdAt: new Date(),
+    });
     return false;
   }
 }

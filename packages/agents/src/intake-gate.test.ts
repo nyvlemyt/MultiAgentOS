@@ -135,5 +135,8 @@ describe('auto-file for trusted sources (ADR 0004 §7)', () => {
     if (res.kind === 'ingested') expect(res.autoFiled).toBe(false);
     const rows = await db.select().from(memoryCandidates);
     expect(rows[0]!.status).toBe('pending'); // promotion refused, candidate intact
+    // The refusal must be visible in /trace, not swallowed (Checker finding).
+    const errs = await db.select().from(events).where(eq(events.type, 'auto_file_error'));
+    expect(errs).toHaveLength(1);
   });
 });
