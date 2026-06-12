@@ -74,7 +74,7 @@ describe('MemoryStore registers', () => {
 
   it('rejects projectIds that could escape the memory root (path traversal)', () => {
     const s = keeperStore();
-    for (const bad of ['../evil', 'a/b', 'a\\b', '..', '']) {
+    for (const bad of ['../evil', 'a/b', String.raw`a\b`, '..', '']) {
       expect(() => s.append(bad, 'decisions', { title: 'x', body: 'y' })).toThrow(/invalid projectId/);
       expect(() => s.read(bad, 'decisions')).toThrow(/invalid projectId/);
     }

@@ -84,10 +84,12 @@ function parse(content: string): RegisterEntry[] {
     const entry: RegisterEntry = { id: id!.trim(), title, body: '' };
     let i = 0;
     for (; i < lines.length; i++) {
-      const m = /^- (\w+):\s*(.*)$/.exec(lines[i]!);
+      // (\S.*)? keeps the value start disjoint from \s* — no overlapping
+      // quantifiers, no super-linear backtracking (S5852).
+      const m = /^- (\w+):\s*(\S.*)?$/.exec(lines[i]!);
       if (!m) break;
-      if (m[1] === 'date') entry.date = m[2]!.trim();
-      if (m[1] === 'source') entry.source = m[2]!.trim();
+      if (m[1] === 'date') entry.date = (m[2] ?? '').trim();
+      if (m[1] === 'source') entry.source = (m[2] ?? '').trim();
     }
     entry.body = lines.slice(i).join('\n').trim();
     return entry;
