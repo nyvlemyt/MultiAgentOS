@@ -95,6 +95,10 @@ async function seedMinimal(missionId: string) {
 let dbPath: string;
 
 beforeEach(async () => {
+  // This suite drives the claudeCodeLLM branch via vi.mock('@mas/core'); a
+  // globally exported MAS_MOCK_LLM=1 would flip selectLLM to mockLLM and skew
+  // the token-accounting fixtures (260 vs 300).
+  delete process.env.MAS_MOCK_LLM;
   const dir = join(tmpdir(), 'mas-test');
   mkdirSync(dir, { recursive: true });
   dbPath = join(dir, `${randomUUID()}.db`);
