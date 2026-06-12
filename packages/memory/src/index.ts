@@ -25,5 +25,13 @@ export {
   type CandidateType,
 } from './capture';
 export { runCloseOutRitual, AUTO_CAPTURE_EVENT, type RitualResult } from './auto-capture';
+export {
+  intakeSource,
+  IntakeSecurityError,
+  type SourceKind,
+  type IntakeSourceInput,
+  type IntakeOpts,
+  type IntakeResult,
+} from './intake';
 export { seedGlobalKnowledge, type SeedResult } from './seed';
 export { buildMemoryContext, MAX_GLOBAL_ITEMS, type MemoryContext } from './context';

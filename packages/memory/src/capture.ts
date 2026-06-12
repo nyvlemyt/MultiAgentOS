@@ -29,7 +29,7 @@ export interface CaptureCandidate {
  */
 export async function captureCandidates(
   db: Db,
-  sourceTaskId: string,
+  sourceTaskId: string | null,
   items: CaptureCandidate[],
 ): Promise<string[]> {
   if (items.length === 0) return [];
