@@ -1,5 +1,5 @@
 {
-  "name": "@mas/agents",
+  "name": "@mas/memory",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,18 +9,17 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "lint": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
-    "@mas/core": "workspace:*",
     "@mas/db": "workspace:*",
-    "@mas/memory": "workspace:*",
-    "@mas/skills": "workspace:*",
-    "drizzle-orm": "^0.36.0",
-    "gray-matter": "^4.0.3"
+    "better-sqlite3": "^11.3.0",
+    "drizzle-orm": "0.36.4"
   },
   "devDependencies": {
-    "better-sqlite3": "12.10.0",
+    "@types/better-sqlite3": "^7.6.11",
+    "tsx": "^4.19.0",
     "typescript": "^5.5.4",
     "vitest": "^2.0.0"
   }

@@ -23,8 +23,30 @@ import {
   type ReviewerVerdict,
 } from '@mas/core';
 import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
+import { MemoryStore, buildMemoryContext, type MemoryContext } from '@mas/memory';
 
 export type Db = ReturnType<typeof getDb>;
+
+// Lazy read-only memory store (no writerAgent — injection only reads, never writes;
+// §8 keeps the Memory Keeper as the sole writer). Resolves data/memory at the repo
+// root; degrades to an empty context under a bundler, like the skill router above.
+let _memoryStore: MemoryStore | undefined;
+function memoryContextFor(projectId: string | undefined, query: string): MemoryContext {
+  const empty: MemoryContext = { text: '', projectEntryCount: 0, globalItems: [] };
+  if (!projectId) return empty;
+  try {
+    const envRoot = process.env.MAS_MEMORY_ROOT;
+    if (envRoot) return buildMemoryContext(new MemoryStore({ root: envRoot }), projectId, query);
+    if (!_memoryStore) {
+      const __dirname = fileURLToPath(new URL('.', import.meta.url));
+      const repoRoot = resolve(__dirname, '../../..');
+      _memoryStore = new MemoryStore({ root: resolve(repoRoot, 'data/memory') });
+    }
+    return buildMemoryContext(_memoryStore, projectId, query);
+  } catch {
+    return empty;
+  }
+}
 
 // Lazy singleton — deferred so Next.js static analysis doesn't eval import.meta.url at bundle time.
 let _skillRouterInstance: SkillRouter | undefined;
@@ -272,10 +294,12 @@ async function executeTaskWithLLM(
 
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
   const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
+  const memCtx = memoryContextFor(proj?.id, next.title);
 
   const resp = await llm.call({
     system: [
       `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
+      memCtx.text,
       skillContext,
     ].filter(Boolean).join('\n\n'),
     user: `Task: ${next.title}\n\n${next.description}`,
@@ -316,7 +340,13 @@ async function executeTaskWithLLM(
     cacheCreation: resp.cacheCreationTokens,
     quotaUnits: resp.quotaUnits,
     risk: next.risk,
-    payload: { title: next.title, sessionId: resp.sessionId },
+    payload: {
+      title: next.title,
+      sessionId: resp.sessionId,
+      memoryContextChars: memCtx.text.length,
+      memoryProjectEntries: memCtx.projectEntryCount,
+      memoryGlobalItems: memCtx.globalItems.length,
+    },
   });
 
   return { kind: 'task_done', taskId: next.id };
@@ -425,10 +455,12 @@ export async function resumeAfterValidation(
 
   const taskSkillIds: string[] = JSON.parse(t.skillsJson ?? '[]');
   const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
+  const memCtx = memoryContextFor(proj?.id, t.title);
 
   const resp = await llm.call({
     system: [
       `You are executing a validated high-risk task inside project at path ${proj?.path ?? '.'}.`,
+      memCtx.text,
       skillContext,
     ].filter(Boolean).join('\n\n'),
     user: `Task: ${t.title}\n\n${t.description}`,

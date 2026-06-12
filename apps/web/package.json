@@ -16,6 +16,7 @@
     "@mas/agents": "workspace:*",
     "@mas/core": "workspace:*",
     "@mas/db": "workspace:*",
+    "@mas/memory": "workspace:*",
     "better-sqlite3": "12.10.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

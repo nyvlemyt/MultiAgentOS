@@ -1,0 +1,101 @@
+# Phase 4 — Memory · Build Report
+
+**Date**: 2026-06-08 · **Branch**: `phase/4-memory` · **Budget**: ~40k (session)
+**Pre-flight**: `docs/learning/2026-06-08-phase4-preflight/audit-report.md` (not re-audited) · **Decisions**: ADR 0003 (FTS5-first), capture BDR (below)
+
+> Branch note: the prompt said "off main", but the Phase-4 decision docs (ADR 0003, audit report,
+> build prompt) live only on `docs/phase4-preflight`, **not** on `main`. Branching off `main` would
+> orphan the very decisions this build implements, so `phase/4-memory` was cut from `docs/phase4-preflight`
+> (= main + those docs). Never pushed to main, never merged — honoring the rule's intent.
+
+## Status: ✅ All 5 explicit DoD gates PASS
+
+| DoD gate | Status | Evidence |
+|---|---|---|
+| Capture mechanism chosen + recorded as BDR + creates `memory_candidates` rows | ✅ | `capture.ts` `CAPTURE_DECISION` + BDR below; `capture.test.ts` (rows inserted, status=pending) |
+| 2nd mission visibly uses 1st mission's memory (Trace diff of system prompts) | ✅ | `memory-injection.test.ts`: mission 1 `memoryContextChars=0`, mission 2 `>0` after a register entry; logged into `task_done` event payload (`memoryContextChars/ProjectEntries/GlobalItems`) → renders in `/trace` |
+| BRIDGE hard gate: every `docs/knowledge/*` + INDEX traceable; the 4 facts retrievable | ✅ | `seed.test.ts` "BRIDGE GATE": `"BDR"`, `"Mem0 cloud"`, `"95% builders"`, `"40% Gartner"` each return a hit traced to `docs/knowledge` |
+| Write path provably locked to Memory Keeper | ✅ | `registers.test.ts`: non-Keeper + no-writer stores throw `MemoryWriteForbiddenError`; seed via non-Keeper throws |
+| `pnpm -r test` green + new memory tests green + web smoke green | ✅ | 53 unit tests (db 3, core 6, skills 9, **memory 24**, agents 9, web 1, worker 1); smoke **19/19** incl `/memory`; PAYG guard PASS |
+
+## CAPTURE mechanism — BDR (the 20-min mini-audit decision)
+
+**Decision: close-out ritual is the primary capture path; agentmemory hooks deferred to 4.x behind the same `captureCandidates()` seam; mem0 ADD-only rejected.**
+
+Three options weighed against §11 (no PAYG), local-first, prefer zero/low-LLM:
+- **agentmemory (rohitg00)** — auto-capture via Claude Code hooks (SessionStart/PostToolUse/Stop), RRF, ~−92% tokens. Cost: a 12-hook + 53-tool MCP stdio server, single-maintainer young repo, RRF retrieval we don't need (FTS5 already clears the gate). → **defer to 4.x** as optional auto-capture feeding the same API.
+- **mem0 ADD-only** — one LLM call at session end. Default = OpenAI embeddings → **PAYG → violates §11**. Reconfiguring to a local model adds cost for no gate benefit. → **rejected**.
+- **close-out ritual** (project-doctrine, 5-min / 3-questions) — explicit, **zero-LLM**, §11-safe by construction, emits formatted BDR/LRN/BLK candidates. → **chosen now**.
+
+Recorded in code as `packages/memory/src/capture.ts` `CAPTURE_DECISION`. The ritual calls `captureCandidates(db, taskId, items[])` which writes `memory_candidates` rows (status=pending) for Memory Keeper triage.
+
+## What was built (commit list)
+
+```
+7d33773 feat(memory): MemoryRetriever + FtsRetriever (FTS5/BM25)
+ae2e4a8 feat(memory): 5 registers + Keeper write-lock + promotion
+78d0093 feat(memory): close-out ritual capture -> memory_candidates
+4179e78 feat(memory): persistence bridge seed (docs/knowledge -> _global)
+45b1730 feat(memory): buildMemoryContext for planner injection (<=5 global)
+40a8d18 feat(agents): inject project+global memory into task prompts
+```
+
+New package `packages/memory/`:
+- `retriever.ts` — `MemoryRetriever` interface + `FtsRetriever` (SQLite FTS5/BM25, safe MATCH escaping, scope filter, replaceable corpus). ADR 0003 seam: `QmdRetriever` swaps in later behind this interface.
+- `registers.ts` — 5 registers (`decisions`=BDR, `learnings`=LRN, `blockers`=BLK, `journal`, `evals`=EVAL) per project + `_global`, Markdown source-of-truth. **Memory Keeper write-lock** (`MemoryWriteForbiddenError`). `corpusHash()` (SHA-256 over register files → index rebuildable). `promoteCandidate()` wires `memory_candidates` → register entry. Seeded knowledge stored under `_global/knowledge/` (separate files, avoids the `##`-header parser collision).
+- `capture.ts` — `captureCandidates()` (ritual → pending rows) + `CAPTURE_DECISION`.
+- `seed.ts` — idempotent persistence bridge: every `docs/knowledge/*.md` (incl. `vibeflow/INDEX.md`) → `_global/knowledge/` with `source:` provenance; re-run skips existing.
+- `context.ts` — `buildMemoryContext()`: per-project summary + **≤5 global items** (§12), on-demand, empty when no memory (no auto-injection of nothing).
+
+`packages/agents/dispatch.ts` — read-only memory injection into task system prompts (both `executeTaskWithLLM` and `resumeAfterValidation`); `MAS_MEMORY_ROOT` env override for tests; injection logged to `task_done` events.
+
+## Follow-up session (2026-06-08, step 5 completed)
+
+**/memory page interactivity — now DONE.** The page reads real `memory_candidates`
+(status=pending) + register/knowledge docs via `MemoryStore.allDocs()` (was the
+fixtures stub). Three web API routes wire the actions:
+- `POST /api/memory/promote` → `promoteCandidate()` behind the Memory Keeper
+  write-lock (`keeperStore()` carries the Keeper identity; §8). Form picks
+  `projectId` + register `kind`.
+- `POST /api/memory/reject` → candidate `status='rejected'` (inbox-only mutation,
+  also serves "retire stale").
+- `POST /api/memory/edit` → candidate body edit before promotion.
+New helper `apps/web/lib/memory.ts` (`readStore` / `keeperStore`, repo-root walk-up
+ported from `packages/db/src/client.ts`). `@mas/memory` added to web deps.
+Verified: web `tsc --noEmit` clean · smoke **19/19** incl `/memory` · PAYG guard PASS.
+Commit `6939554 feat(memory): wire /memory inbox accept/reject/edit`.
+
+Residual within step 5: **retiring an already-promoted register entry** (vs a
+candidate) has no domain API — registers are append-only Markdown by design (§8).
+A `MemoryStore.retire()` + write-lock test is backlogged; reject covers stale
+*candidates* today.
+
+## Deferred (NOT done — reasons)
+
+- **2 prompt-cache breakpoints in `claudeCodeLLM` (step 4 sub-item)** — **Reason: SDK surface limitation, not budget.** `claudeCodeLLM` passes `systemPrompt: { type:'preset', preset:'claude_code', append: <string> }`. The verified Agent SDK surface (see `llm.real.ts` header) exposes no `cache_control` knob on the appended system string; the `claude_code` preset manages caching internally. Setting explicit breakpoints would require abandoning the preset (losing native skill loading / tool defs / memory injection) — not wanted. Deferred pending an SDK affordance; tracked for 4.x.
+- **QMD / Graphify / multi-account router** — out of Phase-4 scope per ADR 0003 / pre-flight (4.x, Phase 5, Phase 3.5).
+
+## Phase gate
+
+Stopping here for review per CLAUDE.md §10. Phase 3.5 / router NOT started. Awaiting explicit "go".
+
+## Checker re-verification — 2026-06-09
+
+Independent Checker run (build prompt §②) against a clean `phase/4-memory` tree. **Verdict: PASS — merge-ready pending human approval.**
+
+| Check | Result | Evidence (fresh run) |
+|---|---|---|
+| 1. 5 registers + `_global`, formats | ✅ | `registers.test.ts`: BDR-001 prefix, per-kind prefixes, `allDocs` across projects+global (9/9) |
+| 2. Write path Keeper-locked | ✅ | `registers.test.ts` "REJECTS writes from any agent other than the Memory Keeper" + `seed.test.ts` "write path is Keeper-locked" |
+| 3. Bridge idempotency + `source:` | ✅ | `seed.test.ts` "imports every docs/knowledge .md (incl. INDEX) with source provenance" + "re-running creates no duplicate docs" |
+| 4. Bridge retrievability (hard gate) | ✅ | `seed.test.ts:46` iterates exactly `['BDR','Mem0 cloud','95% builders','40% Gartner']`, asserts a hit for each |
+| 5. Injection cap ≤5, no auto-inject | ✅ | `context.test.ts` "caps global items at 5 (§12)" + "empty when no memory" + `memory-injection.test.ts` two-mission |
+| 6. No scope creep (QMD/Graphify/router) | ✅ | QMD/mem0/OpenAI appear only in deferral/rejection **comments**; no `providers/`, no `llm.router.ts` |
+| 6b. Capture BDR §11-compliant | ✅ | `capture.ts` `CAPTURE_DECISION`; mem0 rejected for OpenAI-embedding PAYG |
+| 7. Verification green | ✅ | `pnpm -r test` **53/53** · `pnpm lint` PAYG guard PASS + tsc clean (7/8 projects, 8th has no lint script) · `pnpm build` next build OK (incl. 3 new `/api/memory/*` routes) · `pnpm --filter @mas/web smoke` **19/19** |
+
+**All four ROADMAP branching-rule checks green** (`pnpm lint` · `pnpm test` · `pnpm build` · `pnpm smoke`).
+
+### Note — a non-blocking test-hygiene finding (NOT a Phase 4 defect)
+
+Running the suite as `MAS_MOCK_LLM=1 pnpm -r test` (env exported globally) makes **2** `packages/agents/src/dispatch.test.ts` budget/idempotency assertions fail (off-by-40 on `spentTokens`: expects 300, gets 260). Root cause: `dispatch.test.ts` drives the `claudeCodeLLM` branch via `vi.mock('@mas/core')` (fixture 220 in / 80 out = 300) and assumes `MAS_MOCK_LLM` is **unset**; an externally-exported `MAS_MOCK_LLM=1` flips `selectLLM` (`dispatch.ts:80`) to the real `mockLLM()` (200 in / 60 out = 260). The **canonical** command `pnpm -r test` (no exported env; each suite self-configures, memory tests set the flag in their own `beforeEach`) is green. This is a Phase 1/2 test-isolation fragility, out of Phase 4 scope — **not fixed** here per the "only fix Phase 4" mandate. Optional hardening (backlog): add `delete process.env.MAS_MOCK_LLM` to `dispatch.test.ts`'s `beforeEach`.
