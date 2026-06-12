@@ -104,6 +104,16 @@ export class MemoryStore {
   }
 
   private file(projectId: string, kind: RegisterKind): string {
+    // projectId may come from UI forms; a separator or '..' would let the
+    // path escape this.opts.root (path traversal).
+    if (
+      !projectId ||
+      projectId.includes('/') ||
+      projectId.includes('\\') ||
+      projectId.includes('..')
+    ) {
+      throw new Error(`invalid projectId for memory store: ${projectId}`);
+    }
     return join(this.opts.root, projectId, `${kind}.md`);
   }
 
@@ -212,7 +222,7 @@ export class MemoryStore {
   corpusHash(): string {
     const h = createHash('sha256');
     const kinds: RegisterKind[] = ['decisions', 'learnings', 'blockers', 'journal', 'evals'];
-    for (const p of this.projectIds().sort()) {
+    for (const p of this.projectIds().sort((a, b) => a.localeCompare(b))) {
       for (const kind of kinds) {
         const f = this.file(p, kind);
         if (existsSync(f)) h.update(`${p}/${kind}\n${readFileSync(f, 'utf8')}`);

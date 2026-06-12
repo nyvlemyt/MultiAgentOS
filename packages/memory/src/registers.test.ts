@@ -72,6 +72,14 @@ describe('MemoryStore registers', () => {
     );
   });
 
+  it('rejects projectIds that could escape the memory root (path traversal)', () => {
+    const s = keeperStore();
+    for (const bad of ['../evil', 'a/b', 'a\\b', '..', '']) {
+      expect(() => s.append(bad, 'decisions', { title: 'x', body: 'y' })).toThrow(/invalid projectId/);
+      expect(() => s.read(bad, 'decisions')).toThrow(/invalid projectId/);
+    }
+  });
+
   it('feeds the retriever via allDocs across projects + global', () => {
     const s = keeperStore();
     s.append('otakugo', 'decisions', { title: 'Capture = ritual', body: 'Mem0 cloud rejected §11.' });
@@ -90,6 +98,27 @@ describe('MemoryStore registers', () => {
   });
 });
 
+async function seedCandidate(id: string) {
+  const db = getDb();
+  await db.insert(projects).values({
+    id: 'proj', name: 'P', slug: 'p', path: join(tmpdir(), 'p'), type: 'other',
+    createdAt: new Date(), lastActiveAt: new Date(),
+  });
+  await db.insert(missions).values({
+    id: 'm1', projectId: 'proj', title: 't', objective: 'o', status: 'draft', risk: 'low',
+    budgetTokens: 1000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+  });
+  await db.insert(tasks).values({
+    id: 'task1', missionId: 'm1', title: 't', description: 'd', status: 'done', risk: 'low',
+    dependsOnJson: '[]', skillsJson: '[]', budgetTokens: 100, spentTokens: 0,
+    createdAt: new Date(), updatedAt: new Date(),
+  });
+  await db.insert(memoryCandidates).values({
+    id, sourceTaskId: 'task1', type: 'project',
+    body: 'Decided to ship FTS5 for the MVP retriever.', status: 'pending', createdAt: new Date(),
+  });
+}
+
 describe('promoteCandidate (memory_candidates → register)', () => {
   let dbPath: string;
   beforeEach(() => {
@@ -101,27 +130,6 @@ describe('promoteCandidate (memory_candidates → register)', () => {
     closeDb();
     unlinkSync(dbPath);
   });
-
-  async function seedCandidate(id: string) {
-    const db = getDb();
-    await db.insert(projects).values({
-      id: 'proj', name: 'P', slug: 'p', path: join(tmpdir(), 'p'), type: 'other',
-      createdAt: new Date(), lastActiveAt: new Date(),
-    });
-    await db.insert(missions).values({
-      id: 'm1', projectId: 'proj', title: 't', objective: 'o', status: 'draft', risk: 'low',
-      budgetTokens: 1000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
-    });
-    await db.insert(tasks).values({
-      id: 'task1', missionId: 'm1', title: 't', description: 'd', status: 'done', risk: 'low',
-      dependsOnJson: '[]', skillsJson: '[]', budgetTokens: 100, spentTokens: 0,
-      createdAt: new Date(), updatedAt: new Date(),
-    });
-    await db.insert(memoryCandidates).values({
-      id, sourceTaskId: 'task1', type: 'project',
-      body: 'Decided to ship FTS5 for the MVP retriever.', status: 'pending', createdAt: new Date(),
-    });
-  }
 
   it('promotes a pending candidate into a register and marks it accepted', async () => {
     const db = getDb();
