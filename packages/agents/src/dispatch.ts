@@ -23,7 +23,7 @@ import {
   type ReviewerVerdict,
 } from '@mas/core';
 import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
-import { MemoryStore, buildMemoryContext, type MemoryContext } from '@mas/memory';
+import { MemoryStore, buildMemoryContext, runCloseOutRitual, type MemoryContext } from '@mas/memory';
 
 export type Db = ReturnType<typeof getDb>;
 
@@ -235,6 +235,17 @@ async function runReviewPhase(
   } else {
     await db.update(missions).set({ status: 'validated', updatedAt: new Date() }).where(eq(missions.id, m.id));
     await logEvent(db, { missionId: m.id, type: 'mission_validated' });
+  }
+
+  // ADR 0004 §1: mission end auto-fires the close-out ritual. Candidates only —
+  // the §8 write-lock is untouched. Fired here (not in the worker loop) because
+  // runReviewPhase is the single chokepoint both the worker and the web inline
+  // path cross. Idempotent via AUTO_CAPTURE_EVENT, so a replayed tick is a no-op.
+  try {
+    await runCloseOutRitual(db, m.id);
+  } catch (e) {
+    // Capture is best-effort: a ritual failure must not fail the mission.
+    await logEvent(db, { missionId: m.id, type: 'auto_capture_error', payload: { message: String(e) } });
   }
   return { kind: 'mission_complete' };
 }
