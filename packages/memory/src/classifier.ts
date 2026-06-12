@@ -65,14 +65,11 @@ function scopeFor(input: ClassifierInput): MemoryScope {
 }
 
 /**
- * Deterministic-first classification (ADR 0004 §5): user tag → keyword table →
- * source kind. Only when every rule abstains does the single injected light-LLM
- * call run — and the caller is notified so it lands in /trace. No embeddings.
+ * Rules-only classification: user tag → keyword table → source kind. Returns
+ * null on abstain. Used directly by auto-file, which must never burn an LLM
+ * call — an abstaining trusted candidate stays in the inbox.
  */
-export async function classifyCandidate(
-  input: ClassifierInput,
-  opts: ClassifierOpts,
-): Promise<ClassifierDecision> {
+export function classifyByRulesOnly(input: ClassifierInput): ClassifierDecision | null {
   if (input.userTag) {
     return { ...input.userTag, method: 'rule', rule: 'user-tag' };
   }
@@ -93,6 +90,23 @@ export async function classifyCandidate(
     };
   }
 
+  return null;
+}
+
+/**
+ * Deterministic-first classification (ADR 0004 §5): rules via
+ * classifyByRulesOnly; only when every rule abstains does the single injected
+ * light-LLM call run — and the caller is notified so it lands in /trace.
+ * No embeddings.
+ */
+export async function classifyCandidate(
+  input: ClassifierInput,
+  opts: ClassifierOpts,
+): Promise<ClassifierDecision> {
+  const byRules = classifyByRulesOnly(input);
+  if (byRules) return byRules;
+
+  const head = input.body.slice(0, 200);
   const prompt =
     'Classify this memory candidate into exactly one register among: ' +
     'decisions, learnings, blockers, journal, evals. Answer with the register name only.\n\n' +

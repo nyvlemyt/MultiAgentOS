@@ -35,6 +35,7 @@ export {
 } from './intake';
 export {
   classifyCandidate,
+  classifyByRulesOnly,
   type ClassifierInput,
   type ClassifierDecision,
   type ClassifierOpts,

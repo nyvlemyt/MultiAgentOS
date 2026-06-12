@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { eq } from 'drizzle-orm';
 import { getDb, closeDb, memoryCandidates, events } from '@mas/db';
+import { MemoryStore, MEMORY_KEEPER_AGENT } from '@mas/memory';
 import { runGatedIntake } from './intake-gate';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -63,5 +64,74 @@ describe('runGatedIntake (mas-sec-reviewer gate, §5)', () => {
     const reqs = await db.select().from(events).where(eq(events.type, 'validation_requested'));
     expect(reqs).toHaveLength(1);
     expect(reqs[0]!.risk).toBe('blocking');
+  });
+});
+
+describe('auto-file for trusted sources (ADR 0004 §7)', () => {
+  let memRoot: string;
+  beforeEach(() => {
+    memRoot = mkdtempSync(join(tmpdir(), 'mas-trust-'));
+  });
+  afterEach(() => {
+    rmSync(memRoot, { recursive: true, force: true });
+  });
+
+  it('an allowlisted source is Keeper-promoted automatically (no manual triage)', async () => {
+    const db = getDb();
+    const store = new MemoryStore({ root: memRoot, writerAgent: MEMORY_KEEPER_AGENT });
+    const res = await runGatedIntake(
+      db,
+      { kind: 'note', title: 'TIL eco', body: 'TIL: eco mode halves prose tokens.' },
+      { intakeDir, trust: { trustedSources: ['TIL eco'] }, store },
+    );
+    expect(res.kind).toBe('ingested');
+    if (res.kind === 'ingested') expect(res.autoFiled).toBe(true);
+    const rows = await db.select().from(memoryCandidates);
+    expect(rows[0]!.status).toBe('accepted');
+    expect(store.read('_global', 'learnings')).toHaveLength(1);
+  });
+
+  it('an unlisted source lands in the inbox (pending), nothing promoted', async () => {
+    const db = getDb();
+    const store = new MemoryStore({ root: memRoot, writerAgent: MEMORY_KEEPER_AGENT });
+    const res = await runGatedIntake(
+      db,
+      { kind: 'note', title: 'random', body: 'TIL: something.' },
+      { intakeDir, trust: { trustedSources: ['https://only-this.example'] }, store },
+    );
+    expect(res.kind).toBe('ingested');
+    if (res.kind === 'ingested') expect(res.autoFiled).toBe(false);
+    const rows = await db.select().from(memoryCandidates);
+    expect(rows[0]!.status).toBe('pending');
+    expect(store.read('_global', 'learnings')).toHaveLength(0);
+  });
+
+  it('a trusted source whose classification abstains stays in the inbox (zero LLM)', async () => {
+    const db = getDb();
+    const store = new MemoryStore({ root: memRoot, writerAgent: MEMORY_KEEPER_AGENT });
+    const res = await runGatedIntake(
+      db,
+      // note kind + no keyword → rules abstain
+      { kind: 'note', title: 'misc', body: 'quelques pensées diverses.' },
+      { intakeDir, trust: { trustedSources: ['misc'] }, store },
+    );
+    expect(res.kind).toBe('ingested');
+    if (res.kind === 'ingested') expect(res.autoFiled).toBe(false);
+    const rows = await db.select().from(memoryCandidates);
+    expect(rows[0]!.status).toBe('pending');
+  });
+
+  it('auto-file goes through the Keeper write-lock — a non-keeper store cannot promote', async () => {
+    const db = getDb();
+    const intruder = new MemoryStore({ root: memRoot, writerAgent: 'mission-planner' });
+    const res = await runGatedIntake(
+      db,
+      { kind: 'note', title: 'TIL eco', body: 'TIL: eco mode halves prose tokens.' },
+      { intakeDir, trust: { trustedSources: ['TIL eco'] }, store: intruder },
+    );
+    expect(res.kind).toBe('ingested');
+    if (res.kind === 'ingested') expect(res.autoFiled).toBe(false);
+    const rows = await db.select().from(memoryCandidates);
+    expect(rows[0]!.status).toBe('pending'); // promotion refused, candidate intact
   });
 });
