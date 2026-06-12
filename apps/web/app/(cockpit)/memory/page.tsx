@@ -55,8 +55,8 @@ export default async function MemoryCenter({
             href="/memory"
             className="mono rounded-sm px-1.5 py-0.5"
             style={{
-              background: !sourceFilter ? 'var(--accent)' : 'var(--bg-hover)',
-              color: !sourceFilter ? '#fff' : 'var(--text-secondary)',
+              background: sourceFilter ? 'var(--bg-hover)' : 'var(--accent)',
+              color: sourceFilter ? 'var(--text-secondary)' : '#fff',
             }}
           >
             all sources

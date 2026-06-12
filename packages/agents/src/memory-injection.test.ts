@@ -1,33 +1,27 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { unlinkSync, mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { eq, and } from 'drizzle-orm';
-import { getDb, closeDb, projects, agents, missions, events } from '@mas/db';
+import { getDb, projects, events } from '@mas/db';
 import { MemoryStore, MEMORY_KEEPER_AGENT } from '@mas/memory';
 import { planMission, runMission, executeNextTask } from './dispatch';
+import { useTestDb, seedAgentsRoster, seedProject, seedMission } from './testing';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
 const PROJECT_ID = 'otakugo';
 
-let dbPath: string;
 let memRoot: string;
 
+useTestDb(MIGRATIONS_FOLDER);
 beforeEach(() => {
   process.env.MAS_MOCK_LLM = '1';
   memRoot = mkdtempSync(join(tmpdir(), 'mas-inj-'));
   process.env.MAS_MEMORY_ROOT = memRoot;
-  dbPath = join(tmpdir(), `mas-${randomUUID()}.db`);
-  const db = getDb(dbPath);
-  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
 });
 afterEach(() => {
-  closeDb();
-  unlinkSync(dbPath);
   rmSync(memRoot, { recursive: true, force: true });
   delete process.env.MAS_MEMORY_ROOT;
   delete process.env.MAS_MOCK_LLM;
@@ -37,22 +31,10 @@ async function seedProjectAndMission(missionId: string) {
   const db = getDb();
   const exists = await db.select().from(projects).where(eq(projects.id, PROJECT_ID));
   if (exists.length === 0) {
-    await db.insert(projects).values({
-      id: PROJECT_ID, name: 'OtakuGO', slug: 'otakugo', path: join(tmpdir(), 'otakugo'),
-      type: 'other', createdAt: new Date(), lastActiveAt: new Date(),
-    });
-    for (const id of ['mission-planner', 'skill-router', 'design-ux-architect', 'engineering-frontend-developer', 'sec-reviewer', 'reviewer']) {
-      await db.insert(agents).values({
-        id, tier: 'A', fichePath: `f/${id}.md`, name: id, model: 'claude-haiku-4-5',
-        enabled: true, totalRuns: 0, totalTokens: 0, successRate: 1,
-      });
-    }
+    await seedProject(PROJECT_ID, 'OtakuGO');
+    await seedAgentsRoster();
   }
-  await db.insert(missions).values({
-    id: missionId, projectId: PROJECT_ID, title: 'Build settings page',
-    objective: 'Add a settings page', status: 'draft', risk: 'low',
-    budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
-  });
+  await seedMission(missionId, PROJECT_ID);
 }
 
 async function runFirstTask(missionId: string) {

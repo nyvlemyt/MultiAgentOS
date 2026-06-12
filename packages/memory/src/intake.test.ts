@@ -1,28 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { unlinkSync, mkdtempSync, rmSync, existsSync, readFileSync, readdirSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { getDb, closeDb, memoryCandidates } from '@mas/db';
+import { getDb, memoryCandidates } from '@mas/db';
 import { intakeSource, IntakeSecurityError } from './intake';
+import { useTestDb } from './testing';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
 
-let dbPath: string;
 let intakeDir: string;
 
+useTestDb(MIGRATIONS_FOLDER);
 beforeEach(() => {
-  dbPath = join(tmpdir(), `mas-${randomUUID()}.db`);
-  const db = getDb(dbPath);
-  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
   intakeDir = mkdtempSync(join(tmpdir(), 'mas-intake-'));
 });
 afterEach(() => {
-  closeDb();
-  unlinkSync(dbPath);
   rmSync(intakeDir, { recursive: true, force: true });
 });
 

@@ -1,30 +1,24 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { unlinkSync, mkdtempSync, rmSync, existsSync, readdirSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { eq } from 'drizzle-orm';
-import { getDb, closeDb, memoryCandidates, events } from '@mas/db';
+import { getDb, memoryCandidates, events } from '@mas/db';
 import { MemoryStore, MEMORY_KEEPER_AGENT } from '@mas/memory';
 import { runGatedIntake } from './intake-gate';
+import { useTestDb } from './testing';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
 
-let dbPath: string;
 let intakeDir: string;
 
+useTestDb(MIGRATIONS_FOLDER);
 beforeEach(() => {
-  dbPath = join(tmpdir(), `mas-${randomUUID()}.db`);
-  const db = getDb(dbPath);
-  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
   intakeDir = mkdtempSync(join(tmpdir(), 'mas-gate-'));
 });
 afterEach(() => {
-  closeDb();
-  unlinkSync(dbPath);
   rmSync(intakeDir, { recursive: true, force: true });
 });
 

@@ -1,26 +1,16 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { unlinkSync } from 'node:fs';
+import { describe, it, expect } from 'vitest';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { getDb, closeDb, memoryCandidates, tasks, missions, projects, validations } from '@mas/db';
+import { getDb, memoryCandidates, tasks, missions, projects, validations } from '@mas/db';
 import { runCloseOutRitual } from './auto-capture';
+import { useTestDb } from './testing';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
 
-let dbPath: string;
-beforeEach(() => {
-  dbPath = join(tmpdir(), `mas-${randomUUID()}.db`);
-  const db = getDb(dbPath);
-  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
-});
-afterEach(() => {
-  closeDb();
-  unlinkSync(dbPath);
-});
+useTestDb(MIGRATIONS_FOLDER);
 
 async function seedMission(status: 'validated' | 'blocked') {
   const db = getDb();

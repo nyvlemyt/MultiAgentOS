@@ -43,10 +43,13 @@ export interface IntakeResult {
 }
 
 function slugify(title: string): string {
+  // split/filter/join instead of replace + trim regexes: single-pass on a
+  // one-char class, no anchored quantifier for S5852 to flag.
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .join('-');
 }
 
 const CANDIDATE_TYPE: Record<SourceKind, CandidateType> = {
