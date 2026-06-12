@@ -30,6 +30,7 @@ afterEach(() => {
   unlinkSync(dbPath);
   rmSync(memRoot, { recursive: true, force: true });
   delete process.env.MAS_MEMORY_ROOT;
+  delete process.env.MAS_MOCK_LLM;
 });
 
 async function seedProjectAndMission(missionId: string) {

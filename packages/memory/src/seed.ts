@@ -26,7 +26,7 @@ function walkMd(dir: string): string[] {
 export function seedGlobalKnowledge(store: MemoryStore, knowledgeDir: string): SeedResult {
   const imported: string[] = [];
   const skipped: string[] = [];
-  for (const file of walkMd(knowledgeDir).sort()) {
+  for (const file of walkMd(knowledgeDir).sort((a, b) => a.localeCompare(b))) {
     const rel = relative(knowledgeDir, file).split(/[/\\]/).join('/');
     const source = `docs/knowledge/${rel}`;
     if (store.hasKnowledge(source)) {
