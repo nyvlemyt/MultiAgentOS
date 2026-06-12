@@ -88,6 +88,8 @@ describe('auto-file for trusted sources (ADR 0004 §7)', () => {
     if (res.kind === 'ingested') expect(res.autoFiled).toBe(true);
     const rows = await db.select().from(memoryCandidates);
     expect(rows[0]!.status).toBe('accepted');
+    expect(rows[0]!.autoFiled).toBe(true);
+    expect(rows[0]!.classifierDecision).toMatch(/^rule:/);
     expect(store.read('_global', 'learnings')).toHaveLength(1);
   });
 

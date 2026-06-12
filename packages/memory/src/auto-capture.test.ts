@@ -64,6 +64,7 @@ describe('runCloseOutRitual (mission-complete → memory_candidates)', () => {
     const bodies = rows.map((r) => r.body).join('\n');
     expect(bodies).toContain('Polish feed');
     expect(bodies).toContain('apply diff'); // approved high-risk decision captured
+    expect(rows.every((r) => r.sourceKind === 'mission')).toBe(true);
   });
 
   it('never writes a register directly — candidates only', async () => {

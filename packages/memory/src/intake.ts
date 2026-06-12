@@ -111,7 +111,7 @@ export async function intakeSource(
     .join('\n');
 
   const [candidateId] = await captureCandidates(db, opts.sourceTaskId ?? null, [
-    { type: CANDIDATE_TYPE[src.kind], body },
+    { type: CANDIDATE_TYPE[src.kind], body, sourceKind: src.kind, dossierPath },
   ]);
 
   return { dossierPath, candidateId: candidateId! };

@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { events, type getDb } from '@mas/db';
+import { eq } from 'drizzle-orm';
+import { events, memoryCandidates, type getDb } from '@mas/db';
 import { mockSecReviewer } from '@mas/core';
 import {
   intakeSource,
@@ -86,6 +87,10 @@ async function tryAutoFile(
       },
       opts.store,
     );
+    await db
+      .update(memoryCandidates)
+      .set({ autoFiled: true, classifierDecision: `rule:${decision.rule ?? 'unknown'}` })
+      .where(eq(memoryCandidates.id, res.candidateId));
     return true;
   } catch {
     return false;

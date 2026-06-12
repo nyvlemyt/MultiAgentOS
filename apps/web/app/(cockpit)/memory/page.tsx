@@ -1,18 +1,32 @@
+import Link from 'next/link';
 import { getDb, memoryCandidates } from '@mas/db';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { MemoryDoc, RegisterKind } from '@mas/memory';
 import { readStore } from '@/lib/memory';
 
 const KINDS: RegisterKind[] = ['decisions', 'learnings', 'blockers', 'journal', 'evals'];
+const SOURCE_KINDS = ['mission', 'note', 'skill', 'pattern', 'repo', 'course'] as const;
+type SourceFilter = (typeof SOURCE_KINDS)[number];
 
 export const dynamic = 'force-dynamic';
 
-export default async function MemoryCenter() {
+export default async function MemoryCenter({
+  searchParams,
+}: Readonly<{ searchParams: Promise<{ source?: string }> }>) {
+  const { source } = await searchParams;
+  const sourceFilter = SOURCE_KINDS.includes(source as SourceFilter)
+    ? (source as SourceFilter)
+    : undefined;
+
   const db = getDb();
   const pending = await db
     .select()
     .from(memoryCandidates)
-    .where(eq(memoryCandidates.status, 'pending'))
+    .where(
+      sourceFilter
+        ? and(eq(memoryCandidates.status, 'pending'), eq(memoryCandidates.sourceKind, sourceFilter))
+        : eq(memoryCandidates.status, 'pending'),
+    )
     .orderBy(memoryCandidates.createdAt);
 
   let docs: MemoryDoc[] = [];
@@ -36,6 +50,31 @@ export default async function MemoryCenter() {
           <h2 className="text-sm font-semibold">Candidate inbox</h2>
           <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{pending.length} pending</span>
         </header>
+        <nav aria-label="Intake source filter" className="mb-3 flex flex-wrap items-center gap-1 text-[10px]">
+          <Link
+            href="/memory"
+            className="mono rounded-sm px-1.5 py-0.5"
+            style={{
+              background: !sourceFilter ? 'var(--accent)' : 'var(--bg-hover)',
+              color: !sourceFilter ? '#fff' : 'var(--text-secondary)',
+            }}
+          >
+            all sources
+          </Link>
+          {SOURCE_KINDS.map((s) => (
+            <Link
+              key={s}
+              href={`/memory?source=${s}`}
+              className="mono rounded-sm px-1.5 py-0.5"
+              style={{
+                background: sourceFilter === s ? 'var(--accent)' : 'var(--bg-hover)',
+                color: sourceFilter === s ? '#fff' : 'var(--text-secondary)',
+              }}
+            >
+              {s}
+            </Link>
+          ))}
+        </nav>
         {pending.length === 0 ? (
           <p className="px-1 py-4 text-xs" style={{ color: 'var(--text-muted)' }}>
             No pending candidates. Sessions emit them via the close-out ritual (<code className="mono">captureCandidates</code>).
@@ -46,6 +85,9 @@ export default async function MemoryCenter() {
               <li key={c.id} className="surface flex flex-col gap-2 px-3 py-2 text-xs">
                 <div>
                   <span className="mono mr-2 rounded-sm px-1.5 py-0.5 text-[10px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-secondary)' }}>{c.type}</span>
+                  {c.sourceKind && (
+                    <span className="mono mr-2 rounded-sm px-1.5 py-0.5 text-[10px]" style={{ background: 'var(--bg-hover)', color: 'var(--accent)' }}>{c.sourceKind}</span>
+                  )}
                   <span style={{ color: 'var(--text-primary)' }}>{c.body}</span>
                 </div>
                 <div className="flex flex-wrap items-center gap-1">

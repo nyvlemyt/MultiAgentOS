@@ -169,6 +169,11 @@ export const memoryCandidates = sqliteTable('memory_candidates', {
   type: text('type', { enum: ['user', 'feedback', 'project', 'reference'] }).notNull(),
   body: text('body').notNull(),
   status: text('status', { enum: ['pending', 'accepted', 'rejected'] }).notNull().default('pending'),
+  // Intake provenance (Phase 4.5, ADR 0004). Null for ritual/legacy candidates.
+  sourceKind: text('source_kind', { enum: ['note', 'skill', 'pattern', 'repo', 'course', 'mission'] }),
+  dossierPath: text('dossier_path'),
+  classifierDecision: text('classifier_decision'),
+  autoFiled: integer('auto_filed', { mode: 'boolean' }).notNull().default(false),
   createdAt: epoch().notNull(),
 });
 

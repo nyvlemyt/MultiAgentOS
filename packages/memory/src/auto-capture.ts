@@ -44,6 +44,7 @@ export async function runCloseOutRitual(db: Db, missionId: string): Promise<Ritu
   const done = all.filter((t) => t.status === 'done').length;
   items.push({
     type: 'project',
+    sourceKind: 'mission',
     body: `Mission "${m.title}" ${m.status}: ${done}/${all.length} tasks done, ${m.spentTokens ?? 0} tokens spent.`,
   });
 
@@ -53,12 +54,12 @@ export async function runCloseOutRitual(db: Db, missionId: string): Promise<Ritu
     .where(inArray(validations.taskId, all.map((t) => t.id)));
   for (const v of decided) {
     if (v.status === 'approved' || v.status === 'rejected') {
-      items.push({ type: 'project', body: `Decided: ${v.status} — ${v.actionSummary}.` });
+      items.push({ type: 'project', sourceKind: 'mission', body: `Decided: ${v.status} — ${v.actionSummary}.` });
     }
   }
 
   if (m.status === 'blocked') {
-    items.push({ type: 'project', body: `Blocked: mission "${m.title}" ended blocked — needs follow-up.` });
+    items.push({ type: 'project', sourceKind: 'mission', body: `Blocked: mission "${m.title}" ended blocked — needs follow-up.` });
   }
 
   const candidateIds = await captureCandidates(db, anchor.id, items);

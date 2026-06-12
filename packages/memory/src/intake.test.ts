@@ -44,6 +44,8 @@ describe('intakeSource (multi-source → dossier + candidate)', () => {
     expect(rows).toHaveLength(1);
     expect(rows[0]!.status).toBe('pending');
     expect(rows[0]!.body).toContain('effort parameter');
+    expect(rows[0]!.sourceKind).toBe('note');
+    expect(rows[0]!.dossierPath).toBe(res.dossierPath);
   });
 
   it('slugifies the dossier filename as <date>-<slug>.md', async () => {
