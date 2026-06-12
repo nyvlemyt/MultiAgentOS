@@ -33,5 +33,12 @@ export {
   type IntakeOpts,
   type IntakeResult,
 } from './intake';
+export {
+  classifyCandidate,
+  type ClassifierInput,
+  type ClassifierDecision,
+  type ClassifierOpts,
+  type LlmFallbackInfo,
+} from './classifier';
 export { seedGlobalKnowledge, type SeedResult } from './seed';
 export { buildMemoryContext, MAX_GLOBAL_ITEMS, type MemoryContext } from './context';
