@@ -1,7 +1,7 @@
 # ADR 0002 — Multi-account + multi-provider router (Phase 3.5)
 
-- **Status**: Proposed — **deferred to Phase 3.5** (after Phase 4 Memory). Captured now so the reframe isn't lost.
-- **Date**: 2026-06-08
+- **Status**: Accepted — finalized at the 2026-06-13 Phase 3.5 pre-flight (open questions resolved below); build green-lit by user "go Phase 3.5"
+- **Date**: 2026-06-08 (amended 2026-06-13)
 - **Deciders**: Melvyn + Claude
 - **Supersedes scope of**: ROADMAP "Phase 3.5 · Multi-model Router" (which framed it as multi-*provider* only)
 
@@ -22,12 +22,12 @@ The user's real constraint is **quota windows, not € per token**. Billing fact
 5. **Cost model = quota windows**, not money. The router tracks each source's window state (fresh / near-limit / blocked) and prefers the freshest; on `rate_limit` / `quota_exhausted` it logs `provider_fallback { from, to, reason }` in `/trace`.
 6. **Amend CLAUDE.md §11** to allow non-Anthropic providers **only** under `packages/core/src/providers/` behind config; the PAYG-Anthropic ban is unchanged.
 
-## Open questions (resolve at 3.5 pre-flight, before coding)
+## Open questions — RESOLVED (2026-06-13 pre-flight)
 
-- **Multi-account Claude auth with the Agent SDK**: the SDK uses a single `claude login` session. Pooling 2 accounts likely means **per-account `CLAUDE_CONFIG_DIR`** (separate credential/config dirs) and switching on quota block. Validate feasibility (look at how open-source Claude webuis juggle sessions — CLAUDE.md §9.bis Voie 2).
-- **Quota-window detection**: how does the SDK signal "window exhausted" vs a transient rate-limit? Need a reliable signal to drive failover.
-- **Non-Claude API cost**: ChatGPT Plus / Perplexity Pro **subscriptions do not include API access** — their APIs are pay-per-token (real €). Gemini has a free tier. → default routing should prefer **Claude-accounts + Gemini-free**, and treat paid OpenAI/Perplexity APIs as opt-in.
-- **Provider parity on grounding**: verify each provider honors the injected context-pack/memory (no "I don't have access to your files" drift).
+1. **Multi-account Claude auth → per-account `CLAUDE_CONFIG_DIR`.** Confirmed working in the field: setting `CLAUDE_CONFIG_DIR` gives a fully isolated Claude Code profile (credentials, settings, sessions). The router declares accounts in `config/model-routing.json` (`claude_accounts: [{ id, configDir, plan }]`) and the Claude provider passes the account's `configDir` as env when invoking the Agent SDK. Each account = one `LLMClient` instance. (Sources: wmedia.es CLAUDE_CONFIG_DIR profiles guide; anthropics/claude-code#44687 — one-account-per-OS-user limitation + env-var workaround.)
+2. **Quota-window detection → SDK `rate_limit_event` + error taxonomy.** The Agent SDK emits `rate_limit_event` messages (`SDKRateLimitInfo`, fed by `anthropic-ratelimit-unified-*` headers; see anthropics/claude-code#50518). Failover policy: `status` ≠ allowed or a 429/quota error → mark the source's window `blocked` and fail over; **529/overloaded is transient capacity, NOT failover** — retry same source with backoff. Window state persisted per source (events table), reset on first successful call.
+3. **Non-Claude API cost → paid APIs opt-in, default OFF.** ChatGPT Plus / Perplexity Pro subscriptions do NOT include API access; their APIs bill per token (real €). Default enabled chain: **Claude accounts (pooled) → Gemini free tier**. OpenAI/Perplexity providers ship behind `paid_apis_enabled: false` + per-provider keys in `.env.local`; missing key = provider disabled with a startup warning (never a crash). This honors the user's ~20 € envelope (KILL criterion: silent per-token billing).
+4. **Grounding parity → solved by construction, tested at DoD.** Phase 4/4.5 provide `buildMemoryContext` (≤5 global cap) + context-packs. Non-Claude providers (no `cwd`) get both injected explicitly in the system prompt; the DoD includes a parity test asserting the injected context is identical across providers for the same task.
 
 ## Alternatives considered
 
@@ -36,6 +36,7 @@ The user's real constraint is **quota windows, not € per token**. Billing fact
 
 ## Consequences
 
-- This ADR is **deferred**: Phase 4 (Memory) ships first; the router is built on top of it.
-- The Phase 3.5 pre-flight intake-audit must produce the final version of this ADR (resolve the open questions) before any provider code.
+- Phase 4 + 4.5-producer shipped first (done); the router builds on their memory/grounding layer.
 - `LLMRequest` gains an optional `domain`; the dispatcher sets it from the task's skill tags (the Phase 3 domain taxonomy already exists in the `skills` table).
+- CLAUDE.md §11 amended (2026-06-13): non-Anthropic provider SDKs allowed **only** under `packages/core/src/providers/`, behind `config/model-routing.json`; the Anthropic-PAYG ban is unchanged; the lint guard gains a rule confining provider SDK imports to that directory.
+- Routing scope discipline: ROADMAP's initial domain table is the seed, but **default-enabled** providers are only Claude accounts + Gemini free; domains whose primary is a paid API (search/research → Perplexity, ux/writing/code-review → GPT) fall back to the default chain until `paid_apis_enabled` is turned on.
