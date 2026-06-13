@@ -8,6 +8,8 @@ import { MissionActions } from '@/components/MissionActions';
 import { ValidationModal, type PendingValidation } from '@/components/ValidationModal';
 import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
+import { MissionDeadlineEditor } from '@/components/MissionDeadlineEditor';
+import { isDeadlineSoon } from '@/lib/prioritize';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,6 +94,22 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
           <RiskBadge risk={m.risk} />
         </div>
         <MissionActions id={m.id} status={m.status} />
+        <div className="flex items-center gap-3">
+          <MissionDeadlineEditor
+            id={m.id}
+            deadline={m.deadline ? m.deadline.toISOString().slice(0, 10) : null}
+            milestone={m.milestone}
+          />
+          {isDeadlineSoon(m.deadline) && (
+            <span
+              data-testid="deadline-badge"
+              className="rounded-sm px-2 py-0.5 text-[10px] font-semibold"
+              style={{ background: 'var(--warning)', color: '#1a1a1a' }}
+            >
+              ⚠ deadline &lt; 7d
+            </span>
+          )}
+        </div>
         <ol className="flex items-center gap-1 overflow-x-auto" data-testid="fsm-ribbon">
           {fsm.map((s, i) => {
             const active = i === currentStage;

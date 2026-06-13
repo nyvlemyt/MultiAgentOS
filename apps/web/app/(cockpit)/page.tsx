@@ -6,7 +6,9 @@ import { Timeline } from '@/components/Timeline';
 import { allAgents, missions, trace, dailyTokens } from '@/lib/fixtures';
 import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
-import { getDb } from '@mas/db';
+import { isDeadlineSoon } from '@/lib/prioritize';
+import { getDb, missions as missionsTable } from '@mas/db';
+import { isNotNull } from 'drizzle-orm';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -20,6 +22,8 @@ export default async function CommandCenter() {
   const recentDecisions = (await listDecisions(getDb(), { scope: 'global', limit: 5 })).map((d) => ({
     id: d.id, title: d.title, body: d.body, source: d.source, createdAt: d.createdAt.toISOString(),
   }));
+  const deadlineMissions = await getDb().select().from(missionsTable).where(isNotNull(missionsTable.deadline));
+  const soonMissions = deadlineMissions.filter((m) => isDeadlineSoon(m.deadline));
 
   return (
     <div className="flex flex-col gap-6">
@@ -105,6 +109,21 @@ export default async function CommandCenter() {
 
         <Card title="Recent decisions" subtitle="last 5 · global">
           <DecisionLog decisions={recentDecisions} compact />
+        </Card>
+
+        <Card title="Deadlines" subtitle={`${soonMissions.length} within 7d`} accent={soonMissions.length > 0 ? 'warning' : undefined}>
+          {soonMissions.length === 0 ? (
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No imminent deadlines.</p>
+          ) : (
+            <ul className="space-y-1.5" data-testid="deadline-card">
+              {soonMissions.slice(0, 5).map((m) => (
+                <li key={m.id} className="flex items-center justify-between text-xs">
+                  <Link href={`/missions/${m.id}`} className="truncate" style={{ color: 'var(--text-primary)' }}>{m.title}</Link>
+                  <span className="mono text-[10px]" style={{ color: 'var(--warning)' }}>{m.deadline?.toISOString().slice(0, 10)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
       </section>
 
