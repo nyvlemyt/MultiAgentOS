@@ -7,6 +7,7 @@ import { allAgents, missions, trace, dailyTokens } from '@/lib/fixtures';
 import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
 import { isDeadlineSoon } from '@/lib/prioritize';
+import { topMissionsByPriority } from '@/lib/missions';
 import { getDb, missions as missionsTable } from '@mas/db';
 import { isNotNull } from 'drizzle-orm';
 import Link from 'next/link';
@@ -24,6 +25,7 @@ export default async function CommandCenter() {
   }));
   const deadlineMissions = await getDb().select().from(missionsTable).where(isNotNull(missionsTable.deadline));
   const soonMissions = deadlineMissions.filter((m) => isDeadlineSoon(m.deadline));
+  const topPriorities = await topMissionsByPriority(getDb(), { limit: 3 });
 
   return (
     <div className="flex flex-col gap-6">
@@ -99,12 +101,19 @@ export default async function CommandCenter() {
           </div>
         </Card>
 
-        <Card title="Recommendations">
-          <ul className="space-y-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-            <li>3 low-risk missions could batch tonight in autopilot.</li>
-            <li>Promote <code>theme-factory</code> to project-pinned for OtakuGO.</li>
-            <li>Context pack older than 24h — rebuild suggested.</li>
-          </ul>
+        <Card title="Top priorities" subtitle="by score">
+          {topPriorities.length === 0 ? (
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No prioritized missions yet.</p>
+          ) : (
+            <ul className="space-y-1.5 text-xs" data-testid="top-priorities">
+              {topPriorities.map((m) => (
+                <li key={m.id} className="flex items-center justify-between gap-2">
+                  <Link href={`/missions/${m.id}`} className="truncate" style={{ color: 'var(--text-primary)' }}>{m.title}</Link>
+                  <span className="mono tabular-nums text-[10px]" style={{ color: 'var(--accent)' }}>{m.priorityScore}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
         <Card title="Recent decisions" subtitle="last 5 · global">
