@@ -45,6 +45,8 @@ export interface ClaudeCodeLLMOptions {
   sessionId?: string;
   cwd?: string;
   autonomyLevel?: AutonomyLevel;
+  /** Merged into the subprocess env — used for per-account CLAUDE_CONFIG_DIR (ADR 0002 Q1). */
+  extraEnv?: Record<string, string>;
 }
 
 export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
@@ -83,7 +85,7 @@ export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
             : { type: 'preset', preset: 'claude_code' },
           // maxTokens not mapped: Agent SDK uses maxTurns, not per-call token limits.
           // Budget enforcement happens at the worker level via the budgets table check.
-          env: safeEnv as Record<string, string>,
+          env: { ...(safeEnv as Record<string, string>), ...opts.extraEnv },
         },
       });
 
