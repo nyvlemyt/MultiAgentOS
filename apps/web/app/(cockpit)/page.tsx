@@ -4,12 +4,28 @@ import { RiskBadge } from '@/components/RiskBadge';
 import { BudgetBar } from '@/components/BudgetBar';
 import { Timeline } from '@/components/Timeline';
 import { allAgents, missions, trace, dailyTokens } from '@/lib/fixtures';
+import { DecisionLog } from '@/components/DecisionLog';
+import { listDecisions } from '@/lib/decisions';
+import { isDeadlineSoon } from '@/lib/prioritize';
+import { topMissionsByPriority } from '@/lib/missions';
+import { getDb, missions as missionsTable } from '@mas/db';
+import { isNotNull } from 'drizzle-orm';
 import Link from 'next/link';
 
-export default function CommandCenter() {
+export const dynamic = 'force-dynamic';
+
+export default async function CommandCenter() {
   const busy = allAgents.filter((a) => a.status === 'running');
   const blocked: typeof missions = [];
   const pendingValidations = missions.filter((m) => m.risk === 'high');
+
+  // Real-DB cards (Phase 4.5-receptacle) live alongside the fixture cards.
+  const recentDecisions = (await listDecisions(getDb(), { scope: 'global', limit: 5 })).map((d) => ({
+    id: d.id, title: d.title, body: d.body, source: d.source, createdAt: d.createdAt.toISOString(),
+  }));
+  const deadlineMissions = await getDb().select().from(missionsTable).where(isNotNull(missionsTable.deadline));
+  const soonMissions = deadlineMissions.filter((m) => isDeadlineSoon(m.deadline));
+  const topPriorities = await topMissionsByPriority(getDb(), { limit: 3 });
 
   return (
     <div className="flex flex-col gap-6">
@@ -85,12 +101,38 @@ export default function CommandCenter() {
           </div>
         </Card>
 
-        <Card title="Recommendations">
-          <ul className="space-y-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-            <li>3 low-risk missions could batch tonight in autopilot.</li>
-            <li>Promote <code>theme-factory</code> to project-pinned for OtakuGO.</li>
-            <li>Context pack older than 24h — rebuild suggested.</li>
-          </ul>
+        <Card title="Top priorities" subtitle="by score">
+          {topPriorities.length === 0 ? (
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No prioritized missions yet.</p>
+          ) : (
+            <ul className="space-y-1.5 text-xs" data-testid="top-priorities">
+              {topPriorities.map((m) => (
+                <li key={m.id} className="flex items-center justify-between gap-2">
+                  <Link href={`/missions/${m.id}`} className="truncate" style={{ color: 'var(--text-primary)' }}>{m.title}</Link>
+                  <span className="mono tabular-nums text-[10px]" style={{ color: 'var(--accent)' }}>{m.priorityScore}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <Card title="Recent decisions" subtitle="last 5 · global">
+          <DecisionLog decisions={recentDecisions} compact />
+        </Card>
+
+        <Card title="Deadlines" subtitle={`${soonMissions.length} within 7d`} accent={soonMissions.length > 0 ? 'warning' : undefined}>
+          {soonMissions.length === 0 ? (
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No imminent deadlines.</p>
+          ) : (
+            <ul className="space-y-1.5" data-testid="deadline-card">
+              {soonMissions.slice(0, 5).map((m) => (
+                <li key={m.id} className="flex items-center justify-between text-xs">
+                  <Link href={`/missions/${m.id}`} className="truncate" style={{ color: 'var(--text-primary)' }}>{m.title}</Link>
+                  <span className="mono text-[10px]" style={{ color: 'var(--warning)' }}>{m.deadline?.toISOString().slice(0, 10)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
       </section>
 

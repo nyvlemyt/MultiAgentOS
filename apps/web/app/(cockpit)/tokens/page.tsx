@@ -2,7 +2,7 @@ import { Sparkline } from '@/components/Sparkline';
 import { BudgetBar } from '@/components/BudgetBar';
 import { ModePill } from '@/components/ModePill';
 import { dailyTokens, monthlySpend } from '@/lib/fixtures';
-import { getTokenSnapshot } from '@/lib/tokens';
+import { getTokenSnapshot, getRemainingCapacity } from '@/lib/tokens';
 
 // Reads the DB directly (server component) — no HTTP self-fetch, which would be
 // port/origin-fragile and silently fall back to zeros (see PR review).
@@ -16,6 +16,7 @@ function fmtTokens(n: number): string {
 
 export default async function TokenManager() {
   const data = await getTokenSnapshot();
+  const capacity = await getRemainingCapacity();
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,6 +51,11 @@ export default async function TokenManager() {
           title="Cache hit ratio"
           value={`${data.cacheHitRatio}%`}
           hint="≥30% Phase 2 target"
+        />
+        <Card
+          title="Remaining capacity"
+          value={capacity.label}
+          hint="this month · rolling 30-day avg"
         />
       </section>
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">

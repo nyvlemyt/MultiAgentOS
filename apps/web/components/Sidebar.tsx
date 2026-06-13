@@ -1,13 +1,15 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FolderKanban, ListTodo, Users, Workflow, Sparkles, Coins, Activity, Brain } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, ListTodo, Lightbulb, ArrowUpNarrowWide, Users, Workflow, Sparkles, Coins, Activity, Brain } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 const nav = [
   { href: '/', label: 'Command', icon: LayoutDashboard },
   { href: '/projects', label: 'Projects', icon: FolderKanban },
+  { href: '/ideas', label: 'Ideas', icon: Lightbulb },
   { href: '/missions', label: 'Missions', icon: ListTodo },
+  { href: '/priorities', label: 'Priorities', icon: ArrowUpNarrowWide },
   { href: '/agents', label: 'Agents', icon: Users },
   { href: '/studio', label: 'Studio', icon: Workflow },
   { href: '/skills', label: 'Skills', icon: Sparkles },

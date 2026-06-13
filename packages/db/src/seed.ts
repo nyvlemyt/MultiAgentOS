@@ -19,6 +19,8 @@ import {
   contextPacks,
   projectLinks,
   permissions,
+  ideas,
+  decisions,
 } from './schema';
 
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000);
@@ -63,6 +65,8 @@ async function main() {
   // Deterministic reset: every table the seed owns gets wiped, then rewritten.
   // FK cascades cover most of the chain but we wipe explicitly so reseeds are
   // idempotent regardless of prior mutations from the lifecycle tests.
+  await db.delete(decisions);
+  await db.delete(ideas);
   await db.delete(events);
   await db.delete(validations);
   await db.delete(memoryCandidates);
@@ -161,6 +165,10 @@ async function main() {
       risk: 'low',
       budgetTokens: 20000,
       spentTokens: 0,
+      // Phase 4.5-receptacle: deadline within 7d → Command Center warning badge.
+      deadline: minutesAgo(-3 * 24 * 60),
+      milestone: 'feed v2',
+      priorityScore: 72,
       createdAt: minutesAgo(30),
       updatedAt: minutesAgo(5),
     })
@@ -325,6 +333,37 @@ async function main() {
         moneySpentCents: 35,
       },
     ])
+    .onConflictDoNothing();
+
+  // Phase 4.5-receptacle: Ideas Inbox + Decision Log fixtures for smoke.
+  await db
+    .insert(ideas)
+    .values([
+      {
+        id: 'idea_seed_dark', title: 'Add dark mode toggle', body: 'Readers keep asking for a night theme.',
+        scope: 'project', projectId, status: 'inbox',
+        impact: 70, urgency: 40, effortEst: 30, riskScore: 10,
+        priorityScore: Math.round(70 * 0.35 + 40 * 0.3 + (100 - 30) * 0.2 + (100 - 10) * 0.15),
+        costEstTokens: 8000, createdAt: minutesAgo(120), updatedAt: minutesAgo(120),
+      },
+      {
+        id: 'idea_seed_search', title: 'Manga full-text search', body: 'Search across titles + chapters.',
+        scope: 'project', projectId, status: 'prioritized',
+        impact: 90, urgency: 60, effortEst: 70, riskScore: 30,
+        priorityScore: Math.round(90 * 0.35 + 60 * 0.3 + (100 - 70) * 0.2 + (100 - 30) * 0.15),
+        costEstTokens: 25000, createdAt: minutesAgo(200), updatedAt: minutesAgo(90),
+      },
+    ])
+    .onConflictDoNothing();
+
+  await db
+    .insert(decisions)
+    .values({
+      id: 'dec_seed_stack', scope: 'project', projectId, source: 'user',
+      title: 'Keep OtakuGO on Postgres (no Mongo migration)',
+      body: 'Relational integrity for manga metadata outweighs document flexibility.',
+      createdAt: minutesAgo(300),
+    })
     .onConflictDoNothing();
 
   console.log('seed complete.');
