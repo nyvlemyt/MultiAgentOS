@@ -71,7 +71,7 @@ describe('Phase 4.5-receptacle migration 0005', () => {
   it('missions gains deadline/milestone/priorityScore; legacy insert defaults priorityScore=0', async () => {
     const db = getDb();
     await db.insert(projects).values({
-      id: 'p1', name: 'P', slug: 'p', path: '/tmp/p', type: 'other',
+      id: 'p1', name: 'P', slug: 'p', path: join(tmpdir(), 'p'), type: 'other',
       createdAt: new Date(), lastActiveAt: new Date(),
     });
     const dl = new Date('2026-07-01T00:00:00Z');

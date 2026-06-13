@@ -17,7 +17,7 @@ beforeEach(async () => {
   process.env.MAS_DB_PATH = dbPath;
   migrate(getDb(), { migrationsFolder: MIGRATIONS });
   await getDb().insert(projects).values({
-    id: 'p1', name: 'P', slug: 'p', path: '/tmp/p', type: 'other',
+    id: 'p1', name: 'P', slug: 'p', path: join(tmpdir(), 'p'), type: 'other',
     createdAt: new Date(), lastActiveAt: new Date(),
   });
 });

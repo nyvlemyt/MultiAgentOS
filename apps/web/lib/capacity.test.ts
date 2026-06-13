@@ -15,7 +15,7 @@ beforeEach(async () => {
   dbPath = join(tmpdir(), `mas-cap-${randomUUID()}.db`);
   process.env.MAS_DB_PATH = dbPath;
   migrate(getDb(), { migrationsFolder: MIGRATIONS });
-  await getDb().insert(projects).values({ id: 'p1', name: 'P', slug: 'p', path: '/tmp/p', type: 'other', createdAt: new Date(), lastActiveAt: new Date() });
+  await getDb().insert(projects).values({ id: 'p1', name: 'P', slug: 'p', path: join(tmpdir(), 'p'), type: 'other', createdAt: new Date(), lastActiveAt: new Date() });
   await getDb().insert(missions).values([
     { id: 'mA', projectId: 'p1', title: 'A', objective: 'o', createdAt: new Date(), updatedAt: new Date() },
     { id: 'mB', projectId: 'p1', title: 'B', objective: 'o', createdAt: new Date(), updatedAt: new Date() },
