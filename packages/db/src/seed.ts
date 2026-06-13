@@ -197,9 +197,14 @@ async function main() {
   }
 
   const eventTypes = ['llm_call', 'task_start', 'task_done', 'skill_used', 'delegate', 'tick'];
+  // Provider attribution for the /tokens per-source breakdown (Phase 3.5).
+  const seedProviders = ['claude:pro20', 'gemini-free', 'claude:max100'];
   for (let e = 0; e < 30; e++) {
     const eventType = eventTypes[e % eventTypes.length] ?? 'tick';
     const agent = tierA[e % tierA.length] ?? tierA[0]!;
+    const isLlmCall = eventType === 'llm_call' || eventType === 'task_done';
+    const payload: Record<string, unknown> = { note: `seed event ${e + 1}` };
+    if (isLlmCall) payload.provider = seedProviders[e % seedProviders.length];
     await db
       .insert(events)
       .values({
@@ -208,7 +213,7 @@ async function main() {
         taskId: `task_seed_${(e % 5) + 1}`,
         agentId: agent.id,
         type: eventType,
-        payloadJson: JSON.stringify({ note: `seed event ${e + 1}` }),
+        payloadJson: JSON.stringify(payload),
         tokensIn: Math.floor(Math.random() * 800),
         tokensOut: Math.floor(Math.random() * 400),
         cacheRead: Math.floor(Math.random() * 500),

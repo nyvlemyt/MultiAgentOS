@@ -381,6 +381,7 @@ async function executeTaskWithLLM(
     payload: {
       title: next.title,
       sessionId: resp.sessionId,
+      provider: resp.provider,
       memoryContextChars: memCtx.text.length,
       memoryProjectEntries: memCtx.projectEntryCount,
       memoryGlobalItems: memCtx.globalItems.length,
@@ -540,6 +541,7 @@ export async function resumeAfterValidation(
     cacheCreation: resp.cacheCreationTokens,
     quotaUnits: resp.quotaUnits,
     risk: t.risk,
+    payload: { provider: resp.provider },
   });
   return { acted: true, missionId: t.missionId };
 }
