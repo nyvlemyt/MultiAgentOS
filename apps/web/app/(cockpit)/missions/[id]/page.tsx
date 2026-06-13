@@ -6,6 +6,8 @@ import { BudgetBar } from '@/components/BudgetBar';
 import { Timeline, type TimelineRow } from '@/components/Timeline';
 import { MissionActions } from '@/components/MissionActions';
 import { ValidationModal, type PendingValidation } from '@/components/ValidationModal';
+import { DecisionLog } from '@/components/DecisionLog';
+import { listDecisions } from '@/lib/decisions';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +63,10 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
     taskTitle: r.t.title,
     risk: r.t.risk,
     actionSummary: r.v.actionSummary,
+  }));
+
+  const missionDecisions = (await listDecisions(db, { missionId: id })).map((d) => ({
+    id: d.id, title: d.title, body: d.body, source: d.source, createdAt: d.createdAt.toISOString(),
   }));
 
   const currentStage = Math.max(0, fsm.indexOf(m.status as (typeof fsm)[number]));
@@ -149,6 +155,11 @@ data/outputs/<task>.md.`}</pre>
         ) : (
           <Timeline rows={timelineRows} />
         )}
+      </section>
+
+      <section className="surface p-4">
+        <h2 className="mb-3 text-sm font-semibold">Decisions</h2>
+        <DecisionLog decisions={missionDecisions} projectId={m.projectId} missionId={m.id} />
       </section>
 
       <ValidationModal pending={pending} />

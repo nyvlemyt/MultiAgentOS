@@ -4,12 +4,22 @@ import { RiskBadge } from '@/components/RiskBadge';
 import { BudgetBar } from '@/components/BudgetBar';
 import { Timeline } from '@/components/Timeline';
 import { allAgents, missions, trace, dailyTokens } from '@/lib/fixtures';
+import { DecisionLog } from '@/components/DecisionLog';
+import { listDecisions } from '@/lib/decisions';
+import { getDb } from '@mas/db';
 import Link from 'next/link';
 
-export default function CommandCenter() {
+export const dynamic = 'force-dynamic';
+
+export default async function CommandCenter() {
   const busy = allAgents.filter((a) => a.status === 'running');
   const blocked: typeof missions = [];
   const pendingValidations = missions.filter((m) => m.risk === 'high');
+
+  // Real-DB cards (Phase 4.5-receptacle) live alongside the fixture cards.
+  const recentDecisions = (await listDecisions(getDb(), { scope: 'global', limit: 5 })).map((d) => ({
+    id: d.id, title: d.title, body: d.body, source: d.source, createdAt: d.createdAt.toISOString(),
+  }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -91,6 +101,10 @@ export default function CommandCenter() {
             <li>Promote <code>theme-factory</code> to project-pinned for OtakuGO.</li>
             <li>Context pack older than 24h — rebuild suggested.</li>
           </ul>
+        </Card>
+
+        <Card title="Recent decisions" subtitle="last 5 · global">
+          <DecisionLog decisions={recentDecisions} compact />
         </Card>
       </section>
 
