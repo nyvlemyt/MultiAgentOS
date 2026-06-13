@@ -13,6 +13,13 @@
 
 ---
 
+## Multi-account + signaux quota (pre-flight 3.5, 2026-06-13)
+
+- **`CLAUDE_CONFIG_DIR`** : profil Claude Code complètement isolé (credentials, settings, sessions) par répertoire — le mécanisme du pooling multi-comptes (ADR 0002). Limitation officielle : 1 compte authentifié par OS user, l'env var est le contournement supporté (claude-code#44687).
+- **`rate_limit_event`** : le SDK émet des messages `SDKRateLimitInfo` (headers `anthropic-ratelimit-unified-*`) ; champ `utilization` absent quand `status: allowed` (claude-code#50518) — ne pas s'appuyer dessus pour un % live.
+- **Taxonomie d'erreurs failover** : 429/quota = fenêtre épuisée → basculer de source ; **529/overloaded = capacité serveur, transitoire → retry même source avec backoff, PAS un failover**. Deux systèmes de limites distincts : subscription (fenêtres Pro/Max) vs API (RPM/TPM) — le même message "Rate limit reached" peut venir des deux.
+- **APIs tierces** : ChatGPT Plus / Perplexity Pro n'incluent PAS l'API (PAYG €). Gemini API a un free tier. → défaut : comptes Claude poolés + Gemini free ; OpenAI/Perplexity opt-in OFF (CLAUDE.md §11.bis).
+
 ## Claude Agent SDK — Contraintes critiques
 
 Source: https://code.claude.com/docs/en/agent-sdk/overview

@@ -151,6 +151,13 @@ MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). P
 
 **In MultiAgentOS code:** `packages/core/src/llm.ts` is the single LLM injection point. It drives the Claude Code engine via `@anthropic-ai/claude-agent-sdk`. No other file may instantiate an LLM client.
 
+**§11.bis — Non-Anthropic providers (Phase 3.5, ADR 0002):** provider SDKs (`openai`, `@google/generative-ai`, Perplexity via OpenAI-compatible endpoint) are allowed **only** under `packages/core/src/providers/`, resolved exclusively by the `RouterLLMClient`, configured via `config/model-routing.json`. Rules:
+1. The Anthropic-PAYG ban above is **unchanged** — `@anthropic-ai/sdk` stays forbidden everywhere.
+2. Paid third-party APIs (OpenAI, Perplexity) ship **opt-in, default OFF** (`paid_apis_enabled: false`). Default-enabled sources: pooled Claude accounts (per-account `CLAUDE_CONFIG_DIR`) + Gemini free tier.
+3. Provider keys live in `.env.local` (gitignored); a missing key disables that provider with a startup warning, never a crash.
+4. Execution tasks (file I/O, bash, git) are **Claude-only**; non-Claude providers do cognition, grounded by explicit memory/context-pack injection.
+5. The lint guard confines provider SDK imports to `packages/core/src/providers/`.
+
 **Guard against runaway quota:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard window caps. The worker checks the active budget row before every LLM call and returns `budget_exceeded` if the cap is reached.
 
 **⚠️ Billing change effective 2026-06-15:** Agent SDK usage on subscription plans consumes a **separate** monthly credit from Claude.ai conversations. The `budgets` table must track Agent SDK quota independently from interactive Claude.ai usage. Agents consume ~4× quota vs normal chat; multi-agent research missions ~15×. Source: `docs/knowledge/anthropic-ecosystem.md`.

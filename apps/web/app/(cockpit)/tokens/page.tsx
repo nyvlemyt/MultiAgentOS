@@ -63,6 +63,33 @@ export default async function TokenManager() {
         </article>
       </section>
       <section className="surface p-4">
+        <h2 className="mb-3 text-sm font-semibold">Spend by provider — today</h2>
+        {data.byProvider.length === 0 ? (
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No LLM calls recorded today.</p>
+        ) : (
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-left" style={{ color: 'var(--text-muted)' }}>
+                <th className="py-1 font-medium">Source</th>
+                <th className="py-1 text-right font-medium">Calls</th>
+                <th className="py-1 text-right font-medium">Tokens in</th>
+                <th className="py-1 text-right font-medium">Tokens out</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.byProvider.map((row) => (
+                <tr key={row.provider} className="border-t" style={{ borderColor: 'var(--border)' }}>
+                  <td className="py-1 mono">{row.provider}</td>
+                  <td className="py-1 text-right tabular-nums">{row.calls}</td>
+                  <td className="py-1 text-right tabular-nums">{fmtTokens(row.tokensIn)}</td>
+                  <td className="py-1 text-right tabular-nums">{fmtTokens(row.tokensOut)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+      <section className="surface p-4">
         <h2 className="mb-3 text-sm font-semibold">Mode policy</h2>
         <ul className="space-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
           <li><span className="mono">eco</span> · haiku-4-5 everywhere · Caveman ON (internal only) · summaries only</li>

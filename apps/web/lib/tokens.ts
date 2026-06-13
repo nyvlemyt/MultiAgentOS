@@ -1,12 +1,24 @@
 import { getDb, budgets, events } from '@mas/db';
-import { and, eq, gte, sum, count } from 'drizzle-orm';
+import { and, eq, gte, sum, count, inArray } from 'drizzle-orm';
+
+export interface ProviderSpendRow {
+  provider: string;
+  calls: number;
+  tokensIn: number;
+  tokensOut: number;
+}
 
 export interface TokenSnapshot {
   window5h: { messagesUsed: number };
   day: { tokensSpent: number; tokensCap: number };
   week: { tokensSpent: number; tokensCap: number };
   cacheHitRatio: number;
+  /** Today's LLM-call spend grouped by source (Phase 3.5 router breakdown). */
+  byProvider: ProviderSpendRow[];
 }
+
+/** Event types that represent one real LLM call carrying token counts. */
+const LLM_CALL_TYPES = ['llm_call', 'task_done', 'validation_approved'];
 
 function startOfDay(): Date {
   const now = new Date();
@@ -53,10 +65,34 @@ export async function getTokenSnapshot(): Promise<TokenSnapshot> {
   const cacheTotal = cacheRead + cacheCreation;
   const cacheHitRatio = cacheTotal > 0 ? Math.round((cacheRead / cacheTotal) * 100) : 0;
 
+  // Per-provider breakdown: provider rides the event payload (router sources);
+  // events without one predate the router or ran the plain Claude path.
+  const callRows = await db
+    .select({ payloadJson: events.payloadJson, tokensIn: events.tokensIn, tokensOut: events.tokensOut })
+    .from(events)
+    .where(and(gte(events.createdAt, since), inArray(events.type, LLM_CALL_TYPES)));
+  const byProviderMap = new Map<string, ProviderSpendRow>();
+  for (const row of callRows) {
+    let provider = 'claude';
+    try {
+      const parsed = JSON.parse(row.payloadJson ?? '{}') as { provider?: string };
+      if (parsed.provider) provider = parsed.provider;
+    } catch { /* unattributed */ }
+    const agg = byProviderMap.get(provider) ?? { provider, calls: 0, tokensIn: 0, tokensOut: 0 };
+    agg.calls += 1;
+    agg.tokensIn += row.tokensIn ?? 0;
+    agg.tokensOut += row.tokensOut ?? 0;
+    byProviderMap.set(provider, agg);
+  }
+  const byProvider = [...byProviderMap.values()].sort(
+    (a, b) => b.tokensIn + b.tokensOut - (a.tokensIn + a.tokensOut),
+  );
+
   return {
     window5h: { messagesUsed: messagesUsedInWindow },
     day: { tokensSpent: dayRow?.tokensSpent ?? 0, tokensCap: dayRow?.tokensCap ?? 1_000_000 },
     week: { tokensSpent: weekRow?.tokensSpent ?? 0, tokensCap: weekRow?.tokensCap ?? 5_000_000 },
     cacheHitRatio,
+    byProvider,
   };
 }

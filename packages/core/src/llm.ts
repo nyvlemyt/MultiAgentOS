@@ -6,6 +6,8 @@ export interface LLMRequest {
   model: string;
   mode: Mode;
   maxTokens?: number;
+  /** Phase 3 skill-domain taxonomy tag — drives Phase 3.5 routing (ADR 0002). */
+  domain?: string;
 }
 
 export interface LLMResponse {
@@ -17,6 +19,8 @@ export interface LLMResponse {
   quotaUnits: number;
   model: string;
   sessionId?: string;
+  /** Source id that served the call (e.g. 'claude:pro20', 'gemini-free'). */
+  provider?: string;
 }
 
 export interface LLMClient {

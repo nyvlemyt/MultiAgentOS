@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "tsc --noEmit",
-    "test": "vitest run playwright.config.test.ts",
+    "test": "vitest run",
     "smoke:reset": "MAS_DB_PATH=data/test/mas-smoke.db pnpm --filter @mas/db seed",
     "smoke": "pnpm smoke:reset && MAS_DB_PATH=data/test/mas-smoke.db playwright test"
   },

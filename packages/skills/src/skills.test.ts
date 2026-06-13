@@ -71,4 +71,14 @@ describe('SkillRouter', () => {
   it('all returns all skills', () => {
     expect(router.all()).toHaveLength(2);
   });
+
+  it('domainFor returns the first known skill domain (Phase 3.5 routing key)', () => {
+    expect(router.domainFor(['mas-sec-reviewer', 'mas-mission-planner'])).toBe('security');
+    expect(router.domainFor(['unknown', 'mas-mission-planner'])).toBe('planning');
+  });
+
+  it('domainFor returns undefined when no skill is known', () => {
+    expect(router.domainFor(['nope'])).toBeUndefined();
+    expect(router.domainFor([])).toBeUndefined();
+  });
 });
