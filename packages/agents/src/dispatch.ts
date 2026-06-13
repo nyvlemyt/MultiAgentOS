@@ -17,6 +17,7 @@ import {
   mockSkillRouter,
   mockReviewer,
   mockSecReviewer,
+  mockQualityController,
   languageDirective,
   claudeCodeLLM,
   createRouterLLM,
@@ -242,28 +243,39 @@ async function runReviewPhase(
   if (reviewClaimed.length === 0) return { kind: 'mission_complete' };
   await logEvent(db, { missionId: m.id, type: 'mission_review_started' });
 
-  // Run sec-reviewer on every high/blocking-risk task; run reviewer on the last task.
+  // Deterministic "last task": sort by createdAt (mirrors selectRunnableTasks).
+  const lastTask = [...all].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).at(-1);
+
+  // Quality Controller gate (AGENTS.md §4): runs BEFORE the reviewer. It checks
+  // PROCESS/RULES (conventions, no-PAYG drift, architecture, output language),
+  // not the CODE. A QC BLOCK blocks the mission and short-circuits the reviewer.
+  const qc = mockQualityController(lastTask?.id ?? m.id, { taskTitles: all.map((t) => t.title) });
+  await logEvent(db, { missionId: m.id, taskId: lastTask?.id, agentId: 'quality-controller', type: 'quality_control_verdict', payload: qc });
+
+  // A QC BLOCK short-circuits the sec/reviewer stage; otherwise run sec-reviewer
+  // on every high/blocking-risk task and the reviewer on the last task.
   const verdicts: ReviewerVerdict[] = [];
-  for (const t of all) {
-    if (t.risk === 'high' || t.risk === 'blocking') {
-      const sec = mockSecReviewer(t.id, { risk: t.risk });
-      await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
-      verdicts.push(sec);
+  let blockReason = 'quality_control_block';
+  if (qc.verdict !== 'BLOCK') {
+    for (const t of all) {
+      if (t.risk === 'high' || t.risk === 'blocking') {
+        const sec = mockSecReviewer(t.id, { risk: t.risk });
+        await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
+        verdicts.push(sec);
+      }
     }
-  }
-  // Deterministic "last task": sort by createdAt (mirrors selectRunnableTasks)
-  // so the reviewer runs on the actual last-created task, not DB row order.
-  const last = [...all].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).at(-1);
-  if (last) {
-    const rev = mockReviewer(last.id, { risk: last.risk });
-    await logEvent(db, { missionId: m.id, taskId: last.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
-    verdicts.push(rev);
+    if (lastTask) {
+      const rev = mockReviewer(lastTask.id, { risk: lastTask.risk });
+      await logEvent(db, { missionId: m.id, taskId: lastTask.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
+      verdicts.push(rev);
+    }
+    blockReason = 'review_block';
   }
 
-  const blocked = verdicts.some((v) => v.verdict === 'BLOCK');
+  const blocked = qc.verdict === 'BLOCK' || verdicts.some((v) => v.verdict === 'BLOCK');
   if (blocked) {
     await db.update(missions).set({ status: 'blocked', updatedAt: new Date() }).where(eq(missions.id, m.id));
-    await logEvent(db, { missionId: m.id, type: 'mission_blocked', payload: { reason: 'review_block' } });
+    await logEvent(db, { missionId: m.id, type: 'mission_blocked', payload: { reason: blockReason } });
   } else {
     await db.update(missions).set({ status: 'validated', updatedAt: new Date() }).where(eq(missions.id, m.id));
     await logEvent(db, { missionId: m.id, type: 'mission_validated' });

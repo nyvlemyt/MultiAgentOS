@@ -103,6 +103,7 @@ async function main() {
     { id: 'skill-router', name: 'Skill Router', emoji: '🧭', avatar: 'skill-router.svg' },
     { id: 'context-manager', name: 'Context Manager', emoji: '🧠', avatar: 'context-manager.svg' },
     { id: 'memory-keeper', name: 'Memory Keeper', emoji: '📚', avatar: 'memory-keeper.svg' },
+    { id: 'quality-controller', name: 'Quality Controller', emoji: '🎯', avatar: 'quality-controller.svg' },
     { id: 'reviewer', name: 'Code Reviewer', emoji: '🔍', avatar: 'reviewer.svg' },
     { id: 'sec-reviewer', name: 'Security Reviewer', emoji: '🛡️', avatar: 'sec-reviewer.svg' },
   ];

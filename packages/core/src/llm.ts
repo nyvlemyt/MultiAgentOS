@@ -226,3 +226,34 @@ export function mockSecReviewer(taskId: string, prior: { risk: Risk }): Reviewer
     ],
   };
 }
+
+// Quality Controller (AGENTS.md §4): post-execution PROCESS/RULES gate, runs
+// BEFORE the Reviewer. It checks conventions (Conventional Commits, no-PAYG
+// drift, framework-without-ADR, output-language match) rather than the CODE.
+// At the mock stage it returns PASS unless a task carries the deterministic
+// '[qc-block]' sentinel — the stand-in for a detected process violation, which
+// a test can seed to exercise the block path.
+const QC_BLOCK_SENTINEL = '[qc-block]';
+
+export function mockQualityController(
+  taskId: string,
+  input: { taskTitles: string[] },
+): ReviewerVerdict {
+  const violation = input.taskTitles.find((t) => t.includes(QC_BLOCK_SENTINEL));
+  if (violation) {
+    return {
+      taskId,
+      verdict: 'BLOCK',
+      findings: [
+        { severity: 'block', message: `Mocked quality-control: process/rules violation in "${violation}".` },
+      ],
+    };
+  }
+  return {
+    taskId,
+    verdict: 'PASS',
+    findings: [
+      { severity: 'info', message: 'Mocked quality-control: conventions, architecture and output language consistent.' },
+    ],
+  };
+}

@@ -28,6 +28,7 @@ export const TIER_A_ROSTER = [
   'skill-router',
   'design-ux-architect',
   'engineering-frontend-developer',
+  'quality-controller',
   'sec-reviewer',
   'reviewer',
 ] as const;
