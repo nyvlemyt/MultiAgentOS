@@ -1,6 +1,6 @@
 # ADR 0004 — Memory & knowledge intake + auto-capture (Phase 4.5)
 
-- **Status**: Proposed (awaiting Phase 4.5 build green-light; Phase 4 is verified merge-ready)
+- **Status**: Accepted (producer half built 2026-06-12, Checker PASS 2026-06-13 on `phase/4.5-memory-intake`; receptacle half follows Phase 3.5)
 - **Date**: 2026-06-09
 - **Deciders**: Melvyn + Claude (pre-flight Phase 4.5)
 - **Sources**: `docs/backlog/intake-audit-skill.md`, `docs/backlog/second-brain-cross-project.md`, `docs/workflows/intake-audit-template.md`, `docs/knowledge/memory-patterns.md` (§agentmemory), `docs/knowledge/project-doctrine.md` (close-out ritual, 5 registers), `CLAUDE.md §5/§8/§11/§12`, ADR 0003 (storage/retrieval seam), Phase 4 capture BDR (`packages/memory/src/capture.ts` `CAPTURE_DECISION`).

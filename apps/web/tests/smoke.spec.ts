@@ -29,6 +29,15 @@ for (const r of routes) {
   });
 }
 
+test('memory inbox filters by intake source', async ({ page }) => {
+  await page.goto('/memory');
+  const filter = page.getByLabel('Intake source filter');
+  await expect(filter).toBeVisible();
+  await filter.getByRole('link', { name: 'repo', exact: true }).click();
+  await expect(page).toHaveURL(/\/memory\?source=repo/);
+  await expect(page.getByRole('heading', { name: 'Memory Center' })).toBeVisible();
+});
+
 test('studio orbit animates a delegation edge', async ({ page }) => {
   await page.goto('/studio');
   await expect(page.locator('svg .orbit-edge')).toHaveCount(1);

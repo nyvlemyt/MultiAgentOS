@@ -16,7 +16,9 @@ Phase 0 was the bootstrap exception and lives on `main` directly because the rep
 
 The **document** keeps phases in numeric order for readability, but the **build order** from Phase 4 onward is:
 
-> **Phase 4 ✅ (verified) → Phase 4.5 (Memory & Knowledge Intake → Ideas/Decisions/Prioritization) → Phase 3.5 (Multi-model Router) → Phase 5 → …**
+> **Phase 4 ✅ (verified) → Phase 4.5-producer ✅ (built 2026-06-12, split per ADR 0004 — receptacle deferred) → Phase 3.5 (Multi-model Router) → Phase 4.5-receptacle (Ideas/Decisions/Prioritization) → Phase 5 → …**
+>
+> **Split note (2026-06-12):** Phase 4.5 built **producer-only** (auto-capture, intake, classifier, security gate, trust auto-file, intake-audit skill, provenance migration) on `phase/4.5-memory-intake`. The receptacle half (§B Ideas/Decisions/prioritization UI) follows Phase 3.5, as allowed by ADR 0004 §Consequences. Build report: `docs/learning/2026-06-12-phase4.5-intake/build-report.md`.
 
 **Why 4.5 before 3.5:** Phase 4.5 *feeds* the memory — auto-capture on `mission-complete`, multi-source intake, classification into registers. Phase 3.5's multi-account router *consumes* grounded project memory to ground non-Claude providers and justify routing. Build the producer of memory before its consumer. (The auto-capture explicitly deferred in Phase 4's capture BDR — agentmemory hooks behind the `captureCandidates()` seam — lands in 4.5, not bolted onto Phase 4.) Architecture: **ADR 0004**. Pre-flight pack: `docs/learning/2026-06-09-phase4.5-preflight/`.
 

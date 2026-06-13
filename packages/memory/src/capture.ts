@@ -21,6 +21,9 @@ export type CandidateType = 'user' | 'feedback' | 'project' | 'reference';
 export interface CaptureCandidate {
   type: CandidateType;
   body: string;
+  /** Intake provenance (Phase 4.5) — 'mission' for ritual captures. */
+  sourceKind?: 'note' | 'skill' | 'pattern' | 'repo' | 'course' | 'mission';
+  dossierPath?: string;
 }
 
 /**
@@ -29,7 +32,7 @@ export interface CaptureCandidate {
  */
 export async function captureCandidates(
   db: Db,
-  sourceTaskId: string,
+  sourceTaskId: string | null,
   items: CaptureCandidate[],
 ): Promise<string[]> {
   if (items.length === 0) return [];
@@ -39,6 +42,8 @@ export async function captureCandidates(
     type: it.type,
     body: it.body,
     status: 'pending' as const,
+    sourceKind: it.sourceKind,
+    dossierPath: it.dossierPath,
     createdAt: new Date(),
   }));
   await db.insert(memoryCandidates).values(rows);

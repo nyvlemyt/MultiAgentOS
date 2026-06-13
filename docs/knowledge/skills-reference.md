@@ -1,5 +1,18 @@
 # Skills et Librairies de Référence
 
+## skills.sh — registre interrogeable (intake 2026-06-13)
+
+Registre open-source de skills opéré par Vercel : leaderboard d'installs, badges d'audits sécu
+(Gen Agent Trust Hub / Socket / Snyk), CLI `npx skills add <owner/repo>`. Multi-plateforme, gratuit.
+
+**Usage MultiAgentOS** (dossier : `docs/intake/2026-06-13-skills-sh-find-skills.md`) :
+- **Découverte build-time** : "existe-t-il un skill pour X ?" → `npx skills find [query]` (skill
+  `find-skills`, vercel-labs, 2M installs, 22.2k★) ou recherche directe sur skills.sh.
+- Leaderboard + badges sécu = signal `evidence_maturity` gratuit pour les dossiers d'intake.
+- **Règle dure (§5)** : `npx skills add` exécute du code tiers → tout skill découvert passe
+  `intake-audit` + `skill-install-policy.md` avant install dans le repo. Découverte oui,
+  auto-install jamais. Intégration runtime (worker) = backlog Phase 5, via `runGatedIntake`.
+
 ## Librairies de skills prioritaires
 
 | Repo | Stars | Contenu |

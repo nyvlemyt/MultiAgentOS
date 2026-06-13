@@ -294,6 +294,20 @@ Ce fichier contient les prompts copy-paste complets pour implémenter la mémoir
 
 ---
 
+## Classifier signals — intake Phase 4.5 (pre-flight 2026-06-12)
+
+Classement déterministe `{register, scope}` AVANT tout LLM (ADR 0004 §5). Signaux par priorité :
+
+1. **Tag utilisateur explicite** (UI) — gagne toujours.
+2. **`source_kind`** (note/skill/pattern/repo/course) : skill|pattern → LRN ; repo|course → LRN (reference).
+3. **`type` du candidat Phase 4** (user/feedback/project/reference) : feedback → LRN scope global ; project → BDR/journal scope project.
+4. **Table de mots-clés** sur la tête du body : decided/décidé/chose/rejected → BDR · learned/pattern/TIL → LRN · blocked/bloqué/stuck → BLK · eval/benchmark/score → EVAL · défaut daté → journal.
+
+**Abstain** (aucune règle) → 1 seul appel LLM eco via `llm.ts`, loggé en event (`/trace`). Jamais d'embeddings (§11).
+Auto-fire capture : dans `runReviewPhase()` (chokepoint web+worker), `validated` OU `blocked`, dédup par mission — voir `docs/learning/2026-06-12-phase4.5-intake/preflight-audit.md`.
+
+---
+
 ## Règles anti-patterns
 
 **Rolling summaries seuls → À ÉVITER**
