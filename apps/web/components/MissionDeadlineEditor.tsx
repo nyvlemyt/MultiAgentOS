@@ -27,7 +27,7 @@ export function MissionDeadlineEditor({
   return (
     <div className="flex flex-wrap items-end gap-2">
       <label className="flex flex-col gap-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>
-        Deadline
+        <span>Deadline</span>
         <input
           type="date"
           aria-label="Mission deadline"
@@ -38,7 +38,7 @@ export function MissionDeadlineEditor({
         />
       </label>
       <label className="flex flex-col gap-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>
-        Milestone
+        <span>Milestone</span>
         <input
           type="text"
           aria-label="Mission milestone"

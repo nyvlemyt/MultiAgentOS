@@ -85,6 +85,7 @@ export function IdeasKanbanClient({ ideas }: Readonly<{ ideas: BoardIdea[] }>) {
           return (
             <section
               key={col.key}
+              aria-label={`${col.title} column`}
               className="flex h-full min-w-[220px] flex-col gap-2"
               onDragOver={(e) => { e.preventDefault(); setHoverCol(col.key); }}
               onDragLeave={() => setHoverCol(null)}
@@ -124,7 +125,13 @@ export function IdeasKanbanClient({ ideas }: Readonly<{ ideas: BoardIdea[] }>) {
                       <span className="text-xs font-medium leading-tight" style={{ color: 'var(--text-primary)' }}>{i.title}</span>
                       <span className="mono tabular-nums text-[10px]" style={{ color: 'var(--text-muted)' }}>{i.priorityScore}</span>
                     </div>
-                    {i.status !== 'converted' ? (
+                    {i.status === 'converted' ? (
+                      i.ideaIdLink && (
+                        <a href={`/missions/${i.ideaIdLink}`} className="text-[10px]" style={{ color: 'var(--accent)' }}>
+                          → mission
+                        </a>
+                      )
+                    ) : (
                       <button
                         type="button"
                         onClick={() => convert(i.id)}
@@ -133,12 +140,6 @@ export function IdeasKanbanClient({ ideas }: Readonly<{ ideas: BoardIdea[] }>) {
                       >
                         Convert to mission
                       </button>
-                    ) : (
-                      i.ideaIdLink && (
-                        <a href={`/missions/${i.ideaIdLink}`} className="text-[10px]" style={{ color: 'var(--accent)' }}>
-                          → mission
-                        </a>
-                      )
                     )}
                   </article>
                 ))}

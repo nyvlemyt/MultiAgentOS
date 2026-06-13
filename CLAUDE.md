@@ -97,6 +97,7 @@ See `TOKEN_STRATEGY.md` for the full policy. Summary:
 - **Comments**: write none unless the WHY is non-obvious.
 - **No new top-level files** without updating §3.
 - **No silent destructive ops** — see §5.
+- **Verification = 5 checks, not 4.** A phase/PR is done only when `pnpm -r test` · `pnpm lint` · `pnpm build` · `pnpm --filter @mas/web smoke` **and** SonarCloud are all clean. Sonar clean means `scripts/sonar-pr-issues.sh <pr>` exits 0 — **zero open issues and zero to-review hotspots**, not merely a green gate (the gate ignores MINOR/MAJOR smells). After `git push`, poll until the analysis of your HEAD sha lands, run the script, and fix everything it lists. Recurring rules + canonical fixes: `docs/knowledge/sonar-recurring-rules.md` — read it before writing UI/test code to avoid the round-trips.
 
 ## 8. Memory
 

@@ -17,8 +17,8 @@ export interface ProjectHealth {
   pendingValidations: number;
 }
 
-const DONE_STATUSES = ['validated', 'archived'];
-const OPEN_IDEA_STATUSES = ['inbox', 'to_clarify', 'prioritized'];
+const DONE_STATUSES = new Set(['validated', 'archived']);
+const OPEN_IDEA_STATUSES = new Set(['inbox', 'to_clarify', 'prioritized']);
 
 export async function computeProjectHealth(db: Db, projectId: string, now: Date = new Date()): Promise<ProjectHealth> {
   const ms = await db.select().from(missions).where(eq(missions.projectId, projectId));
@@ -32,7 +32,7 @@ export async function computeProjectHealth(db: Db, projectId: string, now: Date 
   for (const m of ms) {
     budgetSum += m.budgetTokens;
     spentSum += m.spentTokens;
-    if (DONE_STATUSES.includes(m.status)) done += 1;
+    if (DONE_STATUSES.has(m.status)) done += 1;
     if (m.status === 'blocked') blocked += 1;
     if (!lastActivity || m.updatedAt > lastActivity) lastActivity = m.updatedAt;
     if (m.deadline && m.deadline.getTime() >= now.getTime()) {
@@ -41,7 +41,7 @@ export async function computeProjectHealth(db: Db, projectId: string, now: Date 
   }
 
   const projectIdeas = await db.select().from(ideas).where(eq(ideas.projectId, projectId));
-  const openIdeas = projectIdeas.filter((i) => OPEN_IDEA_STATUSES.includes(i.status)).length;
+  const openIdeas = projectIdeas.filter((i) => OPEN_IDEA_STATUSES.has(i.status)).length;
 
   const missionIds = ms.map((m) => m.id);
   let pendingValidations = 0;
