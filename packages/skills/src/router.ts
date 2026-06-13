@@ -55,6 +55,15 @@ export class SkillRouter {
     return `<available_skills>\n${blocks.join('\n')}\n</available_skills>`;
   }
 
+  /** Routing key for Phase 3.5: domain of the first known skill in the list. */
+  domainFor(skillIds: string[]): Domain | undefined {
+    for (const id of skillIds) {
+      const meta = this.skills.get(id);
+      if (meta) return meta.domain;
+    }
+    return undefined;
+  }
+
   all(): SkillMeta[] {
     return [...this.skills.values()];
   }

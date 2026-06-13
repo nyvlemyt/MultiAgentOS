@@ -48,6 +48,17 @@ export class RouterLLMClient implements LLMClient {
   constructor(opts: RouterLLMClientOptions) {
     this.opts = opts;
     this.statuses = buildSourceStatuses(opts.config, opts.env);
+    // Declared accounts are pool members: each is an enabled source (ADR 0002 §2).
+    for (const acc of opts.config.claude_accounts) {
+      this.statuses.set(acc.id, { id: acc.id, enabled: true });
+    }
+  }
+
+  /** CLAUDE_POOL resolves to the declared accounts in order, or itself when none. */
+  private expandPool(id: string): string[] {
+    if (id !== CLAUDE_POOL) return [id];
+    const accounts = this.opts.config.claude_accounts;
+    return accounts.length > 0 ? accounts.map((a) => a.id) : [CLAUDE_POOL];
   }
 
   getWindowState(sourceId: string): WindowState {
@@ -73,7 +84,7 @@ export class RouterLLMClient implements LLMClient {
   }
 
   private candidatesFor(domain: string | undefined): string[] {
-    return this.chainFor(domain).filter(
+    return this.chainFor(domain).flatMap((id) => this.expandPool(id)).filter(
       (id) =>
         this.statuses.get(id)?.enabled &&
         this.opts.clients.has(id) &&

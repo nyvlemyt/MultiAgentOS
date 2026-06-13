@@ -99,6 +99,9 @@ beforeEach(async () => {
   // globally exported MAS_MOCK_LLM=1 would flip selectLLM to mockLLM and skew
   // the token-accounting fixtures (260 vs 300).
   delete process.env.MAS_MOCK_LLM;
+  // Pin the router off: a developer's local .env.local (e.g. GEMINI_API_KEY)
+  // must not flip selectLLM to the router branch and skew these fixtures.
+  process.env.MAS_ROUTING_CONFIG = '/nonexistent/model-routing.json';
   const dir = join(tmpdir(), 'mas-test');
   mkdirSync(dir, { recursive: true });
   dbPath = join(dir, `${randomUUID()}.db`);
@@ -111,6 +114,7 @@ afterEach(() => {
   closeDb();
   try { unlinkSync(dbPath); } catch { /* ignore */ }
   delete process.env.MAS_DB_PATH;
+  delete process.env.MAS_ROUTING_CONFIG;
 });
 
 // Drives a mission through all low/medium tasks up to (but not including) the

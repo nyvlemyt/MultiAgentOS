@@ -167,6 +167,35 @@ describe('failover taxonomy (ADR 0002 Q2)', () => {
     await expect(router.call(reqFor('search'))).rejects.toMatchObject({ status: 429 });
   });
 
+  it('claude pool expands to declared accounts: 429 on first ⇒ second account', async () => {
+    const clients = {
+      pro20: okClient('pro20'),
+      max100: okClient('max100'),
+    };
+    const events: RouterEvent[] = [];
+    const router = new RouterLLMClient({
+      config: {
+        ...cfg,
+        claude_accounts: [
+          { id: 'pro20', configDir: '/p/pro20' },
+          { id: 'max100', configDir: '/p/max100' },
+        ],
+      },
+      env: {},
+      clients: new Map(Object.entries(clients)),
+      onEvent: (e) => events.push(e),
+      sleep: async () => {},
+    });
+    const first = await router.call(reqFor('code-execution'));
+    expect(first.provider).toBe('pro20');
+    clients.pro20.call.mockRejectedValueOnce(coded(429));
+    const second = await router.call(reqFor('code-execution'));
+    expect(second.provider).toBe('max100');
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'provider_fallback', from: 'pro20', to: 'max100' }),
+    );
+  });
+
   it('blocked window resets after TTL', async () => {
     const clients = { claude: okClient('claude'), 'gemini-free': okClient('gemini-free') };
     let t = 0;

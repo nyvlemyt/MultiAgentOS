@@ -7,6 +7,7 @@ export * from './providers/types';
 export * from './providers/credentials';
 export * from './providers/config';
 export * from './providers/claude-account';
+export * from './providers/factory';
 export * from './providers/gemini';
 export * from './providers/openai';
 export * from './providers/perplexity';

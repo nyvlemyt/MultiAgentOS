@@ -18,9 +18,11 @@ import {
   mockReviewer,
   mockSecReviewer,
   claudeCodeLLM,
+  createRouterLLM,
   mockLLM,
   type AutonomyLevel,
   type ReviewerVerdict,
+  type RouterEvent,
 } from '@mas/core';
 import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
 import { MemoryStore, buildMemoryContext, runCloseOutRitual, type MemoryContext } from '@mas/memory';
@@ -76,9 +78,31 @@ function getSkillRouter(): SkillRouter {
 // identical either way. Both branches go through @mas/core factories — no raw
 // SDK client is instantiated here (CLAUDE.md §11). The real path also keeps the
 // vi.mock('@mas/core') seam in dispatch.test.ts working unchanged.
-function selectLLM(opts: { cwd?: string; autonomyLevel?: AutonomyLevel; sessionId?: string }) {
+function selectLLM(opts: {
+  cwd?: string;
+  autonomyLevel?: AutonomyLevel;
+  sessionId?: string;
+  onRouterEvent?: (evt: RouterEvent) => void;
+}) {
   if (process.env.MAS_MOCK_LLM === '1') return mockLLM();
-  return claudeCodeLLM(opts);
+  const { onRouterEvent, ...claudeOpts } = opts;
+  // Phase 3.5 (ADR 0002): the router takes over only when config/model-routing.json
+  // enables at least one non-default source; otherwise current behavior unchanged.
+  try {
+    const __dirname = fileURLToPath(new URL('.', import.meta.url));
+    const repoRoot = resolve(__dirname, '../../..');
+    const router = createRouterLLM({
+      configPath: process.env.MAS_ROUTING_CONFIG ?? resolve(repoRoot, 'config/model-routing.json'),
+      envPath: process.env.MAS_ENV_LOCAL ?? resolve(repoRoot, '.env.local'),
+      claudeOpts,
+      onEvent: onRouterEvent,
+    });
+    if (router) return router;
+  } catch {
+    // Bundler path (import.meta.url not a file: URL) — same degradation as
+    // getSkillRouter above: fall through to the plain Claude client.
+  }
+  return claudeCodeLLM(claudeOpts);
 }
 
 function logEvent(db: Db, evt: {
@@ -301,6 +325,8 @@ async function executeTaskWithLLM(
     cwd: proj?.path,
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
+    onRouterEvent: (evt) =>
+      void logEvent(db, { missionId: m.id, taskId: next.id, type: 'provider_fallback', payload: evt }),
   });
 
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
@@ -316,6 +342,7 @@ async function executeTaskWithLLM(
     user: `Task: ${next.title}\n\n${next.description}`,
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
     mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
+    domain: getSkillRouter().domainFor(taskSkillIds),
   });
 
   // Persist new session_id back to project on first successful call.
@@ -462,6 +489,8 @@ export async function resumeAfterValidation(
     cwd: proj?.path,
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
+    onRouterEvent: (evt) =>
+      void logEvent(db, { missionId: t.missionId, taskId: t.id, type: 'provider_fallback', payload: evt }),
   });
 
   const taskSkillIds: string[] = JSON.parse(t.skillsJson ?? '[]');
@@ -477,6 +506,7 @@ export async function resumeAfterValidation(
     user: `Task: ${t.title}\n\n${t.description}`,
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
     mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
+    domain: getSkillRouter().domainFor(taskSkillIds),
   });
 
   if (proj && resp.sessionId && !proj.sessionId) {
