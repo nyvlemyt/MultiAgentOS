@@ -93,11 +93,59 @@ export const missions = sqliteTable(
     spentTokens: integer('spent_tokens').notNull().default(0),
     autonomyOverride: text('autonomy_override'),
     modeOverride: text('mode_override'),
+    // Phase 4.5-receptacle: planning fields. All deterministic, no LLM.
+    deadline: integer('deadline', { mode: 'timestamp' }),
+    milestone: text('milestone'),
+    priorityScore: integer('priority_score').notNull().default(0),
     createdAt: epoch().notNull(),
     updatedAt: epoch().notNull(),
   },
   (t) => ({ statusIdx: index('missions_status_idx').on(t.projectId, t.status) }),
 );
+
+// Phase 4.5-receptacle: Ideas Inbox. An idea is a pre-mission; on conversion it
+// spawns a draft mission and links via ideaIdLink. priorityScore is computed by
+// the deterministic scorer (apps/web/lib/prioritize.ts) — never an LLM.
+export const ideas = sqliteTable(
+  'ideas',
+  {
+    id: text('id').primaryKey(),
+    title: text('title').notNull(),
+    body: text('body').notNull().default(''),
+    scope: text('scope', { enum: ['global', 'project'] }).notNull().default('global'),
+    projectId: text('project_id').references(() => projects.id, { onDelete: 'cascade' }),
+    status: text('status', {
+      enum: ['inbox', 'to_clarify', 'prioritized', 'converted', 'archived'],
+    }).notNull().default('inbox'),
+    priorityScore: integer('priority_score').notNull().default(0),
+    impact: integer('impact').notNull().default(50),
+    urgency: integer('urgency').notNull().default(50),
+    effortEst: integer('effort_est').notNull().default(50),
+    riskScore: integer('risk_score').notNull().default(0),
+    costEstTokens: integer('cost_est_tokens').notNull().default(0),
+    sourceDossier: text('source_dossier'),
+    // Link to the mission spawned by convert-to-mission (null until converted).
+    ideaIdLink: text('idea_id_link').references(() => missions.id),
+    createdAt: epoch().notNull(),
+    updatedAt: epoch().notNull(),
+  },
+  (t) => ({ statusIdx: index('ideas_status_idx').on(t.status) }),
+);
+
+// Phase 4.5-receptacle: Decision Log. MVP = user-logged manually (source=user).
+// The Keeper-proposed-decision path is deferred (no proposeMemory seam yet);
+// source enum keeps room for it without a new writer (§8 intact).
+export const decisions = sqliteTable('decisions', {
+  id: text('id').primaryKey(),
+  scope: text('scope', { enum: ['global', 'project'] }).notNull().default('global'),
+  projectId: text('project_id').references(() => projects.id, { onDelete: 'cascade' }),
+  source: text('source', { enum: ['user', 'mission', 'validation', 'agent'] }).notNull().default('user'),
+  sourceMissionId: text('source_mission_id').references(() => missions.id),
+  sourceTaskId: text('source_task_id').references(() => tasks.id),
+  title: text('title').notNull(),
+  body: text('body').notNull().default(''),
+  createdAt: epoch().notNull(),
+});
 
 export const tasks = sqliteTable(
   'tasks',
@@ -225,3 +273,7 @@ export type Agent = typeof agents.$inferSelect;
 export type Skill = typeof skills.$inferSelect;
 export type Event = typeof events.$inferSelect;
 export type MemoryItem = typeof memoryItems.$inferSelect;
+export type Idea = typeof ideas.$inferSelect;
+export type NewIdea = typeof ideas.$inferInsert;
+export type Decision = typeof decisions.$inferSelect;
+export type NewDecision = typeof decisions.$inferInsert;
