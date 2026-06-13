@@ -29,7 +29,7 @@ describe('Phase 3.5b migration 0006 — projects.language', () => {
       id: 'p_default',
       name: 'Default',
       slug: 'default',
-      path: '/tmp/p',
+      path: join(tmpdir(), 'p'),
       type: 'other',
     });
     const [row] = await db.select().from(projects).where(eq(projects.id, 'p_default'));
@@ -42,7 +42,7 @@ describe('Phase 3.5b migration 0006 — projects.language', () => {
       id: 'p_en',
       name: 'English',
       slug: 'english',
-      path: '/tmp/e',
+      path: join(tmpdir(), 'e'),
       type: 'other',
       language: 'en',
     });
@@ -54,8 +54,9 @@ describe('Phase 3.5b migration 0006 — projects.language', () => {
     const db = getDb();
     // Simulate a legacy row written before the column existed: write via raw SQL
     // omitting language; the column default must supply 'fr'.
+    const legacyPath = join(tmpdir(), 'l');
     db.run(
-      sql`INSERT INTO projects (id, name, slug, path, type, createdAt, lastActiveAt) VALUES ('p_legacy', 'Legacy', 'legacy', '/tmp/l', 'other', 0, 0)`,
+      sql`INSERT INTO projects (id, name, slug, path, type, createdAt, lastActiveAt) VALUES ('p_legacy', 'Legacy', 'legacy', ${legacyPath}, 'other', 0, 0)`,
     );
     const [row] = await db.select().from(projects).where(eq(projects.id, 'p_legacy'));
     expect(row?.language).toBe('fr');

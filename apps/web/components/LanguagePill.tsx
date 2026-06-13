@@ -14,8 +14,10 @@ export function LanguagePill({
 
   async function pick(next: Language) {
     if (next === lang || busy) return;
-    setLang(next);
-    if (!projectId) return;
+    if (!projectId) {
+      setLang(next);
+      return;
+    }
     setBusy(true);
     try {
       const res = await fetch(`/api/projects/${projectId}/language`, {
@@ -23,9 +25,9 @@ export function LanguagePill({
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ language: next }),
       });
-      if (!res.ok) setLang(lang);
+      if (res.ok) setLang(next);
     } catch {
-      setLang(lang);
+      // Keep the current language on a failed write.
     } finally {
       setBusy(false);
     }
