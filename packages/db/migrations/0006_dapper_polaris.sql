@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD `language` text DEFAULT 'fr' NOT NULL;
