@@ -17,6 +17,7 @@ import {
   mockSkillRouter,
   mockReviewer,
   mockSecReviewer,
+  languageDirective,
   claudeCodeLLM,
   createRouterLLM,
   mockLLM,
@@ -323,6 +324,7 @@ async function executeTaskWithLLM(
       sessionId: projects.sessionId,
       defaultModel: projects.defaultModel,
       defaultMode: projects.defaultMode,
+      language: projects.language,
     })
     .from(projects)
     .innerJoin(missions, eq(missions.projectId, projects.id))
@@ -342,6 +344,7 @@ async function executeTaskWithLLM(
 
   const resp = await llm.call({
     system: [
+      languageDirective(proj?.language),
       `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
       memCtx.text,
       skillContext,
@@ -488,6 +491,7 @@ export async function resumeAfterValidation(
       sessionId: projects.sessionId,
       defaultModel: projects.defaultModel,
       defaultMode: projects.defaultMode,
+      language: projects.language,
     })
     .from(projects)
     .innerJoin(missions, eq(missions.projectId, projects.id))
@@ -507,6 +511,7 @@ export async function resumeAfterValidation(
 
   const resp = await llm.call({
     system: [
+      languageDirective(proj?.language),
       `You are executing a validated high-risk task inside project at path ${proj?.path ?? '.'}.`,
       memCtx.text,
       skillContext,
