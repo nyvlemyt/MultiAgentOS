@@ -3,22 +3,23 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, FolderKanban, ListTodo, Lightbulb, ArrowUpNarrowWide, Users, Workflow, Sparkles, Coins, Activity, Brain } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { t, type Language } from '@/lib/i18n';
 
 const nav = [
-  { href: '/', label: 'Command', icon: LayoutDashboard },
-  { href: '/projects', label: 'Projects', icon: FolderKanban },
-  { href: '/ideas', label: 'Ideas', icon: Lightbulb },
-  { href: '/missions', label: 'Missions', icon: ListTodo },
-  { href: '/priorities', label: 'Priorities', icon: ArrowUpNarrowWide },
-  { href: '/agents', label: 'Agents', icon: Users },
-  { href: '/studio', label: 'Studio', icon: Workflow },
-  { href: '/skills', label: 'Skills', icon: Sparkles },
-  { href: '/tokens', label: 'Tokens', icon: Coins },
-  { href: '/trace', label: 'Trace', icon: Activity },
-  { href: '/memory', label: 'Memory', icon: Brain },
+  { href: '/', key: 'nav.command', icon: LayoutDashboard },
+  { href: '/projects', key: 'nav.projects', icon: FolderKanban },
+  { href: '/ideas', key: 'nav.ideas', icon: Lightbulb },
+  { href: '/missions', key: 'nav.missions', icon: ListTodo },
+  { href: '/priorities', key: 'nav.priorities', icon: ArrowUpNarrowWide },
+  { href: '/agents', key: 'nav.agents', icon: Users },
+  { href: '/studio', key: 'nav.studio', icon: Workflow },
+  { href: '/skills', key: 'nav.skills', icon: Sparkles },
+  { href: '/tokens', key: 'nav.tokens', icon: Coins },
+  { href: '/trace', key: 'nav.trace', icon: Activity },
+  { href: '/memory', key: 'nav.memory', icon: Brain },
 ];
 
-export function Sidebar() {
+export function Sidebar({ lang = 'fr' }: Readonly<{ lang?: Language }>) {
   const path = usePathname() || '/';
   return (
     <aside
@@ -50,7 +51,7 @@ export function Sidebar() {
               )}
             >
               <Icon size={14} />
-              {item.label}
+              {t(item.key, lang)}
             </Link>
           );
         })}
