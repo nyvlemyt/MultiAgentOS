@@ -1,11 +1,18 @@
 import Link from 'next/link';
 import { FolderKanban } from 'lucide-react';
+import { getDb, projects as projectsTable } from '@mas/db';
+import { computeProjectHealth } from '@/lib/health';
+import { ProjectHealthBar } from '@/components/ProjectHealthBar';
 
-const projects = [
-  { id: 'otakugo', name: 'OtakuGO_UP', type: 'manga-app', path: '/Users/melvyn/Documents/03_PROFESSIONNEL/OtakuGO_UP', missions: 5, lastActive: '15 min ago' },
-];
+export const dynamic = 'force-dynamic';
 
-export default function ProjectsList() {
+export default async function ProjectsList() {
+  const db = getDb();
+  const rows = await db.select().from(projectsTable);
+  const projects = await Promise.all(
+    rows.map(async (p) => ({ ...p, health: await computeProjectHealth(db, p.id) })),
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <header className="flex items-end justify-between">
@@ -18,24 +25,21 @@ export default function ProjectsList() {
       <ul className="flex flex-col gap-3">
         {projects.map((p) => (
           <li key={p.id}>
-            <Link href={`/projects/${p.id}`} className="surface flex items-center gap-4 px-4 py-4 transition-colors hover:bg-[color:var(--bg-hover)]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-md" style={{ background: 'var(--bg-hover)', color: 'var(--accent)' }}>
-                <FolderKanban size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{p.name}</span>
-                  <span className="rounded-sm px-1.5 py-0.5 text-[10px] uppercase tracking-wider" style={{ background: 'var(--bg-hover)', color: 'var(--text-muted)' }}>{p.type}</span>
+            <Link href={`/projects/${p.slug}`} className="surface flex flex-col gap-3 px-4 py-4 transition-colors hover:bg-[color:var(--bg-hover)]">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md" style={{ background: 'var(--bg-hover)', color: 'var(--accent)' }}>
+                  <FolderKanban size={20} />
                 </div>
-                <div className="mono truncate text-[11px]" style={{ color: 'var(--text-muted)' }}>{p.path}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{p.name}</span>
+                    <span className="rounded-sm px-1.5 py-0.5 text-[10px] uppercase tracking-wider" style={{ background: 'var(--bg-hover)', color: 'var(--text-muted)' }}>{p.type}</span>
+                  </div>
+                  <div className="mono truncate text-[11px]" style={{ color: 'var(--text-muted)' }}>{p.path}</div>
+                </div>
               </div>
-              <div className="flex flex-col items-end text-right">
-                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{p.missions}</span>
-                <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>missions</span>
-              </div>
-              <div className="flex flex-col items-end text-right">
-                <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>last active</span>
-                <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{p.lastActive}</span>
+              <div className="border-t pt-3" style={{ borderColor: 'var(--border-subtle)' }}>
+                <ProjectHealthBar health={p.health} />
               </div>
             </Link>
           </li>

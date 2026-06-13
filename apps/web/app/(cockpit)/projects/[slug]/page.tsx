@@ -4,6 +4,8 @@ import { AgentCard } from '@/components/AgentCard';
 import { BudgetBar } from '@/components/BudgetBar';
 import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
+import { computeProjectHealth } from '@/lib/health';
+import { ProjectHealthBar } from '@/components/ProjectHealthBar';
 import { getDb, projects as projectsTable } from '@mas/db';
 import { eq } from 'drizzle-orm';
 
@@ -21,6 +23,7 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
         id: d.id, title: d.title, body: d.body, source: d.source, createdAt: d.createdAt.toISOString(),
       }))
     : [];
+  const health = project ? await computeProjectHealth(getDb(), project.id) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,6 +40,11 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
             <span key={s} className="rounded-sm px-1.5 py-0.5 text-[10px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-secondary)' }}>{s}</span>
           ))}
         </div>
+        {health && (
+          <div className="border-t pt-3" style={{ borderColor: 'var(--border-subtle)' }}>
+            <ProjectHealthBar health={health} />
+          </div>
+        )}
       </header>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
