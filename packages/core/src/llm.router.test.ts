@@ -77,7 +77,7 @@ describe('domain resolution (paid OFF — defaults per §11.bis)', () => {
       const { router, clients } = makeRouter();
       const resp = await router.call(reqFor(domain));
       expect(resp.provider).toBe(source);
-      expect(clients[source as keyof typeof clients].call).toHaveBeenCalledTimes(1);
+      expect(clients[source].call).toHaveBeenCalledTimes(1);
     });
   }
 
@@ -89,7 +89,7 @@ describe('domain resolution (paid OFF — defaults per §11.bis)', () => {
 
   it('no domain at all → default claude', async () => {
     const { router } = makeRouter();
-    const resp = await router.call(reqFor(undefined));
+    const resp = await router.call(reqFor());
     expect(resp.provider).toBe('claude');
   });
 });

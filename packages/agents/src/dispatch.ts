@@ -135,6 +135,13 @@ function logEvent(db: Db, evt: {
   });
 }
 
+// Router fallback events fire inside a synchronous onRouterEvent callback, so
+// the logEvent insert cannot be awaited. Swallow rejections explicitly rather
+// than leaving a floating promise (telemetry must never fail a mission).
+function logEventDetached(db: Db, evt: Parameters<typeof logEvent>[1]): void {
+  logEvent(db, evt).then(undefined, () => undefined);
+}
+
 export async function planMission(missionId: string) {
   const db = getDb();
   const [m] = await db.select().from(missions).where(eq(missions.id, missionId));
@@ -326,7 +333,7 @@ async function executeTaskWithLLM(
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
     onRouterEvent: (evt) =>
-      void logEvent(db, { missionId: m.id, taskId: next.id, type: 'provider_fallback', payload: evt }),
+      logEventDetached(db, { missionId: m.id, taskId: next.id, type: 'provider_fallback', payload: evt }),
   });
 
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
@@ -491,7 +498,7 @@ export async function resumeAfterValidation(
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
     onRouterEvent: (evt) =>
-      void logEvent(db, { missionId: t.missionId, taskId: t.id, type: 'provider_fallback', payload: evt }),
+      logEventDetached(db, { missionId: t.missionId, taskId: t.id, type: 'provider_fallback', payload: evt }),
   });
 
   const taskSkillIds: string[] = JSON.parse(t.skillsJson ?? '[]');
