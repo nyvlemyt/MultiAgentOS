@@ -1,5 +1,6 @@
 import { getDb, budgets, events } from '@mas/db';
-import { and, eq, gte, sum, count, inArray } from 'drizzle-orm';
+import { and, eq, gte, isNotNull, sum, count, inArray } from 'drizzle-orm';
+import { remainingCapacity, avgMissionCostCents, type CapacityResult } from './prioritize';
 
 export interface ProviderSpendRow {
   provider: string;
@@ -19,6 +20,31 @@ export interface TokenSnapshot {
 
 /** Event types that represent one real LLM call carrying token counts. */
 const LLM_CALL_TYPES = ['llm_call', 'task_done', 'validation_approved'];
+
+function thirtyDaysAgo(): Date {
+  return new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+}
+
+/**
+ * "Remaining capacity" estimate (Phase 4.5-receptacle). DETERMINISTIC, no LLM.
+ * Cost per mission ≈ sum of event quotaUnits (a cents proxy, see schema) over
+ * the rolling 30-day window, averaged across missions that had activity.
+ */
+export async function getRemainingCapacity(db = getDb()): Promise<CapacityResult> {
+  const monthRow = (await db.select().from(budgets).where(and(eq(budgets.scope, 'global'), eq(budgets.period, 'month'))))[0];
+  const monthlyCapCents = monthRow?.moneyCapCents ?? 0;
+  const spentCents = monthRow?.moneySpentCents ?? 0;
+
+  const since = thirtyDaysAgo();
+  const perMission = await db
+    .select({ missionId: events.missionId, cents: sum(events.quotaUnits) })
+    .from(events)
+    .where(and(gte(events.createdAt, since), isNotNull(events.missionId)))
+    .groupBy(events.missionId);
+  const missionCosts = perMission.map((r) => Number(r.cents ?? 0)).filter((c) => c > 0);
+
+  return remainingCapacity({ monthlyCapCents, spentCents, avgMissionCostCents: avgMissionCostCents(missionCosts) });
+}
 
 function startOfDay(): Date {
   const now = new Date();
