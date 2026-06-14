@@ -18,18 +18,26 @@ import {
   mockReviewer,
   mockSecReviewer,
   mockQualityController,
+  classifyRisk,
   languageDirective,
   claudeCodeLLM,
   createRouterLLM,
   mockLLM,
   type AutonomyLevel,
   type ReviewerVerdict,
+  type Risk,
   type RouterEvent,
 } from '@mas/core';
 import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
 import { MemoryStore, buildMemoryContext, runCloseOutRitual, type MemoryContext } from '@mas/memory';
 
 export type Db = ReturnType<typeof getDb>;
+
+// Risk ordering for "persist the stricter of classified vs planner risk" (§5).
+const RISK_ORDER: Record<Risk, number> = { low: 0, medium: 1, high: 2, blocking: 3 };
+function stricterRisk(a: Risk, b: Risk): Risk {
+  return RISK_ORDER[a] >= RISK_ORDER[b] ? a : b;
+}
 
 // Lazy read-only memory store (no writerAgent — injection only reads, never writes;
 // §8 keeps the Memory Keeper as the sole writer). Resolves data/memory at the repo
@@ -157,13 +165,24 @@ export async function planMission(missionId: string) {
 
   for (const t of plan.tasks) {
     const router = mockSkillRouter(t.id, t.skillsHint);
+
+    // §5 risk classifier: persist the STRICTER of classified vs planner risk.
+    // When the classifier is unsure (shell-ish but no concrete rule) we consult
+    // the (mocked) Sec Reviewer and bump to blocking on BLOCK.
+    const classified = classifyRisk({ title: t.title, description: t.description });
+    let finalRisk = stricterRisk(classified.risk, t.risk);
+    if (classified.needsLLMFallback) {
+      const sec = mockSecReviewer(t.id, { risk: finalRisk });
+      if (sec.verdict === 'BLOCK') finalRisk = 'blocking';
+    }
+
     await db.insert(tasks).values({
       id: t.id,
       missionId: m.id,
       title: t.title,
       description: t.description,
       status: 'todo',
-      risk: t.risk,
+      risk: finalRisk,
       agentId: t.agentHint,
       skillsJson: JSON.stringify(router.favoriteSkills.concat(router.requiredSkills)),
       dependsOnJson: JSON.stringify(t.dependsOn),
@@ -178,6 +197,14 @@ export async function planMission(missionId: string) {
       agentId: 'skill-router',
       type: 'skill_router_decision',
       payload: { rationale: router.rationale, skills: router.favoriteSkills, agents: router.tierBAgents },
+    });
+    await logEvent(db, {
+      missionId: m.id,
+      taskId: t.id,
+      agentId: 'sec-reviewer',
+      type: 'risk_classified',
+      risk: finalRisk,
+      payload: { rule: classified.rule, from: t.risk, to: finalRisk },
     });
   }
 

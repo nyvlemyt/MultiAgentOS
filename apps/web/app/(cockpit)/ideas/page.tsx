@@ -1,6 +1,7 @@
 import { getDb, ideas as ideasTable } from '@mas/db';
 import { desc } from 'drizzle-orm';
 import { IdeasKanbanClient, type BoardIdea } from '@/components/IdeasKanbanClient';
+import { EmptyState } from '@/components/EmptyState';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +24,14 @@ export default async function IdeasInboxPage() {
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} ideas · capture → clarify → prioritize → convert to mission</p>
         </div>
       </header>
-      <IdeasKanbanClient ideas={data} />
+      {data.length === 0 ? (
+        <EmptyState
+          title="No ideas captured yet"
+          hint="Capture a rough idea here, then clarify, prioritize, and convert it into a mission."
+        />
+      ) : (
+        <IdeasKanbanClient ideas={data} />
+      )}
     </div>
   );
 }

@@ -145,3 +145,28 @@ Ouvrir `.claude/memory/` comme vault Obsidian (sans rien modifier) donne :
 - **Canvas** : mapper les patterns émergents visuellement
 
 → Compatible avec MultiAgentOS : les fichiers restent dans `data/memory/<projectId>/`, Obsidian les lit en read-only.
+
+---
+
+## Project templates & autonomy floors (Phase 7)
+
+Le wizard "New project" enregistre un projet à partir d'un **modèle** (`apps/web/lib/templates.ts`).
+Chaque modèle porte des valeurs par défaut sensées — type, **plancher d'autonomie**, mode, modèle,
+stack — plus une mémoire de départ (seed) et une politique d'agents/compétences.
+
+| Modèle | Type DB | Plancher autonomie | Pourquoi |
+|--------|---------|--------------------|----------|
+| `manga-app` | `manga-app` | `assisted` | édits internes OK ; shell/git/sorties gardés |
+| `bot` | `bot` | `assisted` | intégrations + envois sortants gardés |
+| `business-website` | `business-website` | `manual` | site client : aucune écriture/déploiement sans clic |
+| `personal-automation` | `automation` | `autopilot` | lots perso à faible risque (résumés, indexation) |
+
+**Règle d'or — le plancher est un défaut, pas un override de §5.** Un plancher `autopilot` ne lève
+**jamais** les portes de §5/§5-risk : toute tâche `risk: high | blocking` reste gatée et attend un
+clic humain, quel que soit le plancher. Le plancher fixe seulement le point de départ de l'autonomie
+du projet ; il peut être resserré (jamais élargi au-delà des gardes-fous) par projet/session.
+
+**Mémoire seed → candidats uniquement (§8).** La mémoire de départ d'un modèle est insérée comme
+lignes `memory_candidates` en statut `pending`, mappées sur les 5 registres (decisions/learnings/
+blockers/journal/evals). Le **Memory Keeper** est le seul à promouvoir vers `data/memory/` ; le wizard
+et l'API n'écrivent **jamais** le store directement.
