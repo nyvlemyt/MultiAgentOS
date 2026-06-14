@@ -144,15 +144,19 @@ advance. Caveman-terse for prose; normal for code/commits/PRs/security.
     even with the old gap, and the worker already executes dispatched missions with full injection, so
     the live degradation only affects the inline `/run` convenience path.
 
-- [ ] **3 · Phase 8 (functional half) — multi-mission + CLI executor**
-  `ROADMAP.md` Phase 8 minus packaging. (a) Multi-project parallel execution with a per-project
-  concurrency budget in the worker. (b) Headless `claude` CLI as an alternative executor for
-  shell-heavy missions, driven from `apps/worker` (subscription billing; no PAYG). Exit: two projects
-  advance concurrently within budget; a shell-heavy mission runs via the CLI executor.
+- [~] **3 · Phase 8 (functional half)** — 3a SHIPPED (PR #15), 3b deferred to attended.
+  - [x] **3a · multi-project parallel execution** — `runDispatchTick` + per-project/global
+    concurrency budget in the worker. Checker PASS, 5/5 green. PR #15.
+  - [ ] **3b · headless `claude` CLI executor** (ATTENDED) — spawns the real `claude` binary
+    (needs `claude login` + binary); unverifiable in CI/smoke unattended. SDK executor already
+    covers all autonomy modes, so no missions are blocked.
 
-- [ ] **4 · 7b — onboarding & UX polish**
-  Onboarding tour (≤5 steps) across the 7 zones; the remaining empty/error/no-permission states;
-  stack auto-detection from `projects.path`; deeper per-page i18n (fr/en).
+- [~] **4 · 7b — onboarding & UX polish** — 4a in progress; tour/states/i18n → 4b/4c.
+  - [ ] **4a · stack auto-detection from `projects.path`** — pure detector wired into
+    `createProject`. PR pending (`phase/7b-stack-detect`).
+  - [ ] **4b/4c** — onboarding tour (≤5 steps across the 7 zones); remaining
+    empty/error/no-permission states; deeper per-page i18n (fr/en). Frontend/visual — batch
+    (attended-friendly).
 
 - [ ] **5 · Hardening**
   Sec-Reviewer BLOCK-path test coverage; `docs/backlog/sonar-cleanup-remaining.md`; the self-audits
