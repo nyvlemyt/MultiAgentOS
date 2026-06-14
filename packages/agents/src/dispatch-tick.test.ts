@@ -5,26 +5,11 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { getDb, closeDb, projects, missions, tasks } from '@mas/db';
+import { getDb, closeDb } from '@mas/db';
 import { selectForTick, runDispatchTick, type DispatchTickConfig } from './dispatch-tick';
+import { seedDispatchableMission as seedMission } from './fixtures';
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../db/migrations');
-
-async function seedMission(missionId: string, projectId: string): Promise<void> {
-  const db = getDb();
-  await db.insert(projects).values({
-    id: projectId, name: projectId, slug: projectId, path: join(tmpdir(), projectId),
-    type: 'other', autonomy: 'autonomous', createdAt: new Date(), lastActiveAt: new Date(),
-  }).onConflictDoNothing();
-  await db.insert(missions).values({
-    id: missionId, projectId, title: 'M', objective: 'o', status: 'dispatched',
-    risk: 'low', budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
-  });
-  await db.insert(tasks).values({
-    id: `${missionId}_t1`, missionId, title: 'T', description: 'do it', status: 'todo',
-    risk: 'low', createdAt: new Date(), updatedAt: new Date(),
-  });
-}
 
 type Row = { id: string; projectId: string; createdAt: Date };
 

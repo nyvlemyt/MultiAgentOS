@@ -6,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { inArray } from 'drizzle-orm';
-import { getDb, closeDb, projects, missions, tasks } from '@mas/db';
+import { getDb, closeDb, tasks } from '@mas/db';
+import { seedDispatchableMission as seedMission } from '@mas/agents';
 import { tick } from './index';
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../../packages/db/migrations');
@@ -28,22 +29,6 @@ afterEach(() => {
   delete process.env.MAS_MAX_CONCURRENT_PER_PROJECT;
   delete process.env.MAS_MAX_GLOBAL_CONCURRENT;
 });
-
-async function seedMission(missionId: string, projectId: string): Promise<void> {
-  const db = getDb();
-  await db.insert(projects).values({
-    id: projectId, name: projectId, slug: projectId, path: join(tmpdir(), projectId),
-    type: 'other', autonomy: 'autonomous', createdAt: new Date(), lastActiveAt: new Date(),
-  }).onConflictDoNothing();
-  await db.insert(missions).values({
-    id: missionId, projectId, title: 'M', objective: 'o', status: 'dispatched',
-    risk: 'low', budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
-  });
-  await db.insert(tasks).values({
-    id: `${missionId}_t1`, missionId, title: 'T', description: 'do it', status: 'todo',
-    risk: 'low', createdAt: new Date(), updatedAt: new Date(),
-  });
-}
 
 describe('worker tick — multi-project dispatch', () => {
   it('advances two projects concurrently in one tick within budget', async () => {
