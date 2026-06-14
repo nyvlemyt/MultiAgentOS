@@ -59,8 +59,8 @@ export interface DelegateInput {
  * the text has no diff fence.
  */
 export function extractDiff(text: string): string | null {
-  const match = DIFF_FENCE_RE.exec(text);
-  return match ? match[1].trim() : null;
+  const body = DIFF_FENCE_RE.exec(text)?.[1];
+  return body === undefined ? null : body.trim();
 }
 
 function parseResponse(agentId: string, text: string): TaskResult {

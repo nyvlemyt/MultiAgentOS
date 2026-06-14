@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -24,14 +25,30 @@ import {
   createRouterLLM,
   mockLLM,
   type AutonomyLevel,
+  type LLMClient,
+  type LLMResponse,
+  type Mode,
+  type ProjectLanguage,
   type ReviewerVerdict,
   type Risk,
   type RouterEvent,
 } from '@mas/core';
 import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
 import { MemoryStore, buildMemoryContext, runCloseOutRitual, type MemoryContext } from '@mas/memory';
+import { delegateWithDiff } from './delegate';
+import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
+import { TIER_B_DELEGATION_MAP } from './library';
 
 export type Db = ReturnType<typeof getDb>;
+
+// All MultiAgentOS-produced task artifacts land here (CLAUDE.md §8: never
+// data/memory/). Hoisted to one literal (S1192).
+const OUTPUTS_DIR = 'data/outputs';
+
+function repoRootDir(): string {
+  const here = fileURLToPath(new URL('.', import.meta.url));
+  return resolve(here, '../../..');
+}
 
 // Risk ordering for "persist the stricter of classified vs planner risk" (§5).
 const RISK_ORDER: Record<Risk, number> = { low: 0, medium: 1, high: 2, blocking: 3 };
@@ -348,6 +365,161 @@ async function pauseForRiskGate(
   return { kind: 'paused_for_validation', taskId: next.id };
 }
 
+// Project row shape shared by the raw and delegated execution paths.
+type ExecProject = {
+  id: string;
+  path: string | null;
+  autonomy: string | null;
+  sessionId: string | null;
+  defaultModel: string | null;
+  defaultMode: string | null;
+  language: ProjectLanguage | null;
+};
+
+// Shared finalize step for a completed task (raw + delegated paths): persist the
+// session id on first call, mark the task done + spend, bump mission spend, and
+// log the single task_done event. extraPayload carries path-specific telemetry.
+async function persistTaskDone(
+  db: Db,
+  m: Mission,
+  next: Task,
+  proj: ExecProject | undefined,
+  resp: LLMResponse,
+  outputPath: string,
+  extraPayload: Record<string, unknown>,
+): Promise<{ kind: 'task_done'; taskId: string }> {
+  if (proj && resp.sessionId && !proj.sessionId) {
+    await db.update(projects).set({ sessionId: resp.sessionId }).where(eq(projects.id, proj.id));
+  }
+
+  const spend = resp.inputTokens + resp.outputTokens;
+  await db
+    .update(tasks)
+    .set({ status: 'done', spentTokens: spend, outputPath, updatedAt: new Date() })
+    .where(eq(tasks.id, next.id));
+  await db
+    .update(missions)
+    .set({ spentTokens: (m.spentTokens ?? 0) + spend, updatedAt: new Date() })
+    .where(eq(missions.id, m.id));
+  await logEvent(db, {
+    missionId: m.id,
+    taskId: next.id,
+    agentId: next.agentId ?? undefined,
+    type: 'task_done',
+    tokensIn: resp.inputTokens,
+    tokensOut: resp.outputTokens,
+    cacheRead: resp.cacheReadTokens,
+    cacheCreation: resp.cacheCreationTokens,
+    quotaUnits: resp.quotaUnits,
+    risk: next.risk,
+    payload: { title: next.title, sessionId: resp.sessionId, provider: resp.provider, ...extraPayload },
+  });
+
+  return { kind: 'task_done', taskId: next.id };
+}
+
+interface DelegationContext {
+  proj: ExecProject | undefined;
+  llm: LLMClient;
+  skillContext: string;
+  memCtx: MemoryContext;
+  delegation: (typeof TIER_B_DELEGATION_MAP)[string];
+}
+
+// Runs the §5 review gate on a produced diff: write it under data/outputs, check
+// it applies + collect Code-Reviewer + Reality-Checker verdicts, log the result.
+// evidence:false keeps the Reality Checker at NEEDS_WORK (advisory, never
+// auto-approves an unsubstantiated diff — CLAUDE.md §11.bis r4).
+async function gateProducedDiff(
+  db: Db,
+  m: Mission,
+  next: Task,
+  repoDir: string,
+  diff: string,
+  fiche: string,
+): Promise<{ outputPath: string; review: ReviewGateResult }> {
+  const patchPath = `${OUTPUTS_DIR}/${next.id}.patch`;
+  const absDir = resolve(repoRootDir(), OUTPUTS_DIR);
+  mkdirSync(absDir, { recursive: true });
+  // git apply rejects a patch with no trailing newline ("corrupt patch"); the
+  // extracted diff body is trimmed, so re-add one before writing/validating.
+  const patch = diff.endsWith('\n') ? diff : `${diff}\n`;
+  writeFileSync(resolve(repoRootDir(), patchPath), patch, 'utf-8');
+
+  const review = await reviewProducedDiff({ taskId: next.id, diff: patch, repoDir, evidence: false });
+  await logEvent(db, {
+    missionId: m.id,
+    taskId: next.id,
+    agentId: next.agentId ?? undefined,
+    type: 'tier_b_review',
+    risk: next.risk,
+    payload: { verdicts: review.verdicts, approved: review.approved, diffValid: review.diffValid, fiche },
+  });
+  return { outputPath: patchPath, review };
+}
+
+async function runDelegatedTask(
+  db: Db,
+  m: Mission,
+  next: Task,
+  ctx: DelegationContext,
+): Promise<{ kind: 'task_done'; taskId: string }> {
+  const { proj, llm, skillContext, memCtx, delegation } = ctx;
+  const outcome = await delegateWithDiff({
+    agentId: next.agentId!,
+    task: { title: next.title, description: next.description },
+    llm,
+    project: { defaultModel: proj?.defaultModel ?? undefined, defaultMode: (proj?.defaultMode ?? undefined) as Mode | undefined },
+    skillContext,
+    memoryText: memCtx.text,
+    language: proj?.language ?? undefined,
+  });
+
+  let outputPath = `${OUTPUTS_DIR}/${next.id}.md`;
+  let review: ReviewGateResult | undefined;
+  if (outcome.diff && proj?.path) {
+    const gated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche);
+    outputPath = gated.outputPath;
+    review = gated.review;
+  }
+
+  return persistTaskDone(db, m, next, proj, outcome.response, outputPath, {
+    delegated: true,
+    tierBFiche: delegation.fiche,
+    reviewApproved: review?.approved ?? null,
+    diffValid: review?.diffValid ?? null,
+  });
+}
+
+// Raw (non-Tier-B) execution: one LLM call, markdown artifact, no diff gate.
+async function runRawTask(
+  db: Db,
+  m: Mission,
+  next: Task,
+  ctx: Omit<DelegationContext, 'delegation'>,
+  taskSkillIds: string[],
+): Promise<{ kind: 'task_done'; taskId: string }> {
+  const { proj, llm, skillContext, memCtx } = ctx;
+  const resp = await llm.call({
+    system: [
+      languageDirective(proj?.language),
+      `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
+      memCtx.text,
+      skillContext,
+    ].filter(Boolean).join('\n\n'),
+    user: `Task: ${next.title}\n\n${next.description}`,
+    model: proj?.defaultModel ?? 'claude-haiku-4-5',
+    mode: (proj?.defaultMode ?? 'standard') as Mode,
+    domain: getSkillRouter().domainFor(taskSkillIds),
+  });
+
+  return persistTaskDone(db, m, next, proj, resp, `${OUTPUTS_DIR}/${next.id}.md`, {
+    memoryContextChars: memCtx.text.length,
+    memoryProjectEntries: memCtx.projectEntryCount,
+    memoryGlobalItems: memCtx.globalItems.length,
+  });
+}
+
 async function executeTaskWithLLM(
   db: Db,
   m: Mission,
@@ -380,64 +552,28 @@ async function executeTaskWithLLM(
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
   const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
   const memCtx = memoryContextFor(proj?.id, next.title);
+  const baseCtx = { proj, llm, skillContext, memCtx };
 
-  const resp = await llm.call({
-    system: [
-      languageDirective(proj?.language),
-      `You are executing a task inside project at path ${proj?.path ?? '.'}.`,
-      memCtx.text,
-      skillContext,
-    ].filter(Boolean).join('\n\n'),
-    user: `Task: ${next.title}\n\n${next.description}`,
-    model: proj?.defaultModel ?? 'claude-haiku-4-5',
-    mode: (proj?.defaultMode ?? 'standard') as import('@mas/core').Mode,
-    domain: getSkillRouter().domainFor(taskSkillIds),
-  });
-
-  // Persist new session_id back to project on first successful call.
-  if (proj && resp.sessionId && !proj.sessionId) {
-    await db
-      .update(projects)
-      .set({ sessionId: resp.sessionId })
-      .where(eq(projects.id, proj.id));
+  // Tier B delegation branch: a task whose agentId maps to a fiche goes through
+  // delegate() → diff → review gate before user validation (CLAUDE.md §5). If the
+  // fiche cannot load (e.g. under the Next bundler where import.meta.url is not a
+  // file: URL — same degradation as getSkillRouter/selectLLM), fall back to the
+  // raw path rather than failing the mission.
+  const delegation = next.agentId ? TIER_B_DELEGATION_MAP[next.agentId] : undefined;
+  if (delegation) {
+    try {
+      return await runDelegatedTask(db, m, next, { ...baseCtx, delegation });
+    } catch (e) {
+      logEventDetached(db, {
+        missionId: m.id,
+        taskId: next.id,
+        type: 'delegation_fallback',
+        payload: { fiche: delegation.fiche, message: String(e) },
+      });
+    }
   }
 
-  const spend = resp.inputTokens + resp.outputTokens;
-  await db
-    .update(tasks)
-    .set({
-      status: 'done',
-      spentTokens: spend,
-      outputPath: `data/outputs/${next.id}.md`,
-      updatedAt: new Date(),
-    })
-    .where(eq(tasks.id, next.id));
-  await db
-    .update(missions)
-    .set({ spentTokens: (m.spentTokens ?? 0) + spend, updatedAt: new Date() })
-    .where(eq(missions.id, m.id));
-  await logEvent(db, {
-    missionId: m.id,
-    taskId: next.id,
-    agentId: next.agentId ?? undefined,
-    type: 'task_done',
-    tokensIn: resp.inputTokens,
-    tokensOut: resp.outputTokens,
-    cacheRead: resp.cacheReadTokens,
-    cacheCreation: resp.cacheCreationTokens,
-    quotaUnits: resp.quotaUnits,
-    risk: next.risk,
-    payload: {
-      title: next.title,
-      sessionId: resp.sessionId,
-      provider: resp.provider,
-      memoryContextChars: memCtx.text.length,
-      memoryProjectEntries: memCtx.projectEntryCount,
-      memoryGlobalItems: memCtx.globalItems.length,
-    },
-  });
-
-  return { kind: 'task_done', taskId: next.id };
+  return runRawTask(db, m, next, baseCtx, taskSkillIds);
 }
 
 export async function executeNextTask(missionId: string): Promise<
