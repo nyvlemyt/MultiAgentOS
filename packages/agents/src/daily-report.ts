@@ -19,7 +19,12 @@ export interface DailyReport {
 }
 
 // Status-change events that count as a mission "advancing".
-const ADVANCE_TYPES = ['mission_executing', 'mission_dispatched', 'mission_validated', 'mission_review_started'];
+const ADVANCE_TYPES = new Set([
+  'mission_executing',
+  'mission_dispatched',
+  'mission_validated',
+  'mission_review_started',
+]);
 
 export async function buildDailyReport(db: Db, window: { since: Date; until: Date }): Promise<DailyReport> {
   const inWindow = and(gte(events.createdAt, window.since), lt(events.createdAt, window.until));
@@ -32,7 +37,7 @@ export async function buildDailyReport(db: Db, window: { since: Date; until: Dat
   let tasksDone = 0;
   let quotaUnits = 0;
   for (const e of rows) {
-    if (ADVANCE_TYPES.includes(e.type) && e.missionId) advancedMissions.add(e.missionId);
+    if (ADVANCE_TYPES.has(e.type) && e.missionId) advancedMissions.add(e.missionId);
     if (e.type === 'mission_blocked') missionsBlocked += 1;
     if (e.type === 'task_done') tasksDone += 1;
     quotaUnits += e.quotaUnits;

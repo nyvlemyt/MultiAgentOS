@@ -79,8 +79,9 @@ async function seedAutopilotMission(opts: {
   });
   await db.insert(schedules).values({
     id: `sch_${opts.projectId}`, projectId: opts.projectId,
+    // now=12:00 in every test → '00:00'-'23:59' contains it, '23:58'-'23:59' excludes it.
     windowStart: opts.inWindow ? '00:00' : '23:58',
-    windowEnd: opts.inWindow ? '23:59' : '23:59',
+    windowEnd: '23:59',
     enabled: true,
   });
   await db.insert(missions).values({
