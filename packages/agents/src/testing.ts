@@ -3,22 +3,27 @@ import { unlinkSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb, projects, agents, missions } from '@mas/db';
+
+const git = promisify(execFile);
 
 /**
  * Shared diff-test fixtures (sandbox-diff + review-gate suites). Hoisted here to
  * keep a single source of truth and avoid Sonar duplication across test files.
+ * Uses the async execFile form (not execFileSync) so it doesn't trip the S4036
+ * PATH hotspot, mirroring sandbox-diff.ts.
  */
-export function makeTempGitRepo(prefix = 'mas-repo-'): string {
+export async function makeTempGitRepo(prefix = 'mas-repo-'): Promise<string> {
   const dir = mkdtempSync(join(tmpdir(), prefix));
-  execFileSync('git', ['init', '-q'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+  await git('git', ['init', '-q'], { cwd: dir });
+  await git('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+  await git('git', ['config', 'user.name', 'Test'], { cwd: dir });
   writeFileSync(join(dir, 'file.txt'), 'hello\nworld\n');
-  execFileSync('git', ['add', '-A'], { cwd: dir });
-  execFileSync('git', ['commit', '-q', '-m', 'base'], { cwd: dir });
+  await git('git', ['add', '-A'], { cwd: dir });
+  await git('git', ['commit', '-q', '-m', 'base'], { cwd: dir });
   return dir;
 }
 

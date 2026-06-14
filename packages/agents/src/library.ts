@@ -28,6 +28,31 @@ function defaultFichesDir(): string | undefined {
   }
 }
 
+function str(v: unknown): string | undefined {
+  return typeof v === 'string' ? v : undefined;
+}
+
+// Parse a single fiche file. Returns undefined for non-agent docs
+// (EXECUTIVE-BRIEF, QUICKSTART, nexus-strategy) lacking both name + description.
+function parseFiche(dir: string, file: string): LibraryAgentFiche | undefined {
+  const fullPath = join(dir, file);
+  const { data, content } = matter(readFileSync(fullPath, 'utf-8'));
+  const name = str(data.name);
+  const description = str(data.description);
+  if (!name && !description) return undefined;
+  const id = file.slice(0, -'.md'.length);
+  return {
+    id,
+    name: name ?? id,
+    description: description ?? '',
+    color: str(data.color),
+    emoji: str(data.emoji),
+    vibe: str(data.vibe),
+    body: content.trim(),
+    fichePath: fullPath,
+  };
+}
+
 export function loadTierBFiches(dir: string = defaultFichesDir() ?? ''): LibraryAgentFiche[] {
   if (!dir) return [];
   let files: string[];
@@ -36,27 +61,9 @@ export function loadTierBFiches(dir: string = defaultFichesDir() ?? ''): Library
   } catch {
     return [];
   }
-  const fiches: LibraryAgentFiche[] = [];
-  for (const file of files) {
-    const fullPath = join(dir, file);
-    const { data, content } = matter(readFileSync(fullPath, 'utf-8'));
-    const name = typeof data.name === 'string' ? data.name : undefined;
-    const description = typeof data.description === 'string' ? data.description : undefined;
-    // Skip non-agent docs (EXECUTIVE-BRIEF, QUICKSTART, nexus-strategy) that
-    // lack both a name and a description frontmatter field.
-    if (!name && !description) continue;
-    fiches.push({
-      id: file.slice(0, -'.md'.length),
-      name: name ?? file.slice(0, -'.md'.length),
-      description: description ?? '',
-      color: typeof data.color === 'string' ? data.color : undefined,
-      emoji: typeof data.emoji === 'string' ? data.emoji : undefined,
-      vibe: typeof data.vibe === 'string' ? data.vibe : undefined,
-      body: content.trim(),
-      fichePath: fullPath,
-    });
-  }
-  return fiches;
+  return files
+    .map((file) => parseFiche(dir, file))
+    .filter((f): f is LibraryAgentFiche => f !== undefined);
 }
 
 export function loadTierBFiche(id: string, dir?: string): LibraryAgentFiche {

@@ -7,8 +7,8 @@ import { makeTempGitRepo, CLEAN_TEST_DIFF as CLEAN_DIFF, GARBAGE_TEST_DIFF as GA
 
 describe('validateDiffApplies', () => {
   let repo: string;
-  beforeEach(() => {
-    repo = makeTempGitRepo('mas-sbx-');
+  beforeEach(async () => {
+    repo = await makeTempGitRepo('mas-sbx-');
   });
   afterEach(() => {
     rmSync(repo, { recursive: true, force: true });
@@ -22,7 +22,7 @@ describe('validateDiffApplies', () => {
   it('rejects garbage with a non-empty error and never throws', async () => {
     const res = await validateDiffApplies(GARBAGE_DIFF, repo);
     expect(res.ok).toBe(false);
-    expect(res.error && res.error.length).toBeGreaterThan(0);
+    expect(res.error?.length).toBeGreaterThan(0);
   });
 
   it('returns ok:false for a non-repo dir instead of throwing', async () => {
@@ -38,8 +38,8 @@ describe('validateDiffApplies', () => {
 
 describe('applyDiffToSandbox', () => {
   let repo: string;
-  beforeEach(() => {
-    repo = makeTempGitRepo('mas-sbx-');
+  beforeEach(async () => {
+    repo = await makeTempGitRepo('mas-sbx-');
   });
   afterEach(() => {
     rmSync(repo, { recursive: true, force: true });

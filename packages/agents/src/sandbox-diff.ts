@@ -14,9 +14,9 @@ function repoRoot(): string {
 }
 
 function errText(e: unknown): string {
-  if (e && typeof e === 'object' && 'stderr' in e && typeof (e as { stderr: unknown }).stderr === 'string') {
-    const s = (e as { stderr: string }).stderr.trim();
-    if (s) return s;
+  if (e && typeof e === 'object' && 'stderr' in e) {
+    const s = e.stderr;
+    if (typeof s === 'string' && s.trim()) return s.trim();
   }
   return e instanceof Error ? e.message : String(e);
 }

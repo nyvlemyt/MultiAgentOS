@@ -5,8 +5,8 @@ import { makeTempGitRepo, CLEAN_TEST_DIFF as CLEAN_DIFF, GARBAGE_TEST_DIFF as GA
 
 describe('reviewProducedDiff', () => {
   let repo: string;
-  beforeEach(() => {
-    repo = makeTempGitRepo('mas-gate-');
+  beforeEach(async () => {
+    repo = await makeTempGitRepo('mas-gate-');
   });
   afterEach(() => {
     rmSync(repo, { recursive: true, force: true });
