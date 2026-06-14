@@ -8,6 +8,11 @@ import type { Project } from '@mas/db';
 // The 5 long-term memory registers (docs/knowledge/project-doctrine.md).
 export const MEMORY_REGISTERS = ['decisions', 'learnings', 'blockers', 'journal', 'evals'] as const;
 export type MemoryRegister = (typeof MEMORY_REGISTERS)[number];
+// Named aliases so register values aren't repeated as bare literals (Sonar S1192).
+const [DECISIONS, LEARNINGS, BLOCKERS, JOURNAL, EVALS] = MEMORY_REGISTERS;
+
+// Single default model literal — referenced by every template (Sonar S1192).
+const DEFAULT_MODEL = 'claude-haiku-4-5';
 
 export type ProjectType = Project['type'];
 export type Autonomy = Project['autonomy'];
@@ -50,12 +55,12 @@ export const PROJECT_TEMPLATES: readonly ProjectTemplate[] = [
     type: 'manga-app',
     autonomyFloor: 'assisted',
     defaultMode: 'eco',
-    defaultModel: 'claude-haiku-4-5',
+    defaultModel: DEFAULT_MODEL,
     stack: ['next', 'typescript', 'tailwind', 'prisma', 'postgres'],
     seedMemory: [
-      { register: 'decisions', body: 'Stack locked to Next.js + Tailwind; feed cards over infinite spinners.' },
-      { register: 'learnings', body: 'Prefer feed skeletons over spinners for the empty-state.' },
-      { register: 'journal', body: 'Project registered from a MultiAgentOS manga-app template.' },
+      { register: DECISIONS, body: 'Stack locked to Next.js + Tailwind; feed cards over infinite spinners.' },
+      { register: LEARNINGS, body: 'Prefer feed skeletons over spinners for the empty-state.' },
+      { register: JOURNAL, body: 'Project registered from a MultiAgentOS manga-app template.' },
     ],
     skillPolicy: ['mas-skill-router', 'mas-mission-planner', 'mas-reviewer'],
     tierARoster: [...CORE_ROSTER, 'design-ux-architect', 'engineering-frontend-developer'],
@@ -67,12 +72,12 @@ export const PROJECT_TEMPLATES: readonly ProjectTemplate[] = [
     type: 'bot',
     autonomyFloor: 'assisted',
     defaultMode: 'eco',
-    defaultModel: 'claude-haiku-4-5',
+    defaultModel: DEFAULT_MODEL,
     stack: ['node', 'typescript', 'mcp'],
     seedMemory: [
-      { register: 'decisions', body: 'Outbound message sends are risk:high — always human-gated (§5).' },
-      { register: 'blockers', body: 'Rate limits on the chat platform throttle bursts; batch sends.' },
-      { register: 'journal', body: 'Project registered from a MultiAgentOS bot template.' },
+      { register: DECISIONS, body: 'Outbound message sends are risk:high — always human-gated (§5).' },
+      { register: BLOCKERS, body: 'Rate limits on the chat platform throttle bursts; batch sends.' },
+      { register: JOURNAL, body: 'Project registered from a MultiAgentOS bot template.' },
     ],
     skillPolicy: ['mas-skill-router', 'mas-sec-reviewer'],
     tierARoster: [...CORE_ROSTER, 'mas-sec-reviewer', 'engineering-backend-architect'],
@@ -84,12 +89,12 @@ export const PROJECT_TEMPLATES: readonly ProjectTemplate[] = [
     type: 'business-website',
     autonomyFloor: 'manual',
     defaultMode: 'standard',
-    defaultModel: 'claude-haiku-4-5',
+    defaultModel: DEFAULT_MODEL,
     stack: ['next', 'typescript', 'tailwind'],
     seedMemory: [
-      { register: 'decisions', body: 'Client-facing site: manual autonomy floor; no auto-deploy.' },
-      { register: 'evals', body: 'Audit outputs reviewed against the brief before delivery.' },
-      { register: 'journal', body: 'Project registered from a MultiAgentOS business-website template.' },
+      { register: DECISIONS, body: 'Client-facing site: manual autonomy floor; no auto-deploy.' },
+      { register: EVALS, body: 'Audit outputs reviewed against the brief before delivery.' },
+      { register: JOURNAL, body: 'Project registered from a MultiAgentOS business-website template.' },
     ],
     skillPolicy: ['mas-reviewer', 'mas-sec-reviewer'],
     tierARoster: [...CORE_ROSTER, 'design-ui-designer', 'testing-accessibility-auditor'],
@@ -101,12 +106,12 @@ export const PROJECT_TEMPLATES: readonly ProjectTemplate[] = [
     type: 'automation',
     autonomyFloor: 'autopilot',
     defaultMode: 'eco',
-    defaultModel: 'claude-haiku-4-5',
+    defaultModel: DEFAULT_MODEL,
     stack: ['node', 'typescript'],
     seedMemory: [
-      { register: 'decisions', body: 'Only low/medium-risk batches run on autopilot; high/blocking still gates.' },
-      { register: 'learnings', body: 'Summaries + indexing are safe to batch overnight.' },
-      { register: 'journal', body: 'Project registered from a MultiAgentOS personal-automation template.' },
+      { register: DECISIONS, body: 'Only low/medium-risk batches run on autopilot; high/blocking still gates.' },
+      { register: LEARNINGS, body: 'Summaries + indexing are safe to batch overnight.' },
+      { register: JOURNAL, body: 'Project registered from a MultiAgentOS personal-automation template.' },
     ],
     skillPolicy: ['mas-context-manager', 'mas-memory-keeper'],
     tierARoster: [...CORE_ROSTER, 'product-trend-researcher'],
