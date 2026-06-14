@@ -257,3 +257,42 @@ export function mockQualityController(
     ],
   };
 }
+
+// ---- Phase 5: Tier B review gate mocks ------------------------------------
+
+// Code Reviewer (AGENTS.md §6): reviews a produced diff for correctness and
+// maintainability. The mock passes; with no diff it adds a warn finding since
+// there is nothing to assess.
+export function mockCodeReviewer(taskId: string, input: { hasDiff: boolean }): ReviewerVerdict {
+  return {
+    taskId,
+    verdict: 'PASS',
+    findings: [
+      { severity: 'info', message: 'Mocked code-review: change reads consistent with the task brief.' },
+      ...(input.hasDiff
+        ? []
+        : [{ severity: 'warn' as const, message: 'No diff to review — nothing to assess.' }]),
+    ],
+  };
+}
+
+// Reality Checker (AGENTS.md §6): default-to-NEEDS_WORK gate before archive.
+// Requires overwhelming proof — passes only when evidence is supplied.
+export function mockRealityChecker(taskId: string, input: { evidence: boolean }): ReviewerVerdict {
+  if (input.evidence) {
+    return {
+      taskId,
+      verdict: 'PASS',
+      findings: [
+        { severity: 'info', message: 'Mocked reality-check: evidence supplied — claims substantiated.' },
+      ],
+    };
+  }
+  return {
+    taskId,
+    verdict: 'NEEDS_WORK',
+    findings: [
+      { severity: 'warn', message: 'Mocked reality-check: no evidence — defaulting to NEEDS_WORK. Provide proof.' },
+    ],
+  };
+}
