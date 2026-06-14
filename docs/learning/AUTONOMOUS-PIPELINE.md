@@ -158,10 +158,18 @@ advance. Caveman-terse for prose; normal for code/commits/PRs/security.
     empty/error/no-permission states; deeper per-page i18n (fr/en). Frontend/visual — batch
     (attended-friendly).
 
-- [ ] **5 · Hardening**
-  Sec-Reviewer BLOCK-path test coverage; `docs/backlog/sonar-cleanup-remaining.md`; the self-audits
-  (`self-audit-lean-claude-md.md`, `self-audit-memoire-reaudit-debt.md`) at this gate;
-  `router-window-state-persistence.md`.
+- [~] **5 · Hardening** — 5a SHIPPED (PR #17); 5b next; self-audits = human governance pass.
+  - [x] **5a · Sec-Reviewer BLOCK-path test coverage** — unit-test `mockSecReviewer` BLOCK
+    boundary + the reject→blocked §5 gate path. 5/5 green, Sonar clean first pass. PR #17.
+  - [x] **sonar-cleanup-remaining** — CLOSED: `main` verified 0 issues / 0 hotspots; backlog
+    doc marked RESOLVED. Remaining = SonarCloud UI admin actions (user).
+  - [ ] **5b · router-window-state-persistence** (NEXT, own PR off main) — inject
+    `initialBlocked` (hydrate `blockedAt`) + `onBlock` (emit `window_blocked` event) hooks
+    through `createRouterLLM`; keep `RouterLLMClient` (core) free of `@mas/db`. Spec +
+    design: `docs/backlog/router-window-state-persistence.md` + memory `project_phase5_hardening`.
+  - [ ] **self-audits** (ATTENDED governance) — lean-CLAUDE.md trim (RES-012 <200 vs RES-061
+    <150 contradiction) + BDR/EDR/ADR registry-name harmonization in `gouvernance.md`. The
+    docs state the final call is human (Melvyn). mémoire-audit §1 already resolved 2026-06-07.
 
 - [ ] **6 · Phase 8 (packaging half) — Tauri + notifier**  *(do in an ATTENDED session)*
   Tauri desktop wrapper (Rust toolchain, native build, code signing — outward-facing, hard to verify
