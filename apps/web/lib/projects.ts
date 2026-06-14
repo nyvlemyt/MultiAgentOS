@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { getDb, projects, projectLinks, memoryCandidates, type Project } from '@mas/db';
 import { getTemplate, type Autonomy, type ProjectMode, type ProjectType, type MemoryRegister } from './templates';
+import { detectStack } from './stack-detect';
 
 // Phase 3.5b project-settings + Phase 7 create domain. DETERMINISTIC — no LLM.
 
@@ -60,7 +61,7 @@ export async function createProject(db: Db, input: CreateProjectInput): Promise<
   const slug = await uniqueSlug(db, slugify(input.name));
   const id = `proj_${randomUUID()}`;
   const now = new Date();
-  const stack = input.stack ?? (tpl ? [...tpl.stack] : []);
+  const stack = input.stack ?? (tpl ? [...tpl.stack] : [...detectStack(input.path).stack]);
 
   const [project] = await db
     .insert(projects)
