@@ -6,3 +6,4 @@ export * from './delegate';
 export * from './sandbox-diff';
 export * from './review-gate';
 export * from './autopilot';
+export * from './daily-report';
