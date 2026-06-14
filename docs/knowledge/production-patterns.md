@@ -170,6 +170,36 @@ Mission reçue
 
 ---
 
+## Autonomy & autopilot safety (Phase 6)
+
+The risk gate is the load-bearing safety property. Surfacing beats cleverness:
+the audit log must *prove* nothing high-risk ran unsupervised.
+
+**Risk classifier (`packages/core/src/risk-classifier.ts`).** Pure, deterministic
+`classifyRisk()` mirrors **CLAUDE.md §5**'s always-gate list as a hoisted readonly
+rule table → `blocking` (`rm`, `git reset --hard`, `git push --force`/`-f`, branch
+deletion, `.env`/secrets/keystore writes, `curl | sh`, `eval`, `sudo`). Perms-declared
+`high`/`blocking` categories raise to `high`. Shell-ish text with no concrete match
+sets `needsLLMFallback` — the Sec-Reviewer refinement seam (mocked). `planMission`
+persists the **stricter** of classifier vs planner risk and logs `risk_classified`.
+
+**Autopilot maxRisk breaker (`packages/agents/src/autopilot.ts`).** A `schedules`
+row defines the window (HH:MM + days, midnight-wrap aware) and a `maxRisk` cap
+(`low`|`medium`). `runAutopilotTick(db, now)` only auto-runs tasks with
+`risk ≤ maxRisk`, routing every run through `executeNextTask` so the §5 gate stays
+intact; higher-risk tasks are recorded in `skippedHighRisk` and never executed.
+All time logic takes an explicit `now: Date` for deterministic tests — no buried
+`Date.now()`.
+
+**Daily report (`packages/agents/src/daily-report.ts`).** `buildDailyReport`
+counts `missionsAdvanced` / `missionsBlocked` / `tasksDone` / `validationsPending`
+and sums `quotaUnits` over the window; `emitDailyReport` logs a `daily_report`
+event (rendered in `/trace` + on the dashboard) and writes markdown to
+`data/reports/<date>.md`. **Quota units only — never € figures** (CLAUDE.md §11).
+Reports go to `data/reports/`, never `data/memory/` (§8 Memory Keeper lock).
+
+---
+
 ## Ressources à suivre
 
 | Source | Type | Priorité |
