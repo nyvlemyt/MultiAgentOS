@@ -199,6 +199,30 @@ Source: https://github.com/msitarzewski/agency-agents — analysé audit Phase 3
 
 ---
 
+## Pattern : Contrat de délégation Tier B (Phase 5)
+
+**Concept :** un agent Tier A (orchestration) délègue une tâche bornée à un
+spécialiste Tier B (`.claude/agents/*.md`) via `delegate()`. Les 8 agents câblés
+au MVP et leurs appelants sont la table `AGENTS.md §6` (`TIER_B_DELEGATION_MAP`).
+
+**Règles du contrat :**
+- **Exécution Claude-only** (CLAUDE.md §11.bis règle 4) : les tâches I/O fichier,
+  bash et git restent sur Claude ; les providers non-Claude font de la cognition,
+  pas de l'exécution. `delegate()` prend un `LLMClient` injecté — aucun import SDK.
+- **Surface d'outils contrainte** (`prompts/tier-b-system.md`) : lire + proposer ;
+  toute modification de code est un *diff unifié* contre la copie sandbox, jamais
+  une écriture directe hors du projet actif ni dans `data/memory/` (§8).
+- **Pas de Tier B → Tier A** : un subagent ne spawn pas de subagent (AGENTS.md §11).
+- **Validation du diff** : `validateDiffApplies()` lance `git apply --check`
+  (non-mutant) ; `applyDiffToSandbox()` copie l'arbre dans `data/sandboxes/<uuid>/`
+  et applique là — le code source de l'utilisateur n'est jamais muté.
+- **Gate avant l'utilisateur** : `reviewProducedDiff()` exige (a) un diff qui
+  s'applique proprement ET (b) le PASS du **Code Reviewer** *et* du **Reality
+  Checker**. Le Reality Checker est en NEEDS_WORK par défaut — pas de preuve, pas
+  d'approbation.
+
+---
+
 ## Références
 
 - https://github.com/colbymchenry/codegraph
