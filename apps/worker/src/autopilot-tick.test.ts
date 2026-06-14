@@ -5,8 +5,9 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { getDb, closeDb, projects, missions, tasks, schedules, events } from '@mas/db';
+import { seedDispatchableMission } from '@mas/agents';
 import { tick, maybeEmitDailyReport } from './index';
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../../packages/db/migrations');
@@ -70,5 +71,29 @@ describe('worker maybeEmitDailyReport — once per day', () => {
     await maybeEmitDailyReport(getDb(), now);
     const evs = await getDb().select().from(events).where(eq(events.type, 'daily_report'));
     expect(evs.length).toBe(1);
+  });
+});
+
+describe('worker tick — multi-project dispatch (Phase 8a)', () => {
+  it('advances two projects concurrently in one tick within budget', async () => {
+    await seedDispatchableMission('m1', 'p1');
+    await seedDispatchableMission('m2', 'p2');
+    await tick(getDb(), new Date(2026, 5, 15, 3, 0));
+    const rows = await getDb().select().from(tasks).where(inArray(tasks.id, ['m1_t1', 'm2_t1']));
+    expect(rows.length).toBe(2);
+    expect(rows.every((t) => t.status === 'done')).toBe(true);
+  });
+
+  it('honors the global concurrency cap in a single tick', async () => {
+    process.env.MAS_MAX_GLOBAL_CONCURRENT = '1';
+    try {
+      await seedDispatchableMission('g1', 'p1');
+      await seedDispatchableMission('g2', 'p2');
+      await tick(getDb(), new Date(2026, 5, 15, 3, 0));
+      const rows = await getDb().select().from(tasks).where(inArray(tasks.id, ['g1_t1', 'g2_t1']));
+      expect(rows.filter((t) => t.status === 'done').length).toBe(1);
+    } finally {
+      delete process.env.MAS_MAX_GLOBAL_CONCURRENT;
+    }
   });
 });
