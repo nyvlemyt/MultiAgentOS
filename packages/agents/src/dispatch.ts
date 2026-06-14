@@ -424,6 +424,7 @@ interface DelegationContext {
   skillContext: string;
   memCtx: MemoryContext;
   delegation: (typeof TIER_B_DELEGATION_MAP)[string];
+  agentId: string;
 }
 
 // Runs the §5 review gate on a produced diff: write it under data/outputs, check
@@ -463,17 +464,36 @@ async function runDelegatedTask(
   m: Mission,
   next: Task,
   ctx: DelegationContext,
+  taskSkillIds: string[],
 ): Promise<{ kind: 'task_done'; taskId: string }> {
-  const { proj, llm, skillContext, memCtx, delegation } = ctx;
-  const outcome = await delegateWithDiff({
-    agentId: next.agentId!,
-    task: { title: next.title, description: next.description },
-    llm,
-    project: { defaultModel: proj?.defaultModel ?? undefined, defaultMode: (proj?.defaultMode ?? undefined) as Mode | undefined },
-    skillContext,
-    memoryText: memCtx.text,
-    language: proj?.language ?? undefined,
-  });
+  const { proj, llm, skillContext, memCtx, delegation, agentId } = ctx;
+
+  // Only the delegate call is fallback-eligible: a fiche-load failure (e.g. the
+  // Next bundler where import.meta.url is not a file: URL — same degradation as
+  // getSkillRouter/selectLLM) or a failed LLM call falls back to the raw path,
+  // which then issues the single bill. Once delegateWithDiff returns, the call is
+  // billed once; the gate + persist below run OUTSIDE the catch so a downstream
+  // throw propagates and never re-bills via runRawTask.
+  let outcome: Awaited<ReturnType<typeof delegateWithDiff>>;
+  try {
+    outcome = await delegateWithDiff({
+      agentId,
+      task: { title: next.title, description: next.description },
+      llm,
+      project: { defaultModel: proj?.defaultModel ?? undefined, defaultMode: (proj?.defaultMode ?? undefined) as Mode | undefined },
+      skillContext,
+      memoryText: memCtx.text,
+      language: proj?.language ?? undefined,
+    });
+  } catch (e) {
+    logEventDetached(db, {
+      missionId: m.id,
+      taskId: next.id,
+      type: 'delegation_fallback',
+      payload: { fiche: delegation.fiche, message: String(e) },
+    });
+    return runRawTask(db, m, next, { proj, llm, skillContext, memCtx }, taskSkillIds);
+  }
 
   let outputPath = `${OUTPUTS_DIR}/${next.id}.md`;
   let review: ReviewGateResult | undefined;
@@ -496,7 +516,7 @@ async function runRawTask(
   db: Db,
   m: Mission,
   next: Task,
-  ctx: Omit<DelegationContext, 'delegation'>,
+  ctx: Omit<DelegationContext, 'delegation' | 'agentId'>,
   taskSkillIds: string[],
 ): Promise<{ kind: 'task_done'; taskId: string }> {
   const { proj, llm, skillContext, memCtx } = ctx;
@@ -555,22 +575,11 @@ async function executeTaskWithLLM(
   const baseCtx = { proj, llm, skillContext, memCtx };
 
   // Tier B delegation branch: a task whose agentId maps to a fiche goes through
-  // delegate() → diff → review gate before user validation (CLAUDE.md §5). If the
-  // fiche cannot load (e.g. under the Next bundler where import.meta.url is not a
-  // file: URL — same degradation as getSkillRouter/selectLLM), fall back to the
-  // raw path rather than failing the mission.
+  // delegate() → diff → review gate before user validation (CLAUDE.md §5). The
+  // fallback (and its single-bill guarantee) lives inside runDelegatedTask.
   const delegation = next.agentId ? TIER_B_DELEGATION_MAP[next.agentId] : undefined;
-  if (delegation) {
-    try {
-      return await runDelegatedTask(db, m, next, { ...baseCtx, delegation });
-    } catch (e) {
-      logEventDetached(db, {
-        missionId: m.id,
-        taskId: next.id,
-        type: 'delegation_fallback',
-        payload: { fiche: delegation.fiche, message: String(e) },
-      });
-    }
+  if (delegation && next.agentId) {
+    return runDelegatedTask(db, m, next, { ...baseCtx, delegation, agentId: next.agentId }, taskSkillIds);
   }
 
   return runRawTask(db, m, next, baseCtx, taskSkillIds);
