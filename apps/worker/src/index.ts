@@ -1,17 +1,33 @@
 import { argv } from 'node:process';
 import { pathToFileURL } from 'node:url';
 import {
-  listDispatchableMissions,
-  executeNextTask,
+  runDispatchTick,
   runAutopilotTick,
   buildDailyReport,
   emitDailyReport,
   hasDailyReportFor,
+  type DispatchTickConfig,
 } from '@mas/agents';
 import { getDb } from '@mas/db';
 
 const TICK_MS = 1500;
 const DAY_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_MAX_CONCURRENT_PER_PROJECT = 1;
+const DEFAULT_MAX_GLOBAL_CONCURRENT = 4;
+
+function envInt(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (raw === undefined) return fallback;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function dispatchConfig(): DispatchTickConfig {
+  return {
+    maxConcurrentPerProject: envInt('MAS_MAX_CONCURRENT_PER_PROJECT', DEFAULT_MAX_CONCURRENT_PER_PROJECT),
+    maxGlobalConcurrent: envInt('MAS_MAX_GLOBAL_CONCURRENT', DEFAULT_MAX_GLOBAL_CONCURRENT),
+  };
+}
 
 type Db = ReturnType<typeof getDb>;
 
@@ -24,16 +40,9 @@ let busy = false;
  * tick is deterministic in tests.
  */
 export async function tick(db: Db, now: Date): Promise<void> {
-  const dispatchable = await listDispatchableMissions();
-  for (const m of dispatchable) {
-    const res = await executeNextTask(m.id);
-    if (res.kind === 'task_done') {
-      console.log(`[worker] task done in ${m.id}: ${res.taskId}`);
-    } else if (res.kind === 'paused_for_validation') {
-      console.log(`[worker] mission ${m.id} paused — task ${res.taskId} needs validation`);
-    } else if (res.kind === 'mission_complete') {
-      console.log(`[worker] mission ${m.id} complete (validated)`);
-    }
+  const result = await runDispatchTick(db, dispatchConfig());
+  if (result.advanced.length > 0 || result.skipped.length > 0) {
+    console.log(`[worker] dispatch advanced=${result.advanced.length} skipped=${result.skipped.length}`);
   }
 
   const auto = await runAutopilotTick(db, now);
