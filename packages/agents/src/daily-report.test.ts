@@ -54,6 +54,7 @@ describe('buildDailyReport', () => {
     const outside = new Date(2026, 5, 14, 12, 0);
 
     await eventAt('mission_executing', inside);
+    await eventAt('mission_validated', inside); // same mission 'm' — must not double-count
     await eventAt('mission_blocked', inside);
     await eventAt('task_done', inside, 5);
     await eventAt('task_done', inside, 3);

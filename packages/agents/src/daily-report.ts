@@ -25,12 +25,14 @@ export async function buildDailyReport(db: Db, window: { since: Date; until: Dat
   const inWindow = and(gte(events.createdAt, window.since), lt(events.createdAt, window.until));
   const rows = await db.select().from(events).where(inWindow);
 
-  let missionsAdvanced = 0;
+  // Count DISTINCT missions that advanced (an advancing mission emits several
+  // status events in a window — counting events would over-report).
+  const advancedMissions = new Set<string>();
   let missionsBlocked = 0;
   let tasksDone = 0;
   let quotaUnits = 0;
   for (const e of rows) {
-    if (ADVANCE_TYPES.includes(e.type)) missionsAdvanced += 1;
+    if (ADVANCE_TYPES.includes(e.type) && e.missionId) advancedMissions.add(e.missionId);
     if (e.type === 'mission_blocked') missionsBlocked += 1;
     if (e.type === 'task_done') tasksDone += 1;
     quotaUnits += e.quotaUnits;
@@ -41,7 +43,7 @@ export async function buildDailyReport(db: Db, window: { since: Date; until: Dat
   return {
     since: window.since,
     until: window.until,
-    missionsAdvanced,
+    missionsAdvanced: advancedMissions.size,
     missionsBlocked,
     tasksDone,
     validationsPending: pending.length,
