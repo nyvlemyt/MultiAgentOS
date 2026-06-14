@@ -40,7 +40,7 @@ let busy = false;
  * tick is deterministic in tests.
  */
 export async function tick(db: Db, now: Date): Promise<void> {
-  const result = await runDispatchTick(db, dispatchConfig());
+  const result = await runDispatchTick(dispatchConfig());
   if (result.advanced.length > 0 || result.skipped.length > 0) {
     console.log(`[worker] dispatch advanced=${result.advanced.length} skipped=${result.skipped.length}`);
   }

@@ -88,7 +88,7 @@ describe('runDispatchTick — integration (mock LLM)', () => {
   it('advances one mission per project across two projects', async () => {
     await seedMission('m1', 'p1');
     await seedMission('m2', 'p2');
-    const result = await runDispatchTick(getDb(), { maxConcurrentPerProject: 1, maxGlobalConcurrent: 4 });
+    const result = await runDispatchTick({ maxConcurrentPerProject: 1, maxGlobalConcurrent: 4 });
     expect(result.advanced.map((a) => a.missionId).sort((a, b) => a.localeCompare(b))).toEqual(['m1', 'm2']);
     expect(result.skipped).toEqual([]);
   });
@@ -97,7 +97,7 @@ describe('runDispatchTick — integration (mock LLM)', () => {
     await seedMission('a1', 'p1');
     await seedMission('a2', 'p1');
     await seedMission('a3', 'p1');
-    const result = await runDispatchTick(getDb(), { maxConcurrentPerProject: 1, maxGlobalConcurrent: 4 });
+    const result = await runDispatchTick({ maxConcurrentPerProject: 1, maxGlobalConcurrent: 4 });
     expect(result.advanced.length).toBe(1);
     expect(result.skipped.length).toBe(2);
     expect(result.skipped.every((s) => s.reason === 'project_cap')).toBe(true);

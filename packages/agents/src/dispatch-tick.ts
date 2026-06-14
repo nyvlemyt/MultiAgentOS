@@ -1,4 +1,4 @@
-import { executeNextTask, listDispatchableMissions, type Db } from './dispatch';
+import { executeNextTask, listDispatchableMissions } from './dispatch';
 
 export interface DispatchTickConfig {
   readonly maxConcurrentPerProject: number;
@@ -74,9 +74,10 @@ export function selectForTick<M extends SelectableMission>(
  * One dispatch pass: pick missions within the concurrency budget and advance
  * each one task. better-sqlite3 is synchronous per statement and executeNextTask
  * uses an atomic task-claim, so concurrent advance via Promise.all is safe.
+ * Mission/task DB access is self-resolved via getDb() inside the dispatch
+ * helpers, so no Db handle is threaded here.
  */
 export async function runDispatchTick(
-  db: Db,
   config: DispatchTickConfig,
 ): Promise<DispatchTickResult> {
   const dispatchable = await listDispatchableMissions();
