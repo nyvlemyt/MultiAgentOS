@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3ea742c8-f99e-436e-a0e2-84ab75371c1a",
-  "prevId": "84669f7f-c164-4820-b39f-ce8c7526ba6d",
+  "id": "84669f7f-c164-4820-b39f-ce8c7526ba6d",
+  "prevId": "f1bb8b9a-6dd1-4adb-87a0-d6a2c0d1ee85",
   "tables": {
     "agents": {
       "name": "agents",
@@ -1262,113 +1262,6 @@
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "schedules": {
-      "name": "schedules",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "project_id": {
-          "name": "project_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "kind": {
-          "name": "kind",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'autopilot'"
-        },
-        "window_start": {
-          "name": "window_start",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "window_end": {
-          "name": "window_end",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "days_json": {
-          "name": "days_json",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[0,1,2,3,4,5,6]'"
-        },
-        "max_risk": {
-          "name": "max_risk",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'low'"
-        },
-        "enabled": {
-          "name": "enabled",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
-        "last_run_at": {
-          "name": "last_run_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "schedules_project_idx": {
-          "name": "schedules_project_idx",
-          "columns": [
-            "project_id",
-            "enabled"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "schedules_project_id_projects_id_fk": {
-          "name": "schedules_project_id_projects_id_fk",
-          "tableFrom": "schedules",
-          "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

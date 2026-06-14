@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { getDb, projects, projectLinks, memoryCandidates } from '@mas/db';
@@ -76,6 +77,16 @@ describe('createProject', () => {
     await createProject(getDb(), { name: 'Bare', path: A_PATH, type: 'other' });
     expect(await getDb().select().from(projectLinks)).toHaveLength(0);
     expect(await getDb().select().from(memoryCandidates)).toHaveLength(0);
+  });
+
+  it('auto-detects the stack from path when no template and no explicit stack', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'create-detect-'));
+    writeFileSync(
+      join(dir, 'package.json'),
+      JSON.stringify({ dependencies: { next: '15', react: '19' } }),
+    );
+    const p = await createProject(getDb(), { name: 'Detected', path: dir, type: 'other' });
+    expect(JSON.parse(p.stackJson)).toContain('Next.js');
   });
 
   it('lets explicit autonomy/mode/stack override template defaults', async () => {
