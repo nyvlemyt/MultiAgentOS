@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import {
   languageDirective,
   type LLMClient,
+  type LLMResponse,
   type Mode,
   type ProjectLanguage,
   type TaskResult,
@@ -11,6 +12,9 @@ import {
 import { loadTierBFiche } from './library';
 
 const BLOCKED_SENTINEL = '[blocked]';
+// Single source of truth for the diff-fence shape (S1192): reused by both
+// extractDiff() and parseResponse().
+const DIFF_FENCE_RE = /```diff\s*\n([\s\S]*?)```/;
 const DEFAULT_MODEL = 'claude-haiku-4-5';
 const DEFAULT_MODE: Mode = 'standard';
 
@@ -50,8 +54,17 @@ export interface DelegateInput {
   fichesDir?: string;
 }
 
+/**
+ * Returns the trimmed inner body of the first ```diff fenced block, or null when
+ * the text has no diff fence.
+ */
+export function extractDiff(text: string): string | null {
+  const match = DIFF_FENCE_RE.exec(text);
+  return match ? match[1].trim() : null;
+}
+
 function parseResponse(agentId: string, text: string): TaskResult {
-  if (/```diff[\s\S]*?```/.test(text)) {
+  if (extractDiff(text) !== null) {
     return {
       kind: 'done',
       outputs: [{ kind: 'patch', path: `data/outputs/${agentId}.patch` }],
@@ -70,7 +83,13 @@ function parseResponse(agentId: string, text: string): TaskResult {
   };
 }
 
-export async function delegate(input: DelegateInput): Promise<TaskResult> {
+export interface DelegateOutcome {
+  readonly result: TaskResult;
+  readonly diff: string | null;
+  readonly response: LLMResponse;
+}
+
+export async function delegateWithDiff(input: DelegateInput): Promise<DelegateOutcome> {
   const { agentId, task, llm, project, skillContext, memoryText, language, fichesDir } = input;
   // Unknown agent → loadTierBFiche throws; let it propagate.
   const fiche = loadTierBFiche(agentId, fichesDir);
@@ -92,5 +111,13 @@ export async function delegate(input: DelegateInput): Promise<TaskResult> {
     mode: project?.defaultMode ?? DEFAULT_MODE,
   });
 
-  return parseResponse(agentId, resp.text);
+  return {
+    result: parseResponse(agentId, resp.text),
+    diff: extractDiff(resp.text),
+    response: resp,
+  };
+}
+
+export async function delegate(input: DelegateInput): Promise<TaskResult> {
+  return (await delegateWithDiff(input)).result;
 }
