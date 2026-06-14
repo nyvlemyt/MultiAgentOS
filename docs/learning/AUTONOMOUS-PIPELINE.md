@@ -130,7 +130,7 @@ advance. Caveman-terse for prose; normal for code/commits/PRs/security.
   (§11.bis r4). Exit: a real mission emits a reviewed unified diff. Likely files: `dispatch.ts`,
   `delegate.ts`, `review-gate.ts`, new dispatch tests.
 
-- [~] **2 · Tech-debt sprint (two quick wins)** — win 1 shipped, win 2 deferred to 2b.
+- [~] **2 · Tech-debt sprint** — win 1 SHIPPED (PR #14, Checker PASS, 5/5 green); win 2 → 2b (attended).
   - [x] **drizzle-0006 snapshot** (`docs/backlog/drizzle-0006-snapshot-drift.md`): reconstructed
     `meta/0006_snapshot.json` (= 0007 minus `schedules`) + repointed 0007 `prevId` so the chain is
     `0005→0006→0007`. Added a `migrations-meta.test.ts` chain-integrity guard. `drizzle-kit generate`
