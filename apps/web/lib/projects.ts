@@ -36,7 +36,7 @@ export function slugify(name: string): string {
 }
 
 async function uniqueSlug(db: Db, base: string): Promise<string> {
-  const root = base || 'project';
+  const root = base.length > 0 ? base : 'project';
   const existing = await db.select({ slug: projects.slug }).from(projects);
   const taken = new Set(existing.map((r) => r.slug));
   if (!taken.has(root)) return root;

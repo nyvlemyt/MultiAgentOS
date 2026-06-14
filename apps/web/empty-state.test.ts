@@ -10,7 +10,8 @@ function render(props: Parameters<typeof EmptyState>[0]): string {
 describe('EmptyState', () => {
   it('renders the title and a status landmark', () => {
     const html = render({ title: 'No projects yet' });
-    expect(html).toContain('role="status"');
+    // <output> carries an implicit ARIA status role (S6819 — preferred over role="status").
+    expect(html).toContain('<output');
     expect(html).toContain('No projects yet');
   });
 

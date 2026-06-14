@@ -63,8 +63,9 @@ describe('createProject', () => {
     const links = await getDb().select().from(projectLinks).where(eq(projectLinks.projectId, p.id));
     const skillLinks = links.filter((l) => l.kind === 'skill');
     const agentLinks = links.filter((l) => l.kind === 'agent');
-    expect(skillLinks.map((l) => l.refId).sort()).toEqual([...tpl.skillPolicy].sort());
-    expect(agentLinks.map((l) => l.refId).sort()).toEqual([...tpl.tierARoster].sort());
+    const byName = (a: string, b: string) => a.localeCompare(b);
+    expect(skillLinks.map((l) => l.refId).sort(byName)).toEqual([...tpl.skillPolicy].sort(byName));
+    expect(agentLinks.map((l) => l.refId).sort(byName)).toEqual([...tpl.tierARoster].sort(byName));
 
     const cands = await getDb().select().from(memoryCandidates);
     expect(cands).toHaveLength(tpl.seedMemory.length);

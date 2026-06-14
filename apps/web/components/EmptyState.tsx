@@ -9,8 +9,7 @@ export function EmptyState({
   cta,
 }: Readonly<{ title: string; hint?: string; cta?: EmptyStateCta }>) {
   return (
-    <div
-      role="status"
+    <output
       className="surface flex flex-col items-center gap-3 px-6 py-12 text-center"
       style={{ borderColor: 'var(--border-subtle)' }}
     >
@@ -25,6 +24,6 @@ export function EmptyState({
           {cta.label}
         </a>
       )}
-    </div>
+    </output>
   );
 }
