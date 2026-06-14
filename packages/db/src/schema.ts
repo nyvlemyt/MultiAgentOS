@@ -18,6 +18,9 @@ export const projects = sqliteTable('projects', {
   defaultMode: text('default_mode', {
     enum: ['eco', 'standard', 'expert'],
   }).notNull().default('eco'),
+  language: text('language', {
+    enum: ['fr', 'en'],
+  }).notNull().default('fr'),
   monthlyBudgetCents: integer('monthly_budget_cents').notNull().default(500),
   sessionId: text('session_id'),
   createdAt: epoch().notNull(),

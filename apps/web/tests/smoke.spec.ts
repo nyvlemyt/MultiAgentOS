@@ -92,3 +92,32 @@ test('priorities board lists missions with a score', async ({ page }) => {
   await page.goto('/priorities');
   await expect(page.getByTestId('priority-row').first()).toBeVisible({ timeout: 15_000 });
 });
+
+test('language pill persists and switches the cockpit-shell language (Phase 3.5b)', async ({ page }) => {
+  await page.goto('/');
+  const pill = page.getByTestId('language-pill');
+  await expect(pill).toBeVisible();
+  // Default project language is fr → French nav.
+  await expect(page.getByRole('link', { name: 'Centre de commande' })).toBeVisible({ timeout: 15_000 });
+
+  // Await the PATCH so the write lands before we reload (a reload would
+  // otherwise abort the in-flight request).
+  const [patch] = await Promise.all([
+    page.waitForResponse((r) => /\/api\/projects\/.+\/language$/.test(r.url()) && r.request().method() === 'PATCH'),
+    pill.getByRole('button', { name: 'en' }).click(),
+  ]);
+  expect(patch.ok()).toBeTruthy();
+  await expect(pill.getByRole('button', { name: 'en' })).toHaveAttribute('aria-pressed', 'true');
+
+  // Persisted: a reload re-reads the project and keeps en + English nav.
+  await page.reload();
+  await expect(page.getByTestId('language-pill').getByRole('button', { name: 'en' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('link', { name: 'Command Center' })).toBeVisible({ timeout: 15_000 });
+
+  // Restore the default so the rest of the suite sees fr.
+  await Promise.all([
+    page.waitForResponse((r) => /\/api\/projects\/.+\/language$/.test(r.url()) && r.request().method() === 'PATCH'),
+    page.getByTestId('language-pill').getByRole('button', { name: 'fr' }).click(),
+  ]);
+  await expect(page.getByTestId('language-pill').getByRole('button', { name: 'fr' })).toHaveAttribute('aria-pressed', 'true');
+});

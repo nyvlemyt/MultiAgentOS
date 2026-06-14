@@ -50,6 +50,7 @@ const AGENT_IDS = [
   'skill-router',
   'design-ux-architect',
   'engineering-frontend-developer',
+  'quality-controller',
   'sec-reviewer',
   'reviewer',
 ];

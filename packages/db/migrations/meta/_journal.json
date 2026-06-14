@@ -43,6 +43,13 @@
       "when": 1781372429484,
       "tag": "0005_ordinary_vengeance",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1781459000000,
+      "tag": "0006_dapper_polaris",
+      "breakpoints": true
     }
   ]
 }
