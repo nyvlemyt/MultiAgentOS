@@ -226,6 +226,31 @@ describe('dispatch — validation idempotency', () => {
     const [t] = await db.select().from(tasks).where(eq(tasks.id, pausedTaskId!));
     expect(t?.status).toBe('done'); // still done, not blocked
   });
+
+  it('rejecting a pending §5 validation blocks the task + mission and logs it', async () => {
+    const MID = 'mid_reject_block';
+    await seedMinimal(MID);
+    const pausedTaskId = await driveToHighRiskGate(MID);
+    expect(pausedTaskId).toBeTruthy();
+
+    // Reject as the FIRST decision — the §5 human-gate BLOCK path.
+    const r = await resumeAfterValidation(pausedTaskId!, false);
+    expect(r.acted).toBe(true);
+
+    const db = getDb();
+    const [t] = await db.select().from(tasks).where(eq(tasks.id, pausedTaskId!));
+    expect(t?.status).toBe('blocked');
+    const [m] = await db.select().from(missions).where(eq(missions.id, MID));
+    expect(m?.status).toBe('blocked');
+
+    // The rejection is auditable.
+    const rejected = await db
+      .select()
+      .from(events)
+      .where(and(eq(events.missionId, MID), eq(events.type, 'validation_rejected')));
+    expect(rejected.length).toBe(1);
+    expect(rejected[0]?.taskId).toBe(pausedTaskId);
+  });
 });
 
 describe('dispatch — budget accounting', () => {

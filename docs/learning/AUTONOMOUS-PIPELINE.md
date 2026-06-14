@@ -152,8 +152,8 @@ advance. Caveman-terse for prose; normal for code/commits/PRs/security.
     covers all autonomy modes, so no missions are blocked.
 
 - [~] **4 · 7b — onboarding & UX polish** — 4a in progress; tour/states/i18n → 4b/4c.
-  - [ ] **4a · stack auto-detection from `projects.path`** — pure detector wired into
-    `createProject`. PR pending (`phase/7b-stack-detect`).
+  - [x] **4a · stack auto-detection from `projects.path`** — pure detector wired into
+    `createProject`. Checker PASS, 5/5 green (Sonar clean first pass). PR #16.
   - [ ] **4b/4c** — onboarding tour (≤5 steps across the 7 zones); remaining
     empty/error/no-permission states; deeper per-page i18n (fr/en). Frontend/visual — batch
     (attended-friendly).

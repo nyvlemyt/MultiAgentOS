@@ -1,5 +1,15 @@
 # SonarCloud cleanup — remaining work (handoff for an autonomous session)
 
+> **✅ RESOLVED 2026-06-14 (item 5 Hardening).** `main` is Sonar-clean: the live API reports
+> **0 open issues and 0 TO_REVIEW hotspots** on branch `main` (`api/issues/search` +
+> `api/hotspots/search`, project `nyvlemyt_MultiAgentOS2`). The strict 5th-check gate enforced
+> on every phase PR since (script must exit 0 + gate OK before merge, CLAUDE.md §7) cleared the
+> Wave B/C backlog incrementally. The Wave that remained is the **non-code, UI-only** SonarCloud
+> admin actions (Mark-Safe seed/test hotspots, Source File Exclusions for `**/.claude/**`,
+> UTF-8 encoding, delete duplicate Sonar projects) — those require the SonarCloud web UI and are
+> the user's to action. The `stream/route.ts` SSE composite-cursor item stays a separate backlog
+> (see below). Nothing code-side remains for an autonomous session.
+
 **Branch** : `chore/sonar-cleanup` (PR open, based on `main`). Wave A already done (`55fc394` + `aa556e1` scanner str() + `0ee9443` .mcp.json removed from git).
 **Sonar** : project `nyvlemyt_MultiAgentOS2`, org `nyvlem`, **public** → read issues without auth via
 `https://sonarcloud.io/api/issues/search?componentKeys=nyvlemyt_MultiAgentOS2&resolved=false&ps=100&branch=main`
