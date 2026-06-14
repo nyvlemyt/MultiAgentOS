@@ -41,7 +41,7 @@ export function selectForTick<M extends SelectableMission>(
 ): { selected: M[]; skipped: DispatchSkip[] } {
   const ordered = [...missionRows].sort((a, b) => {
     const byTime = a.createdAt.getTime() - b.createdAt.getTime();
-    return byTime !== 0 ? byTime : a.id.localeCompare(b.id);
+    return byTime === 0 ? a.id.localeCompare(b.id) : byTime;
   });
 
   const skipped: DispatchSkip[] = [];
