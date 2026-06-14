@@ -1,5 +1,12 @@
 # Backlog — drizzle meta 0006 snapshot drift
 
+**Status:** ✅ RESOLVED 2026-06-14 (tech-debt sprint, item 2 win 1). Reconstructed
+`meta/0006_snapshot.json` (= 0007 snapshot minus the `schedules` table, `prevId` →
+0005's id) and repointed `0007_snapshot.json` `prevId` → the new 0006 id, so the
+chain is `0005 → 0006 → 0007`. Added `packages/db/src/migrations-meta.test.ts` — a
+chain-integrity guard (every journal entry owns a snapshot; each `prevId` links the
+previous `id`) so this can't drift again. `drizzle-kit generate` is clean.
+
 **Found:** Phase 6 (2026-06-14). **Severity:** low (runtime unaffected).
 
 `packages/db/migrations/meta/0006_snapshot.json` is missing (snapshots jump 0005 → 0007).
