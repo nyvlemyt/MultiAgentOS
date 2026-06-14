@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const routes = [
   { path: '/', heading: 'Command Center' },
   { path: '/projects', heading: 'Projects' },
-  { path: '/projects/new', heading: 'Register a project' },
+  { path: '/projects/new', heading: 'Enregistrer un projet' },
   { path: '/projects/otakugo', heading: 'OtakuGO_UP' },
   { path: '/ideas', heading: 'Ideas Inbox' },
   { path: '/priorities', heading: 'Priorities' },
