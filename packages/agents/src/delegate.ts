@@ -14,7 +14,9 @@ import { loadTierBFiche } from './library';
 const BLOCKED_SENTINEL = '[blocked]';
 // Single source of truth for the diff-fence shape (S1192): reused by both
 // extractDiff() and parseResponse().
-const DIFF_FENCE_RE = /```diff\s*\n([\s\S]*?)```/;
+// Disjoint quantifiers (S5852): [^\n]* cannot overlap the \n that follows, so
+// there is no super-linear backtracking on the fence line.
+const DIFF_FENCE_RE = /```diff[^\n]*\n([\s\S]*?)```/;
 const DEFAULT_MODEL = 'claude-haiku-4-5';
 const DEFAULT_MODE: Mode = 'standard';
 
