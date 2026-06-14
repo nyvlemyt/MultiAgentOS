@@ -2,6 +2,17 @@
 import { useEffect, useState } from 'react';
 import { Timeline, type TimelineRow } from '@/components/Timeline';
 
+// Friendly labels for select event types (Phase 6: surface the autopilot wake
+// report clearly in the live trace).
+const EVENT_LABELS: Record<string, string> = {
+  daily_report: '🌅 Daily report',
+  risk_classified: '🛡️ Risk classified',
+};
+
+function labelFor(type: string): string {
+  return EVENT_LABELS[type] ?? type;
+}
+
 export default function TracePage() {
   const [rows, setRows] = useState<TimelineRow[]>([]);
 
@@ -24,7 +35,7 @@ export default function TracePage() {
           id: p.id,
           ts: p.at.slice(11, 19),
           agent: p.agentId ?? 'system',
-          action: p.type,
+          action: labelFor(p.type),
           tokens: p.tokens,
           risk: p.risk,
         };

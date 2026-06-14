@@ -8,16 +8,17 @@ import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
 import { isDeadlineSoon } from '@/lib/prioritize';
 import { topMissionsByPriority } from '@/lib/missions';
-import { getDb, missions as missionsTable } from '@mas/db';
-import { isNotNull } from 'drizzle-orm';
+import { getDb, missions as missionsTable, projects } from '@mas/db';
+import { isNotNull, desc } from 'drizzle-orm';
 import Link from 'next/link';
+import { listPendingValidations, latestDailyReport } from '@/lib/autopilot';
+import { t, type Language } from '@/lib/i18n';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CommandCenter() {
   const busy = allAgents.filter((a) => a.status === 'running');
   const blocked: typeof missions = [];
-  const pendingValidations = missions.filter((m) => m.risk === 'high');
 
   // Real-DB cards (Phase 4.5-receptacle) live alongside the fixture cards.
   const recentDecisions = (await listDecisions(getDb(), { scope: 'global', limit: 5 })).map((d) => ({
@@ -26,6 +27,16 @@ export default async function CommandCenter() {
   const deadlineMissions = await getDb().select().from(missionsTable).where(isNotNull(missionsTable.deadline));
   const soonMissions = deadlineMissions.filter((m) => isDeadlineSoon(m.deadline));
   const topPriorities = await topMissionsByPriority(getDb(), { limit: 3 });
+
+  // Phase 6 autopilot surface: real pending validations + latest daily report.
+  const [activeProject] = await getDb()
+    .select({ language: projects.language })
+    .from(projects)
+    .orderBy(desc(projects.lastActiveAt))
+    .limit(1);
+  const lang = (activeProject?.language ?? 'fr') as Language;
+  const pendingValidations = await listPendingValidations(getDb());
+  const dailyReport = await latestDailyReport(getDb());
 
   return (
     <div className="flex flex-col gap-6">
@@ -72,19 +83,40 @@ export default async function CommandCenter() {
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>None right now.</p>
         </Card>
 
-        <Card title="Pending validations" subtitle={`${pendingValidations.length} action${pendingValidations.length === 1 ? '' : 's'}`} accent={pendingValidations.length > 0 ? 'warning' : undefined}>
-          {pendingValidations.length === 0 ? (
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Nothing to validate.</p>
-          ) : (
-            <ul className="space-y-1.5">
-              {pendingValidations.map((m) => (
-                <li key={m.id} className="text-xs">
-                  <span style={{ color: 'var(--text-primary)' }}>{m.title}</span>
-                  <span className="ml-1" style={{ color: 'var(--text-muted)' }}>· risk {m.risk}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+        <Card title={t('card.pendingValidations', lang)} subtitle={`${pendingValidations.length} action${pendingValidations.length === 1 ? '' : 's'}`} accent={pendingValidations.length > 0 ? 'warning' : undefined}>
+          <div data-testid="pending-validations">
+            {pendingValidations.length === 0 ? (
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Nothing to validate.</p>
+            ) : (
+              <ul className="space-y-1.5">
+                {pendingValidations.map((v) => (
+                  <li key={v.validationId} className="text-xs">
+                    <span style={{ color: 'var(--text-primary)' }}>{v.taskTitle}</span>
+                    <span className="ml-1" style={{ color: 'var(--text-muted)' }}>· risk {v.risk}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Card>
+
+        <Card title={t('card.dailyReport', lang)} subtitle={t('card.dailyReport.subtitle', lang)}>
+          <div data-testid="daily-report-card">
+            {dailyReport === null ? (
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.empty', lang)}</p>
+            ) : (
+              <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.advanced', lang)}</dt>
+                <dd className="mono tabular-nums text-right" style={{ color: 'var(--text-primary)' }}>{dailyReport.missionsAdvanced}</dd>
+                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.blocked', lang)}</dt>
+                <dd className="mono tabular-nums text-right" style={{ color: 'var(--text-primary)' }}>{dailyReport.missionsBlocked}</dd>
+                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.tasksDone', lang)}</dt>
+                <dd className="mono tabular-nums text-right" style={{ color: 'var(--text-primary)' }}>{dailyReport.tasksDone}</dd>
+                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.quota', lang)}</dt>
+                <dd className="mono tabular-nums text-right" style={{ color: 'var(--accent)' }}>{dailyReport.quotaUnits}</dd>
+              </dl>
+            )}
+          </div>
         </Card>
 
         <Card title="Token budget" subtitle="today · €0.35 / €3.00">

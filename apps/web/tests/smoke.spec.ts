@@ -88,6 +88,12 @@ test('Command Center flags a mission deadline within 7 days', async ({ page }) =
   await expect(page.getByTestId('deadline-card')).toBeVisible({ timeout: 15_000 });
 });
 
+test('Command Center shows the autopilot daily-report card and pending-validations indicator (Phase 6)', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByTestId('daily-report-card')).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId('pending-validations')).toBeVisible({ timeout: 15_000 });
+});
+
 test('priorities board lists missions with a score', async ({ page }) => {
   await page.goto('/priorities');
   await expect(page.getByTestId('priority-row').first()).toBeVisible({ timeout: 15_000 });
