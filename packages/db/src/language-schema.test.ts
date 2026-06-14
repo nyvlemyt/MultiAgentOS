@@ -1,26 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { unlinkSync } from 'node:fs';
+import { describe, it, expect } from 'vitest';
 import { tmpdir } from 'node:os';
-import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
+import { join } from 'node:path';
 import { eq, sql } from 'drizzle-orm';
-import { getDb, closeDb } from './client';
+import { getDb } from './client';
 import { projects } from './schema';
+import { useTempDb } from './testing';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const MIGRATIONS_FOLDER = resolve(__dirname, '../migrations');
-
-let dbPath: string;
-beforeEach(() => {
-  dbPath = join(tmpdir(), `mas-${randomUUID()}.db`);
-  migrate(getDb(dbPath), { migrationsFolder: MIGRATIONS_FOLDER });
-});
-afterEach(() => {
-  closeDb();
-  unlinkSync(dbPath);
-});
+useTempDb();
 
 describe('Phase 3.5b migration 0006 — projects.language', () => {
   it('defaults new rows to fr', async () => {
