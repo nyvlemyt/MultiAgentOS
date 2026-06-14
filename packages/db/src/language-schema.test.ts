@@ -4,9 +4,9 @@ import { join } from 'node:path';
 import { eq, sql } from 'drizzle-orm';
 import { getDb } from './client';
 import { projects } from './schema';
-import { useTempDb } from './testing';
+import { setupTempDb } from './testing';
 
-useTempDb();
+setupTempDb();
 
 describe('Phase 3.5b migration 0006 — projects.language', () => {
   it('defaults new rows to fr', async () => {

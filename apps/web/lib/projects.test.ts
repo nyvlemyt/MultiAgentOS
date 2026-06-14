@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { getDb, projects } from '@mas/db';
-import { useTempDb } from '@mas/db/testing';
+import { setupTempDb } from '@mas/db/testing';
 import { setProjectLanguage, PROJECT_LANGUAGES } from './projects';
 
-useTempDb();
+setupTempDb();
 beforeEach(async () => {
   await getDb().insert(projects).values({
     id: 'p1', name: 'P', slug: 'p', path: join(tmpdir(), 'p'), type: 'other',

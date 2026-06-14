@@ -14,7 +14,7 @@ const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../m
  * by MAS_DB_PATH. Tears it down (close + unlink) after each test. Shared by the
  * @mas/db and @mas/web suites so the temp-db lifecycle lives in one place.
  */
-export function useTempDb(): void {
+export function setupTempDb(): void {
   let dbPath: string;
   beforeEach(() => {
     dbPath = join(tmpdir(), `mas-${randomUUID()}.db`);
