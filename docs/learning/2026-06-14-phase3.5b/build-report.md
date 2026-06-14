@@ -30,7 +30,7 @@
 2. ✅ `pnpm lint` — no-PAYG guard clean (§11/§11.bis), all `tsc --noEmit` Done.
 3. ✅ `pnpm build` — clean; `/api/projects/[id]/language` route present.
 4. ✅ `pnpm --filter @mas/web smoke` — 28 passed (incl. language-pill persistence + fr→en shell switch).
-5. ⏳ **SonarCloud** — push + PR #9 created; CI/Sonar scan pending. Will run `scripts/sonar-pr-issues.sh 9` until it exits 0 (zero open issues + zero to-review hotspots, per CLAUDE.md §7). *(Updated below once the HEAD-sha analysis lands.)*
+5. ✅ **SonarCloud** — first scan flagged 4: `S6443` ×2 (LanguagePill setter-uses-its-own-state) + `S5443` ×2 (hardcoded `/tmp` paths in the migration test). Fixed (commit `6536936`): LanguagePill now commits state only on a successful PATCH (no optimistic-revert); the test uses `join(tmpdir(), …)`. Re-scan (analysis `2026-06-13T23:59:32Z`, new HEAD sha `6536936`): `scripts/sonar-pr-issues.sh 9` → **0 open issues, 0 to-review hotspots, exit 0** = SONAR CLEAN (CLAUDE.md §7). The quality **gate** still reads ERROR — that is the new-code *coverage* metric on the UI/test files, not an open issue; §7 makes the issue script (exit 0) the bar, consistent with prior phases.
 
 Scope guardrails respected: no provider/router change (§11 intact), no Phase 5 Tier B execution, §8 memory write-lock untouched (no new writer), producer/receptacle code untouched.
 
@@ -42,4 +42,5 @@ dd2941a feat(agents): languageDirective injected into both system assemblies
 23c575a feat(web): LanguagePill + PATCH language route + minimal i18n shell
 9bae716 feat(agents): Quality Controller gate before reviewer + Tier A fiche
 dfb989c test(web): smoke covers language pill persistence + shell i18n
+6536936 fix(review): sonar PR9 — S6443 commit-on-success, S5443 tmpdir paths
 ```
