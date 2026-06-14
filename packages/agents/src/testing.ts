@@ -1,10 +1,41 @@
 import { beforeEach, afterEach } from 'vitest';
-import { unlinkSync } from 'node:fs';
+import { unlinkSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb, projects, agents, missions } from '@mas/db';
+
+/**
+ * Shared diff-test fixtures (sandbox-diff + review-gate suites). Hoisted here to
+ * keep a single source of truth and avoid Sonar duplication across test files.
+ */
+export function makeTempGitRepo(prefix = 'mas-repo-'): string {
+  const dir = mkdtempSync(join(tmpdir(), prefix));
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+  writeFileSync(join(dir, 'file.txt'), 'hello\nworld\n');
+  execFileSync('git', ['add', '-A'], { cwd: dir });
+  execFileSync('git', ['commit', '-q', '-m', 'base'], { cwd: dir });
+  return dir;
+}
+
+/** A clean unified diff that turns 'hello' into 'goodbye' in file.txt. */
+export const CLEAN_TEST_DIFF = [
+  'diff --git a/file.txt b/file.txt',
+  'index 0000000..1111111 100644',
+  '--- a/file.txt',
+  '+++ b/file.txt',
+  '@@ -1,2 +1,2 @@',
+  '-hello',
+  '+goodbye',
+  ' world',
+  '',
+].join('\n');
+
+export const GARBAGE_TEST_DIFF = 'this is not a diff at all\n@@ broken @@\n';
 
 /**
  * Test-only helpers (not exported from the package index). Deduplicate the

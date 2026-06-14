@@ -1,39 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { rmSync } from 'node:fs';
 import { reviewProducedDiff } from './review-gate';
-
-function makeTempRepo(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'mas-gate-'));
-  execFileSync('git', ['init', '-q'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
-  writeFileSync(join(dir, 'file.txt'), 'hello\nworld\n');
-  execFileSync('git', ['add', '-A'], { cwd: dir });
-  execFileSync('git', ['commit', '-q', '-m', 'base'], { cwd: dir });
-  return dir;
-}
-
-const CLEAN_DIFF = [
-  'diff --git a/file.txt b/file.txt',
-  'index 0000000..1111111 100644',
-  '--- a/file.txt',
-  '+++ b/file.txt',
-  '@@ -1,2 +1,2 @@',
-  '-hello',
-  '+goodbye',
-  ' world',
-  '',
-].join('\n');
-
-const GARBAGE_DIFF = 'not a diff\n@@ broken @@\n';
+import { makeTempGitRepo, CLEAN_TEST_DIFF as CLEAN_DIFF, GARBAGE_TEST_DIFF as GARBAGE_DIFF } from './testing';
 
 describe('reviewProducedDiff', () => {
   let repo: string;
   beforeEach(() => {
-    repo = makeTempRepo();
+    repo = makeTempGitRepo('mas-gate-');
   });
   afterEach(() => {
     rmSync(repo, { recursive: true, force: true });
