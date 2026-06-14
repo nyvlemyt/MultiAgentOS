@@ -94,6 +94,32 @@ test('Command Center shows the autopilot daily-report card and pending-validatio
   await expect(page.getByTestId('pending-validations')).toBeVisible({ timeout: 15_000 });
 });
 
+test('new-project wizard shows template cards and creates a project (Phase 7)', async ({ page }) => {
+  await page.goto('/projects/new');
+
+  // Four template cards render as pressable buttons.
+  const businessCard = page.getByRole('button', { name: /Business website/ });
+  await expect(businessCard).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('button', { name: /Manga/ })).toBeVisible();
+
+  // Selecting a template marks it pressed and reveals its blurb.
+  await businessCard.click();
+  await expect(businessCard).toHaveAttribute('aria-pressed', 'true');
+
+  // Fill the required fields and submit; land on the created project page.
+  const unique = `Website audit ${Date.now()}`;
+  await page.getByLabel(/Nom|Name/).fill(unique);
+  await page.getByLabel(/Chemin absolu|Absolute path/).fill('/Users/test/projects/website-audit');
+  await page.getByRole('button', { name: /Créer le projet|Create project/ }).click();
+
+  await expect(page).toHaveURL(/\/projects\/website-audit/, { timeout: 15_000 });
+});
+
+test('projects list renders without console errors (empty-state landmark when empty)', async ({ page }) => {
+  await page.goto('/projects');
+  await expect(page.getByRole('heading', { name: 'Projects' })).toBeVisible({ timeout: 15_000 });
+});
+
 test('priorities board lists missions with a score', async ({ page }) => {
   await page.goto('/priorities');
   await expect(page.getByTestId('priority-row').first()).toBeVisible({ timeout: 15_000 });

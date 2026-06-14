@@ -1,6 +1,7 @@
 import { getDb, missions as missionsTable } from '@mas/db';
 import { desc } from 'drizzle-orm';
 import { MissionsBoardClient, type BoardMission, type BoardStatus } from '@/components/MissionsBoardClient';
+import { EmptyState } from '@/components/EmptyState';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,15 @@ export default async function MissionsBoardPage() {
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} missions · drag between Inbox / To clarify / Planned</p>
         </div>
       </header>
-      <MissionsBoardClient missions={data} />
+      {data.length === 0 ? (
+        <EmptyState
+          title="No missions yet"
+          hint="Capture an idea and convert it to a mission, or start one from a project page."
+          cta={{ label: 'Open the Ideas Inbox', href: '/ideas' }}
+        />
+      ) : (
+        <MissionsBoardClient missions={data} />
+      )}
     </div>
   );
 }

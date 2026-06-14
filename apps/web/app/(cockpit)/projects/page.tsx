@@ -3,6 +3,7 @@ import { FolderKanban } from 'lucide-react';
 import { getDb, projects as projectsTable } from '@mas/db';
 import { computeProjectHealth } from '@/lib/health';
 import { ProjectHealthBar } from '@/components/ProjectHealthBar';
+import { EmptyState } from '@/components/EmptyState';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +23,13 @@ export default async function ProjectsList() {
         </div>
         <Link href="/projects/new" className="rounded-md px-3 py-1.5 text-xs font-medium text-white" style={{ background: 'var(--accent)' }}>+ New project</Link>
       </header>
+      {projects.length === 0 ? (
+        <EmptyState
+          title="No projects registered yet"
+          hint="Register an external project by absolute path to start dispatching missions. Your code never moves."
+          cta={{ label: '+ New project', href: '/projects/new' }}
+        />
+      ) : (
       <ul className="flex flex-col gap-3">
         {projects.map((p) => (
           <li key={p.id}>
@@ -45,6 +53,7 @@ export default async function ProjectsList() {
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }
