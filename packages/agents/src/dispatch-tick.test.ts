@@ -1,13 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { unlinkSync, mkdirSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve, dirname } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { getDb, closeDb } from '@mas/db';
 import { selectForTick, runDispatchTick, type DispatchTickConfig } from './dispatch-tick';
 import { seedDispatchableMission as seedMission } from './fixtures';
+import { useTestDb } from './testing';
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../db/migrations');
 
@@ -54,19 +50,11 @@ describe('selectForTick — pure selection', () => {
 });
 
 describe('runDispatchTick — integration (mock LLM)', () => {
-  let dbPath: string;
+  useTestDb(MIGRATIONS_FOLDER);
   beforeEach(() => {
     process.env.MAS_MOCK_LLM = '1';
-    const dir = join(tmpdir(), 'mas-dispatch-tick');
-    mkdirSync(dir, { recursive: true });
-    dbPath = join(dir, `${randomUUID()}.db`);
-    process.env.MAS_DB_PATH = dbPath;
-    migrate(getDb(), { migrationsFolder: MIGRATIONS_FOLDER });
   });
   afterEach(() => {
-    closeDb();
-    try { unlinkSync(dbPath); } catch { /* ignore */ }
-    delete process.env.MAS_DB_PATH;
     delete process.env.MAS_MOCK_LLM;
   });
 
