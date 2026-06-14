@@ -3,13 +3,13 @@ import { getDb, missions, projects, schedules, tasks, type Mission, type Schedul
 import type { Risk } from '@mas/core';
 import { executeNextTask } from './dispatch';
 
-export type Db = ReturnType<typeof getDb>;
+type Db = ReturnType<typeof getDb>;
 
 const RISK_ORDER: Record<Risk, number> = { low: 0, medium: 1, high: 2, blocking: 3 };
 
 function parseHHMM(value: string): number {
-  const [h, m] = value.split(':').map((n) => Number.parseInt(n, 10));
-  return h * 60 + m;
+  const [h = '0', m = '0'] = value.split(':');
+  return Number.parseInt(h, 10) * 60 + Number.parseInt(m, 10);
 }
 
 /**

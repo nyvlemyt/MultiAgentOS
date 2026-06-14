@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { and, gte, lt, eq } from 'drizzle-orm';
 import { getDb, events, validations } from '@mas/db';
 
-export type Db = ReturnType<typeof getDb>;
+type Db = ReturnType<typeof getDb>;
 
 export interface DailyReport {
   readonly since: Date;

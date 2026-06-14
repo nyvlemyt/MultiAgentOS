@@ -75,7 +75,7 @@ describe('planMission — risk classifier wiring', () => {
       .from(events)
       .where(and(eq(events.missionId, 'mid_rm'), eq(events.type, 'risk_classified')));
     expect(evs.length).toBe(1);
-    const payload = JSON.parse(evs[0].payloadJson) as { rule: string; from: string; to: string };
+    const payload = JSON.parse(evs[0]!.payloadJson) as { rule: string; from: string; to: string };
     expect(payload.from).toBe('low');
     expect(payload.to).toBe('blocking');
     expect(payload.rule).toBe('rm');

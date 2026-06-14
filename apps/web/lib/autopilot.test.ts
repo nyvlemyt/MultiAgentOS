@@ -39,8 +39,8 @@ describe('listPendingValidations', () => {
     });
     const rows = await listPendingValidations(getDb());
     expect(rows).toHaveLength(1);
-    expect(rows[0].taskTitle).toBe('High task');
-    expect(rows[0].missionId).toBe('m');
+    expect(rows[0]?.taskTitle).toBe('High task');
+    expect(rows[0]?.missionId).toBe('m');
   });
 
   it('ignores decided validations', async () => {
