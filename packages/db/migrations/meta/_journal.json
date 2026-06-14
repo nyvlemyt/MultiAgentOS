@@ -50,6 +50,13 @@
       "when": 1781459000000,
       "tag": "0006_dapper_polaris",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1781408262360,
+      "tag": "0007_panoramic_brood",
+      "breakpoints": true
     }
   ]
 }

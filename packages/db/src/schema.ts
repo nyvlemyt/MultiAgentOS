@@ -260,6 +260,27 @@ export const contextPacks = sqliteTable('context_packs', {
   fileCount: integer('file_count').notNull().default(0),
 });
 
+// Phase 6: autopilot scheduler. One enabled schedule per project drives the
+// autopilot window. maxRisk is the auto-run breaker — the worker NEVER runs a
+// task whose risk exceeds it (higher-risk tasks stay gated). All time logic in
+// the engine takes an explicit `now: Date`; this table only stores the window.
+export const schedules = sqliteTable(
+  'schedules',
+  {
+    id: text('id').primaryKey(),
+    projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+    kind: text('kind', { enum: ['autopilot'] }).notNull().default('autopilot'),
+    windowStart: text('window_start').notNull(),
+    windowEnd: text('window_end').notNull(),
+    daysJson: text('days_json').notNull().default('[0,1,2,3,4,5,6]'),
+    maxRisk: text('max_risk', { enum: ['low', 'medium'] }).notNull().default('low'),
+    enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+    lastRunAt: integer('last_run_at', { mode: 'timestamp' }),
+    createdAt: epoch().notNull(),
+  },
+  (t) => ({ byProject: index('schedules_project_idx').on(t.projectId, t.enabled) }),
+);
+
 export const permissions = sqliteTable('permissions', {
   id: text('id').primaryKey(),
   category: text('category').notNull(),
@@ -280,3 +301,5 @@ export type Idea = typeof ideas.$inferSelect;
 export type NewIdea = typeof ideas.$inferInsert;
 export type Decision = typeof decisions.$inferSelect;
 export type NewDecision = typeof decisions.$inferInsert;
+export type Schedule = typeof schedules.$inferSelect;
+export type NewSchedule = typeof schedules.$inferInsert;
