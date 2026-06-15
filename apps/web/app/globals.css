@@ -122,6 +122,12 @@ body {
   box-shadow: var(--glow-accent);
 }
 
+button:not(:disabled),
+[role='button'],
+a[href] {
+  cursor: pointer;
+}
+
 @keyframes status-pulse {
   0%, 100% { box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--ring-color); }
   50% { box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--ring-color), 0 0 10px 4px var(--ring-color); }
