@@ -31,6 +31,13 @@ export interface RouterLLMClientOptions {
   blockedTtlMs?: number;
   /** Retries on 529 before propagating. */
   maxOverloadedRetries?: number;
+  /**
+   * Hydrate the block map at construction (source id → blockedAt ms). Lets a
+   * db-aware caller restore persisted windows without coupling core to @mas/db.
+   */
+  readonly initialBlocked?: Readonly<Record<string, number>>;
+  /** Fired when a source is quota-blocked; the caller persists it (5b). */
+  readonly onBlock?: (sourceId: string, blockedAt: number) => void;
 }
 
 function classify(err: unknown): 'quota' | 'overloaded' | 'other' {
@@ -51,6 +58,9 @@ export class RouterLLMClient implements LLMClient {
     // Declared accounts are pool members: each is an enabled source (ADR 0002 §2).
     for (const acc of opts.config.claude_accounts) {
       this.statuses.set(acc.id, { id: acc.id, enabled: true });
+    }
+    for (const [id, at] of Object.entries(opts.initialBlocked ?? {})) {
+      this.blockedAt.set(id, at);
     }
   }
 
@@ -108,7 +118,9 @@ export class RouterLLMClient implements LLMClient {
         lastError = err;
         const kind = classify(err);
         if (kind === 'quota') {
-          this.blockedAt.set(id, (this.opts.now ?? Date.now)());
+          const blockedAt = (this.opts.now ?? Date.now)();
+          this.blockedAt.set(id, blockedAt);
+          this.opts.onBlock?.(id, blockedAt);
           const next = candidates[i + 1];
           if (next) {
             this.opts.onEvent?.({ type: 'provider_fallback', from: id, to: next, reason: 'quota' });

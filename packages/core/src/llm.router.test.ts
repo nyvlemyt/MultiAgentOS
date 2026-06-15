@@ -196,6 +196,36 @@ describe('failover taxonomy (ADR 0002 Q2)', () => {
     );
   });
 
+  it('hydrates from initialBlocked: recent ts → blocked, stale ts → fresh', () => {
+    const clients = { claude: okClient('claude'), 'gemini-free': okClient('gemini-free') };
+    const router = new RouterLLMClient({
+      config: cfg,
+      env: { GEMINI_API_KEY: 'k' },
+      clients: new Map(Object.entries(clients)),
+      now: () => 10_000,
+      blockedTtlMs: 1000,
+      initialBlocked: { 'gemini-free': 9_500, claude: 1_000 },
+    });
+    expect(router.getWindowState('gemini-free')).toBe('blocked');
+    expect(router.getWindowState('claude')).toBe('fresh');
+  });
+
+  it('fires onBlock with (id, now) on a quota block', async () => {
+    const clients = { claude: okClient('claude'), 'gemini-free': okClient('gemini-free') };
+    const onBlock = vi.fn();
+    const router = new RouterLLMClient({
+      config: cfg,
+      env: { GEMINI_API_KEY: 'k' },
+      clients: new Map(Object.entries(clients)),
+      sleep: async () => {},
+      now: () => 42_000,
+      onBlock,
+    });
+    clients['gemini-free'].call.mockRejectedValueOnce(coded(429));
+    await router.call(reqFor('search'));
+    expect(onBlock).toHaveBeenCalledWith('gemini-free', 42_000);
+  });
+
   it('blocked window resets after TTL', async () => {
     const clients = { claude: okClient('claude'), 'gemini-free': okClient('gemini-free') };
     let t = 0;
