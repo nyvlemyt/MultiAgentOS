@@ -121,6 +121,11 @@ advance. Caveman-terse for prose; normal for code/commits/PRs/security.
 
 > Tick items as PRs open. Each links to its scope. When unsure of scope, expand it into a preflight
 > `plan.md` before building (step 2).
+>
+> **STATUS 2026-06-15 — autonomous backlog EXHAUSTED.** All cleanly-autonomous slices shipped
+> (PRs #13–#18: 5b-delegate · tech-debt 2a · 8a · 4a · 5a · 5b). Everything below that is still
+> open needs a HUMAN decision, a real binary/login, or visual/UX judgement that can't be verified
+> unattended — **paste-ready prompts for each are in `docs/learning/2026-06-15-handoff-prompts.md`.**
 
 - [x] **1 · 5b — wire `delegate()` into live execution** — PR #13 OPEN, Checker PASS, 5/5 green (Sonar exit 0). Awaiting user merge.
   Phase 5 built the Tier B delegation engine + diff-validation + review-gate as an isolated layer.
@@ -163,10 +168,9 @@ advance. Caveman-terse for prose; normal for code/commits/PRs/security.
     boundary + the reject→blocked §5 gate path. 5/5 green, Sonar clean first pass. PR #17.
   - [x] **sonar-cleanup-remaining** — CLOSED: `main` verified 0 issues / 0 hotspots; backlog
     doc marked RESOLVED. Remaining = SonarCloud UI admin actions (user).
-  - [ ] **5b · router-window-state-persistence** (NEXT, own PR off main) — inject
-    `initialBlocked` (hydrate `blockedAt`) + `onBlock` (emit `window_blocked` event) hooks
-    through `createRouterLLM`; keep `RouterLLMClient` (core) free of `@mas/db`. Spec +
-    design: `docs/backlog/router-window-state-persistence.md` + memory `project_phase5_hardening`.
+  - [x] **5b · router-window-state-persistence** — SHIPPED (PR #18): `window_blocked` events
+    persist + rehydrate per call/restart via injected `initialBlocked`/`onBlock` hooks; core
+    stays free of `@mas/db`. Checker PASS, 5/5 green.
   - [ ] **self-audits** (ATTENDED governance) — lean-CLAUDE.md trim (RES-012 <200 vs RES-061
     <150 contradiction) + BDR/EDR/ADR registry-name harmonization in `gouvernance.md`. The
     docs state the final call is human (Melvyn). mémoire-audit §1 already resolved 2026-06-07.
