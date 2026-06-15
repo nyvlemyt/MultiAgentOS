@@ -2,6 +2,7 @@
 import { useState, useTransition } from 'react';
 import { Check } from 'lucide-react';
 import { updateProjectSettings } from '@/app/(cockpit)/project-actions';
+import { MODE_MODEL, MODE_LABEL, type Mode } from '@/lib/modes';
 
 const AUTONOMY = [
   { v: 'manual', label: 'Manuel — tout est proposé, tu valides chaque action' },
@@ -9,16 +10,7 @@ const AUTONOMY = [
   { v: 'autonomous', label: 'Autonome — agit dans le bac à sable, risqué gardé' },
   { v: 'autopilot', label: 'Autopilote — lots longs non-risqués, rapport au réveil' },
 ];
-const MODE = [
-  { v: 'eco', label: 'Eco — Haiku, prose compressée, budget mini' },
-  { v: 'standard', label: 'Standard — Sonnet, équilibre coût/qualité' },
-  { v: 'expert', label: 'Expert — Opus, qualité max sur les gros travaux' },
-];
-const MODEL = [
-  { v: 'claude-haiku-4-5', label: 'Haiku — rapide, pas cher (volume)' },
-  { v: 'claude-sonnet-4-6', label: 'Sonnet — défaut conseillé' },
-  { v: 'claude-opus-4-8', label: 'Opus — gros travaux' },
-];
+const MODES: Mode[] = ['eco', 'standard', 'expert'];
 
 function Field({ label, value, onChange, options }: Readonly<{ label: string; value: string; onChange: (v: string) => void; options: { v: string; label: string }[] }>) {
   return (
@@ -41,15 +33,14 @@ export function ProjectSettings({
   slug,
   autonomy,
   defaultMode,
-  defaultModel,
-}: Readonly<{ projectId: string; slug: string; autonomy: string; defaultMode: string; defaultModel: string }>) {
+}: Readonly<{ projectId: string; slug: string; autonomy: string; defaultMode: string }>) {
   const [a, setA] = useState(autonomy);
   const [m, setM] = useState(defaultMode);
-  const [model, setModel] = useState(defaultModel);
   const [saved, setSaved] = useState(false);
   const [pending, start] = useTransition();
 
-  const dirty = a !== autonomy || m !== defaultMode || model !== defaultModel;
+  const dirty = a !== autonomy || m !== defaultMode;
+  const derivedModel = MODE_MODEL[m as Mode] ?? MODE_MODEL.standard;
 
   let buttonLabel: React.ReactNode = 'Enregistrer';
   if (saved) buttonLabel = <><Check size={13} /> Enregistré</>;
@@ -57,7 +48,7 @@ export function ProjectSettings({
 
   function save() {
     start(async () => {
-      await updateProjectSettings(projectId, slug, { autonomy: a, defaultMode: m, defaultModel: model });
+      await updateProjectSettings(projectId, slug, { autonomy: a, defaultMode: m });
       setSaved(true);
       globalThis.setTimeout(() => setSaved(false), 1800);
     });
@@ -66,8 +57,10 @@ export function ProjectSettings({
   return (
     <div className="flex flex-col gap-3">
       <Field label="Autonomie" value={a} onChange={setA} options={AUTONOMY} />
-      <Field label="Mode" value={m} onChange={setM} options={MODE} />
-      <Field label="Modèle par défaut" value={model} onChange={setModel} options={MODEL} />
+      <Field label="Mode (pilote le modèle)" value={m} onChange={setM} options={MODES.map((v) => ({ v, label: MODE_LABEL[v] }))} />
+      <div className="mono text-[11px]" style={{ color: 'var(--text-muted)' }}>
+        modèle : <span style={{ color: 'var(--accent)' }}>{derivedModel}</span>
+      </div>
       <button
         type="button"
         onClick={save}

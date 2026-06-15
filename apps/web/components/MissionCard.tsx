@@ -36,7 +36,10 @@ export function MissionCard({ m }: Readonly<{ m: MissionCardData }>) {
             <AgentAvatar key={a.name} alt={a.name} status="running" size={22} />
           ))}
         </div>
-        <BudgetBar spent={m.budgetSpent} cap={m.budgetCap} />
+        <div className="flex flex-col items-end gap-0.5">
+          <span className="mono text-[9px]" style={{ color: 'var(--text-muted)' }}>{(m.budgetSpent / 1000).toFixed(1)}k / {(m.budgetCap / 1000).toFixed(0)}k tokens</span>
+          <BudgetBar spent={m.budgetSpent} cap={m.budgetCap} />
+        </div>
       </div>
     </Link>
   );
