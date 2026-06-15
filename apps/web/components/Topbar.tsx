@@ -1,7 +1,6 @@
 import { ScopeBreadcrumb } from './ScopeBreadcrumb';
 import { ModePill, AutonomyPill } from './ModePill';
 import { LanguagePill } from './LanguagePill';
-import { ThemeToggle } from './ThemeToggle';
 import { BudgetBar } from './BudgetBar';
 import { type Language } from '@/lib/i18n';
 
@@ -31,7 +30,6 @@ export function Topbar({
         <span className="mx-1 h-5 w-px" style={{ background: 'var(--border-default)' }} />
         <LanguagePill projectId={projectId} value={language} />
         <BudgetBar spent={35} cap={300} label="today · €0.35/3" />
-        <ThemeToggle />
       </div>
     </header>
   );
