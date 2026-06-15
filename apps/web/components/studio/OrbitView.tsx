@@ -65,7 +65,7 @@ export function OrbitView({ nodes, edges, size = 520 }: Readonly<{ nodes: OrbitN
           style={{ left: p.x, top: p.y }}
           title={p.node.name}
         >
-          <AgentAvatar src={p.node.avatarPath ?? undefined} alt={p.node.name} status={p.node.status} size={p.node.tier === 'A' ? 40 : 32} />
+          <AgentAvatar role={p.node.id} alt={p.node.name} status={p.node.status} size={p.node.tier === 'A' ? 40 : 32} />
         </div>
       ))}
     </div>

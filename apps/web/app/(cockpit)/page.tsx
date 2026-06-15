@@ -73,7 +73,7 @@ export default async function CommandCenter() {
         <Card title="Agents busy" subtitle={`${busy.length} running`}>
           <div className="flex flex-wrap gap-1.5">
             {busy.map((a) => (
-              <AgentAvatar key={a.id} src={a.avatarPath ?? undefined} alt={a.name} status="running" size={32} />
+              <AgentAvatar key={a.id} role={a.id} alt={a.name} status="running" size={32} />
             ))}
             {busy.length === 0 && <span className="text-xs" style={{ color: 'var(--text-muted)' }}>All idle.</span>}
           </div>

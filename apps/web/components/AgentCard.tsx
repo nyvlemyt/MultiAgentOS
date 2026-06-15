@@ -21,7 +21,7 @@ export function AgentCard({ a }: Readonly<{ a: AgentCardData }>) {
   return (
     <Link href={href} className="surface group flex flex-col gap-3 px-4 py-3 transition-colors hover:bg-[color:var(--bg-hover)]">
       <div className="flex items-start gap-3">
-        <AgentAvatar src={a.avatarPath ?? undefined} alt={a.name} status={a.status} size={40} />
+        <AgentAvatar role={a.id} alt={a.name} status={a.status} size={40} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1">
             <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{a.name}</span>
