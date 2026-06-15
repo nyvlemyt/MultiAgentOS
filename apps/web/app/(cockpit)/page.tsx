@@ -40,12 +40,13 @@ export default async function CommandCenter() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Command Center</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>1 project active · {missions.length} missions in flight · {busy.length} agents working</p>
+      <header className="hero-band flex items-end justify-between p-6">
+        <div className="hero-grid" />
+        <div className="relative">
+          <h1 className="text-3xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Command Center</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>1 project active · {missions.length} missions in flight · {busy.length} agents working</p>
         </div>
-        <Link href="/missions" className="rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[color:var(--bg-hover)]" style={{ borderColor: 'var(--border-default)', color: 'var(--text-primary)' }}>New mission</Link>
+        <Link href="/missions" className="relative rounded-lg px-4 py-2 text-xs font-semibold transition-transform hover:-translate-y-0.5 glow-accent" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent-dim))', color: '#04141a' }}>New mission</Link>
       </header>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -200,7 +201,7 @@ function accentBorderFor(accent?: 'warning' | 'danger'): string {
 function Card({ title, subtitle, children, accent }: Readonly<{ title: string; subtitle?: string; children: React.ReactNode; accent?: 'warning' | 'danger' }>) {
   const accentBorder = accentBorderFor(accent);
   return (
-    <article className={`surface p-4 ${accentBorder}`}>
+    <article className={`surface lift p-4 ${accentBorder}`}>
       <header className="mb-3 flex items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</h2>
         {subtitle && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{subtitle}</span>}

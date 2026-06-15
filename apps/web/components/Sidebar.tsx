@@ -29,7 +29,7 @@ export function Sidebar({ lang = 'fr' }: Readonly<{ lang?: Language }>) {
   const path = usePathname() || '/';
   return (
     <aside
-      className="flex h-full w-56 flex-col gap-4 border-r px-3 py-4"
+      className="flex h-full w-56 shrink-0 flex-col gap-4 border-r px-3 py-4"
       style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
     >
       <div className="flex items-center gap-2 px-2">
