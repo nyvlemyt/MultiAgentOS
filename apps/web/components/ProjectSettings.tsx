@@ -51,6 +51,10 @@ export function ProjectSettings({
 
   const dirty = a !== autonomy || m !== defaultMode || model !== defaultModel;
 
+  let buttonLabel: React.ReactNode = 'Enregistrer';
+  if (saved) buttonLabel = <><Check size={13} /> Enregistré</>;
+  else if (pending) buttonLabel = 'Enregistrement…';
+
   function save() {
     start(async () => {
       await updateProjectSettings(projectId, slug, { autonomy: a, defaultMode: m, defaultModel: model });
@@ -71,7 +75,7 @@ export function ProjectSettings({
         className="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
         style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent-dim))', color: '#04141a' }}
       >
-        {saved ? <><Check size={13} /> Enregistré</> : pending ? 'Enregistrement…' : 'Enregistrer'}
+        {buttonLabel}
       </button>
     </div>
   );
