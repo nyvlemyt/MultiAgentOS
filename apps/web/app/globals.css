@@ -31,31 +31,6 @@
   --glow-accent: 0 0 12px rgba(56, 232, 255, 0.45);
 }
 
-[data-theme='light'] {
-  --bg-base: #fafbfd;
-  --bg-surface: #ffffff;
-  --bg-elevated: #ffffff;
-  --bg-hover: #f1f3f8;
-  --border-subtle: #e5e8f0;
-  --border-default: #d3d8e4;
-  --text-primary: #0e1320;
-  --text-secondary: #4a5168;
-  --text-muted: #7a8094;
-  --accent: #0e7d92;
-  --accent-dim: #0a5e6e;
-  --accent-soft: #d6f3f9;
-  --gold: #b8860b;
-  --success: #16a34a;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --status-idle: #94a3b8;
-  --status-running: #0e7d92;
-  --status-blocked: #dc2626;
-  --status-waiting: #d97706;
-  --status-done: #16a34a;
-  --glow-accent: 0 0 10px rgba(14, 125, 146, 0.25);
-}
-
 html,
 body {
   background: var(--bg-base);
