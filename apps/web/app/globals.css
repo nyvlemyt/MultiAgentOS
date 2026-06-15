@@ -7,25 +7,28 @@
 
 :root,
 [data-theme='dark'] {
-  --bg-base: #0b0d12;
-  --bg-surface: #11141b;
-  --bg-elevated: #161a24;
-  --bg-hover: #1c2230;
-  --border-subtle: #1f2533;
-  --border-default: #2a3142;
+  --bg-base: #07090e;
+  --bg-surface: #0d1018;
+  --bg-elevated: #131722;
+  --bg-hover: #1a2030;
+  --border-subtle: #181d29;
+  --border-default: #232a3a;
   --text-primary: #e8ecf4;
   --text-secondary: #a5adbf;
   --text-muted: #6b7388;
-  --accent: #7c8cff;
-  --accent-soft: #2c3260;
-  --success: #4ade80;
+  --accent: #38e8ff;
+  --accent-dim: #0e7d92;
+  --accent-soft: #0c2a33;
+  --gold: #f5c451;
+  --success: #3ddc84;
   --warning: #f9a23a;
-  --danger: #ef4458;
+  --danger: #ff4d6a;
   --status-idle: #6b7388;
-  --status-running: #7c8cff;
-  --status-blocked: #ef4458;
+  --status-running: #38e8ff;
+  --status-blocked: #ff4d6a;
   --status-waiting: #f9a23a;
-  --status-done: #4ade80;
+  --status-done: #3ddc84;
+  --glow-accent: 0 0 12px rgba(56, 232, 255, 0.45);
 }
 
 [data-theme='light'] {
@@ -38,16 +41,19 @@
   --text-primary: #0e1320;
   --text-secondary: #4a5168;
   --text-muted: #7a8094;
-  --accent: #5161e7;
-  --accent-soft: #dde1ff;
+  --accent: #0e7d92;
+  --accent-dim: #0a5e6e;
+  --accent-soft: #d6f3f9;
+  --gold: #b8860b;
   --success: #16a34a;
   --warning: #d97706;
   --danger: #dc2626;
   --status-idle: #94a3b8;
-  --status-running: #5161e7;
+  --status-running: #0e7d92;
   --status-blocked: #dc2626;
   --status-waiting: #d97706;
   --status-done: #16a34a;
+  --glow-accent: 0 0 10px rgba(14, 125, 146, 0.25);
 }
 
 html,
@@ -110,4 +116,36 @@ body {
 .orbit-edge {
   stroke-dasharray: 6 6;
   animation: orbit-dash 1.6s linear infinite;
+}
+
+.glow-accent {
+  box-shadow: var(--glow-accent);
+}
+
+button:not(:disabled),
+[role='button'],
+a[href] {
+  cursor: pointer;
+}
+
+@keyframes status-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--ring-color); }
+  50% { box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--ring-color), 0 0 10px 4px var(--ring-color); }
+}
+
+.status-ring[data-status='running'] {
+  animation: status-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-ring[data-status='running'],
+  .orbit-edge {
+    animation: none;
+  }
+}
+
+:where(a, button, [role='button'], input, select, textarea):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

@@ -9,7 +9,7 @@ export default async function AgentDetail({ params }: Readonly<{ params: Promise
   return (
     <div className="flex flex-col gap-6">
       <header className="surface flex items-start gap-4 p-5">
-        <AgentAvatar src={a.avatarPath ?? undefined} alt={a.name} status={a.status} size={64} />
+        <AgentAvatar role={a.id} alt={a.name} status={a.status} size={64} />
         <div className="flex-1">
           <h1 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>{a.name} <span className="ml-1">{a.emoji}</span></h1>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Tier {a.tier} · model <span className="mono">{a.model}</span></p>
