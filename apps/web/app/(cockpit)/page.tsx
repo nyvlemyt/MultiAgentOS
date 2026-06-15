@@ -1,212 +1,147 @@
-import { Sparkline } from '@/components/Sparkline';
-import { AgentAvatar } from '@/components/AgentAvatar';
-import { RiskBadge } from '@/components/RiskBadge';
-import { BudgetBar } from '@/components/BudgetBar';
-import { Timeline } from '@/components/Timeline';
-import { allAgents, missions, trace, dailyTokens } from '@/lib/fixtures';
-import { DecisionLog } from '@/components/DecisionLog';
-import { listDecisions } from '@/lib/decisions';
-import { isDeadlineSoon } from '@/lib/prioritize';
-import { topMissionsByPriority } from '@/lib/missions';
-import { getDb, missions as missionsTable, projects } from '@mas/db';
-import { isNotNull, desc } from 'drizzle-orm';
 import Link from 'next/link';
+import { isNotNull, desc } from 'drizzle-orm';
+import { getDb, missions as missionsTable, projects as projectsTable } from '@mas/db';
+import { ManagerConsole } from '@/components/manager/ManagerConsole';
+import { AgentAvatar } from '@/components/AgentAvatar';
+import { allAgents } from '@/lib/fixtures';
+import { isDeadlineSoon } from '@/lib/prioritize';
 import { listPendingValidations, latestDailyReport } from '@/lib/autopilot';
-import { t, type Language } from '@/lib/i18n';
+import { FolderPlus, AlertTriangle, CalendarClock, ShieldCheck } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CommandCenter() {
+  const db = getDb();
+  const projectRows = await db.select().from(projectsTable).orderBy(desc(projectsTable.lastActiveAt));
+  const active = projectRows[0];
+  const allMissions = await db.select().from(missionsTable);
+  const deadlineMissions = (await db.select().from(missionsTable).where(isNotNull(missionsTable.deadline)))
+    .filter((m) => isDeadlineSoon(m.deadline));
+  const pendingValidations = await listPendingValidations(db);
+  const dailyReport = await latestDailyReport(db);
   const busy = allAgents.filter((a) => a.status === 'running');
-  const blocked: typeof missions = [];
-
-  // Real-DB cards (Phase 4.5-receptacle) live alongside the fixture cards.
-  const recentDecisions = (await listDecisions(getDb(), { scope: 'global', limit: 5 })).map((d) => ({
-    id: d.id, title: d.title, body: d.body, source: d.source, createdAt: d.createdAt.toISOString(),
-  }));
-  const deadlineMissions = await getDb().select().from(missionsTable).where(isNotNull(missionsTable.deadline));
-  const soonMissions = deadlineMissions.filter((m) => isDeadlineSoon(m.deadline));
-  const topPriorities = await topMissionsByPriority(getDb(), { limit: 3 });
-
-  // Phase 6 autopilot surface: real pending validations + latest daily report.
-  const [activeProject] = await getDb()
-    .select({ language: projects.language })
-    .from(projects)
-    .orderBy(desc(projects.lastActiveAt))
-    .limit(1);
-  const lang = (activeProject?.language ?? 'fr') as Language;
-  const pendingValidations = await listPendingValidations(getDb());
-  const dailyReport = await latestDailyReport(getDb());
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="hero-band flex items-end justify-between p-6">
-        <div className="hero-grid" />
-        <div className="relative">
-          <h1 className="text-3xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Command Center</h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>1 project active · {missions.length} missions in flight · {busy.length} agents working</p>
-        </div>
-        <Link href="/missions" className="relative rounded-lg px-4 py-2 text-xs font-semibold transition-transform hover:-translate-y-0.5 glow-accent" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent-dim))', color: '#04141a' }}>New mission</Link>
+    <div className="flex flex-col gap-5">
+      <header>
+        <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Command Center</h1>
+        <p className="mono text-xs" style={{ color: 'var(--text-muted)' }}>
+          parle au Manager — il route vers le bon projet et les bons agents
+        </p>
       </header>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Card title="Active projects" subtitle="last active 15 min ago">
-          <Link href="/projects/otakugo" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-md" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent-soft))' }} />
-            <div>
-              <div className="text-sm font-semibold">OtakuGO_UP</div>
-              <div className="text-[11px] mono" style={{ color: 'var(--text-muted)' }}>/Users/melvyn/.../OtakuGO_UP</div>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
+        <ManagerConsole project={active?.name ?? 'OtakuGO_UP'} />
+
+        <aside className="flex flex-col gap-5">
+          {/* Projects */}
+          <section className="surface p-4">
+            <header className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Tes projets</h2>
+              <Link href="/projects" className="text-[11px]" style={{ color: 'var(--accent)' }}>tout voir →</Link>
+            </header>
+            <div className="flex flex-col gap-2.5">
+              {projectRows.map((p) => {
+                const slug = p.slug;
+                const missionCount = allMissions.filter((m) => m.projectId === p.id).length;
+                const nextDeadline = deadlineMissions.find((m) => m.projectId === p.id)?.deadline;
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/projects/${slug}`}
+                    className="surface lift block p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="h-9 w-9 shrink-0 rounded-lg" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent-dim))' }} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--status-running)' }} />
+                          <span className="truncate text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{p.name}</span>
+                        </div>
+                        <div className="mono truncate text-[10px]" style={{ color: 'var(--text-muted)' }}>{p.path}</div>
+                      </div>
+                      <div className="flex -space-x-1.5">
+                        {busy.slice(0, 3).map((a) => (
+                          <AgentAvatar key={a.id} role={a.id} alt={a.name} status="running" size={22} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mono mt-2.5 flex items-center gap-3 text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                      <span>{missionCount} mission{missionCount === 1 ? '' : 's'}</span>
+                      <span>·</span>
+                      <span>{busy.length} agents actifs</span>
+                      {nextDeadline && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: 'var(--warning)' }}>échéance {nextDeadline.toISOString().slice(0, 10)}</span>
+                        </>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+              <Link
+                href="/projects/new"
+                className="flex items-center justify-center gap-2 rounded-lg border border-dashed py-3 text-xs font-medium transition-colors hover:bg-[color:var(--bg-hover)]"
+                style={{ borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}
+              >
+                <FolderPlus size={14} /> nouveau projet
+              </Link>
             </div>
-          </Link>
-        </Card>
+          </section>
 
-        <Card title="Missions in flight" subtitle={`${missions.length} active`}>
-          <ul className="space-y-1.5">
-            {missions.slice(0, 3).map((m) => (
-              <li key={m.id} className="flex items-center justify-between text-xs">
-                <span className="truncate" style={{ color: 'var(--text-primary)' }}>{m.title}</span>
-                <RiskBadge risk={m.risk} />
-              </li>
-            ))}
-          </ul>
-        </Card>
+          {/* À traiter — consolidated */}
+          <section className="surface p-4">
+            <header className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>À traiter</h2>
+              <span className="mono text-[10px]" style={{ color: 'var(--text-muted)' }}>ce qui t'attend</span>
+            </header>
 
-        <Card title="Agents busy" subtitle={`${busy.length} running`}>
-          <div className="flex flex-wrap gap-1.5">
-            {busy.map((a) => (
-              <AgentAvatar key={a.id} role={a.id} alt={a.name} status="running" size={32} />
-            ))}
-            {busy.length === 0 && <span className="text-xs" style={{ color: 'var(--text-muted)' }}>All idle.</span>}
-          </div>
-        </Card>
+            <div data-testid="pending-validations" className="flex flex-col gap-2">
+              {pendingValidations.length === 0 && deadlineMissions.length === 0 ? (
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Rien ne t'attend. 🎉</p>
+              ) : (
+                <>
+                  {pendingValidations.map((v) => (
+                    <div key={v.validationId} className="flex items-center gap-2.5 rounded-lg px-2.5 py-2" style={{ background: 'var(--bg-hover)' }}>
+                      <ShieldCheck size={15} style={{ color: 'var(--warning)' }} />
+                      <span className="flex-1 truncate text-xs" style={{ color: 'var(--text-primary)' }}>{v.taskTitle}</span>
+                      <span className="mono text-[10px]" style={{ color: 'var(--text-muted)' }}>risk {v.risk}</span>
+                    </div>
+                  ))}
+                  <div data-testid="deadline-card" className="flex flex-col gap-2">
+                    {deadlineMissions.slice(0, 4).map((m) => (
+                      <Link key={m.id} href={`/missions/${m.id}`} className="flex items-center gap-2.5 rounded-lg px-2.5 py-2" style={{ background: 'var(--bg-hover)' }}>
+                        <CalendarClock size={15} style={{ color: 'var(--warning)' }} />
+                        <span className="flex-1 truncate text-xs" style={{ color: 'var(--text-primary)' }}>{m.title}</span>
+                        <span className="mono text-[10px]" style={{ color: 'var(--warning)' }}>{m.deadline?.toISOString().slice(0, 10)}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
 
-        <Card title="Blocked" subtitle={`${blocked.length} tasks`} accent={blocked.length > 0 ? 'danger' : undefined}>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>None right now.</p>
-        </Card>
-
-        <Card title={t('card.pendingValidations', lang)} subtitle={`${pendingValidations.length} action${pendingValidations.length === 1 ? '' : 's'}`} accent={pendingValidations.length > 0 ? 'warning' : undefined}>
-          <div data-testid="pending-validations">
-            {pendingValidations.length === 0 ? (
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Nothing to validate.</p>
-            ) : (
-              <ul className="space-y-1.5">
-                {pendingValidations.map((v) => (
-                  <li key={v.validationId} className="text-xs">
-                    <span style={{ color: 'var(--text-primary)' }}>{v.taskTitle}</span>
-                    <span className="ml-1" style={{ color: 'var(--text-muted)' }}>· risk {v.risk}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </Card>
-
-        <Card title={t('card.dailyReport', lang)} subtitle={t('card.dailyReport.subtitle', lang)}>
-          <div data-testid="daily-report-card">
+          {/* Compact autopilot report */}
+          <section data-testid="daily-report-card" className="surface p-4">
+            <header className="mb-2 flex items-center gap-2">
+              <AlertTriangle size={14} style={{ color: 'var(--text-muted)' }} />
+              <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Dernier rapport autopilote</h2>
+            </header>
             {dailyReport === null ? (
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.empty', lang)}</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucun rapport pour le moment.</p>
             ) : (
-              <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.advanced', lang)}</dt>
-                <dd className="mono tabular-nums text-right" style={{ color: 'var(--text-primary)' }}>{dailyReport.missionsAdvanced}</dd>
-                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.blocked', lang)}</dt>
-                <dd className="mono tabular-nums text-right" style={{ color: 'var(--text-primary)' }}>{dailyReport.missionsBlocked}</dd>
-                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.tasksDone', lang)}</dt>
-                <dd className="mono tabular-nums text-right" style={{ color: 'var(--text-primary)' }}>{dailyReport.tasksDone}</dd>
-                <dt style={{ color: 'var(--text-muted)' }}>{t('card.dailyReport.quota', lang)}</dt>
-                <dd className="mono tabular-nums text-right" style={{ color: 'var(--accent)' }}>{dailyReport.quotaUnits}</dd>
-              </dl>
+              <div className="mono flex flex-wrap gap-x-4 gap-y-1 text-[11px]" style={{ color: 'var(--text-secondary)' }}>
+                <span>missions avancées <b style={{ color: 'var(--text-primary)' }}>{dailyReport.missionsAdvanced}</b></span>
+                <span>bloquées <b style={{ color: 'var(--text-primary)' }}>{dailyReport.missionsBlocked}</b></span>
+                <span>tâches faites <b style={{ color: 'var(--text-primary)' }}>{dailyReport.tasksDone}</b></span>
+                <span>quota <b style={{ color: 'var(--accent)' }}>{dailyReport.quotaUnits}</b></span>
+              </div>
             )}
-          </div>
-        </Card>
-
-        <Card title="Token budget" subtitle="today · €0.35 / €3.00">
-          <div className="flex items-center gap-3">
-            <Sparkline data={dailyTokens} width={120} height={32} />
-            <BudgetBar spent={35} cap={300} />
-          </div>
-        </Card>
-
-        <Card title="Cache hit ratio" subtitle="5-min window">
-          <div className="flex items-end gap-2">
-            <span className="mono text-2xl font-semibold tabular-nums" style={{ color: 'var(--text-primary)' }}>62%</span>
-            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>target ≥60%</span>
-          </div>
-        </Card>
-
-        <Card title="Top priorities" subtitle="by score">
-          {topPriorities.length === 0 ? (
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No prioritized missions yet.</p>
-          ) : (
-            <ul className="space-y-1.5 text-xs" data-testid="top-priorities">
-              {topPriorities.map((m) => (
-                <li key={m.id} className="flex items-center justify-between gap-2">
-                  <Link href={`/missions/${m.id}`} className="truncate" style={{ color: 'var(--text-primary)' }}>{m.title}</Link>
-                  <span className="mono tabular-nums text-[10px]" style={{ color: 'var(--accent)' }}>{m.priorityScore}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Card title="Recent decisions" subtitle="last 5 · global">
-          <DecisionLog decisions={recentDecisions} compact />
-        </Card>
-
-        <Card title="Deadlines" subtitle={`${soonMissions.length} within 7d`} accent={soonMissions.length > 0 ? 'warning' : undefined}>
-          {soonMissions.length === 0 ? (
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No imminent deadlines.</p>
-          ) : (
-            <ul className="space-y-1.5" data-testid="deadline-card">
-              {soonMissions.slice(0, 5).map((m) => (
-                <li key={m.id} className="flex items-center justify-between text-xs">
-                  <Link href={`/missions/${m.id}`} className="truncate" style={{ color: 'var(--text-primary)' }}>{m.title}</Link>
-                  <span className="mono text-[10px]" style={{ color: 'var(--warning)' }}>{m.deadline?.toISOString().slice(0, 10)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </section>
-
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="surface lg:col-span-2 p-4">
-          <header className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Live trace</h2>
-            <Link href="/trace" className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>view all →</Link>
-          </header>
-          <Timeline rows={trace.slice(0, 7)} />
-        </div>
-        <div className="surface p-4">
-          <header className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Today's spend</h2>
-          </header>
-          <div className="flex flex-col gap-1">
-            <span className="mono text-3xl font-semibold tabular-nums" style={{ color: 'var(--text-primary)' }}>€0.35</span>
-            <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>cap €3.00 · 12% used</span>
-            <Sparkline data={dailyTokens} width={220} height={48} />
-          </div>
-        </div>
-      </section>
+          </section>
+        </aside>
+      </div>
     </div>
-  );
-}
-
-function accentBorderFor(accent?: 'warning' | 'danger'): string {
-  if (accent === 'danger') return 'border-l-2 border-l-red-500';
-  if (accent === 'warning') return 'border-l-2 border-l-amber-500';
-  return '';
-}
-
-function Card({ title, subtitle, children, accent }: Readonly<{ title: string; subtitle?: string; children: React.ReactNode; accent?: 'warning' | 'danger' }>) {
-  const accentBorder = accentBorderFor(accent);
-  return (
-    <article className={`surface lift p-4 ${accentBorder}`}>
-      <header className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</h2>
-        {subtitle && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{subtitle}</span>}
-      </header>
-      {children}
-    </article>
   );
 }
