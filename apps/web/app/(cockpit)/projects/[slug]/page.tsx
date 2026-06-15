@@ -83,9 +83,9 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Active agents on this project</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Agents sur ce projet — clique pour leur parler</h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {allAgents.filter((a) => a.status !== 'idle').map((a) => <AgentCard key={a.id} a={a} />)}
+          {allAgents.filter((a) => a.status !== 'idle').map((a) => <AgentCard key={a.id} a={a} href={`/projects/${slug}/agents/${a.id}`} />)}
         </div>
       </section>
     </div>

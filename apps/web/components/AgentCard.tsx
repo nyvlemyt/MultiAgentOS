@@ -16,10 +16,10 @@ export interface AgentCardData {
   spark?: number[];
 }
 
-export function AgentCard({ a }: Readonly<{ a: AgentCardData }>) {
-  const href = `/agents/${a.id}`;
+export function AgentCard({ a, href }: Readonly<{ a: AgentCardData; href?: string }>) {
+  const target = href ?? `/agents/${a.id}`;
   return (
-    <Link href={href} className="surface group flex flex-col gap-3 px-4 py-3 transition-colors hover:bg-[color:var(--bg-hover)]">
+    <Link href={target} className="surface group flex flex-col gap-3 px-4 py-3 transition-colors hover:bg-[color:var(--bg-hover)]">
       <div className="flex items-start gap-3">
         <AgentAvatar role={a.id} alt={a.name} status={a.status} size={40} />
         <div className="min-w-0 flex-1">

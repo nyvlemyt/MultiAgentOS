@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { isNotNull, desc } from 'drizzle-orm';
 import { getDb, missions as missionsTable, projects as projectsTable } from '@mas/db';
-import { ManagerConsole } from '@/components/manager/ManagerConsole';
+import { ConversationPanel } from '@/components/manager/ConversationPanel';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { allAgents } from '@/lib/fixtures';
 import { isDeadlineSoon } from '@/lib/prioritize';
@@ -35,7 +35,17 @@ export default async function CommandCenter() {
       </header>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
-        <ManagerConsole conversationId={managerConv.id} initialMessages={managerMessages} project={active?.name ?? 'OtakuGO_UP'} />
+        <ConversationPanel
+          kind="manager"
+          conversationId={managerConv.id}
+          initialMessages={managerMessages}
+          presenceName="Manager"
+          presenceRole="mission-planner"
+          subtitle="orchestrateur global · historique conservé"
+          project={active?.name ?? 'OtakuGO_UP'}
+          chips={['+ nouveau projet', 'une idée…', 'état du projet']}
+          greeting={`Bonjour. Sur ${active?.name ?? 'OtakuGO_UP'}, que veut-on accomplir ? Décris une mission, lance une idée, ou demande l'état.`}
+        />
 
         <aside className="flex flex-col gap-5">
           {/* Projects */}
