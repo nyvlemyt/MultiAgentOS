@@ -21,6 +21,10 @@ export interface CreateRouterLLMOptions {
   /** Injectables for tests — zero network, zero quota. */
   claudeFactory?: (opts: ClaudeCodeLLMOptions) => LLMClient;
   fetchImpl?: FetchLike;
+  /** Persisted quota windows to restore (source id → blockedAt ms). */
+  initialBlocked?: Readonly<Record<string, number>>;
+  /** Persist hook fired when a source is quota-blocked (5b). */
+  onBlock?: (sourceId: string, blockedAt: number) => void;
 }
 
 export function createRouterLLM(opts: CreateRouterLLMOptions): LLMClient | undefined {
@@ -54,5 +58,12 @@ export function createRouterLLM(opts: CreateRouterLLMOptions): LLMClient | undef
     else if (def.kind === 'perplexity') clients.set(def.id, perplexityLLM(def, key, opts.fetchImpl));
   }
 
-  return new RouterLLMClient({ config, env, clients, onEvent: opts.onEvent });
+  return new RouterLLMClient({
+    config,
+    env,
+    clients,
+    onEvent: opts.onEvent,
+    initialBlocked: opts.initialBlocked,
+    onBlock: opts.onBlock,
+  });
 }
