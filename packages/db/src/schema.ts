@@ -281,6 +281,38 @@ export const schedules = sqliteTable(
   (t) => ({ byProject: index('schedules_project_idx').on(t.projectId, t.enabled) }),
 );
 
+// UI redesign: persistent conversations. A 'manager' conversation is global
+// (projectId/agentId null). An 'agent' conversation is one running instance of a
+// base agent scoped to a project (the "Docker container" model): unique per
+// (projectId, agentId). Messages survive navigation and are revisitable.
+export const conversations = sqliteTable(
+  'conversations',
+  {
+    id: text('id').primaryKey(),
+    scope: text('scope', { enum: ['manager', 'agent'] }).notNull(),
+    projectId: text('project_id').references(() => projects.id, { onDelete: 'cascade' }),
+    agentId: text('agent_id').references(() => agents.id),
+    title: text('title').notNull().default(''),
+    createdAt: epoch().notNull(),
+    updatedAt: epoch().notNull(),
+  },
+  (t) => ({ byScope: index('conversations_scope_idx').on(t.scope, t.projectId, t.agentId) }),
+);
+
+export const messages = sqliteTable(
+  'messages',
+  {
+    id: text('id').primaryKey(),
+    conversationId: text('conversation_id')
+      .notNull()
+      .references(() => conversations.id, { onDelete: 'cascade' }),
+    role: text('role', { enum: ['user', 'agent'] }).notNull(),
+    text: text('text').notNull(),
+    createdAt: epoch().notNull(),
+  },
+  (t) => ({ byConversation: index('messages_conversation_idx').on(t.conversationId, t.createdAt) }),
+);
+
 export const permissions = sqliteTable('permissions', {
   id: text('id').primaryKey(),
   category: text('category').notNull(),
@@ -303,3 +335,7 @@ export type Decision = typeof decisions.$inferSelect;
 export type NewDecision = typeof decisions.$inferInsert;
 export type Schedule = typeof schedules.$inferSelect;
 export type NewSchedule = typeof schedules.$inferInsert;
+export type Conversation = typeof conversations.$inferSelect;
+export type NewConversation = typeof conversations.$inferInsert;
+export type Message = typeof messages.$inferSelect;
+export type NewMessage = typeof messages.$inferInsert;

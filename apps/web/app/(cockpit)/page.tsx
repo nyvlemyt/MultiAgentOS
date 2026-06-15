@@ -6,6 +6,7 @@ import { AgentAvatar } from '@/components/AgentAvatar';
 import { allAgents } from '@/lib/fixtures';
 import { isDeadlineSoon } from '@/lib/prioritize';
 import { listPendingValidations, latestDailyReport } from '@/lib/autopilot';
+import { getOrCreateManagerConversation, listMessages } from '@/lib/conversations';
 import { FolderPlus, AlertTriangle, CalendarClock, ShieldCheck } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -21,17 +22,20 @@ export default async function CommandCenter() {
   const dailyReport = await latestDailyReport(db);
   const busy = allAgents.filter((a) => a.status === 'running');
 
+  const managerConv = await getOrCreateManagerConversation(db);
+  const managerMessages = (await listMessages(db, managerConv.id)).map((m) => ({ role: m.role, text: m.text }));
+
   return (
     <div className="flex flex-col gap-5">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Command Center</h1>
         <p className="mono text-xs" style={{ color: 'var(--text-muted)' }}>
-          parle au Manager — il route vers le bon projet et les bons agents
+          parle au Manager — agent global qui route vers le bon projet et les bons agents
         </p>
       </header>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
-        <ManagerConsole project={active?.name ?? 'OtakuGO_UP'} />
+        <ManagerConsole conversationId={managerConv.id} initialMessages={managerMessages} project={active?.name ?? 'OtakuGO_UP'} />
 
         <aside className="flex flex-col gap-5">
           {/* Projects */}
