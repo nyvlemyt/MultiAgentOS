@@ -22,33 +22,38 @@ type Block =
 const HEADING = /^(#{1,3}) (.{1,300})$/;
 const LIST_ITEM = /^[-*] (.{1,300})$/;
 
+type ParseState = { blocks: Block[]; code: string[] | null; list: string[] | null };
+
+function flushList(st: ParseState): void {
+  if (st.list) { st.blocks.push({ kind: 'list', items: st.list }); st.list = null; }
+}
+
+// A non-fence, non-code line → heading / list item / paragraph.
+function consumeText(st: ParseState, line: string): void {
+  const h = HEADING.exec(line);
+  if (h) { flushList(st); st.blocks.push({ kind: 'h', level: h[1]!.length, text: h[2]! }); return; }
+  const li = LIST_ITEM.exec(line);
+  if (li) { st.list ??= []; st.list.push(li[1]!); return; }
+  flushList(st);
+  if (line.trim() !== '') st.blocks.push({ kind: 'p', text: line });
+}
+
 // Pass 1: group escaped lines into blocks (keeps each function simple).
 function parseBlocks(lines: string[]): Block[] {
-  const blocks: Block[] = [];
-  let code: string[] | null = null;
-  let list: string[] | null = null;
-  const flushList = () => { if (list) { blocks.push({ kind: 'list', items: list }); list = null; } };
-
+  const st: ParseState = { blocks: [], code: null, list: null };
   for (const line of lines) {
     if (line.trim().startsWith('```')) {
-      if (code) { blocks.push({ kind: 'code', lines: code }); code = null; }
-      else { flushList(); code = []; }
-      continue;
+      if (st.code) { st.blocks.push({ kind: 'code', lines: st.code }); st.code = null; }
+      else { flushList(st); st.code = []; }
+    } else if (st.code) {
+      st.code.push(line);
+    } else {
+      consumeText(st, line);
     }
-    if (code) { code.push(line); continue; }
-
-    const h = HEADING.exec(line);
-    if (h) { flushList(); blocks.push({ kind: 'h', level: h[1]!.length, text: h[2]! }); continue; }
-
-    const li = LIST_ITEM.exec(line);
-    if (li) { list ??= []; list.push(li[1]!); continue; }
-
-    flushList();
-    if (line.trim() !== '') blocks.push({ kind: 'p', text: line });
   }
-  flushList();
-  if (code) blocks.push({ kind: 'code', lines: code });
-  return blocks;
+  flushList(st);
+  if (st.code) st.blocks.push({ kind: 'code', lines: st.code });
+  return st.blocks;
 }
 
 // Pass 2: render blocks to HTML.
@@ -56,8 +61,10 @@ function renderBlock(b: Block): string {
   switch (b.kind) {
     case 'code':
       return `<pre><code>${b.lines.join('\n')}</code></pre>`;
-    case 'list':
-      return `<ul>${b.items.map((i) => `<li>${inline(i)}</li>`).join('')}</ul>`;
+    case 'list': {
+      const items = b.items.map((i) => `<li>${inline(i)}</li>`).join('');
+      return `<ul>${items}</ul>`;
+    }
     case 'h':
       return `<h${b.level}>${inline(b.text)}</h${b.level}>`;
     default:
