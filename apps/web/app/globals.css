@@ -96,6 +96,7 @@ body {
 }
 .status-ring[data-status='running'] {
   --ring-color: var(--status-running);
+  animation: status-pulse 1.8s ease-in-out infinite;
 }
 .status-ring[data-status='blocked'] {
   --ring-color: var(--status-blocked);
@@ -131,10 +132,6 @@ a[href] {
 @keyframes status-pulse {
   0%, 100% { box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--ring-color); }
   50% { box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--ring-color), 0 0 10px 4px var(--ring-color); }
-}
-
-.status-ring[data-status='running'] {
-  animation: status-pulse 1.8s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
