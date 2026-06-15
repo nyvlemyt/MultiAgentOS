@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { ThemeInit } from './theme-init';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -11,7 +10,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
-        <ThemeInit />
         <link
           rel="preconnect"
           href="https://fonts.googleapis.com"

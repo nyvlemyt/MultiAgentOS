@@ -45,11 +45,10 @@ test('studio orbit animates a delegation edge', async ({ page }) => {
   await expect(page.locator('svg .orbit-edge')).toHaveCount(1);
 });
 
-test('theme toggle flips data-theme attribute', async ({ page }) => {
+test('cockpit is locked to the dark HUD theme', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.getByLabel('Toggle theme').click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByLabel('Toggle theme')).toHaveCount(0);
 });
 
 test('ideas kanban renders seeded idea cards', async ({ page }) => {
