@@ -1,46 +1,70 @@
 // Minimal, dependency-free Markdown → safe HTML for agent reports.
-// Escapes HTML first (no XSS), then applies a small, predictable subset:
-// headings, bold, inline code, fenced code blocks, bullet lists, links.
-// Not a full CommonMark engine — just enough for readable deliverable reports.
+// Escapes HTML first (no XSS), then a small subset: headings, bold, inline code,
+// fenced code blocks, bullet lists, links. Bounded quantifiers (no ReDoS).
 
 function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
 function inline(s: string): string {
   return s
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+    .replace(/`([^`]{1,200})`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]{1,200})\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]{1,200})\]\((https?:\/\/[^\s)]{1,500})\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
 }
 
-export function renderMarkdown(src: string): string {
-  const escaped = escapeHtml(src);
-  const lines = escaped.split('\n');
-  const out: string[] = [];
-  let inList = false;
-  let inCode = false;
-  const closeList = () => { if (inList) { out.push('</ul>'); inList = false; } };
+type Block =
+  | { kind: 'code'; lines: string[] }
+  | { kind: 'list'; items: string[] }
+  | { kind: 'h'; level: number; text: string }
+  | { kind: 'p'; text: string };
+
+const HEADING = /^(#{1,3}) (.{1,300})$/;
+const LIST_ITEM = /^[-*] (.{1,300})$/;
+
+// Pass 1: group escaped lines into blocks (keeps each function simple).
+function parseBlocks(lines: string[]): Block[] {
+  const blocks: Block[] = [];
+  let code: string[] | null = null;
+  let list: string[] | null = null;
+  const flushList = () => { if (list) { blocks.push({ kind: 'list', items: list }); list = null; } };
 
   for (const line of lines) {
     if (line.trim().startsWith('```')) {
-      if (inCode) { out.push('</code></pre>'); inCode = false; }
-      else { closeList(); out.push('<pre><code>'); inCode = true; }
+      if (code) { blocks.push({ kind: 'code', lines: code }); code = null; }
+      else { flushList(); code = []; }
       continue;
     }
-    if (inCode) { out.push(line); continue; }
+    if (code) { code.push(line); continue; }
 
-    const h = /^(#{1,3})\s+(.*)$/.exec(line);
-    if (h) { closeList(); const lvl = h[1]!.length; out.push(`<h${lvl}>${inline(h[2]!)}</h${lvl}>`); continue; }
+    const h = HEADING.exec(line);
+    if (h) { flushList(); blocks.push({ kind: 'h', level: h[1]!.length, text: h[2]! }); continue; }
 
-    const li = /^[-*]\s+(.*)$/.exec(line);
-    if (li) { if (!inList) { out.push('<ul>'); inList = true; } out.push(`<li>${inline(li[1]!)}</li>`); continue; }
+    const li = LIST_ITEM.exec(line);
+    if (li) { list ??= []; list.push(li[1]!); continue; }
 
-    if (line.trim() === '') { closeList(); continue; }
-    closeList();
-    out.push(`<p>${inline(line)}</p>`);
+    flushList();
+    if (line.trim() !== '') blocks.push({ kind: 'p', text: line });
   }
-  closeList();
-  if (inCode) out.push('</code></pre>');
-  return out.join('\n');
+  flushList();
+  if (code) blocks.push({ kind: 'code', lines: code });
+  return blocks;
+}
+
+// Pass 2: render blocks to HTML.
+function renderBlock(b: Block): string {
+  switch (b.kind) {
+    case 'code':
+      return `<pre><code>${b.lines.join('\n')}</code></pre>`;
+    case 'list':
+      return `<ul>${b.items.map((i) => `<li>${inline(i)}</li>`).join('')}</ul>`;
+    case 'h':
+      return `<h${b.level}>${inline(b.text)}</h${b.level}>`;
+    default:
+      return `<p>${inline(b.text)}</p>`;
+  }
+}
+
+export function renderMarkdown(src: string): string {
+  return parseBlocks(escapeHtml(src).split('\n')).map(renderBlock).join('\n');
 }

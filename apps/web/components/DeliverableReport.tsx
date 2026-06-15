@@ -4,16 +4,18 @@ import { Eye, Bot } from 'lucide-react';
 import { renderMarkdown } from '@/lib/markdown';
 import type { Deliverable } from '@/lib/deliverables';
 
+function diffColor(line: string): string {
+  if (line.startsWith('+') && !line.startsWith('+++')) return 'var(--success)';
+  if (line.startsWith('-') && !line.startsWith('---')) return 'var(--danger)';
+  if (line.startsWith('@@')) return 'var(--accent)';
+  return 'var(--text-secondary)';
+}
+
 function DiffBlock({ diff }: Readonly<{ diff: string }>) {
+  const rows = diff.split('\n').map((line, i) => ({ id: `${i}`, line }));
   return (
     <pre className="mono overflow-x-auto rounded-lg p-3 text-[11px] leading-relaxed" style={{ background: 'var(--bg-base)', border: '1px solid var(--border-subtle)' }}>
-      {diff.split('\n').map((line, i) => {
-        let color = 'var(--text-secondary)';
-        if (line.startsWith('+') && !line.startsWith('+++')) color = 'var(--success)';
-        else if (line.startsWith('-') && !line.startsWith('---')) color = 'var(--danger)';
-        else if (line.startsWith('@@')) color = 'var(--accent)';
-        return <div key={i} style={{ color }}>{line || ' '}</div>;
-      })}
+      {rows.map((r) => <div key={r.id} style={{ color: diffColor(r.line) }}>{r.line || ' '}</div>)}
     </pre>
   );
 }
