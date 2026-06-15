@@ -10,6 +10,8 @@ import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
 import { MissionDeadlineEditor } from '@/components/MissionDeadlineEditor';
 import { isDeadlineSoon } from '@/lib/prioritize';
+import { DeliverableReport } from '@/components/DeliverableReport';
+import { mockDeliverable } from '@/lib/deliverables';
 
 export const dynamic = 'force-dynamic';
 
@@ -157,12 +159,9 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
           )}
         </article>
         <article className="surface p-4">
-          <h2 className="mb-3 text-sm font-semibold">Diff preview</h2>
-          <pre className="mono overflow-x-auto rounded-md p-3 text-[10px]" style={{ background: 'var(--bg-base)', color: 'var(--text-secondary)' }}>{`Phase 5 will populate this panel with the
-real unified diff produced by the Frontend
-Developer. Phase 1 only orchestrates the
-FSM and writes mock outputs to
-data/outputs/<task>.md.`}</pre>
+          <h2 className="mb-1 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Rapport &amp; livrables</h2>
+          <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>ce qui a été produit — vue humaine (lisible) ou vue IA (machine)</p>
+          <DeliverableReport deliverable={mockDeliverable(m.id)} />
         </article>
       </section>
 

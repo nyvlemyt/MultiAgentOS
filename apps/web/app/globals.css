@@ -139,6 +139,19 @@ body {
   box-shadow: var(--glow-accent);
 }
 
+.report-prose h1 { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin: 0.4rem 0; }
+.report-prose h2 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0.6rem 0 0.3rem; }
+.report-prose h3 { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin: 0.5rem 0 0.2rem; }
+.report-prose p { margin: 0.3rem 0; }
+.report-prose ul { margin: 0.3rem 0; padding-left: 1.1rem; list-style: disc; }
+.report-prose li { margin: 0.15rem 0; }
+.report-prose strong { color: var(--text-primary); }
+.report-prose code { font-family: var(--font-mono); font-size: 0.8em; background: var(--bg-hover); padding: 0.05rem 0.3rem; border-radius: 4px; color: var(--accent); }
+.report-prose pre { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.6rem; overflow-x: auto; }
+.report-prose pre code { background: none; color: var(--text-secondary); padding: 0; }
+.report-prose a { color: var(--accent); }
+.report-prose blockquote { border-left: 2px solid var(--border-default); padding-left: 0.7rem; color: var(--text-muted); margin: 0.4rem 0; }
+
 button:not(:disabled),
 [role='button'],
 a[href] {
