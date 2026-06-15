@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb, projects, agents } from '@mas/db';
-import { getOrCreateManagerConversation, getOrCreateAgentConversation, listMessages, appendExchange } from './conversations';
+import { ensureConversation, createConversation, listConversations, getConversation, listMessages, appendExchange } from './conversations';
 
 const MIGRATIONS = resolve(dirname(fileURLToPath(import.meta.url)), '../../../packages/db/migrations');
 
@@ -25,28 +25,33 @@ afterEach(() => {
   try { unlinkSync(dbPath); } catch { /* ignore */ }
 });
 
-describe('conversations', () => {
-  it('manager conversation is a singleton (get-or-create)', async () => {
-    const a = await getOrCreateManagerConversation(getDb());
-    const b = await getOrCreateManagerConversation(getDb());
+describe('conversations (multi-thread)', () => {
+  it('ensureConversation returns the existing latest, does not duplicate', async () => {
+    const a = await ensureConversation(getDb(), 'manager');
+    const b = await ensureConversation(getDb(), 'manager');
     expect(a.id).toBe(b.id);
-    expect(a.scope).toBe('manager');
+    expect((await listConversations(getDb(), 'manager')).length).toBe(1);
   });
 
-  it('agent conversation is unique per (project, agent)', async () => {
-    const a = await getOrCreateAgentConversation(getDb(), 'p1', 'mission-planner');
-    const b = await getOrCreateAgentConversation(getDb(), 'p1', 'mission-planner');
-    expect(a.id).toBe(b.id);
-    expect(a.projectId).toBe('p1');
-    expect(a.agentId).toBe('mission-planner');
+  it('supports several manager threads, newest first', async () => {
+    await createConversation(getDb(), 'manager', null, null, new Date(1000));
+    const second = await createConversation(getDb(), 'manager', null, null, new Date(2000));
+    const threads = await listConversations(getDb(), 'manager');
+    expect(threads.length).toBe(2);
+    expect(threads[0]!.id).toBe(second.id);
   });
 
-  it('persists an exchange in order and survives a reopen', async () => {
-    const conv = await getOrCreateManagerConversation(getDb());
+  it('scopes agent threads per (project, agent)', async () => {
+    const conv = await createConversation(getDb(), 'agent', 'p1', 'mission-planner');
+    expect((await listConversations(getDb(), 'agent', 'p1', 'mission-planner'))[0]!.id).toBe(conv.id);
+    expect((await listConversations(getDb(), 'agent', 'p1', 'other')).length).toBe(0);
+  });
+
+  it('persists an exchange and titles the thread from the first message', async () => {
+    const conv = await createConversation(getDb(), 'manager');
     await appendExchange(getDb(), conv.id, 'refais la home', 'je routerais ça…');
     const msgs = await listMessages(getDb(), conv.id);
     expect(msgs.map((m) => m.role)).toEqual(['user', 'agent']);
-    expect(msgs[0]!.text).toBe('refais la home');
-    expect(msgs[1]!.text).toBe('je routerais ça…');
+    expect((await getConversation(getDb(), conv.id))!.title).toBe('refais la home');
   });
 });
