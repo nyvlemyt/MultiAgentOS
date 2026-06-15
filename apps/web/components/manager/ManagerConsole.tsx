@@ -41,10 +41,7 @@ export function ManagerConsole({ project = 'OtakuGO_UP' }: Readonly<{ project?: 
         <div className="leading-tight">
           <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
             Manager
-            <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-              <span>en ligne</span>
-            </span>
+            <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}><span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }} /><span>en ligne</span></span>
           </div>
           <div className="mono text-[11px]" style={{ color: 'var(--text-muted)' }}>orchestrateur · {project}</div>
         </div>
