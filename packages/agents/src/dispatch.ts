@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray } from 'drizzle-orm';
 import {
   getDb,
   missions,
@@ -44,6 +44,10 @@ export type Db = ReturnType<typeof getDb>;
 // All MultiAgentOS-produced task artifacts land here (CLAUDE.md §8: never
 // data/memory/). Hoisted to one literal (S1192).
 const OUTPUTS_DIR = 'data/outputs';
+
+// Quota-window TTL — must match RouterLLMClient's default (5 h subscription
+// window). Hoisted to one literal (S1192).
+const WINDOW_TTL_MS = 5 * 60 * 60 * 1000;
 
 function repoRootDir(): string {
   const here = fileURLToPath(new URL('.', import.meta.url));
@@ -110,9 +114,11 @@ function selectLLM(opts: {
   autonomyLevel?: AutonomyLevel;
   sessionId?: string;
   onRouterEvent?: (evt: RouterEvent) => void;
+  initialBlocked?: Record<string, number>;
+  onBlock?: (sourceId: string, blockedAt: number) => void;
 }) {
   if (process.env.MAS_MOCK_LLM === '1') return mockLLM();
-  const { onRouterEvent, ...claudeOpts } = opts;
+  const { onRouterEvent, initialBlocked, onBlock, ...claudeOpts } = opts;
   // Phase 3.5 (ADR 0002): the router takes over only when config/model-routing.json
   // enables at least one non-default source; otherwise current behavior unchanged.
   try {
@@ -123,6 +129,8 @@ function selectLLM(opts: {
       envPath: process.env.MAS_ENV_LOCAL ?? resolve(repoRoot, '.env.local'),
       claudeOpts,
       onEvent: onRouterEvent,
+      initialBlocked,
+      onBlock,
     });
     if (router) return router;
   } catch {
@@ -167,6 +175,30 @@ function logEvent(db: Db, evt: {
 // than leaving a floating promise (telemetry must never fail a mission).
 function logEventDetached(db: Db, evt: Parameters<typeof logEvent>[1]): void {
   logEvent(db, evt).then(undefined, () => undefined);
+}
+
+// Restore the router's quota-window block map from persisted `window_blocked`
+// events (5b). Without this, selectLLM builds a fresh router per call/restart and
+// retries a just-blocked source (one wasted 429). Newest-first so the first row
+// seen per source wins (its latest blockedAt). Time-dependent → explicit `now`.
+export async function loadBlockedWindows(
+  db: Db,
+  now: Date,
+  ttlMs = WINDOW_TTL_MS,
+): Promise<Record<string, number>> {
+  const since = new Date(now.getTime() - ttlMs);
+  const rows = await db
+    .select({ payloadJson: events.payloadJson })
+    .from(events)
+    .where(and(eq(events.type, 'window_blocked'), gte(events.createdAt, since)))
+    .orderBy(desc(events.createdAt));
+
+  const blocked: Record<string, number> = {};
+  for (const { payloadJson } of rows) {
+    const { source, blockedAt } = JSON.parse(payloadJson) as { source: string; blockedAt: number };
+    blocked[source] ??= blockedAt;
+  }
+  return blocked;
 }
 
 export async function planMission(missionId: string) {
@@ -561,12 +593,21 @@ async function executeTaskWithLLM(
     .innerJoin(missions, eq(missions.projectId, projects.id))
     .where(eq(missions.id, missionId));
 
+  const initialBlocked = await loadBlockedWindows(db, new Date());
   const llm = selectLLM({
     cwd: proj?.path,
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
     onRouterEvent: (evt) =>
       logEventDetached(db, { missionId: m.id, taskId: next.id, type: 'provider_fallback', payload: evt }),
+    initialBlocked,
+    onBlock: (source, at) =>
+      logEventDetached(db, {
+        missionId: m.id,
+        taskId: next.id,
+        type: 'window_blocked',
+        payload: { source, blockedAt: at },
+      }),
   });
 
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
@@ -681,12 +722,21 @@ export async function resumeAfterValidation(
     .innerJoin(missions, eq(missions.projectId, projects.id))
     .where(eq(missions.id, t.missionId));
 
+  const initialBlocked = await loadBlockedWindows(db, new Date());
   const llm = selectLLM({
     cwd: proj?.path,
     autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
     sessionId: proj?.sessionId ?? undefined,
     onRouterEvent: (evt) =>
       logEventDetached(db, { missionId: t.missionId, taskId: t.id, type: 'provider_fallback', payload: evt }),
+    initialBlocked,
+    onBlock: (source, at) =>
+      logEventDetached(db, {
+        missionId: t.missionId,
+        taskId: t.id,
+        type: 'window_blocked',
+        payload: { source, blockedAt: at },
+      }),
   });
 
   const taskSkillIds: string[] = JSON.parse(t.skillsJson ?? '[]');
