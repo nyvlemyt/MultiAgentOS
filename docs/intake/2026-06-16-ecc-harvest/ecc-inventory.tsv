@@ -1,0 +1,338 @@
+kind	name	origin	description
+skill	accessibility	ECC	Design, implement, and audit inclusive digital products using WCAG 2.2 Level AA
+skill	agent-architecture-audit	oh-my-agent-check	Full-stack diagnostic for agent and LLM applications. Audits the 12-layer agent stack for wrapper regression, memory pollution, tool discipline failures, hidden
+skill	agent-eval	ECC	Head-to-head comparison of coding agents (Claude Code, Aider, Codex, etc.) on custom tasks with pass rate, cost, time, and consistency metrics
+skill	agent-harness-construction	ECC	Design and optimize AI agent action spaces, tool definitions, and observation formatting for higher completion rates.
+skill	agent-introspection-debugging	ECC	Structured self-debugging workflow for AI agent failures using capture, diagnosis, contained recovery, and introspection reports.
+skill	agent-payment-x402	community	Add x402 payment execution to AI agents with per-task budgets, spending controls, and non-custodial wallets. Supports Base through agentwallet-sdk and X Layer t
+skill	agent-self-evaluation	ECC	Use after completing any non-trivial task. The agent self-rates its output on 5 axes — accuracy, completeness, clarity, actionability, conciseness — with concre
+skill	agent-sort	ECC	Build an evidence-backed ECC install plan for a specific repo by sorting skills, commands, rules, hooks, and extras into DAILY vs LIBRARY buckets using parallel
+skill	agentic-engineering	ECC	Operate as an agentic engineer using eval-first execution, decomposition, and cost-aware model routing.
+skill	agentic-os	ECC	Build persistent multi-agent operating systems on Claude Code. Covers kernel architecture, specialist agents, slash commands, file-based memory, scheduled autom
+skill	ai-first-engineering	ECC	Engineering operating model for teams where AI agents generate a large share of implementation output.
+skill	ai-regression-testing	ECC	Regression testing strategies for AI-assisted development. Sandbox-mode API testing without database dependencies, automated bug-check workflows, and patterns t
+skill	android-clean-architecture	ECC	Clean Architecture patterns for Android and Kotlin Multiplatform projects — module structure, dependency rules, UseCases, Repositories, and data layer patterns.
+skill	angular-developer	ECC	Generates Angular code and provides architectural guidance. Trigger when creating projects, components, or services, or for best practices on reactivity (signal
+skill	api-connector-builder	ECC direct-port adaptation	Build a new API connector or provider by matching the target repo's existing integration pattern exactly. Use when adding one more integration without inventing
+skill	api-design	ECC	REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs.
+skill	architecture-decision-records	ECC	Capture architectural decisions made during Claude Code sessions as structured ADRs. Auto-detects decision moments, records context, alternatives considered, an
+skill	article-writing	ECC	Write articles, guides, blog posts, tutorials, newsletter issues, and other long-form content in a distinctive voice derived from supplied examples or brand gui
+skill	automation-audit-ops	ECC	Evidence-first automation inventory and overlap audit workflow for ECC. Use when the user wants to know which jobs, hooks, connectors, MCP servers, or wrappers 
+skill	autonomous-agent-harness	ECC	Transform Claude Code into a fully autonomous agent system with persistent memory, scheduled operations, computer use, and task queuing. Replaces standalone age
+skill	autonomous-loops	ECC	Patterns and architectures for autonomous Claude Code loops — from simple sequential pipelines to RFC-driven multi-agent DAG systems.
+skill	backend-patterns	ECC	Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.
+skill	benchmark-methodology	?	>-
+skill	benchmark-optimization-loop	ECC	Use when the user asks to make something faster, try many variants, run recursive optimization, benchmark latency/throughput/cost, or choose the best implementa
+skill	benchmark	ECC	Use this skill to measure performance baselines, detect regressions before/after PRs, and compare stack alternatives.
+skill	blender-motion-state-inspection	ECC	Use this skill when inspecting Blender characters, rigs, poses, animation retargeting, ground contact, facing direction, or model-vs-motion alignment where scre
+skill	blueprint	community	>-
+skill	brand-discovery	?	>-
+skill	brand-voice	ECC	Build a source-derived writing style profile from real posts, essays, launch notes, docs, or site copy, then reuse that profile across content, outreach, and so
+skill	browser-qa	ECC	Use this skill to automate visual testing and UI interaction verification using browser automation after deploying features.
+skill	bun-runtime	ECC	Bun as runtime, package manager, bundler, and test runner. When to choose Bun vs Node, migration notes, and Vercel support.
+skill	canary-watch	ECC	Use this skill to monitor and verify a deployed URL after releases — checks HTTP endpoints, SSE streams, static assets, console errors, and performance regressi
+skill	carrier-relationship-management	ECC	>
+skill	cisco-ios-patterns	community	Cisco IOS and IOS-XE review patterns for show commands, config hierarchy, wildcard masks, ACL placement, interface hygiene, and safe change-window verification.
+skill	ck	community	Persistent per-project memory for Claude Code. Auto-loads project context on session start, tracks sessions with git activity, and writes to native memory. Comm
+skill	claude-devfleet	community	Orchestrate multi-agent coding tasks via Claude DevFleet — plan projects, dispatch parallel agents in isolated worktrees, monitor progress, and read structured 
+skill	click-path-audit	community	Trace every user-facing button/touchpoint through its full state change sequence to find bugs where functions individually work but cancel each other out, produ
+skill	clickhouse-io	ECC	ClickHouse database patterns, query optimization, analytics, and data engineering best practices for high-performance analytical workloads.
+skill	code-tour	ECC	Create CodeTour `.tour` files — persona-targeted, step-by-step walkthroughs with real file and line anchors. Use for onboarding tours, architecture walkthroughs
+skill	codebase-onboarding	ECC	Analyze an unfamiliar codebase and generate a structured onboarding guide with architecture map, key entry points, conventions, and a starter CLAUDE.md. Use whe
+skill	codehealth-mcp	community	Real-time structural Code Health via CodeScene MCP — review before edits, verify score deltas after changes, gate commits and PRs. Use when reviewing code quali
+skill	coding-standards	ECC	Baseline cross-project coding conventions for naming, readability, immutability, and code-quality review. Use detailed frontend or backend skills for framework-
+skill	competitive-platform-analysis	?	>-
+skill	competitive-report-structure	?	>-
+skill	compose-multiplatform-patterns	ECC	Compose Multiplatform and Jetpack Compose patterns for KMP projects — state management, navigation, theming, performance, and platform-specific UI.
+skill	config-gc	ECC	Garbage collection for your Claude Code configuration. Periodically scans ~/.claude (skills, memory, hooks, permissions, MCP servers, caches) for redundant, sta
+skill	configure-ecc	ECC	Interactive installer for Everything Claude Code — guides users through selecting and installing skills and rules to user-level or project-level directories, ve
+skill	connections-optimizer	ECC	Reorganize the user's X and LinkedIn network with review-first pruning, add/follow recommendations, and channel-specific warm outreach drafted in the user's rea
+skill	content-engine	ECC	Create platform-native content systems for X, LinkedIn, TikTok, YouTube, newsletters, and repurposed multi-platform campaigns. Use when the user wants social po
+skill	content-hash-cache-pattern	ECC	Cache expensive file processing results using SHA-256 content hashes — path-independent, auto-invalidating, with service layer separation.
+skill	context-budget	ECC	Audits Claude Code context window consumption across agents, skills, MCP servers, and rules. Identifies bloat, redundant components, and produces prioritized to
+skill	continuous-agent-loop	ECC	Patterns for continuous autonomous agent loops with quality gates, evals, and recovery controls.
+skill	continuous-learning-v2	ECC	Instinct-based learning system that observes sessions via hooks, creates atomic instincts with confidence scoring, and evolves them into skills/commands/agents.
+skill	continuous-learning	ECC	[DEPRECATED - use continuous-learning-v2] Legacy v1 stop-hook skill extractor. v2 is a strict superset with instinct-based, project-scoped, hook-reliable learni
+skill	cost-aware-llm-pipeline	ECC	Cost optimization patterns for LLM API usage — model routing by task complexity, budget tracking, retry logic, and prompt caching.
+skill	cost-tracking	community	Track and report Claude Code token usage, spending, and budgets from a local cost-tracking database. Use when the user asks about costs, spending, usage, tokens
+skill	council	ECC	Convene a four-voice council for ambiguous decisions, tradeoffs, and go/no-go calls. Use when multiple valid paths exist and you need structured disagreement be
+skill	cpp-coding-standards	ECC	C++ coding standards based on the C++ Core Guidelines (isocpp.github.io). Use when writing, reviewing, or refactoring C++ code to enforce modern, safe, and idio
+skill	cpp-testing	ECC	Use only when writing/updating/fixing C++ tests, configuring GoogleTest/CTest, diagnosing failing or flaky tests, or adding coverage/sanitizers.
+skill	crosspost	ECC	Multi-platform content distribution across X, LinkedIn, Threads, and Bluesky. Adapts content per platform using content-engine patterns. Never posts identical c
+skill	csharp-testing	ECC	C# and .NET testing patterns with xUnit, FluentAssertions, mocking, integration tests, and test organization best practices.
+skill	customer-billing-ops	ECC	Operate customer billing workflows such as subscriptions, refunds, churn triage, billing-portal recovery, and plan analysis using connected billing tools like S
+skill	customs-trade-compliance	ECC	>
+skill	dart-flutter-patterns	ECC	Production-ready Dart and Flutter patterns covering null safety, immutable state, async composition, widget architecture, popular state management frameworks (B
+skill	dashboard-builder	ECC direct-port adaptation	Build monitoring dashboards that answer real operator questions for Grafana, SigNoz, and similar platforms. Use when turning metrics into a working dashboard in
+skill	data-scraper-agent	community	Build a fully automated AI-powered data collection agent for any public source — job boards, prices, news, GitHub, sports, anything. Scrapes on a schedule, enri
+skill	data-throughput-accelerator	ECC	Use when large data ingestion, backfill, export, ETL, warehouse loading, manifest catch-up, or table synchronization needs to become much faster while preservin
+skill	database-migrations	ECC	Database migration best practices for schema changes, data migrations, rollbacks, and zero-downtime deployments across PostgreSQL, MySQL, and common ORMs (Prism
+skill	deep-research	ECC	Multi-source deep research using firecrawl and exa MCPs. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when th
+skill	defi-amm-security	ECC direct-port adaptation	Security checklist for Solidity AMM contracts, liquidity pools, and swap flows. Covers reentrancy, CEI ordering, donation or inflation attacks, oracle manipulat
+skill	deployment-patterns	ECC	Deployment workflows, CI/CD pipeline patterns, Docker containerization, health checks, rollback strategies, and production readiness checklists for web applicat
+skill	design-system	ECC	Use this skill to generate or audit design systems, check visual consistency, and review PRs that touch styling.
+skill	django-celery	ECC	Django + Celery async task patterns — configuration, task design, beat scheduling, retries, canvas workflows, monitoring, and testing. Use when adding backgroun
+skill	django-patterns	ECC	Django architecture patterns, REST API design with DRF, ORM best practices, caching, signals, middleware, and production-grade Django apps.
+skill	django-security	ECC	Django security best practices, authentication, authorization, CSRF protection, SQL injection prevention, XSS prevention, and secure deployment configurations.
+skill	django-tdd	ECC	Django testing strategies with pytest-django, TDD methodology, factory_boy, mocking, coverage, and testing Django REST Framework APIs.
+skill	django-verification	ECC	Verification loop for Django projects: migrations, linting, tests with coverage, security scans, and deployment readiness checks before release or PR.
+skill	dmux-workflows	ECC	Multi-agent orchestration using dmux (tmux pane manager for AI agents). Patterns for parallel agent workflows across Claude Code, Codex, OpenCode, and other har
+skill	docker-patterns	ECC	Docker and Docker Compose patterns for local development, container security, networking, volume strategies, and multi-service orchestration.
+skill	documentation-lookup	ECC	Use up-to-date library and framework docs via Context7 MCP instead of training data. Activates for setup questions, API references, code examples, or when the u
+skill	dotnet-patterns	ECC	Idiomatic C# and .NET patterns, conventions, dependency injection, async/await, and best practices for building robust, maintainable .NET applications.
+skill	dynamic-workflow-mode	ECC	Design task-local harnesses, eval gates, and reusable skill extraction for Claude dynamic workflow mode and other adaptive agent harnesses.
+skill	e2e-testing	ECC	Playwright E2E testing patterns, Page Object Model, configuration, CI/CD integration, artifact management, and flaky test strategies.
+skill	ecc-guide	community	Guide users through ECC's current agents, skills, commands, hooks, rules, install profiles, and project onboarding by reading the live repository surface before
+skill	ecc-tools-cost-audit	ECC	Evidence-first ECC Tools burn and billing audit workflow. Use when investigating runaway PR creation, quota bypass, premium-model leakage, duplicate jobs, or Gi
+skill	email-ops	ECC	Evidence-first mailbox triage, drafting, send verification, and sent-mail-safe follow-up workflow for ECC. Use when the user wants to organize email, draft or s
+skill	energy-procurement	ECC	>
+skill	enterprise-agent-ops	ECC	Operate long-lived agent workloads with observability, security boundaries, and lifecycle management.
+skill	error-handling	ECC	Patterns for robust error handling across TypeScript, Python, and Go. Covers typed errors, error boundaries, retries, circuit breakers, and user-facing error me
+skill	eval-harness	ECC	Formal evaluation framework for Claude Code sessions implementing eval-driven development (EDD) principles
+skill	evm-token-decimals	ECC direct-port adaptation	Prevent silent decimal mismatch bugs across EVM chains. Covers runtime decimal lookup, chain-aware caching, bridged-token precision drift, and safe normalizatio
+skill	exa-search	ECC	Neural search via Exa MCP for web, code, and company research. Use when the user needs web search, code examples, company intel, people lookup, or AI-powered de
+skill	fal-ai-media	ECC	Unified media generation via fal.ai MCP — image, video, and audio. Covers text-to-image (Nano Banana), text/image-to-video (Seedance, Kling, Veo 3), text-to-spe
+skill	fastapi-patterns	ECC	FastAPI best practices covering project structure, Pydantic v2 schemas, dependency injection, async handlers, authentication, authorization, transactional servi
+skill	finance-billing-ops	ECC	Evidence-first revenue, pricing, refunds, team-billing, and billing-model truth workflow for ECC. Use when the user wants a sales snapshot, pricing comparison, 
+skill	flox-environments	Flox	Create reproducible, cross-platform development environments with Flox — a declarative environment manager built on Nix. ALWAYS use this skill when the user nee
+skill	flutter-dart-code-review	ECC	Library-agnostic Flutter/Dart code review checklist covering widget best practices, state management patterns (BLoC, Riverpod, Provider, GetX, MobX, Signals), D
+skill	foundation-models-on-device	?	Apple FoundationModels framework for on-device LLM — text generation, guided generation with @Generable, tool calling, and snapshot streaming in iOS 26+.
+skill	frontend-a11y	community	>
+skill	frontend-design-direction	community	Set an ECC-specific frontend design direction for production UI work. Use when building or improving websites, dashboards, applications, components, landing pag
+skill	frontend-patterns	ECC	Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.
+skill	frontend-slides	ECC	Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. Use when the user wants to build a presentation, convert a PP
+skill	fsharp-testing	ECC	F# testing patterns with xUnit, FsUnit, Unquote, FsCheck property-based testing, integration tests, and test organization best practices.
+skill	gan-style-harness	ECC-community	GAN-inspired Generator-Evaluator agent harness for building high-quality applications autonomously. Based on Anthropic's March 2026 harness design paper.
+skill	gateguard	community	Fact-forcing gate that blocks Edit/Write/Bash (including MultiEdit) and demands concrete investigation (importers, data schemas, user instruction) before allowi
+skill	git-workflow	ECC	Git workflow patterns including branching strategies, commit conventions, merge vs rebase, conflict resolution, and collaborative development best practices for
+skill	github-ops	ECC	GitHub repository operations, automation, and management. Issue triage, PR management, CI/CD operations, release management, and security monitoring using the g
+skill	golang-patterns	ECC	Idiomatic Go patterns, best practices, and conventions for building robust, efficient, and maintainable Go applications.
+skill	golang-testing	ECC	Go testing patterns including table-driven tests, subtests, benchmarks, fuzzing, and test coverage. Follows TDD methodology with idiomatic Go practices.
+skill	google-workspace-ops	ECC	Operate across Google Drive, Docs, Sheets, and Slides as one workflow surface for plans, trackers, decks, and shared documents. Use when the user needs to find,
+skill	healthcare-cdss-patterns	Health1 Super Speciality Hospitals — contributed by Dr. Keyur Patel	Clinical Decision Support System (CDSS) development patterns. Drug interaction checking, dose validation, clinical scoring (NEWS2, qSOFA), alert severity classi
+skill	healthcare-emr-patterns	Health1 Super Speciality Hospitals — contributed by Dr. Keyur Patel	EMR/EHR development patterns for healthcare applications. Clinical safety, encounter workflows, prescription generation, clinical decision support integration, 
+skill	healthcare-eval-harness	Health1 Super Speciality Hospitals — contributed by Dr. Keyur Patel	Patient safety evaluation harness for healthcare application deployments. Automated test suites for CDSS accuracy, PHI exposure, clinical workflow integrity, an
+skill	healthcare-phi-compliance	Health1 Super Speciality Hospitals — contributed by Dr. Keyur Patel	Protected Health Information (PHI) and Personally Identifiable Information (PII) compliance patterns for healthcare applications. Covers data classification, ac
+skill	hermes-imports	ECC	Convert local Hermes operator workflows into sanitized ECC skills and release-pack artifacts. Use when preparing a Hermes workflow for public ECC reuse without 
+skill	hexagonal-architecture	ECC	Design, implement, and refactor Ports & Adapters systems with clear domain boundaries, dependency inversion, and testable use-case orchestration across TypeScri
+skill	hipaa-compliance	ECC direct-port adaptation	HIPAA-specific entrypoint for healthcare privacy and security work. Use when a task is explicitly framed around HIPAA, PHI handling, covered entities, BAAs, bre
+skill	homelab-network-readiness	community	Readiness checklist for homelab VLAN segmentation, local DNS filtering, and WireGuard-style remote access before changing router, firewall, DHCP, or VPN configu
+skill	homelab-network-setup	community	Practical home and homelab network planning for gateways, switches, access points, IP ranges, DHCP reservations, DNS, cabling, and common beginner mistakes.
+skill	homelab-pihole-dns	community	Pi-hole installation, blocklist management, DNS-over-HTTPS setup, DHCP integration, local DNS records, and troubleshooting broken DNS resolution on a home netwo
+skill	homelab-vlan-segmentation	community	Segmenting home networks into VLANs for IoT, guest, trusted, and server traffic using UniFi, pfSense/OPNsense, and MikroTik — including switch trunk config, fir
+skill	homelab-wireguard-vpn	community	WireGuard VPN server setup, peer configuration, key generation, split tunneling vs full tunnel routing, and remote access to a home network from mobile and lapt
+skill	hookify-rules	?	This skill should be used when the user asks to create a hookify rule, write a hook rule, configure hookify, add a hookify rule, or needs guidance on hookify ru
+skill	inherit-legacy-style	community	Legacy-project style inheritance skill. Use when the user types /inherit-legacy-style, or when onboarding an AI coding agent onto a hand-written legacy project 
+skill	intent-driven-development	?	Turn ambiguous or high-impact product and engineering changes into scoped, verifiable acceptance criteria before or alongside implementation. Use when a user as
+skill	inventory-demand-planning	ECC	>
+skill	investor-materials	ECC	Create and update pitch decks, one-pagers, investor memos, accelerator applications, financial models, and fundraising materials. Use when the user needs invest
+skill	investor-outreach	ECC	Draft cold emails, warm intro blurbs, follow-ups, update emails, and investor communications for fundraising. Use when the user wants outreach to angels, VCs, s
+skill	ios-icon-gen	community	Generate iOS app icons as PNG imagesets for Xcode asset catalogs from SF Symbols (5000+ Apple-native) or Iconify API (275k+ open source icons from 200+ collecti
+skill	iterative-retrieval	ECC	Pattern for progressively refining context retrieval to solve the subagent context problem
+skill	ito-basket-compare	ECC	Compare Itô prediction-market baskets against a user's knowledge base, portfolio notes, financial context, watchlist, or research thesis. Use for read-only bask
+skill	ito-data-atlas-agent	ECC	Design background Data Atlas style agents for Itô basket research, market discovery, parameter drafting, and human-in-the-loop editing. Use for architecture and
+skill	ito-market-intelligence	ECC	Research prediction-market events, venues, underliers, liquidity, and news context for Itô basket workflows. Use for read-only market intelligence, API-gated It
+skill	ito-trade-planner	ECC	Build a non-advisory prediction-market trade planning worksheet for Itô or venue workflows. Use to inspect venues, underliers, constraints, order prerequisites,
+skill	java-coding-standards	ECC	Java coding standards for Spring Boot and Quarkus services: naming, immutability, Optional usage, streams, exceptions, generics, CDI, reactive patterns, and pro
+skill	jira-integration	ECC	Use this skill when retrieving Jira tickets, analyzing requirements, updating ticket status, adding comments, or transitioning issues. Provides Jira API pattern
+skill	jpa-patterns	ECC	JPA/Hibernate patterns for entity design, relationships, query optimization, transactions, auditing, indexing, pagination, and pooling in Spring Boot.
+skill	knowledge-ops	ECC	Knowledge base management, ingestion, sync, and retrieval across multiple storage layers (local files, MCP memory, vector stores, Git repos). Use when the user 
+skill	kotlin-coroutines-flows	ECC	Kotlin Coroutines and Flow patterns for Android and KMP — structured concurrency, Flow operators, StateFlow, error handling, and testing.
+skill	kotlin-exposed-patterns	ECC	JetBrains Exposed ORM patterns including DSL queries, DAO pattern, transactions, HikariCP connection pooling, Flyway migrations, and repository pattern.
+skill	kotlin-ktor-patterns	ECC	Ktor server patterns including routing DSL, plugins, authentication, Koin DI, kotlinx.serialization, WebSockets, and testApplication testing.
+skill	kotlin-patterns	ECC	Idiomatic Kotlin patterns, best practices, and conventions for building robust, efficient, and maintainable Kotlin applications with coroutines, null safety, an
+skill	kotlin-testing	ECC	Kotlin testing patterns with Kotest, MockK, coroutine testing, property-based testing, and Kover coverage. Follows TDD methodology with idiomatic Kotlin practic
+skill	kubernetes-patterns	ECC	Kubernetes workload patterns, resource management, RBAC, probes, autoscaling, ConfigMap/Secret handling, and kubectl debugging for production-grade deployments.
+skill	laravel-patterns	ECC	Laravel architecture patterns, routing/controllers, Eloquent ORM, service layers, queues, events, caching, and API resources for production apps.
+skill	laravel-plugin-discovery	ECC	Discover and evaluate Laravel packages via LaraPlugins.io MCP. Use when the user wants to find plugins, check package health, or assess Laravel/PHP compatibilit
+skill	laravel-security	ECC	Laravel security best practices — authentication, authorization, Eloquent safety, CSRF, XSS prevention, API security, and secure deployment configurations.
+skill	laravel-tdd	ECC	Laravel testing strategies with PHPUnit, Pest, model factories, HTTP tests, Sanctum authentication testing, mocking, and coverage.
+skill	laravel-verification	ECC	Verification loop for Laravel projects: env checks, linting, static analysis, tests with coverage, security scans, and deployment readiness.
+skill	latency-critical-systems	ECC	Use for latency-sensitive systems such as realtime dashboards, market data, streaming agents, execution gateways, queues, caches, or HFT-like infrastructure whe
+skill	lead-intelligence	ECC	AI-native lead intelligence and outreach pipeline. Replaces Apollo, Clay, and ZoomInfo with agent-powered signal scoring, mutual ranking, warm path discovery, s
+skill	liquid-glass-design	?	iOS 26 Liquid Glass design system — dynamic glass material with blur, reflection, and interactive morphing for SwiftUI, UIKit, and WidgetKit.
+skill	llm-trading-agent-security	ECC direct-port adaptation	Security patterns for autonomous trading agents with wallet or transaction authority. Covers prompt injection, spend limits, pre-send simulation, circuit breake
+skill	logistics-exception-management	ECC	>
+skill	make-interfaces-feel-better	community	Apply concrete design-engineering details that make interfaces feel polished. Use when reviewing or improving UI spacing, typography, borders, shadows, motion, 
+skill	manim-video	ECC	Build reusable Manim explainers for technical concepts, graphs, system diagrams, and product walkthroughs, then hand off to the wider ECC video stack if needed.
+skill	market-research	ECC	Conduct market research, competitive analysis, investor due diligence, and industry intelligence with source attribution and decision-oriented summaries. Use wh
+skill	marketing-campaign	ECC	End-to-end marketing campaign planning and execution. Covers audience research, positioning, campaign angle definition, landing page copy, email sequences, soci
+skill	mcp-server-patterns	ECC	Build MCP servers with Node/TypeScript SDK — tools, resources, prompts, Zod validation, stdio vs Streamable HTTP. Use Context7 or official MCP docs for latest A
+skill	messages-ops	ECC	Evidence-first live messaging workflow for ECC. Use when the user wants to read texts or DMs, recover a recent one-time code, inspect a thread before replying, 
+skill	ml-adoption-playbook	ECC	End-to-end methodology for AI agents and software engineers to add machine learning algorithms to existing non-ML codebases. Covers problem framing, data readin
+skill	mle-workflow	ECC	Production machine-learning engineering workflow for data contracts, reproducible training, model evaluation, deployment, monitoring, and rollback. Use when bui
+skill	motion-advanced	?	Advanced motion patterns for React / Next.js — drag & drop, gestures, text animations, SVG path drawing, custom hooks, imperative sequences (useAnimate), loader
+skill	motion-foundations	?	Motion tokens, spring presets, performance rules, device adaptation, accessibility enforcement, and SSR safety for React / Next.js using motion/react. Foundatio
+skill	motion-patterns	?	Production-ready animation patterns for React / Next.js — button, modal, toast, stagger, page transitions, exit animations, scroll, and layout — built on motion
+skill	motion-ui	ECC	Production-ready UI motion system for React/Next.js. Use when implementing animations, transitions, or motion patterns.
+skill	mysql-patterns	ECC	MySQL and MariaDB schema, query, indexing, transaction, replication, and connection-pool patterns for production backends.
+skill	nanoclaw-repl	ECC	Operate and extend NanoClaw v2, ECC's zero-dependency session-aware REPL built on claude -p.
+skill	nestjs-patterns	ECC	NestJS architecture patterns for modules, controllers, providers, DTO validation, guards, interceptors, config, and production-grade TypeScript backends.
+skill	netmiko-ssh-automation	community	Safe Python Netmiko patterns for read-only collection, bounded batch SSH, TextFSM parsing, guarded config changes, timeouts, and network automation error handli
+skill	network-bgp-diagnostics	community	Diagnostics-only BGP troubleshooting patterns for neighbor state, route exchange, prefix policy, AS path inspection, and safe evidence collection.
+skill	network-config-validation	community	Pre-deployment checks for router and switch configuration, including dangerous commands, duplicate addresses, subnet overlaps, stale references, management-plan
+skill	network-interface-health	community	Diagnose interface errors, drops, CRCs, duplex mismatches, flapping, speed negotiation issues, and counter trends on routers, switches, and Linux hosts.
+skill	nextjs-turbopack	ECC	Next.js 16+ and Turbopack — incremental bundling, FS caching, dev speed, and when to use Turbopack vs webpack.
+skill	nodejs-keccak256	ECC direct-port adaptation	Prevent Ethereum hashing bugs in JavaScript and TypeScript. Node's sha3-256 is NIST SHA3, not Ethereum Keccak-256, and silently breaks selectors, signatures, st
+skill	nutrient-document-processing	ECC	Process, convert, OCR, extract, redact, sign, and fill documents using the Nutrient DWS API. Works with PDFs, DOCX, XLSX, PPTX, HTML, and images.
+skill	nuxt4-patterns	ECC	Nuxt 4 app patterns for hydration safety, performance, route rules, lazy loading, and SSR-safe data fetching with useFetch and useAsyncData.
+skill	openclaw-persona-forge	community	为 OpenClaw AI Agent 锻造完整的龙虾灵魂方案。根据用户偏好或随机抽卡， 输出身份定位、灵魂描述(SOUL.md)、角色化底线规则、名字和头像生图提示词。 如当前环境提供已审核的生图 skill，可自动生成统一风格头像图片。 当用户需要创建、设计或定制 OpenClaw 龙虾灵魂时使用。 不适用于：微调
+skill	opensource-pipeline	ECC	Open-source pipeline: fork, sanitize, and package private projects for safe public release. Chains 3 agents (forker, sanitizer, packager). Triggers: '/opensourc
+skill	orch-add-feature	ECC	Orchestrate building a brand-new feature end to end — research, plan, TDD implementation, review, and gated commit — by delegating each phase to the matching EC
+skill	orch-build-mvp	ECC	Orchestrate bootstrapping a working MVP from a design or spec document — ingest the doc, plan thin vertical slices, scaffold the first end-to-end slice, then TD
+skill	orch-change-feature	ECC	Orchestrate altering an existing, working feature to new desired behavior — update its tests to the new spec, change the implementation to match, review, and ga
+skill	orch-fix-defect	ECC	Orchestrate fixing a bug — reproduce it as a failing regression test, fix to green, review, and gated commit — by delegating each phase to the matching ECC agen
+skill	orch-pipeline	ECC	Shared orchestration engine for the orch-* skill family. Defines the gated Research-Plan-TDD-Review-Commit pipeline, the size classifier, the agent map, and the
+skill	orch-refine-code	ECC	Orchestrate a behavior-preserving refactor — confirm tests are green, restructure without changing behavior, keep tests green, review, and gated commit. Use whe
+skill	parallel-execution-optimizer	ECC	Use when the user wants a task done much faster through parallel work, concurrent agents, batched tool calls, isolated worktrees, or many independent verificati
+skill	perl-patterns	ECC	Modern Perl 5.36+ idioms, best practices, and conventions for building robust, maintainable Perl applications.
+skill	perl-security	ECC	Comprehensive Perl security covering taint mode, input validation, safe process execution, DBI parameterized queries, web security (XSS/SQLi/CSRF), and perlcrit
+skill	perl-testing	ECC	Perl testing patterns using Test2::V0, Test::More, prove runner, mocking, coverage with Devel::Cover, and TDD methodology.
+skill	plan-orchestrate	ECC	Read a plan document, decompose it into steps, design a per-step agent chain from the ECC catalogue, and emit ready-to-paste /orchestrate custom prompts. Genera
+skill	plankton-code-quality	community	Write-time code quality enforcement using Plankton — auto-formatting, linting, and Claude-powered fixes on every file edit via hooks.
+skill	postgres-patterns	ECC	PostgreSQL database patterns for query optimization, schema design, indexing, and security. Based on Supabase best practices.
+skill	prediction-market-oracle-research	ECC	Research prediction markets as data sources or oracle signals for products, agents, dashboards, and corporate decision intelligence. Use for source-grounded ana
+skill	prediction-market-risk-review	ECC	Review prediction-market, basket, oracle, and trading-agent workflows for compliance, safety, data-quality, privacy, and execution risk. Use before any workflow
+skill	prisma-patterns	ECC	Prisma ORM patterns for TypeScript backends — schema design, query optimization, transactions, pagination, and critical traps like updateMany returning count no
+skill	product-capability	ECC	Translate PRD intent, roadmap asks, or product discussions into an implementation-ready capability plan that exposes constraints, invariants, interfaces, and un
+skill	product-lens	ECC	Use this skill to validate the why before building, run product diagnostics, and pressure-test product direction before the request becomes an implementation co
+skill	production-audit	community	Local-evidence production readiness audit for shipped apps, pre-launch reviews, post-merge checks, and what breaks in prod? questions without sending repo data 
+skill	production-scheduling	ECC	>
+skill	project-flow-ops	ECC	Operate execution flow across GitHub and Linear by triaging issues and pull requests, linking active work, and keeping GitHub public-facing while Linear remains
+skill	prompt-optimizer	community	>-
+skill	python-patterns	ECC	Pythonic idioms, PEP 8 standards, type hints, and best practices for building robust, efficient, and maintainable Python applications.
+skill	python-testing	ECC	Python testing strategies using pytest, TDD methodology, fixtures, mocking, parametrization, and coverage requirements.
+skill	pytorch-patterns	ECC	PyTorch deep learning patterns and best practices for building robust, efficient, and reproducible training pipelines, model architectures, and data loading.
+skill	quality-nonconformance	ECC	>
+skill	quarkus-patterns	ECC	Quarkus 3.x LTS architecture patterns with Camel for messaging, RESTful API design, CDI services, data access with Panache, and async processing. Use for Java Q
+skill	quarkus-security	ECC	Quarkus Security best practices for authentication, authorization, JWT/OIDC, RBAC, input validation, CSRF, secrets management, and dependency security.
+skill	quarkus-tdd	ECC	Test-driven development for Quarkus 3.x LTS using JUnit 5, Mockito, REST Assured, Camel testing, and JaCoCo. Use when adding features, fixing bugs, or refactori
+skill	quarkus-verification	ECC	Verification loop for Quarkus projects: build, static analysis, tests with coverage, security scans, native compilation, and diff review before release or PR.
+skill	ralphinho-rfc-pipeline	ECC	RFC-driven multi-agent DAG execution pattern with quality gates, merge queues, and work unit orchestration.
+skill	react-patterns	ECC	React 18/19 patterns including hooks discipline, server/client component boundaries, Suspense + error boundaries, form actions, data fetching, state management 
+skill	react-performance	ECC	React and Next.js performance optimization patterns adapted from Vercel Engineering's React Best Practices (https://github.com/vercel-labs/agent-skills). Organi
+skill	react-testing	ECC	React component testing with React Testing Library, Vitest/Jest, MSW for network mocking, accessibility assertions with axe, and the decision boundary between c
+skill	recsys-pipeline-architect	community	Design composable recommendation, ranking, and feed pipelines using the six-stage Source→Hydrator→Filter→Scorer→Selector→SideEffect framework popularized by xAI
+skill	recursive-decision-ledger	ECC	Use when the user asks for repeated rollouts, marked decision processes, high-dimensional search, stochastic optimization, local-optima exploration, ensemble co
+skill	redis-patterns	ECC	Redis data structure patterns, caching strategies, distributed locks, rate limiting, pub/sub, and connection management for production applications.
+skill	regex-vs-llm-structured-text	ECC	Decision framework for choosing between regex and LLM when parsing structured text — start with regex, add LLM only for low-confidence edge cases.
+skill	remotion-video-creation	?	Best practices for Remotion - Video creation in React. 29 domain-specific rules covering 3D, animations, audio, captions, charts, transitions, and more.
+skill	repo-scan	community	Cross-stack source code asset audit — classifies every file, detects embedded third-party libraries, and delivers actionable four-level verdicts per module with
+skill	research-ops	ECC	Evidence-first current-state research workflow for ECC. Use when the user wants fresh facts, comparisons, enrichment, or a recommendation built from current pub
+skill	returns-reverse-logistics	ECC	>
+skill	rules-distill	ECC	Scan skills to extract cross-cutting principles and distill them into rules — append, revise, or create new rule files
+skill	rust-patterns	ECC	Idiomatic Rust patterns, ownership, error handling, traits, concurrency, and best practices for building safe, performant applications.
+skill	rust-testing	ECC	Rust testing patterns including unit tests, integration tests, async testing, property-based testing, mocking, and coverage. Follows TDD methodology.
+skill	safety-guard	ECC	Use this skill to prevent destructive operations when working on production systems or running agents autonomously.
+skill	santa-method	Ronald Skelton - Founder, RapportScore.ai	Multi-agent adversarial verification with convergence loop. Two independent review agents must both pass before output ships.
+skill	pubmed-database	community	Direct PubMed and NCBI E-utilities search workflows for biomedical literature, MeSH queries, PMID lookup, citation retrieval, and API-backed literature monitori
+skill	uspto-database	community	USPTO patent and trademark data workflow for official record lookup, PatentSearch queries, TSDR checks, assignment data, and reproducible IP research logs.
+skill	gget	community	gget CLI and Python workflow for quick genomic database queries, sequence lookup, BLAST-style searches, enrichment checks, and reproducible bioinformatics evide
+skill	literature-review	community	Systematic literature-review workflow for academic, biomedical, technical, and scientific topics, including search planning, source screening, synthesis, citati
+skill	scholar-evaluation	community	Structured scholarly-work evaluation for papers, proposals, literature reviews, methods sections, evidence quality, citation support, and research-writing feedb
+skill	search-first	ECC	Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code. Invokes the researcher agent.
+skill	security-bounty-hunter	ECC direct-port adaptation	Hunt for exploitable, bounty-worthy security issues in repositories. Focuses on remotely reachable vulnerabilities that qualify for real reports instead of nois
+skill	security-review	ECC	Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provid
+skill	security-scan	ECC	Scan your Claude Code configuration (.claude/ directory) for security vulnerabilities, misconfigurations, and injection risks using AgentShield. Checks CLAUDE.m
+skill	seo	ECC	Audit, plan, and implement SEO improvements across technical SEO, on-page optimization, structured data, Core Web Vitals, and content strategy. Use when the use
+skill	skill-comply	ECC	Visualize whether skills, rules, and agent definitions are actually followed — auto-generates scenarios at 3 prompt strictness levels, runs agents, classifies b
+skill	skill-scout	community	Search existing local, marketplace, GitHub, and web skill sources before creating a new skill. Use when the user wants to create, build, fork, or find a skill f
+skill	skill-stocktake	ECC	Use when auditing Claude skills and commands for quality. Supports Quick Scan (changed skills only) and Full Stocktake modes with sequential subagent batch eval
+skill	social-graph-ranker	ECC	Weighted social-graph ranking for warm intro discovery, bridge scoring, and network gap analysis across X and LinkedIn. Use when the user wants the reusable gra
+skill	social-publisher	community	Agent-driven scheduling and publishing of social media posts across 13 platforms via SocialClaw. Use when the user wants to publish to X, LinkedIn, Instagram, F
+skill	springboot-patterns	ECC	Spring Boot architecture patterns, REST API design, layered services, data access, caching, async processing, and logging. Use for Java Spring Boot backend work
+skill	springboot-security	ECC	Spring Security best practices for authn/authz, validation, CSRF, secrets, headers, rate limiting, and dependency security in Java Spring Boot services.
+skill	springboot-tdd	ECC	Test-driven development for Spring Boot using JUnit 5, Mockito, MockMvc, Testcontainers, and JaCoCo. Use when adding features, fixing bugs, or refactoring.
+skill	springboot-verification	ECC	Verification loop for Spring Boot projects: build, static analysis, tests with coverage, security scans, and diff review before release or PR.
+skill	strategic-compact	ECC	Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
+skill	swift-actor-persistence	ECC	Thread-safe data persistence in Swift using actors — in-memory cache with file-backed storage, eliminating data races by design.
+skill	swift-concurrency-6-2	?	Swift 6.2 Approachable Concurrency — single-threaded by default, @concurrent for explicit background offloading, isolated conformances for main actor types.
+skill	swift-protocol-di-testing	ECC	Protocol-based dependency injection for testable Swift code — mock file system, network, and external APIs using focused protocols and Swift Testing.
+skill	swiftui-patterns	?	SwiftUI architecture patterns, state management with @Observable, view composition, navigation, performance optimization, and modern iOS/macOS UI best practices
+skill	taste	ECC	A creative-direction (taste) layer for music videos and short-form edits in the angelcore / cloud-trance / hyperpop visual family. Distills a named-genre aesthe
+skill	tdd-workflow	ECC	Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and
+skill	team-agent-orchestration	ECC	Run team-based orchestration for agent squads using work items, ownership, agent Kanban, merge gates, and control pane handoffs.
+skill	team-builder	community	Interactive agent picker for composing and dispatching parallel teams
+skill	terminal-ops	ECC	Evidence-first repo execution workflow for ECC. Use when the user wants a command run, a repo checked, a CI failure debugged, or a narrow fix pushed with exact 
+skill	tinystruct-patterns	ECC	Expert guidance for developing with the tinystruct Java framework. Use when working on the tinystruct codebase or any project built on tinystruct — including cr
+skill	token-budget-advisor	community	>-
+skill	ui-demo	ECC	Record polished UI demo videos using Playwright. Use when the user asks to create a demo, walkthrough, screen recording, or tutorial video of a web application.
+skill	ui-to-vue	community	Use when the user has UI screenshots or design exports that need batch conversion into Vue 3 components, especially with Vant, Element Plus, or Ant Design Vue.
+skill	uncloud	ECC	Use when managing an Uncloud cluster — deploying services, configuring Caddy ingress, adding static proxy routes for non-cluster devices, publishing ports, scal
+skill	unified-notifications-ops	ECC	Operate notifications as one ECC-native workflow across GitHub, Linear, desktop alerts, hooks, and connected communication surfaces. Use when the real problem i
+skill	verification-loop	ECC	A comprehensive verification system for Claude Code sessions.
+skill	video-editing	ECC	AI-assisted video editing workflows for cutting, structuring, and augmenting real footage. Covers the full pipeline from raw capture through FFmpeg, Remotion, E
+skill	videodb	ECC	See, Understand, Act on video and audio. See- ingest from local files, URLs, RTSP/live feeds, or live record desktop; return realtime context and playable strea
+skill	visa-doc-translate	?	Translate visa application documents (images) to English and create a bilingual PDF with original and translation
+skill	vite-patterns	ECC	Vite build tool patterns including config, plugins, HMR, env variables, proxy setup, SSR, library mode, dependency pre-bundling, and build optimization. Activat
+skill	vue-patterns	ECC	Vue.js 3 Composition API patterns, component architecture, reactivity best practices, Pinia state management, Vue Router navigation, and Nuxt SSR patterns. Acti
+skill	windows-desktop-e2e	ECC	E2E testing for Windows native desktop apps (WPF, WinForms, Win32/MFC, Qt) using pywinauto and Windows UI Automation.
+skill	workspace-surface-audit	ECC	Audit the active repo, MCP servers, plugins, connectors, env surfaces, and harness setup, then recommend the highest-value ECC-native skills, hooks, agents, and
+skill	x-api	ECC	X/Twitter API integration for posting tweets, threads, reading timelines, search, and analytics. Covers OAuth auth patterns, rate limits, and platform-native co
+agent	a11y-architect	-	Accessibility Architect specializing in WCAG 2.2 compliance for Web and Native platforms. Use PROACTIVELY when designing UI components, establishing design syst
+agent	agent-evaluator	-	Evaluates agent output against 5-axis quality rubric (accuracy, completeness, clarity, actionability, conciseness). Use after any non-trivial task when the user
+agent	architect	-	Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large sy
+agent	build-error-resolver	-	Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no arc
+agent	chief-of-staff	-	Personal communication chief of staff that triages email, Slack, LINE, and Messenger. Classifies messages into 4 tiers (skip/info_only/meeting_info/action_requi
+agent	code-architect	-	Designs feature architectures by analyzing existing codebase patterns and conventions, then providing implementation blueprints with concrete files, interfaces,
+agent	code-explorer	-	Deeply analyzes existing codebase features by tracing execution paths, mapping architecture layers, and documenting dependencies to inform new development.
+agent	code-reviewer	-	Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USE
+agent	code-simplifier	-	Simplifies and refines code for clarity, consistency, and maintainability while preserving behavior. Focus on recently modified code unless instructed otherwise
+agent	comment-analyzer	-	Analyze code comments for accuracy, completeness, maintainability, and comment rot risk.
+agent	conversation-analyzer	-	Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks. Triggered by /hookify without arguments.
+agent	cpp-build-resolver	-	C++ build, CMake, and compilation error resolution specialist. Fixes build errors, linker issues, and template errors with minimal changes. Use when C++ builds 
+agent	cpp-reviewer	-	Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. Use for all C++ code changes. MUST BE USED for C++ proj
+agent	csharp-reviewer	-	Expert C# code reviewer specializing in .NET conventions, async patterns, security, nullable reference types, and performance. Use for all C# code changes. MUST
+agent	dart-build-resolver	-	Dart/Flutter build, analysis, and dependency error resolution specialist. Fixes `dart analyze` errors, Flutter compilation failures, pub dependency conflicts, a
+agent	database-reviewer	-	PostgreSQL database specialist for query optimization, schema design, security, and performance. Use PROACTIVELY when writing SQL, creating migrations, designin
+agent	django-build-resolver	-	Django/Python build, migration, and dependency error resolution specialist. Fixes pip/Poetry errors, migration conflicts, import errors, Django configuration is
+agent	django-reviewer	-	Expert Django code reviewer specializing in ORM correctness, DRF patterns, migration safety, security misconfigurations, and production-grade Django practices. 
+agent	doc-updater	-	Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*
+agent	docs-lookup	-	When the user asks how to use a library, framework, or API or needs up-to-date code examples, use Context7 MCP to fetch current documentation and return answers
+agent	e2e-runner	-	End-to-end testing specialist using Vercel Agent Browser (preferred) with Playwright fallback. Use PROACTIVELY for generating, maintaining, and running E2E test
+agent	fastapi-reviewer	-	Reviews FastAPI applications for async correctness, dependency injection, Pydantic schemas, security, OpenAPI quality, testing, and production readiness.
+agent	flutter-reviewer	-	Flutter and Dart code reviewer. Reviews Flutter code for widget best practices, state management patterns, Dart idioms, performance pitfalls, accessibility, and
+agent	fsharp-reviewer	-	Expert F# code reviewer specializing in functional idioms, type safety, pattern matching, computation expressions, and performance. Use for all F# code changes.
+agent	gan-evaluator	-	GAN Harness — Evaluator agent. Tests the live running application via Playwright, scores against rubric, and provides actionable feedback to the Generator.
+agent	gan-generator	-	GAN Harness — Generator agent. Implements features according to the spec, reads evaluator feedback, and iterates until quality threshold is met.
+agent	gan-planner	-	GAN Harness — Planner agent. Expands a one-line prompt into a full product specification with features, sprints, evaluation criteria, and design direction.
+agent	go-build-resolver	-	Go build, vet, and compilation error resolution specialist. Fixes build errors, go vet issues, and linter warnings with minimal changes. Use when Go builds fail
+agent	go-reviewer	-	Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance. Use for all Go code changes. MUST BE USED for Go pr
+agent	harmonyos-app-resolver	-	HarmonyOS application development expert specializing in ArkTS and ArkUI. Reviews code for V2 state management compliance, Navigation routing patterns, API usag
+agent	harness-optimizer	-	Analyze and improve the local agent harness configuration for reliability, cost, and throughput.
+agent	healthcare-reviewer	-	Reviews healthcare application code for clinical safety, CDSS accuracy, PHI compliance, and medical data integrity. Specialized for EMR/EHR, clinical decision s
+agent	homelab-architect	-	Designs home and small-lab network plans from hardware inventory, goals, and operator experience level, with safe staged changes and rollback guidance.
+agent	java-build-resolver	-	Java/Maven/Gradle build, compilation, and dependency error resolution specialist. Automatically detects Spring Boot or Quarkus and applies framework-specific fi
+agent	java-reviewer	-	Expert Java code reviewer for Spring Boot and Quarkus projects. Automatically detects the framework and applies the appropriate review rules. Covers layered arc
+agent	kotlin-build-resolver	-	Kotlin/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors, Kotlin compiler errors, and Gradle issues with minimal changes
+agent	kotlin-reviewer	-	Kotlin and Android/KMP code reviewer. Reviews Kotlin code for idiomatic patterns, coroutine safety, Compose best practices, clean architecture violations, and c
+agent	loop-operator	-	Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.
+agent	marketing-agent	-	Marketing strategist and copywriter for campaign planning, audience research, positioning, copy creation, and content review. Covers landing pages, email sequen
+agent	mle-reviewer	-	Production machine-learning engineering reviewer for data contracts, feature pipelines, training reproducibility, offline/online evaluation, model serving, moni
+agent	network-architect	-	Designs enterprise or multi-site network architecture from requirements, using existing network skills for focused routing, validation, automation, and troubles
+agent	network-config-reviewer	-	Reviews router and switch configurations for security, correctness, stale references, risky change-window commands, and missing operational guardrails.
+agent	network-troubleshooter	-	Diagnoses network connectivity, routing, DNS, interface, and policy symptoms with a read-only OSI-layer workflow and evidence-backed root cause summary.
+agent	opensource-forker	-	Fork any project for open-sourcing. Copies files, strips secrets and credentials (20+ patterns), replaces internal references with placeholders, generates .env.
+agent	opensource-packager	-	Generate complete open-source packaging for a sanitized project. Produces CLAUDE.md, setup.sh, README.md, LICENSE, CONTRIBUTING.md, and GitHub issue templates. 
+agent	opensource-sanitizer	-	Verify an open-source fork is fully sanitized before release. Scans for leaked secrets, PII, internal references, and dangerous files using 20+ regex patterns. 
+agent	performance-optimizer	-	Performance analysis and optimization specialist. Use PROACTIVELY for identifying bottlenecks, optimizing slow code, reducing bundle sizes, and improving runtim
+agent	php-reviewer	-	Expert PHP code reviewer specializing in PSR-12 compliance, PHP type system, Eloquent ORM patterns, security, and performance. Use for all PHP code changes. MUS
+agent	planner	-	Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex re
+agent	pr-test-analyzer	-	Review pull request test coverage quality and completeness, with emphasis on behavioral coverage and real bug prevention.
+agent	python-reviewer	-	Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance. Use for all Python code changes. MUST BE U
+agent	pytorch-build-resolver	-	PyTorch runtime, CUDA, and training error resolution specialist. Fixes tensor shape mismatches, device errors, gradient issues, DataLoader problems, and mixed p
+agent	react-build-resolver	-	Diagnose and fix React build failures across Vite, webpack, Next.js, CRA, Parcel, esbuild, and Bun. Handles JSX/TSX compile errors, hydration mismatches, server
+agent	react-reviewer	-	Expert React/JSX code reviewer specializing in hook correctness, render performance, server/client component boundaries, accessibility, and React-specific secur
+agent	refactor-cleaner	-	Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-p
+agent	rust-build-resolver	-	Rust build, compilation, and dependency error resolution specialist. Fixes cargo build errors, borrow checker issues, and Cargo.toml problems with minimal chang
+agent	rust-reviewer	-	Expert Rust code reviewer specializing in ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Use for all Rust code changes. MUST BE USE
+agent	security-reviewer	-	Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensi
+agent	seo-specialist	-	SEO specialist for technical SEO audits, on-page optimization, structured data, Core Web Vitals, and content/keyword mapping. Use for site audits, meta tag revi
+agent	silent-failure-hunter	-	Review code for silent failures, swallowed errors, bad fallbacks, and missing error propagation.
+agent	spec-miner	-	Extracts behavioral specs from existing codebases for OpenSpec. Produces flat Requirement and Invariant blocks with structured metadata (entities, enforced, id,
+agent	swift-build-resolver	-	Swift/Xcode build, compilation, and dependency error resolution specialist. Fixes swift build errors, Xcode build failures, SPM dependency issues, and code sign
+agent	swift-reviewer	-	Expert Swift code reviewer specializing in protocol-oriented design, value semantics, ARC memory management, Swift Concurrency, and idiomatic patterns. Use for 
+agent	tdd-guide	-	Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures
+agent	type-design-analyzer	-	Analyze type design for encapsulation, invariant expression, usefulness, and enforcement.
+agent	typescript-reviewer	-	Expert TypeScript/JavaScript code reviewer specializing in type safety, async correctness, Node/web security, and idiomatic patterns. Use for all TypeScript and
+agent	vue-reviewer	-	Expert Vue.js code reviewer specializing in Composition API correctness, reactivity pitfalls, component architecture, template security, and Vue-specific perfor

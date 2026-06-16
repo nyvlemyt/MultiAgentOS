@@ -24,8 +24,8 @@ export default async function PrioritiesPage({
     <div className="flex flex-col gap-4">
       <header className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Priorities</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} missions · drag the slider to set 0–100 priority</p>
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Priorités</h1>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} missions · glisse le curseur pour fixer la priorité 0–100</p>
         </div>
       </header>
 

@@ -43,7 +43,7 @@ export default async function SkillsRegistry({
             className="text-2xl font-semibold tracking-tight"
             style={{ color: 'var(--text-primary)' }}
           >
-            Skills Registry
+            Registre des compétences
           </h1>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             {rows.length} skill{rows.length === 1 ? '' : 's'} indexed
@@ -53,7 +53,7 @@ export default async function SkillsRegistry({
           <input
             name="q"
             defaultValue={q}
-            placeholder="Search…"
+            placeholder="Rechercher…"
             className="mono text-xs px-2 py-1 rounded"
             style={{
               background: 'var(--bg-hover)',
@@ -71,7 +71,7 @@ export default async function SkillsRegistry({
               border: '1px solid var(--border-subtle)',
             }}
           >
-            <option value="">All domains</option>
+            <option value="">Tous les domaines</option>
             {domains.map((d) => (
               <option key={d} value={d ?? ''}>
                 {d}
@@ -83,7 +83,7 @@ export default async function SkillsRegistry({
             className="mono text-xs px-2 py-1 rounded"
             style={{ background: 'var(--accent)', color: '#fff' }}
           >
-            Filter
+            Filtrer
           </button>
           {(domain || q) && (
             <a
@@ -175,7 +175,7 @@ export default async function SkillsRegistry({
                           color: 'var(--accent)',
                         }}
                       >
-                        Pin
+                        Épingler
                       </button>
                     </form>
                   )}

@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getDb, missions as missionsTable, tasks as tasksTable, events as eventsTable, validations as validationsTable } from '@mas/db';
+import { getDb, missions as missionsTable, tasks as tasksTable, events as eventsTable, validations as validationsTable, projects as projectsTable } from '@mas/db';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { RiskBadge } from '@/components/RiskBadge';
 import { BudgetBar } from '@/components/BudgetBar';
@@ -10,8 +11,9 @@ import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
 import { MissionDeadlineEditor } from '@/components/MissionDeadlineEditor';
 import { isDeadlineSoon } from '@/lib/prioritize';
-import { DeliverableReport } from '@/components/DeliverableReport';
-import { mockDeliverable } from '@/lib/deliverables';
+import { listMissionReports } from '@/lib/reports';
+import { allAgents } from '@/lib/fixtures';
+import { FileText } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +51,8 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
   const db = getDb();
   const [m] = await db.select().from(missionsTable).where(eq(missionsTable.id, id));
   if (!m) return notFound();
+  const [proj] = await db.select().from(projectsTable).where(eq(projectsTable.id, m.projectId));
+  const missionReports = await listMissionReports(db, id);
 
   const ts = await db.select().from(tasksTable).where(eq(tasksTable.missionId, id)).orderBy(asc(tasksTable.createdAt));
   const evs = await db.select().from(eventsTable).where(eq(eventsTable.missionId, id)).orderBy(desc(eventsTable.createdAt)).limit(25);
@@ -139,7 +143,7 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <article className="surface lg:col-span-2 p-4">
-          <h2 className="mb-3 text-sm font-semibold">Task DAG</h2>
+          <h2 className="mb-3 text-sm font-semibold">Graphe des tâches</h2>
           {ts.length === 0 ? (
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No tasks yet. Click <strong>Plan mission</strong> to generate the DAG.</p>
           ) : (
@@ -159,23 +163,43 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
           )}
         </article>
         <article className="surface p-4">
-          <h2 className="mb-1 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Rapport &amp; livrables</h2>
-          <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>ce qui a été produit — vue humaine (lisible) ou vue IA (machine)</p>
-          <DeliverableReport deliverable={mockDeliverable(m.id)} />
+          <h2 className="mb-1 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Rapports de la mission</h2>
+          <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>un rapport par tâche produite — clique pour la page rapport (vue humaine + IA)</p>
+          {missionReports.length === 0 ? (
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucun rapport encore.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {missionReports.map((r) => {
+                const author = r.agentId ? allAgents.find((a) => a.id === r.agentId)?.name ?? r.agentId : 'Système';
+                return (
+                  <li key={r.id}>
+                    <Link href={`/projects/${proj?.slug ?? ''}/reports/${r.id}`} className="surface flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-[color:var(--bg-hover)]">
+                      <FileText size={15} style={{ color: 'var(--accent)' }} />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{r.title}</div>
+                        <div className="mono text-[10px]" style={{ color: 'var(--text-muted)' }}>par {author}</div>
+                      </div>
+                      <span className="mono text-[10px]" style={{ color: 'var(--accent)' }}>ouvrir →</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </article>
       </section>
 
       <section className="surface p-4">
-        <h2 className="mb-3 text-sm font-semibold">Live trace · this mission</h2>
+        <h2 className="mb-3 text-sm font-semibold">Trace live · cette mission</h2>
         {timelineRows.length === 0 ? (
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No events yet.</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucun événement.</p>
         ) : (
           <Timeline rows={timelineRows} />
         )}
       </section>
 
       <section className="surface p-4">
-        <h2 className="mb-3 text-sm font-semibold">Decisions</h2>
+        <h2 className="mb-3 text-sm font-semibold">Décisions</h2>
         <DecisionLog decisions={missionDecisions} projectId={m.projectId} missionId={m.id} />
       </section>
 

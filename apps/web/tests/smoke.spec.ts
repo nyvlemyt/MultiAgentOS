@@ -2,20 +2,20 @@ import { test, expect } from '@playwright/test';
 
 const routes = [
   { path: '/', heading: 'Command Center' },
-  { path: '/projects', heading: 'Projects' },
+  { path: '/projects', heading: 'Projets' },
   { path: '/projects/new', heading: 'Enregistrer un projet' },
   { path: '/projects/otakugo', heading: 'OtakuGO_UP' },
-  { path: '/ideas', heading: 'Ideas Inbox' },
-  { path: '/priorities', heading: 'Priorities' },
+  { path: '/ideas', heading: 'Boîte à idées' },
+  { path: '/priorities', heading: 'Priorités' },
   { path: '/missions', heading: 'Missions' },
   { path: '/missions/mission_seed_001', heading: 'Polish OtakuGO feed empty-state' },
   { path: '/agents', heading: 'Agents' },
   { path: '/agents/mission-planner', heading: 'Mission Planner' },
-  { path: '/studio', heading: 'Agent Studio' },
-  { path: '/skills', heading: 'Skills Registry' },
+  { path: '/studio', heading: 'Studio des agents' },
+  { path: '/skills', heading: 'Registre des compétences' },
   { path: '/tokens', heading: 'Quota & Cache' },
   { path: '/trace', heading: 'Trace' },
-  { path: '/memory', heading: 'Memory Center' },
+  { path: '/memory', heading: 'Centre de mémoire' },
 ];
 
 for (const r of routes) {
@@ -33,11 +33,11 @@ for (const r of routes) {
 
 test('memory inbox filters by intake source', async ({ page }) => {
   await page.goto('/memory');
-  const filter = page.getByLabel('Intake source filter');
+  const filter = page.getByLabel('Filtre par source');
   await expect(filter).toBeVisible();
   await filter.getByRole('link', { name: 'repo', exact: true }).click();
   await expect(page).toHaveURL(/\/memory\?source=repo/);
-  await expect(page.getByRole('heading', { name: 'Memory Center' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Centre de mémoire' })).toBeVisible();
 });
 
 test('studio orbit animates a delegation edge', async ({ page }) => {
@@ -116,7 +116,7 @@ test('new-project wizard shows template cards and creates a project (Phase 7)', 
 
 test('projects list renders without console errors (empty-state landmark when empty)', async ({ page }) => {
   await page.goto('/projects');
-  await expect(page.getByRole('heading', { name: 'Projects' })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('heading', { name: 'Projets' })).toBeVisible({ timeout: 15_000 });
 });
 
 test('priorities board lists missions with a score', async ({ page }) => {

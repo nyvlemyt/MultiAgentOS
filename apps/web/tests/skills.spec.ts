@@ -9,15 +9,15 @@ test.describe.serial('Phase 3 skill registry — filter + promote persist', () =
   test('search filter narrows the table to matching skills', async ({ page }) => {
     await page.goto('/skills');
     await expect(
-      page.getByRole('heading', { name: 'Skills Registry' }),
+      page.getByRole('heading', { name: 'Registre des compétences' }),
     ).toBeVisible();
 
     const total = await page.locator('tbody tr').count();
     expect(total).toBeGreaterThan(1);
 
     // 'slack' is a unique substring of exactly one seeded skill id.
-    await page.getByPlaceholder('Search').fill('slack');
-    await page.getByRole('button', { name: 'Filter' }).click();
+    await page.getByPlaceholder('Rechercher').fill('slack');
+    await page.getByRole('button', { name: 'Filtrer' }).click();
 
     await expect(page).toHaveURL(/[?&]q=slack/);
     const filtered = page.locator('tbody tr');
@@ -31,23 +31,23 @@ test.describe.serial('Phase 3 skill registry — filter + promote persist', () =
     // Pick whichever skill is currently un-pinned (idempotent across reseeds:
     // reseed never overwrites a user-set tier, so target the live state).
     const targetRow = page
-      .locator('tbody tr', { has: page.getByRole('button', { name: 'Pin' }) })
+      .locator('tbody tr', { has: page.getByRole('button', { name: 'Épingler' }) })
       .first();
     await expect(targetRow).toBeVisible();
     const skillId = (await targetRow.locator('td').first().innerText()).trim();
 
-    await targetRow.getByRole('button', { name: 'Pin' }).click();
+    await targetRow.getByRole('button', { name: 'Épingler' }).click();
 
     // POST /api/skills/promote redirects back to /skills.
     await expect(page).toHaveURL(/\/skills$/);
     const pinnedRow = page.locator('tbody tr', { hasText: skillId });
     await expect(pinnedRow).toContainText('pinned');
-    await expect(pinnedRow.getByRole('button', { name: 'Pin' })).toHaveCount(0);
+    await expect(pinnedRow.getByRole('button', { name: 'Épingler' })).toHaveCount(0);
 
     // Reload: the pin is DB-persisted, not in-memory.
     await page.reload();
     const afterReload = page.locator('tbody tr', { hasText: skillId });
     await expect(afterReload).toContainText('pinned');
-    await expect(afterReload.getByRole('button', { name: 'Pin' })).toHaveCount(0);
+    await expect(afterReload.getByRole('button', { name: 'Épingler' })).toHaveCount(0);
   });
 });

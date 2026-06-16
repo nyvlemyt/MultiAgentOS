@@ -12,8 +12,8 @@ export default function Studio() {
     <div className="flex flex-col gap-6">
       <header className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Agent Studio</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{orbitNodes.length} agents — orchestrators inside, library outside. Edges are live delegations.</p>
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Studio des agents</h1>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{orbitNodes.length} agents — orchestrateurs inside, library outside. Edges are live delegations.</p>
         </div>
         <div className="inline-flex items-center gap-0.5 rounded-md p-0.5 text-[11px] font-medium" style={{ background: 'var(--bg-hover)' }}>
           {(['orbit', 'org'] as View[]).map((v) => (

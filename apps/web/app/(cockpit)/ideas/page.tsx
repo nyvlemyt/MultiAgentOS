@@ -20,13 +20,13 @@ export default async function IdeasInboxPage() {
     <div className="flex h-full flex-col gap-4">
       <header className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Ideas Inbox</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} ideas · capture → clarify → prioritize → convert to mission</p>
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Boîte à idées</h1>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} ideas · capture → clarifier → prioriser → convertir en mission</p>
         </div>
       </header>
       {data.length === 0 ? (
         <EmptyState
-          title="No ideas captured yet"
+          title="Aucune idée capturée"
           hint="Capture a rough idea here, then clarify, prioritize, and convert it into a mission."
         />
       ) : (

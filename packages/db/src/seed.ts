@@ -21,6 +21,7 @@ import {
   permissions,
   ideas,
   decisions,
+  reports,
 } from './schema';
 
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000);
@@ -203,6 +204,30 @@ async function main() {
         updatedAt: minutesAgo(30 - i * 2),
       })
       .onConflictDoNothing();
+  }
+
+  const reportRows = [
+    { id: 'rep_seed_1', taskId: 'task_seed_1', agentId: 'mission-planner', kind: 'task' as const, title: 'Survey des empty-states',
+      humanMd: '# Survey des empty-states\n\n**Objectif** : recenser 5 références best-in-class.\n\n## Trouvailles\n- Linear — illustration + 1 CTA\n- Notion — phrase + raccourci\n- GitHub — checklist d\'onboarding\n\n## Reco\nUn message court + **un seul** CTA, ton de la marque.',
+      ai: '{"task":"survey-empty-states","status":"done","refs":5,"recommendation":"one short message + single CTA","nextStep":"pick skills"}' },
+    { id: 'rep_seed_2', taskId: 'task_seed_2', agentId: 'skill-router', kind: 'task' as const, title: 'Skills + agents choisis',
+      humanMd: '# Skills + agents\n\nChoisis : `ui-ux-pro-max`, `frontend-design`.\nAgents Tier B : **UX Architect** puis **Frontend Developer**.',
+      ai: '{"task":"pick-skills","status":"done","skills":["ui-ux-pro-max","frontend-design"],"agents":["design-ux-architect","engineering-frontend-developer"]}' },
+    { id: 'rep_seed_3', taskId: 'task_seed_4', agentId: 'engineering-frontend-developer', kind: 'task' as const, title: 'Composant EmptyState implémenté',
+      humanMd: '# EmptyState implémenté\n\nLe feed vide affiche un message + CTA. `+38` / `-4` lignes.',
+      ai: '{"task":"implement-empty-state","status":"review","filesTouched":["components/Feed.tsx","components/EmptyState.tsx"],"linesAdded":38,"linesRemoved":4}',
+      diff: '--- a/components/Feed.tsx\n+++ b/components/Feed.tsx\n@@ -12,6 +12,9 @@\n-  if (items.length === 0) return null;\n+  if (items.length === 0) {\n+    return <EmptyState title="Aucun manga ici" cta="Explorer" />;\n+  }' },
+    { id: 'rep_seed_proj', taskId: null, agentId: null, kind: 'project' as const, title: 'État du projet — semaine',
+      humanMd: '# État du projet\n\n**OtakuGO_UP** · 1 mission en cours, 0 bloquée.\n\n## Avancement\n- Polish feed empty-state : 3/5 tâches faites, en revue\n\n## À surveiller\n- Échéance feed v2 le 18/06\n\n> Rapport agrégé par le Manager projet (démo).',
+      ai: '{"scope":"project","missionsActive":1,"missionsBlocked":0,"nextDeadline":"2026-06-18","summary":"feed empty-state in review"}' },
+  ];
+  for (const r of reportRows) {
+    await db.insert(reports).values({
+      id: r.id, projectId, missionId: r.kind === 'project' ? null : missionId,
+      taskId: r.taskId ?? null, agentId: r.agentId ?? null, kind: r.kind, title: r.title,
+      humanMd: r.humanMd, ai: r.ai, diff: 'diff' in r ? (r as { diff: string }).diff : '',
+      createdAt: minutesAgo(20 - reportRows.indexOf(r) * 3),
+    }).onConflictDoNothing();
   }
 
   const eventTypes = ['llm_call', 'task_start', 'task_done', 'skill_used', 'delegate', 'tick'];

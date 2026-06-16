@@ -321,6 +321,31 @@ export const permissions = sqliteTable('permissions', {
   allowListJson: text('allow_list_json').notNull().default('[]'),
 });
 
+// Deliverable reports. Every done task should leave a report + trace so progress
+// is followable by both the human (humanMd) and the next agent/LLM (ai = structured
+// JSON). A mission (a "phase") has many task reports; the manager can also produce
+// a project-level report (kind='project'). Stored in the MAS DB (§8); a later step
+// mirrors them as .md/.html files inside the project for sharing.
+export const reports = sqliteTable(
+  'reports',
+  {
+    id: text('id').primaryKey(),
+    projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+    missionId: text('mission_id'),
+    taskId: text('task_id'),
+    agentId: text('agent_id'),
+    kind: text('kind', { enum: ['task', 'mission', 'project'] }).notNull().default('task'),
+    title: text('title').notNull(),
+    humanMd: text('human_md').notNull().default(''),
+    ai: text('ai').notNull().default('{}'),
+    diff: text('diff').notNull().default(''),
+    createdAt: epoch().notNull(),
+  },
+  (t) => ({ byProject: index('reports_project_idx').on(t.projectId, t.createdAt), byMission: index('reports_mission_idx').on(t.missionId) }),
+);
+
+export type Report = typeof reports.$inferSelect;
+export type NewReport = typeof reports.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type Mission = typeof missions.$inferSelect;
