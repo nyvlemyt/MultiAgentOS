@@ -97,8 +97,8 @@ export async function restoreFiche(
 export async function pruneFicheRevisions(db: Db, agentId: string, now: Date): Promise<number> {
   const rows = await listFicheRevisions(db, agentId); // newest first
   const cutoff = new Date(now.getTime() - MAX_AGE_MS);
-  const survivors = rows.filter((r, i) => i < KEEP_MAX && r.savedAt >= cutoff).map((r) => r.id);
-  const toDelete = rows.filter((r) => !survivors.includes(r.id)).map((r) => r.id);
+  const survivors = new Set(rows.filter((r, i) => i < KEEP_MAX && r.savedAt >= cutoff).map((r) => r.id));
+  const toDelete = rows.filter((r) => !survivors.has(r.id)).map((r) => r.id);
   if (toDelete.length === 0) return 0;
   await db
     .delete(ficheRevisions)
