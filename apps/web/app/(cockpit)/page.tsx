@@ -6,12 +6,15 @@ import { AgentAvatar } from '@/components/AgentAvatar';
 import { allAgents } from '@/lib/fixtures';
 import { isDeadlineSoon } from '@/lib/prioritize';
 import { listPendingValidations, latestDailyReport } from '@/lib/autopilot';
-import { getOrCreateManagerConversation, listMessages } from '@/lib/conversations';
+import { ensureConversation, listConversations, getConversation, listMessages } from '@/lib/conversations';
+import { newManagerConversation } from '@/app/(cockpit)/conversation-actions';
+import { ConversationThreads } from '@/components/manager/ConversationThreads';
 import { FolderPlus, AlertTriangle, CalendarClock, ShieldCheck } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CommandCenter() {
+export default async function CommandCenter({ searchParams }: Readonly<{ searchParams: Promise<{ c?: string }> }>) {
+  const { c } = await searchParams;
   const db = getDb();
   const projectRows = await db.select().from(projectsTable).orderBy(desc(projectsTable.lastActiveAt));
   const active = projectRows[0];
@@ -22,8 +25,11 @@ export default async function CommandCenter() {
   const dailyReport = await latestDailyReport(db);
   const busy = allAgents.filter((a) => a.status === 'running');
 
-  const managerConv = await getOrCreateManagerConversation(db);
-  const managerMessages = (await listMessages(db, managerConv.id)).map((m) => ({ role: m.role, text: m.text }));
+  await ensureConversation(db, 'manager');
+  const threads = await listConversations(db, 'manager');
+  const selected = (c ? await getConversation(db, c) : undefined) ?? threads[0]!;
+  const activeConv = selected.scope === 'manager' ? selected : threads[0]!;
+  const managerMessages = (await listMessages(db, activeConv.id)).map((m) => ({ role: m.role, text: m.text }));
 
   return (
     <div className="flex flex-col gap-5">
@@ -35,17 +41,27 @@ export default async function CommandCenter() {
       </header>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
-        <ConversationPanel
-          kind="manager"
-          conversationId={managerConv.id}
-          initialMessages={managerMessages}
-          presenceName="Manager"
-          presenceRole="mission-planner"
-          subtitle="orchestrateur global · historique conservé"
-          project={active?.name ?? 'OtakuGO_UP'}
-          chips={['+ nouveau projet', 'une idée…', 'état du projet']}
-          greeting={`Bonjour. Sur ${active?.name ?? 'OtakuGO_UP'}, que veut-on accomplir ? Décris une mission, lance une idée, ou demande l'état.`}
-        />
+        <div className="flex gap-4">
+          <ConversationThreads
+            threads={threads.map((t) => ({ id: t.id, title: t.title }))}
+            activeId={activeConv.id}
+            basePath="/"
+            onNew={newManagerConversation}
+          />
+          <div className="min-w-0 flex-1">
+            <ConversationPanel
+              kind="manager"
+              conversationId={activeConv.id}
+              initialMessages={managerMessages}
+              presenceName="Manager"
+              presenceRole="mission-planner"
+              subtitle="orchestrateur global · multi-conversations"
+              project={active?.name ?? 'OtakuGO_UP'}
+              chips={['+ nouveau projet', 'une idée…', 'état du projet']}
+              greeting={`Bonjour. Sur ${active?.name ?? 'OtakuGO_UP'}, que veut-on accomplir ? Décris une mission, lance une idée, ou demande l'état.`}
+            />
+          </div>
+        </div>
 
         <aside className="flex flex-col gap-5">
           {/* Projects */}
