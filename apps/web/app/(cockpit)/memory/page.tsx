@@ -41,16 +41,16 @@ export default async function MemoryCenter({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Memory Center</h1>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Only the Memory Keeper writes here. Accept promotes a candidate into a register entry.</p>
+        <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Centre de mémoire</h1>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Seul le Memory Keeper écrit ici. « Accepter » promeut un candidat en entrée de registre.</p>
       </header>
 
       <section className="surface p-4">
         <header className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Candidate inbox</h2>
+          <h2 className="text-sm font-semibold">Boîte de candidats</h2>
           <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{pending.length} pending</span>
         </header>
-        <nav aria-label="Intake source filter" className="mb-3 flex flex-wrap items-center gap-1 text-[10px]">
+        <nav aria-label="Filtre par source" className="mb-3 flex flex-wrap items-center gap-1 text-[10px]">
           <Link
             href="/memory"
             className="mono rounded-sm px-1.5 py-0.5"
@@ -77,7 +77,7 @@ export default async function MemoryCenter({
         </nav>
         {pending.length === 0 ? (
           <p className="px-1 py-4 text-xs" style={{ color: 'var(--text-muted)' }}>
-            No pending candidates. Sessions emit them via the close-out ritual (<code className="mono">captureCandidates</code>).
+            Aucun candidat en attente. Sessions emit them via the close-out ritual (<code className="mono">captureCandidates</code>).
           </p>
         ) : (
           <ul className="space-y-2">

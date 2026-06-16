@@ -40,7 +40,7 @@ export function DecisionLog({
   return (
     <div className="flex flex-col gap-2">
       {decisions.length === 0 ? (
-        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No decisions logged yet.</p>
+        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucune décision enregistrée.</p>
       ) : (
         <ul className="space-y-1.5" data-testid="decision-list">
           {decisions.map((d) => (
@@ -58,7 +58,7 @@ export function DecisionLog({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') log(); }}
-            placeholder="Log a decision…"
+            placeholder="Note une décision…"
             className="flex-1 rounded-md border px-2 py-1 text-[11px]"
             style={{ borderColor: 'var(--border-default)', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
           />

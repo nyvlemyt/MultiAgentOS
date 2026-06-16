@@ -18,14 +18,14 @@ export default async function ProjectsList() {
     <div className="flex flex-col gap-6">
       <header className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Projects</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{projects.length} registered · external paths only</p>
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Projets</h1>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{projects.length} enregistré · chemins externes uniquement</p>
         </div>
         <Link href="/projects/new" className="rounded-md px-3 py-1.5 text-xs font-medium text-white" style={{ background: 'var(--accent)' }}>+ New project</Link>
       </header>
       {projects.length === 0 ? (
         <EmptyState
-          title="No projects registered yet"
+          title="No projects enregistré yet"
           hint="Register an external project by absolute path to start dispatching missions. Your code never moves."
           cta={{ label: '+ New project', href: '/projects/new' }}
         />

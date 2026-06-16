@@ -23,63 +23,63 @@ export default async function TokenManager() {
       <header className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Quota & Cache</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Subscription window usage, cache health, mode controls.</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Usage de la fenêtre d'abonnement, santé du cache, contrôle des modes.</p>
         </div>
         <ModePill defaultMode="eco" />
       </header>
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card
-          title="5h window"
+          title="Fenêtre 5 h"
           value={`${data.window5h.messagesUsed} msg`}
-          hint="≥40% margin required"
+          hint="marge ≥40% requise"
         />
         <Card
-          title="Tokens today"
+          title="Tokens aujourd'hui"
           value={fmtTokens(data.day.tokensSpent)}
-          hint={`cap ${fmtTokens(data.day.tokensCap)}`}
+          hint={`plafond ${fmtTokens(data.day.tokensCap)}`}
         >
           <BudgetBar spent={data.day.tokensSpent} cap={data.day.tokensCap} />
         </Card>
         <Card
-          title="Tokens this week"
+          title="Tokens cette semaine"
           value={fmtTokens(data.week.tokensSpent)}
-          hint={`cap ${fmtTokens(data.week.tokensCap)}`}
+          hint={`plafond ${fmtTokens(data.week.tokensCap)}`}
         >
           <BudgetBar spent={data.week.tokensSpent} cap={data.week.tokensCap} />
         </Card>
         <Card
-          title="Cache hit ratio"
+          title="Taux de cache"
           value={`${data.cacheHitRatio}%`}
-          hint="≥30% Phase 2 target"
+          hint="cible ≥30%"
         />
         <Card
-          title="Remaining capacity"
+          title="Capacité restante"
           value={capacity.label}
-          hint="this month · rolling 30-day avg"
+          hint="ce mois · moyenne glissante 30 j"
         />
       </section>
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <article className="surface p-4">
-          <h2 className="mb-3 text-sm font-semibold">Daily tokens (k) — historical</h2>
+          <h2 className="mb-3 text-sm font-semibold">Tokens par jour (k) — historique</h2>
           <Sparkline data={dailyTokens} width={500} height={140} />
         </article>
         <article className="surface p-4">
-          <h2 className="mb-3 text-sm font-semibold">Weekly quota usage — historical</h2>
+          <h2 className="mb-3 text-sm font-semibold">Quota hebdomadaire — historique</h2>
           <Sparkline data={monthlySpend} width={500} height={140} stroke="var(--success)" />
         </article>
       </section>
       <section className="surface p-4">
-        <h2 className="mb-3 text-sm font-semibold">Spend by provider — today</h2>
+        <h2 className="mb-3 text-sm font-semibold">Dépense par fournisseur — aujourd'hui</h2>
         {data.byProvider.length === 0 ? (
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No LLM calls recorded today.</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucun appel LLM enregistré aujourd'hui.</p>
         ) : (
           <table className="w-full text-xs">
             <thead>
               <tr className="text-left" style={{ color: 'var(--text-muted)' }}>
                 <th className="py-1 font-medium">Source</th>
-                <th className="py-1 text-right font-medium">Calls</th>
-                <th className="py-1 text-right font-medium">Tokens in</th>
-                <th className="py-1 text-right font-medium">Tokens out</th>
+                <th className="py-1 text-right font-medium">Appels</th>
+                <th className="py-1 text-right font-medium">Tokens entrée</th>
+                <th className="py-1 text-right font-medium">Tokens sortie</th>
               </tr>
             </thead>
             <tbody>
@@ -96,11 +96,11 @@ export default async function TokenManager() {
         )}
       </section>
       <section className="surface p-4">
-        <h2 className="mb-3 text-sm font-semibold">Mode policy</h2>
+        <h2 className="mb-3 text-sm font-semibold">Politique des modes</h2>
         <ul className="space-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
-          <li><span className="mono">eco</span> · haiku-4-5 everywhere · Caveman ON (internal only) · summaries only</li>
-          <li><span className="mono">standard</span> · haiku → sonnet on retry · Caveman OFF · on-demand hydration</li>
-          <li><span className="mono">expert</span> · sonnet base · opus on review · full hydration · no auto-cap bypass</li>
+          <li><span className="mono">eco</span> · haiku partout · Caveman ON (interne) · résumés seulement</li>
+          <li><span className="mono">standard</span> · haiku → sonnet au retry · Caveman OFF · hydratation à la demande</li>
+          <li><span className="mono">expert</span> · sonnet base · opus en revue · hydratation complète · pas de contournement du plafond</li>
         </ul>
       </section>
     </div>

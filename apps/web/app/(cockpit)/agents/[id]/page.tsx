@@ -15,23 +15,23 @@ export default async function AgentDetail({ params }: Readonly<{ params: Promise
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Tier {a.tier} · model <span className="mono">{a.model}</span></p>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{a.currentTask ?? 'idle'}</p>
         </div>
-        <button className="rounded-md border px-3 py-1.5 text-xs" style={{ borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}>Edit fiche</button>
+        <button className="rounded-md border px-3 py-1.5 text-xs" style={{ borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}>Éditer la fiche</button>
       </header>
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="Success rate" value={`${Math.round(a.successRate * 100)}%`} />
-        <Stat label="Tokens (lifetime)" value={`${(a.totalTokens / 1000).toFixed(1)}k`} />
-        <Stat label="Avg cost / task" value="€0.04" />
-        <Stat label="Modes used" value="eco 80% · std 20%" />
+        <Stat label="Taux de succès" value={`${Math.round(a.successRate * 100)}%`} />
+        <Stat label="Tokens (total)" value={`${(a.totalTokens / 1000).toFixed(1)}k`} />
+        <Stat label="Coût moy / tâche" value="€0.04" />
+        <Stat label="Modes utilisés" value="eco 80% · std 20%" />
       </section>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <article className="surface lg:col-span-2 p-4">
-          <h2 className="mb-3 text-sm font-semibold">Recent activity</h2>
+          <h2 className="mb-3 text-sm font-semibold">Activité récente</h2>
           <Timeline rows={trace.slice(0, 8)} />
         </article>
         <aside className="surface p-4">
-          <h2 className="mb-3 text-sm font-semibold">Capabilities</h2>
+          <h2 className="mb-3 text-sm font-semibold">Capacités</h2>
           <div className="space-y-3 text-xs">
             <div>
               <div className="mb-1 text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>favorite skills</div>

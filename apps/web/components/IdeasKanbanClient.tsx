@@ -64,7 +64,7 @@ export function IdeasKanbanClient({ ideas }: Readonly<{ ideas: BoardIdea[] }>) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') createIdea(); }}
-          placeholder="Capture an idea…"
+          placeholder="Capture une idée…"
           className="flex-1 rounded-md border px-3 py-2 text-sm"
           style={{ borderColor: 'var(--border-default)', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
         />
@@ -138,7 +138,7 @@ export function IdeasKanbanClient({ ideas }: Readonly<{ ideas: BoardIdea[] }>) {
                         className="rounded-md border px-2 py-1 text-[10px] font-medium"
                         style={{ borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}
                       >
-                        Convert to mission
+                        Convertir en mission
                       </button>
                     )}
                   </article>

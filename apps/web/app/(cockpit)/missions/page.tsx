@@ -22,14 +22,14 @@ export default async function MissionsBoardPage() {
       <header className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Missions</h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} missions · drag between Inbox / To clarify / Planned</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{data.length} missions · glisse entre Boîte / À clarifier / Planifié</p>
         </div>
       </header>
       {data.length === 0 ? (
         <EmptyState
           title="No missions yet"
           hint="Capture an idea and convert it to a mission, or start one from a project page."
-          cta={{ label: 'Open the Ideas Inbox', href: '/ideas' }}
+          cta={{ label: 'Open the Boîte à idées', href: '/ideas' }}
         />
       ) : (
         <MissionsBoardClient missions={data} />

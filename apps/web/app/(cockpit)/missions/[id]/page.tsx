@@ -139,7 +139,7 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <article className="surface lg:col-span-2 p-4">
-          <h2 className="mb-3 text-sm font-semibold">Task DAG</h2>
+          <h2 className="mb-3 text-sm font-semibold">Graphe des tâches</h2>
           {ts.length === 0 ? (
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No tasks yet. Click <strong>Plan mission</strong> to generate the DAG.</p>
           ) : (
@@ -166,16 +166,16 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
       </section>
 
       <section className="surface p-4">
-        <h2 className="mb-3 text-sm font-semibold">Live trace · this mission</h2>
+        <h2 className="mb-3 text-sm font-semibold">Trace live · cette mission</h2>
         {timelineRows.length === 0 ? (
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No events yet.</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucun événement.</p>
         ) : (
           <Timeline rows={timelineRows} />
         )}
       </section>
 
       <section className="surface p-4">
-        <h2 className="mb-3 text-sm font-semibold">Decisions</h2>
+        <h2 className="mb-3 text-sm font-semibold">Décisions</h2>
         <DecisionLog decisions={missionDecisions} projectId={m.projectId} missionId={m.id} />
       </section>
 
