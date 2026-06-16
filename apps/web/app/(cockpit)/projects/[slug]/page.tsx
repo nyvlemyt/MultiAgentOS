@@ -18,6 +18,11 @@ export const dynamic = 'force-dynamic';
 
 const RISK_RANK: Record<string, number> = { blocking: 0, high: 1, medium: 2, low: 3 };
 
+function reportAuthor(agentId: string | null, kind: string): string {
+  if (agentId) return allAgents.find((a) => a.id === agentId)?.name ?? agentId;
+  return kind === 'project' ? 'Manager projet' : 'Système';
+}
+
 export default async function ProjectDetail({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const [project] = await getDb().select().from(projectsTable).where(eq(projectsTable.slug, slug));
@@ -66,7 +71,7 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
         ) : (
           <div className="surface flex flex-col divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
             {projectReports.slice(0, 6).map((r) => {
-              const author = r.agentId ? allAgents.find((a) => a.id === r.agentId)?.name ?? r.agentId : (r.kind === 'project' ? 'Manager projet' : 'Système');
+              const author = reportAuthor(r.agentId, r.kind);
               return (
                 <Link key={r.id} href={`/projects/${slug}/reports/${r.id}`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[color:var(--bg-hover)]">
                   <FileText size={15} className="shrink-0" style={{ color: 'var(--accent)' }} />
