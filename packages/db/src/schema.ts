@@ -284,19 +284,24 @@ export const schedules = sqliteTable(
 // UI redesign: persistent conversations. A 'manager' conversation is global
 // (projectId/agentId null). An 'agent' conversation is one running instance of a
 // base agent scoped to a project (the "Docker container" model): unique per
-// (projectId, agentId). Messages survive navigation and are revisitable.
+// (projectId, agentId). A 'mission' conversation is the chat that drives a single
+// mission, scoped per (projectId, missionId). Messages survive navigation.
 export const conversations = sqliteTable(
   'conversations',
   {
     id: text('id').primaryKey(),
-    scope: text('scope', { enum: ['manager', 'agent'] }).notNull(),
+    scope: text('scope', { enum: ['manager', 'agent', 'mission'] }).notNull(),
     projectId: text('project_id').references(() => projects.id, { onDelete: 'cascade' }),
     agentId: text('agent_id').references(() => agents.id),
+    missionId: text('mission_id').references(() => missions.id, { onDelete: 'cascade' }),
     title: text('title').notNull().default(''),
     createdAt: epoch().notNull(),
     updatedAt: epoch().notNull(),
   },
-  (t) => ({ byScope: index('conversations_scope_idx').on(t.scope, t.projectId, t.agentId) }),
+  (t) => ({
+    byScope: index('conversations_scope_idx').on(t.scope, t.projectId, t.agentId),
+    byMission: index('conversations_mission_idx').on(t.scope, t.projectId, t.missionId),
+  }),
 );
 
 export const messages = sqliteTable(
