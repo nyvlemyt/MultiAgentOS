@@ -3,11 +3,13 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles } from 'lucide-react';
 import { managerReply } from '@/lib/manager-script';
 import { agentReply } from '@/lib/agent-script';
-import { sendManagerMessage, sendAgentMessage } from '@/app/(cockpit)/conversation-actions';
+import { missionReply } from '@/lib/mission-script';
+import { sendManagerMessage, sendAgentMessage, sendMissionMessage } from '@/app/(cockpit)/conversation-actions';
 import { AgentAvatar } from '@/components/AgentAvatar';
 
 type Msg = { id: number; from: 'you' | 'them'; text: string };
 type InitialMsg = { role: 'user' | 'agent'; text: string };
+type Kind = 'manager' | 'agent' | 'mission';
 
 export function ConversationPanel({
   kind,
@@ -18,10 +20,11 @@ export function ConversationPanel({
   subtitle,
   project = 'OtakuGO_UP',
   agentId = '',
+  mission = '',
   chips = [],
   greeting,
 }: Readonly<{
-  kind: 'manager' | 'agent';
+  kind: Kind;
   conversationId: string;
   initialMessages: InitialMsg[];
   presenceName: string;
@@ -29,6 +32,7 @@ export function ConversationPanel({
   subtitle: string;
   project?: string;
   agentId?: string;
+  mission?: string;
   chips?: string[];
   greeting: string;
 }>) {
@@ -45,6 +49,18 @@ export function ConversationPanel({
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [msgs, thinking]);
 
+  function replyFor(value: string): string {
+    if (kind === 'manager') return managerReply(value, project).text;
+    if (kind === 'mission') return missionReply(value, mission).text;
+    return agentReply(agentId, value);
+  }
+
+  function persist(value: string): Promise<void> {
+    if (kind === 'manager') return sendManagerMessage(conversationId, value, project);
+    if (kind === 'mission') return sendMissionMessage(conversationId, value, mission);
+    return sendAgentMessage(conversationId, value, agentId);
+  }
+
   function send(text: string) {
     const value = text.trim();
     if (!value || thinking) return;
@@ -52,13 +68,12 @@ export function ConversationPanel({
     setMsgs((m) => [...m, { id: baseId, from: 'you', text: value }]);
     setDraft('');
     setThinking(true);
-    const replyText = kind === 'manager' ? managerReply(value, project).text : agentReply(agentId, value);
+    const replyText = replyFor(value);
     globalThis.setTimeout(() => {
       setMsgs((m) => [...m, { id: baseId + 1, from: 'them', text: replyText }]);
       setThinking(false);
     }, 480);
-    if (kind === 'manager') void sendManagerMessage(conversationId, value, project);
-    else void sendAgentMessage(conversationId, value, agentId);
+    persist(value).then(undefined, () => undefined);
   }
 
   return (
