@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { missions, allAgents } from '@/lib/fixtures';
 import { MissionCard } from '@/components/MissionCard';
 import { AgentCard } from '@/components/AgentCard';
@@ -53,6 +54,20 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
       </header>
 
       {/* WORK FIRST — what matters */}
+      <section>
+        <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Derniers rapports</h2>
+        <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>ce qui a été fait récemment — clique pour le rapport visuel + le diff</p>
+        <div className="surface flex flex-col divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+          {byImportance.slice(0, 4).map((m) => (
+            <Link key={m.id} href={`/missions/${m.id}`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[color:var(--bg-hover)]">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: 'var(--status-running)' }} />
+              <span className="flex-1 truncate text-sm" style={{ color: 'var(--text-primary)' }}>{m.title}</span>
+              <span className="mono text-[10px]" style={{ color: 'var(--accent)' }}>voir le rapport →</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section>
         <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Agents sur ce projet</h2>
         <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>clique un agent pour lui parler et voir ce qu'il a fait ici</p>
