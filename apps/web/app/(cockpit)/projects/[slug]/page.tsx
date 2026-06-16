@@ -8,9 +8,11 @@ import { OpenButtons } from '@/components/OpenButtons';
 import { listDecisions } from '@/lib/decisions';
 import { computeProjectHealth } from '@/lib/health';
 import { ProjectHealthBar } from '@/components/ProjectHealthBar';
+import { listProjectReports } from '@/lib/reports';
 import { getDb, projects as projectsTable } from '@mas/db';
 import { eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
+import { FileText } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +30,8 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
   const health = await computeProjectHealth(getDb(), project.id);
   const byImportance = [...missions].sort((a, b) => (RISK_RANK[a.risk] ?? 9) - (RISK_RANK[b.risk] ?? 9));
   const projectAgents = allAgents.filter((a) => a.status !== 'idle');
+  const projectReports = await listProjectReports(getDb(), project.id);
+  const KIND_LABEL: Record<string, string> = { task: 'tâche', mission: 'mission', project: 'projet' };
 
   return (
     <div className="flex flex-col gap-6">
@@ -56,16 +60,26 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
       {/* WORK FIRST — what matters */}
       <section>
         <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Derniers rapports</h2>
-        <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>ce qui a été fait récemment — clique pour le rapport visuel + le diff</p>
-        <div className="surface flex flex-col divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
-          {byImportance.slice(0, 4).map((m) => (
-            <Link key={m.id} href={`/missions/${m.id}`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[color:var(--bg-hover)]">
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: 'var(--status-running)' }} />
-              <span className="flex-1 truncate text-sm" style={{ color: 'var(--text-primary)' }}>{m.title}</span>
-              <span className="mono text-[10px]" style={{ color: 'var(--accent)' }}>voir le rapport →</span>
-            </Link>
-          ))}
-        </div>
+        <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>ce qui a été produit, et par qui — clique pour le rapport (vue humaine + IA)</p>
+        {projectReports.length === 0 ? (
+          <p className="surface p-4 text-xs" style={{ color: 'var(--text-muted)' }}>Aucun rapport encore.</p>
+        ) : (
+          <div className="surface flex flex-col divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+            {projectReports.slice(0, 6).map((r) => {
+              const author = r.agentId ? allAgents.find((a) => a.id === r.agentId)?.name ?? r.agentId : (r.kind === 'project' ? 'Manager projet' : 'Système');
+              return (
+                <Link key={r.id} href={`/projects/${slug}/reports/${r.id}`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[color:var(--bg-hover)]">
+                  <FileText size={15} className="shrink-0" style={{ color: 'var(--accent)' }} />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm" style={{ color: 'var(--text-primary)' }}>{r.title}</div>
+                    <div className="mono text-[10px]" style={{ color: 'var(--text-muted)' }}>{KIND_LABEL[r.kind]} · par {author}</div>
+                  </div>
+                  <span className="mono text-[10px]" style={{ color: 'var(--accent)' }}>voir le rapport →</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section>
