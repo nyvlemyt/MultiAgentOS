@@ -4,9 +4,11 @@ import { eq } from 'drizzle-orm';
 import { getDb, projects as projectsTable } from '@mas/db';
 import { ConversationPanel } from '@/components/manager/ConversationPanel';
 import { ConversationThreads } from '@/components/manager/ConversationThreads';
-import { AgentAvatar } from '@/components/AgentAvatar';
+import { AgentControlPanel } from '@/components/agent/AgentControlPanel';
 import { allAgents, trace } from '@/lib/fixtures';
 import { ensureConversation, listConversations, getConversation, listMessages } from '@/lib/conversations';
+import { getAgentConfig, agentSkills } from '@/lib/agent-config';
+import { readFiche } from '@/lib/agent-fiche';
 import { newAgentConversation } from '@/app/(cockpit)/conversation-actions';
 
 export const dynamic = 'force-dynamic';
@@ -28,8 +30,12 @@ export default async function ProjectAgentConversation({
   const selected = (c ? await getConversation(db, c) : undefined) ?? threads[0]!;
   const conv = selected.scope === 'agent' && selected.agentId === agentId ? selected : threads[0]!;
   const messages = (await listMessages(db, conv.id)).map((m) => ({ role: m.role, text: m.text }));
-  const activity = trace.filter((r) => r.agent === agentId).slice(0, 8);
+  const activity = trace.filter((r) => r.agent === agentId).slice(0, 8).map((r) => ({ id: r.id, ts: r.ts, action: r.action }));
   const newThread = newAgentConversation.bind(null, slug, project.id, agentId);
+
+  const config = await getAgentConfig(db, agentId, project.id);
+  const skills = agentSkills(agentId, config.enabledSkills);
+  const fiche = await readFiche(agentId);
 
   return (
     <div className="flex flex-col gap-5">
@@ -62,36 +68,21 @@ export default async function ProjectAgentConversation({
           </div>
         </div>
 
-        <aside className="flex flex-col gap-5">
-          <section className="surface p-4">
-            <header className="mb-3 flex items-center gap-3">
-              <AgentAvatar role={agent.id} alt={agent.name} status={agent.status} size={40} />
-              <div>
-                <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{agent.name}</div>
-                <div className="mono text-[11px]" style={{ color: 'var(--text-muted)' }}>Tier {agent.tier} · {agent.model}</div>
-              </div>
-            </header>
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{agent.currentTask ?? 'au repos sur ce projet'}</p>
-            <Link href={`/agents/${agent.id}`} className="mono mt-3 inline-block text-[11px]" style={{ color: 'var(--accent)' }}>
-              voir l'agent de base →
-            </Link>
-          </section>
-
-          <section className="surface p-4">
-            <h2 className="mb-3 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Activité sur ce projet</h2>
-            {activity.length === 0 ? (
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucune activité encore.</p>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {activity.map((r) => (
-                  <li key={r.id} className="flex items-center gap-2 text-[11px]">
-                    <span className="mono" style={{ color: 'var(--text-muted)' }}>{r.ts}</span>
-                    <span className="truncate" style={{ color: 'var(--text-secondary)' }}>{r.action}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+        <aside className="flex flex-col gap-3">
+          <Link href={`/agents/${agent.id}`} className="mono text-[11px]" style={{ color: 'var(--accent)' }}>
+            voir l&apos;agent de base →
+          </Link>
+          <AgentControlPanel
+            mode="override"
+            agentId={agent.id}
+            projectId={project.id}
+            config={config}
+            skills={skills}
+            fiche={{ found: fiche.found, content: fiche.content }}
+            revisions={[]}
+            needCleanup={false}
+            activity={activity}
+          />
         </aside>
       </div>
     </div>
