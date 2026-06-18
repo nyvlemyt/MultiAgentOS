@@ -11,8 +11,8 @@ skill	skill:core-token	agentic-engineering	integrated	adapt	decisions/skill-core
 skill	skill:core-memory	agentic-os	rejected	reject	decisions/skill-core-memory-N1.md
 skill	skill:core-agent	ai-first-engineering	integrated	adapt	decisions/skill-core-agent-A.md
 skill	skill:core-eval	ai-regression-testing	integrated	adapt	decisions/skill-core-eval-J.md
-skill	skill:eng-lang	android-clean-architecture	pending		
-skill	skill:eng-lang	angular-developer	pending		
+skill	skill:eng-lang	android-clean-architecture	integrated	adapt	decisions/skill-eng-lang-L.md
+skill	skill:eng-lang	angular-developer	integrated	adapt	decisions/skill-eng-lang-I.md
 skill	skill:misc	api-connector-builder	integrated	adopt	decisions/skill-misc-D.md
 skill	skill:eng-arch	api-design	integrated	adopt	decisions/skill-eng-arch-A.md
 skill	skill:core-agent	architecture-decision-records	integrated	adapt	decisions/skill-core-agent-B.md
@@ -29,7 +29,7 @@ skill	skill:eng-arch	blueprint	integrated	adapt	decisions/skill-eng-arch-A.md
 skill	skill:core-research	brand-discovery	integrated	adapt	decisions/skill-core-research-R1.md
 skill	skill:eng-arch	brand-voice	integrated	adapt	decisions/skill-eng-arch-A.md
 skill	skill:core-eval	browser-qa	integrated	adapt	decisions/skill-core-eval-J.md
-skill	skill:eng-lang	bun-runtime	pending		
+skill	skill:eng-lang	bun-runtime	integrated	adapt	decisions/skill-eng-lang-J.md
 skill	skill:core-eval	canary-watch	integrated	adapt	decisions/skill-core-eval-K.md
 skill	skill:vertical	carrier-relationship-management	pending		
 skill	skill:core-eval	cisco-ios-patterns	rejected	reject	decisions/skill-core-eval-K.md
@@ -43,7 +43,7 @@ skill	skill:core-eval	codehealth-mcp	rejected	reject	decisions/skill-core-eval-K
 skill	skill:core-eval	coding-standards	integrated	adapt	decisions/skill-core-eval-K.md
 skill	skill:misc	competitive-platform-analysis	integrated	adopt	decisions/skill-misc-D.md
 skill	skill:misc	competitive-report-structure	integrated	adopt	decisions/skill-misc-D.md
-skill	skill:eng-lang	compose-multiplatform-patterns	pending		
+skill	skill:eng-lang	compose-multiplatform-patterns	integrated	adapt	decisions/skill-eng-lang-L.md
 skill	skill:core-skills-mgmt	config-gc	integrated	adapt	decisions/skill-core-skills-mgmt-S1.md
 skill	skill:core-skills-mgmt	configure-ecc	rejected	reject	decisions/skill-core-skills-mgmt-S1.md
 skill	skill:core-eval	connections-optimizer	rejected	reject	decisions/skill-core-eval-K.md
@@ -71,11 +71,11 @@ skill	skill:core-research	deep-research	integrated	adapt	decisions/skill-core-re
 skill	skill:core-security	defi-amm-security	integrated	adapt	decisions/skill-core-security-SA.md
 skill	skill:eng-arch	deployment-patterns	integrated	adapt	decisions/skill-eng-arch-B.md
 skill	skill:core-eval	design-system	integrated	adapt	decisions/skill-core-eval-L.md
-skill	skill:eng-lang	django-celery	pending		
-skill	skill:eng-lang	django-patterns	pending		
+skill	skill:eng-lang	django-celery	integrated	adapt	decisions/skill-eng-lang-H.md
+skill	skill:eng-lang	django-patterns	integrated	adapt	decisions/skill-eng-lang-H.md
 skill	skill:core-security	django-security	integrated	adapt	decisions/skill-core-security-SA.md
-skill	skill:eng-lang	django-tdd	pending		
-skill	skill:eng-lang	django-verification	pending		
+skill	skill:eng-lang	django-tdd	integrated	adapt	decisions/skill-eng-lang-H.md
+skill	skill:eng-lang	django-verification	integrated	adapt	decisions/skill-eng-lang-H.md
 skill	skill:core-agent	dmux-workflows	integrated	adopt	decisions/skill-core-agent-C.md
 skill	skill:eng-lang	docker-patterns	pending		
 skill	skill:core-research	documentation-lookup	integrated	adapt	decisions/skill-core-research-R1.md
@@ -92,7 +92,7 @@ skill	skill:core-agent	eval-harness	integrated	adopt	decisions/skill-core-agent-
 skill	skill:core-token	evm-token-decimals	integrated	adapt	decisions/skill-core-token-T2.md
 skill	skill:core-research	exa-search	integrated	adapt	decisions/skill-core-research-R1.md
 skill	skill:vertical	fal-ai-media	pending		
-skill	skill:eng-lang	fastapi-patterns	pending		
+skill	skill:eng-lang	fastapi-patterns	integrated	adapt	decisions/skill-eng-lang-H.md
 skill	skill:core-token	finance-billing-ops	integrated	adapt	decisions/skill-core-token-T2.md
 skill	skill:misc	flox-environments	integrated	adapt	decisions/skill-misc-E.md
 skill	skill:eng-lang	flutter-dart-code-review	pending		
@@ -133,15 +133,15 @@ skill	skill:core-memory	ito-basket-compare	rejected	reject	decisions/skill-core-
 skill	skill:core-agent	ito-data-atlas-agent	rejected	reject	decisions/skill-core-agent-E.md
 skill	skill:vertical	ito-market-intelligence	pending		
 skill	skill:vertical	ito-trade-planner	pending		
-skill	skill:eng-lang	java-coding-standards	pending		
+skill	skill:eng-lang	java-coding-standards	integrated	adopt	decisions/skill-eng-lang-K.md
 skill	skill:misc	jira-integration	integrated	adapt	decisions/skill-misc-E.md
-skill	skill:eng-lang	jpa-patterns	pending		
+skill	skill:eng-lang	jpa-patterns	integrated	adopt	decisions/skill-eng-lang-K.md
 skill	skill:core-memory	knowledge-ops	rejected	reject	decisions/skill-core-memory-N2.md
-skill	skill:eng-lang	kotlin-coroutines-flows	pending		
-skill	skill:eng-lang	kotlin-exposed-patterns	pending		
-skill	skill:eng-lang	kotlin-ktor-patterns	pending		
-skill	skill:eng-lang	kotlin-patterns	pending		
-skill	skill:eng-lang	kotlin-testing	pending		
+skill	skill:eng-lang	kotlin-coroutines-flows	integrated	adapt	decisions/skill-eng-lang-L.md
+skill	skill:eng-lang	kotlin-exposed-patterns	integrated	adapt	decisions/skill-eng-lang-L.md
+skill	skill:eng-lang	kotlin-ktor-patterns	integrated	adapt	decisions/skill-eng-lang-L.md
+skill	skill:eng-lang	kotlin-patterns	integrated	adapt	decisions/skill-eng-lang-L.md
+skill	skill:eng-lang	kotlin-testing	integrated	adapt	decisions/skill-eng-lang-L.md
 skill	skill:eng-lang	kubernetes-patterns	pending		
 skill	skill:eng-lang	laravel-patterns	pending		
 skill	skill:eng-lang	laravel-plugin-discovery	pending		
@@ -150,7 +150,7 @@ skill	skill:eng-lang	laravel-tdd	pending
 skill	skill:eng-lang	laravel-verification	pending		
 skill	skill:core-agent	latency-critical-systems	integrated	adopt	decisions/skill-core-agent-E.md
 skill	skill:core-agent	lead-intelligence	integrated	adapt	decisions/skill-core-agent-E.md
-skill	skill:eng-lang	liquid-glass-design	pending		
+skill	skill:eng-lang	liquid-glass-design	integrated	adapt	decisions/skill-eng-lang-J.md
 skill	skill:core-agent	llm-trading-agent-security	integrated	adapt	decisions/skill-core-agent-E.md
 skill	skill:vertical	logistics-exception-management	pending		
 skill	skill:core-eval	make-interfaces-feel-better	integrated	adapt	decisions/skill-core-eval-L.md
@@ -161,21 +161,21 @@ skill	skill:eng-arch	mcp-server-patterns	integrated	adapt	decisions/skill-eng-ar
 skill	skill:misc	messages-ops	rejected	reject	decisions/skill-misc-E.md
 skill	skill:core-agent	ml-adoption-playbook	integrated	adopt	decisions/skill-core-agent-E.md
 skill	skill:core-eval	mle-workflow	integrated	adapt	decisions/skill-core-eval-L.md
-skill	skill:eng-lang	motion-advanced	pending		
-skill	skill:eng-lang	motion-foundations	pending		
-skill	skill:eng-lang	motion-patterns	pending		
-skill	skill:eng-lang	motion-ui	pending		
+skill	skill:eng-lang	motion-advanced	integrated	adapt	decisions/skill-eng-lang-J.md
+skill	skill:eng-lang	motion-foundations	integrated	adapt	decisions/skill-eng-lang-J.md
+skill	skill:eng-lang	motion-patterns	integrated	adapt	decisions/skill-eng-lang-J.md
+skill	skill:eng-lang	motion-ui	rejected	reject	decisions/skill-eng-lang-J.md
 skill	skill:eng-lang	mysql-patterns	pending		
-skill	skill:eng-lang	nanoclaw-repl	pending		
-skill	skill:eng-lang	nestjs-patterns	pending		
+skill	skill:eng-lang	nanoclaw-repl	rejected	reject	decisions/skill-eng-lang-J.md
+skill	skill:eng-lang	nestjs-patterns	integrated	adapt	decisions/skill-eng-lang-J.md
 skill	skill:vertical	netmiko-ssh-automation	pending		
 skill	skill:vertical	network-bgp-diagnostics	pending		
 skill	skill:vertical	network-config-validation	pending		
 skill	skill:vertical	network-interface-health	pending		
-skill	skill:eng-lang	nextjs-turbopack	pending		
+skill	skill:eng-lang	nextjs-turbopack	integrated	adapt	decisions/skill-eng-lang-I.md
 skill	skill:misc	nodejs-keccak256	integrated	adopt	decisions/skill-misc-F.md
 skill	skill:vertical	nutrient-document-processing	pending		
-skill	skill:eng-lang	nuxt4-patterns	pending		
+skill	skill:eng-lang	nuxt4-patterns	integrated	adapt	decisions/skill-eng-lang-I.md
 skill	skill:core-agent	openclaw-persona-forge	rejected	reject	decisions/skill-core-agent-G.md
 skill	skill:core-agent	opensource-pipeline	rejected	reject	decisions/skill-core-agent-G.md
 skill	skill:core-agent	orch-add-feature	rejected	reject-consolidated	decisions/skill-core-agent-F.md
@@ -200,18 +200,18 @@ skill	skill:core-eval	production-audit	integrated	adapt	decisions/skill-core-eva
 skill	skill:vertical	production-scheduling	pending		
 skill	skill:misc	project-flow-ops	integrated	adapt	decisions/skill-misc-F.md
 skill	skill:core-research	prompt-optimizer	integrated	adapt	decisions/skill-core-research-R2.md
-skill	skill:eng-lang	python-patterns	pending		
-skill	skill:eng-lang	python-testing	pending		
+skill	skill:eng-lang	python-patterns	integrated	adapt	decisions/skill-eng-lang-H.md
+skill	skill:eng-lang	python-testing	integrated	adapt	decisions/skill-eng-lang-H.md
 skill	skill:data-ml	pytorch-patterns	integrated	adapt	decisions/skill-data-ml-G.md
 skill	skill:vertical	quality-nonconformance	pending		
-skill	skill:eng-lang	quarkus-patterns	pending		
+skill	skill:eng-lang	quarkus-patterns	integrated	adopt	decisions/skill-eng-lang-K.md
 skill	skill:core-security	quarkus-security	integrated	adapt	decisions/skill-core-security-SB.md
-skill	skill:eng-lang	quarkus-tdd	pending		
-skill	skill:eng-lang	quarkus-verification	pending		
+skill	skill:eng-lang	quarkus-tdd	integrated	adopt	decisions/skill-eng-lang-K.md
+skill	skill:eng-lang	quarkus-verification	integrated	adopt	decisions/skill-eng-lang-K.md
 skill	skill:core-agent	ralphinho-rfc-pipeline	integrated	adopt	decisions/skill-core-agent-H.md
-skill	skill:eng-lang	react-patterns	pending		
-skill	skill:eng-lang	react-performance	pending		
-skill	skill:eng-lang	react-testing	pending		
+skill	skill:eng-lang	react-patterns	integrated	adapt	decisions/skill-eng-lang-I.md
+skill	skill:eng-lang	react-performance	integrated	adapt	decisions/skill-eng-lang-I.md
+skill	skill:eng-lang	react-testing	integrated	adapt	decisions/skill-eng-lang-I.md
 skill	skill:data-ml	recsys-pipeline-architect	integrated	adapt	decisions/skill-data-ml-G.md
 skill	skill:core-agent	recursive-decision-ledger	integrated	adopt	decisions/skill-core-agent-H.md
 skill	skill:eng-lang	redis-patterns	pending		
@@ -240,10 +240,10 @@ skill	skill:core-skills-mgmt	skill-scout	integrated	adapt	decisions/skill-core-s
 skill	skill:core-skills-mgmt	skill-stocktake	integrated	adapt	decisions/skill-core-skills-mgmt-S2.md
 skill	skill:misc	social-graph-ranker	integrated	adopt	decisions/skill-misc-F.md
 skill	skill:core-agent	social-publisher	rejected	reject	decisions/skill-core-agent-I.md
-skill	skill:eng-lang	springboot-patterns	pending		
+skill	skill:eng-lang	springboot-patterns	integrated	adopt	decisions/skill-eng-lang-K.md
 skill	skill:core-security	springboot-security	integrated	adapt	decisions/skill-core-security-SB.md
-skill	skill:eng-lang	springboot-tdd	pending		
-skill	skill:eng-lang	springboot-verification	pending		
+skill	skill:eng-lang	springboot-tdd	integrated	adopt	decisions/skill-eng-lang-K.md
+skill	skill:eng-lang	springboot-verification	integrated	adopt	decisions/skill-eng-lang-K.md
 skill	skill:core-token	strategic-compact	integrated	adapt	decisions/skill-core-token-T2.md
 skill	skill:eng-lang	swift-actor-persistence	pending		
 skill	skill:eng-lang	swift-concurrency-6-2	pending		
@@ -254,7 +254,7 @@ skill	skill:eng-arch	tdd-workflow	integrated	adapt	decisions/skill-eng-arch-C.md
 skill	skill:core-agent	team-agent-orchestration	integrated	adopt	decisions/skill-core-agent-I.md
 skill	skill:core-agent	team-builder	integrated	adopt	decisions/skill-core-agent-I.md
 skill	skill:misc	terminal-ops	integrated	adapt	decisions/skill-misc-F.md
-skill	skill:eng-lang	tinystruct-patterns	pending		
+skill	skill:eng-lang	tinystruct-patterns	integrated	adopt	decisions/skill-eng-lang-K.md
 skill	skill:core-token	token-budget-advisor	integrated	adapt	decisions/skill-core-token-T2.md
 skill	skill:misc	ui-demo	integrated	adapt	decisions/skill-misc-F.md
 skill	skill:eng-arch	ui-to-vue	rejected	reject	decisions/skill-eng-arch-C.md
@@ -264,8 +264,8 @@ skill	skill:core-eval	verification-loop	rejected	reject	decisions/skill-core-eva
 skill	skill:eng-arch	video-editing	integrated	adapt	decisions/skill-eng-arch-C.md
 skill	skill:vertical	videodb	pending		
 skill	skill:vertical	visa-doc-translate	pending		
-skill	skill:eng-lang	vite-patterns	pending		
-skill	skill:eng-lang	vue-patterns	pending		
+skill	skill:eng-lang	vite-patterns	integrated	adapt	decisions/skill-eng-lang-I.md
+skill	skill:eng-lang	vue-patterns	integrated	adapt	decisions/skill-eng-lang-I.md
 skill	skill:vertical	windows-desktop-e2e	pending		
 skill	skill:core-agent	workspace-surface-audit	integrated	adopt	decisions/skill-core-agent-I.md
 skill	skill:misc	x-api	rejected	reject	decisions/skill-misc-F.md
