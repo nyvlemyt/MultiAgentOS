@@ -269,73 +269,73 @@ skill	skill:eng-lang	vue-patterns	integrated	adapt	decisions/skill-eng-lang-I.md
 skill	skill:vertical	windows-desktop-e2e	rejected	reject	decisions/skill-vertical-T.md
 skill	skill:core-agent	workspace-surface-audit	integrated	adopt	decisions/skill-core-agent-I.md
 skill	skill:misc	x-api	rejected	reject	decisions/skill-misc-F.md
-agent	agent:singleton	a11y-architect	pending		
-agent	agent:singleton	agent-evaluator	pending		
-agent	agent:singleton	architect	pending		
-agent	agent:singleton	build-error-resolver	pending		
-agent	agent:singleton	chief-of-staff	pending		
-agent	agent:singleton	code-architect	pending		
-agent	agent:singleton	code-explorer	pending		
-agent	agent:reviewer	code-reviewer	pending		
-agent	agent:singleton	code-simplifier	pending		
-agent	agent:singleton	comment-analyzer	pending		
-agent	agent:singleton	conversation-analyzer	pending		
-agent	agent:build-resolver	cpp-build-resolver	pending		
-agent	agent:reviewer	cpp-reviewer	pending		
-agent	agent:reviewer	csharp-reviewer	pending		
-agent	agent:build-resolver	dart-build-resolver	pending		
-agent	agent:reviewer	database-reviewer	pending		
-agent	agent:build-resolver	django-build-resolver	pending		
-agent	agent:reviewer	django-reviewer	pending		
-agent	agent:singleton	doc-updater	pending		
-agent	agent:singleton	docs-lookup	pending		
-agent	agent:singleton	e2e-runner	pending		
-agent	agent:reviewer	fastapi-reviewer	pending		
-agent	agent:reviewer	flutter-reviewer	pending		
-agent	agent:reviewer	fsharp-reviewer	pending		
-agent	agent:singleton	gan-evaluator	pending		
-agent	agent:singleton	gan-generator	pending		
-agent	agent:singleton	gan-planner	pending		
-agent	agent:build-resolver	go-build-resolver	pending		
-agent	agent:reviewer	go-reviewer	pending		
-agent	agent:singleton	harmonyos-app-resolver	pending		
-agent	agent:singleton	harness-optimizer	pending		
-agent	agent:reviewer	healthcare-reviewer	pending		
-agent	agent:singleton	homelab-architect	pending		
-agent	agent:build-resolver	java-build-resolver	pending		
-agent	agent:reviewer	java-reviewer	pending		
-agent	agent:build-resolver	kotlin-build-resolver	pending		
-agent	agent:reviewer	kotlin-reviewer	pending		
-agent	agent:singleton	loop-operator	pending		
-agent	agent:singleton	marketing-agent	pending		
-agent	agent:reviewer	mle-reviewer	pending		
-agent	agent:singleton	network-architect	pending		
-agent	agent:reviewer	network-config-reviewer	pending		
-agent	agent:singleton	network-troubleshooter	pending		
-agent	agent:singleton	opensource-forker	pending		
-agent	agent:singleton	opensource-packager	pending		
-agent	agent:singleton	opensource-sanitizer	pending		
-agent	agent:singleton	performance-optimizer	pending		
-agent	agent:reviewer	php-reviewer	pending		
-agent	agent:singleton	planner	pending		
-agent	agent:singleton	pr-test-analyzer	pending		
-agent	agent:reviewer	python-reviewer	pending		
-agent	agent:build-resolver	pytorch-build-resolver	pending		
-agent	agent:build-resolver	react-build-resolver	pending		
-agent	agent:reviewer	react-reviewer	pending		
-agent	agent:singleton	refactor-cleaner	pending		
-agent	agent:build-resolver	rust-build-resolver	pending		
-agent	agent:reviewer	rust-reviewer	pending		
-agent	agent:reviewer	security-reviewer	pending		
-agent	agent:singleton	seo-specialist	pending		
-agent	agent:singleton	silent-failure-hunter	pending		
-agent	agent:singleton	spec-miner	pending		
-agent	agent:build-resolver	swift-build-resolver	pending		
-agent	agent:reviewer	swift-reviewer	pending		
-agent	agent:singleton	tdd-guide	pending		
-agent	agent:singleton	type-design-analyzer	pending		
-agent	agent:reviewer	typescript-reviewer	pending		
-agent	agent:reviewer	vue-reviewer	pending		
+agent	agent:singleton	a11y-architect	integrated	adapt	decisions/agent-S1.md
+agent	agent:singleton	agent-evaluator	integrated	adapt	decisions/agent-S1.md
+agent	agent:singleton	architect	integrated	adapt	decisions/agent-S1.md
+agent	agent:singleton	build-error-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:singleton	chief-of-staff	rejected	reject	decisions/agent-S1.md
+agent	agent:singleton	code-architect	integrated	adapt	decisions/agent-S1.md
+agent	agent:singleton	code-explorer	integrated	adapt	decisions/agent-S1.md
+agent	agent:reviewer	code-reviewer	rejected	reject	decisions/agent-reviewer.md
+agent	agent:singleton	code-simplifier	integrated	adapt	decisions/agent-S1.md
+agent	agent:singleton	comment-analyzer	integrated	adopt	decisions/agent-S2.md
+agent	agent:singleton	conversation-analyzer	integrated	adopt	decisions/agent-S2.md
+agent	agent:build-resolver	cpp-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	cpp-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:reviewer	csharp-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:build-resolver	dart-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	database-reviewer	integrated	adopt	decisions/agent-reviewer.md
+agent	agent:build-resolver	django-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	django-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:singleton	doc-updater	integrated	adapt	decisions/agent-S2.md
+agent	agent:singleton	docs-lookup	integrated	adapt	decisions/agent-S2.md
+agent	agent:singleton	e2e-runner	integrated	adapt	decisions/agent-S2.md
+agent	agent:reviewer	fastapi-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:reviewer	flutter-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:reviewer	fsharp-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:singleton	gan-evaluator	integrated	adopt	decisions/agent-S2.md
+agent	agent:singleton	gan-generator	integrated	adopt	decisions/agent-S2.md
+agent	agent:singleton	gan-planner	integrated	adopt	decisions/agent-S3.md
+agent	agent:build-resolver	go-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	go-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:singleton	harmonyos-app-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:singleton	harness-optimizer	integrated	adopt	decisions/agent-S3.md
+agent	agent:reviewer	healthcare-reviewer	rejected	reject	decisions/agent-reviewer.md
+agent	agent:singleton	homelab-architect	integrated	adopt	decisions/agent-S3.md
+agent	agent:build-resolver	java-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	java-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:build-resolver	kotlin-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	kotlin-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:singleton	loop-operator	integrated	adapt	decisions/agent-S3.md
+agent	agent:singleton	marketing-agent	integrated	adapt	decisions/agent-S3.md
+agent	agent:reviewer	mle-reviewer	integrated	adopt	decisions/agent-reviewer.md
+agent	agent:singleton	network-architect	integrated	adopt	decisions/agent-S3.md
+agent	agent:reviewer	network-config-reviewer	rejected	reject	decisions/agent-reviewer.md
+agent	agent:singleton	network-troubleshooter	integrated	adopt	decisions/agent-S3.md
+agent	agent:singleton	opensource-forker	rejected	reject	decisions/agent-S4.md
+agent	agent:singleton	opensource-packager	integrated	adapt	decisions/agent-S4.md
+agent	agent:singleton	opensource-sanitizer	rejected	reject	decisions/agent-S4.md
+agent	agent:singleton	performance-optimizer	integrated	adapt	decisions/agent-S4.md
+agent	agent:reviewer	php-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:singleton	planner	rejected	reject	decisions/agent-S4.md
+agent	agent:singleton	pr-test-analyzer	integrated	adapt	decisions/agent-S4.md
+agent	agent:reviewer	python-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:build-resolver	pytorch-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:build-resolver	react-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	react-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:singleton	refactor-cleaner	integrated	adapt	decisions/agent-S5.md
+agent	agent:build-resolver	rust-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	rust-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:reviewer	security-reviewer	rejected	reject	decisions/agent-reviewer.md
+agent	agent:singleton	seo-specialist	integrated	adapt	decisions/agent-S5.md
+agent	agent:singleton	silent-failure-hunter	integrated	adapt	decisions/agent-S5.md
+agent	agent:singleton	spec-miner	integrated	adapt	decisions/agent-S5.md
+agent	agent:build-resolver	swift-build-resolver	integrated	adopt-pattern	decisions/agent-resolver.md
+agent	agent:reviewer	swift-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:singleton	tdd-guide	rejected	reject	decisions/agent-S5.md
+agent	agent:singleton	type-design-analyzer	integrated	adapt	decisions/agent-S5.md
+agent	agent:reviewer	typescript-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
+agent	agent:reviewer	vue-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
 command	cmd	aside	pending		
 command	cmd	auto-update	pending		
 command	cmd	build-fix	pending		
