@@ -336,98 +336,98 @@ agent	agent:singleton	tdd-guide	rejected	reject	decisions/agent-S5.md
 agent	agent:singleton	type-design-analyzer	integrated	adapt	decisions/agent-S5.md
 agent	agent:reviewer	typescript-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
 agent	agent:reviewer	vue-reviewer	integrated	adopt-pattern	decisions/agent-reviewer.md
-command	cmd	aside	pending		
-command	cmd	auto-update	pending		
-command	cmd	build-fix	pending		
-command	cmd	checkpoint	pending		
-command	cmd	code-review	pending		
-command	cmd	cost-report	pending		
-command	cmd	cpp-build	pending		
-command	cmd	cpp-review	pending		
-command	cmd	cpp-test	pending		
-command	cmd	ecc-guide	pending		
-command	cmd	epic-claim	pending		
-command	cmd	epic-decompose	pending		
-command	cmd	epic-publish	pending		
-command	cmd	epic-review	pending		
-command	cmd	epic-sync	pending		
-command	cmd	epic-unblock	pending		
-command	cmd	epic-validate	pending		
-command	cmd	evolve	pending		
-command	cmd	fastapi-review	pending		
-command	cmd	feature-dev	pending		
-command	cmd	flutter-build	pending		
-command	cmd	flutter-review	pending		
-command	cmd	flutter-test	pending		
-command	cmd	gan-build	pending		
-command	cmd	gan-design	pending		
-command	cmd	go-build	pending		
-command	cmd	go-review	pending		
-command	cmd	go-test	pending		
-command	cmd	gradle-build	pending		
-command	cmd	harness-audit	pending		
-command	cmd	hookify-configure	pending		
-command	cmd	hookify-help	pending		
-command	cmd	hookify-list	pending		
-command	cmd	hookify	pending		
-command	cmd	instinct-export	pending		
-command	cmd	instinct-import	pending		
-command	cmd	instinct-status	pending		
-command	cmd	jira	pending		
-command	cmd	kotlin-build	pending		
-command	cmd	kotlin-review	pending		
-command	cmd	kotlin-test	pending		
-command	cmd	learn-eval	pending		
-command	cmd	learn	pending		
-command	cmd	loop-start	pending		
-command	cmd	loop-status	pending		
-command	cmd	marketing-campaign	pending		
-command	cmd	model-route	pending		
-command	cmd	multi-backend	pending		
-command	cmd	multi-execute	pending		
-command	cmd	multi-frontend	pending		
-command	cmd	multi-plan	pending		
-command	cmd	multi-workflow	pending		
-command	cmd	orch-add-feature	pending		
-command	cmd	orch-build-mvp	pending		
-command	cmd	orch-change-feature	pending		
-command	cmd	orch-fix-defect	pending		
-command	cmd	orch-refine-code	pending		
-command	cmd	plan-prd	pending		
-command	cmd	plan	pending		
-command	cmd	pm2	pending		
-command	cmd	pr	pending		
-command	cmd	project-init	pending		
-command	cmd	projects	pending		
-command	cmd	promote	pending		
-command	cmd	prp-commit	pending		
-command	cmd	prp-implement	pending		
-command	cmd	prp-plan	pending		
-command	cmd	prp-pr	pending		
-command	cmd	prp-prd	pending		
-command	cmd	prune	pending		
-command	cmd	python-review	pending		
-command	cmd	quality-gate	pending		
-command	cmd	react-build	pending		
-command	cmd	react-review	pending		
-command	cmd	react-test	pending		
-command	cmd	refactor-clean	pending		
-command	cmd	resume-session	pending		
-command	cmd	review-pr	pending		
-command	cmd	rust-build	pending		
-command	cmd	rust-review	pending		
-command	cmd	rust-test	pending		
-command	cmd	santa-loop	pending		
-command	cmd	save-session	pending		
-command	cmd	security-scan	pending		
-command	cmd	sessions	pending		
-command	cmd	setup-pm	pending		
-command	cmd	skill-create	pending		
-command	cmd	skill-health	pending		
-command	cmd	test-coverage	pending		
-command	cmd	update-codemaps	pending		
-command	cmd	update-docs	pending		
-command	cmd	vue-review	pending		
+command	cmd	aside	integrated	adopt	decisions/command-CA.md
+command	cmd	auto-update	rejected	skip	decisions/command-CA.md
+command	cmd	build-fix	rejected	skip	decisions/command-CA.md
+command	cmd	checkpoint	integrated	adopt	decisions/command-CA.md
+command	cmd	code-review	rejected	skip	decisions/command-CA.md
+command	cmd	cost-report	rejected	skip	decisions/command-CA.md
+command	cmd	cpp-build	rejected	skip	decisions/command-CA.md
+command	cmd	cpp-review	rejected	skip	decisions/command-CA.md
+command	cmd	cpp-test	rejected	skip	decisions/command-CA.md
+command	cmd	ecc-guide	rejected	skip	decisions/command-CA.md
+command	cmd	epic-claim	rejected	skip	decisions/command-CA.md
+command	cmd	epic-decompose	rejected	skip	decisions/command-CA.md
+command	cmd	epic-publish	rejected	skip	decisions/command-CA.md
+command	cmd	epic-review	rejected	skip	decisions/command-CA.md
+command	cmd	epic-sync	rejected	skip	decisions/command-CA.md
+command	cmd	epic-unblock	rejected	skip	decisions/command-CA.md
+command	cmd	epic-validate	rejected	skip	decisions/command-CA.md
+command	cmd	evolve	rejected	skip	decisions/command-CA.md
+command	cmd	fastapi-review	rejected	skip	decisions/command-CA.md
+command	cmd	feature-dev	rejected	skip	decisions/command-CA.md
+command	cmd	flutter-build	rejected	skip	decisions/command-CA.md
+command	cmd	flutter-review	rejected	skip	decisions/command-CA.md
+command	cmd	flutter-test	rejected	skip	decisions/command-CA.md
+command	cmd	gan-build	rejected	skip	decisions/command-CA.md
+command	cmd	gan-design	rejected	skip	decisions/command-CA.md
+command	cmd	go-build	rejected	skip	decisions/command-CA.md
+command	cmd	go-review	rejected	skip	decisions/command-CA.md
+command	cmd	go-test	rejected	skip	decisions/command-CA.md
+command	cmd	gradle-build	rejected	skip	decisions/command-CA.md
+command	cmd	harness-audit	rejected	skip	decisions/command-CA.md
+command	cmd	hookify-configure	rejected	skip	decisions/command-CA.md
+command	cmd	hookify-help	rejected	skip	decisions/command-CA.md
+command	cmd	hookify-list	rejected	skip	decisions/command-CA.md
+command	cmd	hookify	rejected	skip	decisions/command-CA.md
+command	cmd	instinct-export	rejected	skip	decisions/command-CA.md
+command	cmd	instinct-import	rejected	skip	decisions/command-CA.md
+command	cmd	instinct-status	rejected	skip	decisions/command-CA.md
+command	cmd	jira	rejected	skip	decisions/command-CA.md
+command	cmd	kotlin-build	rejected	skip	decisions/command-CA.md
+command	cmd	kotlin-review	rejected	skip	decisions/command-CA.md
+command	cmd	kotlin-test	rejected	skip	decisions/command-CA.md
+command	cmd	learn-eval	rejected	skip	decisions/command-CA.md
+command	cmd	learn	rejected	skip	decisions/command-CA.md
+command	cmd	loop-start	rejected	skip	decisions/command-CA.md
+command	cmd	loop-status	rejected	skip	decisions/command-CA.md
+command	cmd	marketing-campaign	rejected	skip	decisions/command-CA.md
+command	cmd	model-route	rejected	skip	decisions/command-CB.md
+command	cmd	multi-backend	rejected	skip	decisions/command-CB.md
+command	cmd	multi-execute	rejected	skip	decisions/command-CB.md
+command	cmd	multi-frontend	rejected	skip	decisions/command-CB.md
+command	cmd	multi-plan	rejected	skip	decisions/command-CB.md
+command	cmd	multi-workflow	rejected	skip	decisions/command-CB.md
+command	cmd	orch-add-feature	rejected	skip	decisions/command-CB.md
+command	cmd	orch-build-mvp	rejected	skip	decisions/command-CB.md
+command	cmd	orch-change-feature	rejected	skip	decisions/command-CB.md
+command	cmd	orch-fix-defect	rejected	skip	decisions/command-CB.md
+command	cmd	orch-refine-code	rejected	skip	decisions/command-CB.md
+command	cmd	plan-prd	rejected	skip	decisions/command-CB.md
+command	cmd	plan	rejected	skip	decisions/command-CB.md
+command	cmd	pm2	rejected	skip	decisions/command-CB.md
+command	cmd	pr	integrated	adopt	decisions/command-CB.md
+command	cmd	project-init	rejected	skip	decisions/command-CB.md
+command	cmd	projects	rejected	skip	decisions/command-CB.md
+command	cmd	promote	rejected	skip	decisions/command-CB.md
+command	cmd	prp-commit	rejected	skip	decisions/command-CB.md
+command	cmd	prp-implement	rejected	skip	decisions/command-CB.md
+command	cmd	prp-plan	rejected	skip	decisions/command-CB.md
+command	cmd	prp-pr	rejected	skip	decisions/command-CB.md
+command	cmd	prp-prd	rejected	skip	decisions/command-CB.md
+command	cmd	prune	rejected	skip	decisions/command-CB.md
+command	cmd	python-review	rejected	skip	decisions/command-CB.md
+command	cmd	quality-gate	rejected	skip	decisions/command-CB.md
+command	cmd	react-build	rejected	skip	decisions/command-CB.md
+command	cmd	react-review	rejected	skip	decisions/command-CB.md
+command	cmd	react-test	rejected	skip	decisions/command-CB.md
+command	cmd	refactor-clean	rejected	skip	decisions/command-CB.md
+command	cmd	resume-session	rejected	skip	decisions/command-CB.md
+command	cmd	review-pr	rejected	skip	decisions/command-CB.md
+command	cmd	rust-build	rejected	skip	decisions/command-CB.md
+command	cmd	rust-review	rejected	skip	decisions/command-CB.md
+command	cmd	rust-test	rejected	skip	decisions/command-CB.md
+command	cmd	santa-loop	rejected	skip	decisions/command-CB.md
+command	cmd	save-session	rejected	skip	decisions/command-CB.md
+command	cmd	security-scan	rejected	skip	decisions/command-CB.md
+command	cmd	sessions	rejected	skip	decisions/command-CB.md
+command	cmd	setup-pm	rejected	skip	decisions/command-CB.md
+command	cmd	skill-create	rejected	skip	decisions/command-CB.md
+command	cmd	skill-health	rejected	skip	decisions/command-CB.md
+command	cmd	test-coverage	integrated	adopt	decisions/command-CB.md
+command	cmd	update-codemaps	integrated	adopt	decisions/command-CB.md
+command	cmd	update-docs	integrated	adopt	decisions/command-CB.md
+command	cmd	vue-review	rejected	skip	decisions/command-CB.md
 rule	rules:angular	angular/coding-style	pending		
 rule	rules:angular	angular/hooks	pending		
 rule	rules:angular	angular/patterns	pending		
