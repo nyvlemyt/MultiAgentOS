@@ -1,0 +1,139 @@
+{
+  "clarifyingQuestions": [],
+  "objective": "Harvest 542 ECC items (270 skills + 67 agents + 92 commands + 113 rules) and ~755 cybersec skills into a deduped, audited, deep-boosted MultiAgentOS arsenal (router-indexed library), with phase gates and 100% ledger coverage.",
+  "note": "Campaign-level DAG (not a single mission). Phase nodes gate sequentially; C/D phases fan out into independent cluster nodes processed by parallel Doer subagents (one ledger shard each). Decisions locked 2026-06-16 (PLAN.md): library storage, deep-boost-everything, broad acceptance bar.",
+  "tasks": [
+    {
+      "id": "ecc_B3",
+      "title": "Scaffold harvest engine — ledger + dedup index + shard dir",
+      "description": "Seed ledger.tsv from the 3 ECC inventory TSVs (542 rows, status=pending, cluster assigned). Build our-assets-index.md by scanning .claude/{skills,agents,commands} + packages/agents. Create decisions/ shard dir. Mechanical, no SKILL.md bodies.",
+      "agentHint": "general-purpose",
+      "skillsHint": [],
+      "dependsOn": [],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_A1",
+      "title": "Inventory cybersec-skills repo",
+      "description": "Clone mukul975/Anthropic-Cybersecurity-Skills read-only into /tmp/cybersec-inspect. Extract frontmatter inventory to cybersec-inventory.tsv (~755 rows). Cluster by the repo's 26 domains into cybersec-clusters.md, tagging T1 (defense/agent-security) vs T2 (offensive/forensics). Append rows to ledger.tsv.",
+      "agentHint": "general-purpose",
+      "skillsHint": [],
+      "dependsOn": ["ecc_B3"],
+      "budgetTokens": 4000,
+      "risk": "medium"
+    },
+    {
+      "id": "ecc_B1",
+      "title": "ADR 0005 — skill arsenal library architecture",
+      "description": "Write docs/decisions/0005-skill-arsenal-library.md fixing kept skills at packages/skills/library/<slug>/SKILL.md indexed by mas-skill-router (not auto-injected into .claude/skills). Record rejected alternatives. Link CLAUDE.md §3 layout update.",
+      "agentHint": "general-purpose",
+      "skillsHint": [],
+      "dependsOn": ["ecc_B3"],
+      "budgetTokens": 2500,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_B2",
+      "title": "Upgrade our intake-audit skill (sanitizer + prompt-defense + broad bar)",
+      "description": "Run our own intake-audit on the four ECC patterns (opensource-pipeline, opensource-sanitizer, production-audit), produce self-upgrade dossier, then add Sanitize sub-step, Prompt Defense Baseline, maintainer-safe rewrite default, and broad acceptance bar + effort tiers to .claude/skills/intake-audit/SKILL.md. Must keep all 5 §12 sections.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit", "skill-creator"],
+      "dependsOn": ["ecc_A1", "ecc_B1"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_C_core_agent",
+      "title": "ECC C — CORE agent/harness/orchestration cluster (68 skills)",
+      "description": "Deep-boost the 68 CORE agent/harness/orchestration skills: per-item intake-audit → §12 rewrite → improve → Prompt Defense Baseline → cite source → packages/skills/library. One ledger shard. Batched ~5-8 items per gate.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit", "skill-creator"],
+      "dependsOn": ["ecc_B2"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_C_core_evalsec",
+      "title": "ECC C — CORE eval/verify/review + security + memory clusters (50 skills)",
+      "description": "Deep-boost CORE eval/verify/review (21), security (15), memory/context (14) skills. Security skills also feed mas-sec-reviewer + §5. Same deep pipeline, ledger shards per cluster.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit", "skill-creator"],
+      "dependsOn": ["ecc_B2"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_C_core_rest",
+      "title": "ECC C — CORE research/prompt + skills-mgmt + token clusters (25 skills)",
+      "description": "Deep-boost CORE research/prompt (10), skills-mgmt (8), token/cost (7) skills. Feed docs/knowledge, mas-skill-router, packages/tokens. Ledger shards per cluster.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit", "skill-creator"],
+      "dependsOn": ["ecc_B2"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_C_agents",
+      "title": "ECC C — agent fiches (67) via template-once",
+      "description": "ONE pattern-level intake-audit per agent cluster: 22 *-reviewer → one parametrized Tier B reviewer template; 10 *-build-resolver → one template; audit singletons individually. Apply Prompt Defense Baseline. Generate-many from gold template, human-review a sample.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit"],
+      "dependsOn": ["ecc_B2"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_C_eng_t2",
+      "title": "ECC C — ENG + DATA/ML + Misc + Vertical clusters (~111 skills)",
+      "description": "Deep-boost (broad bar) ENG arch/patterns (24), language/framework packs (49), DATA/ML (6), misc gems (32), out-of-product verticals (16, keep if strong). Sub-cluster dossiers group tight families; each skill still gets its own boosted SKILL.md.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit", "skill-creator"],
+      "dependsOn": ["ecc_C_core_agent", "ecc_C_core_evalsec", "ecc_C_core_rest"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_C_cmd",
+      "title": "ECC C-CMD — adopt workflow commands (92)",
+      "description": "Dedup-map all 92 commands (WRAPPER/WORKFLOW/DUP). Adopt only WORKFLOW keepers to .claude/commands/ via intake-audit; cluster *-review/*-build families into one parametrized pattern. Ledger covers all 92.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit"],
+      "dependsOn": ["ecc_C_agents"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_C_rules",
+      "title": "ECC C-RULES — language coding-standard arsenal (113)",
+      "description": "Audit per language pack (~21 + common). P1 (ts/web/react/vue/nuxt/common) → docs/rules/<lang>/ + distill deltas into CLAUDE.md §7. P2 (other langs) → docs/rules/<lang>/ as arsenal. Template-once for the 21×5 grid. Ledger covers all 113.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit"],
+      "dependsOn": ["ecc_C_agents"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_D",
+      "title": "Phase D — cybersec-skills keeper batches (~755)",
+      "description": "Same machinery as C, driven by cybersec-clusters.md. T1 defense/agent-security skills feed mas-sec-reviewer + map risky actions in config/permissions.json to MITRE/NIST. T2 offensive/forensics → library if strong. Broad inspection, no minimum.",
+      "agentHint": "general-purpose",
+      "skillsHint": ["intake-audit", "skill-creator"],
+      "dependsOn": ["ecc_C_eng_t2", "ecc_C_cmd", "ecc_C_rules"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    },
+    {
+      "id": "ecc_E",
+      "title": "Phase E — index, self-audit, memory seed, close ledger, DRAFT PR",
+      "description": "Generate packages/skills/library/index.json from all frontmatters; wire mas-skill-router. Re-run §13 self-audit (whole-arsenal dup check). Seed Phase-4 memory. Verify decisions.md covers 100% of ~1297 items. Full 5-check green. Open DRAFT PR.",
+      "agentHint": "reviewer",
+      "skillsHint": ["mas-reviewer"],
+      "dependsOn": ["ecc_D"],
+      "budgetTokens": 4000,
+      "risk": "low"
+    }
+  ],
+  "estimatedTokens": 50000,
+  "estimatedQuotaUnits": 0
+}
