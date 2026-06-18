@@ -1,6 +1,26 @@
 # Cockpit interconnecté — roadmap consolidée
 
-Date: 2026-06-16 · Statut: plan (à valider)
+Date: 2026-06-16 · Statut: plan · **MAJ 2026-06-18 (re-séquencé par le commandant)**
+
+## ⟳ Ordre maître 2026-06-18 (AUTORITÉ — supersede §4/§5 ci-dessous)
+
+Suite à la Revue de Commandant (`docs/learning/2026-06-18/commander-review.md`). La séquence
+ci-dessous fait foi ; les §4/§5 d'origine restent comme contexte de faisabilité.
+
+| # | Phase | Contenu | Dépend |
+|---|-------|---------|--------|
+| **P1** | **Compétences** (ECC + cybersec) — *priorité absolue* | Harvest → install → apprendre → **tester pour de vrai**. `docs/intake/2026-06-16-ecc-harvest/` (PLAN+KICKOFF prêts). Attended, budget levé. | — |
+| **P2** | **Maquette d'app** (Figma-like via **MCP**) | Audit design **+ disposition pages/éléments** ; trouver le MCP maquette ; concevoir le plus beau design intégrant tous nos composants/idées. | P1 (idées de skills/agents à exposer) |
+| **P3** | **Mise en place** | Modifier pages + ajouter composants selon P2. Inclut **espace chat type app Claude** (page dédiée, sélecteur modèle/agent, réf *mammouth.ia*) = **Spec B élargie**. | P2 |
+| **P4** | **Mémoire reliée** | Finaliser le second cerveau : MCPs, connecteur **Obsidian** (chercher le meilleur), **qmd** (github.com/tobi/qmD), registre de liens. | P1 |
+| **P5** | **Axes restants** | manager projet · export rapports · stats agent cross-mission · **vrai LLM** (capstone) — écrits en phases. | continu |
+
+**Anti-oubli :** tout item dit en revue → mémoire projet + `docs/knowledge/` (jamais jeté).
+**Itératif assumé :** les phases ouvertes (#30, #31) peuvent être poussées/mergées en sachant
+qu'on y reviendra via la boucle de revue (`docs/workflows/commander-feedback-loop.md`).
+
+---
+
 
 Réconcilie : la nouvelle vision (mission = dashboard + chat + rapport final, tout relié) ·
 le backlog de session (manager projet, export fichiers, vrai LLM) · Spec A (Agent Control

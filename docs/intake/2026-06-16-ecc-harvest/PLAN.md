@@ -24,6 +24,19 @@
 
 ---
 
+## Harvest Engine (efficiency design — how we process ~1297 items without dying)
+
+Not a linear loop. A **resumable, parallel, map-reduce machine**:
+
+- **Ledger-driven & resumable:** `docs/intake/2026-06-16-ecc-harvest/ledger.tsv` = one row per item (`type · cluster · name · status · decision · dossier`). Status ∈ `pending→triaged→boosted→integrated|rejected`. A run processes ONLY `pending`/`triaged` rows → crash-safe, spans multiple sessions, no double work.
+- **Two stages, cheap before expensive:**
+  - **Triage** (frontmatter + skim): dedup vs our index, keep/reject. Kills the bulk before any costly write.
+  - **Boost** (the expensive rewrite-to-§12 + improve): keepers only.
+- **Parallel fan-out by cluster** (`superpowers:dispatching-parallel-agents`): each cluster / language-pack / skill is independent → one subagent each. Writes are **one-file-per-item** (zero conflict); each subagent appends its own ledger shard `decisions/<cluster>.md`; main session reduces them. Cap concurrency to respect token sub-budget.
+- **Template-once-generate-many** for regular grids: rules (21×5) and the 22 `*-reviewer` agents → author ONE gold template, generate the rest mechanically, human-review a sample. Saves ~90 audits.
+- **Dedup index built once:** `our-assets-index.md` (our current skills/agents/commands + summaries) so every subagent does a lookup, never re-derives.
+- **Skills/agents in play:** `mas-mission-planner` (decompose to DAG) · `superpowers:dispatching-parallel-agents` + `subagent-driven-development` (execution) · `intake-audit` (per-item decision) · `skill-creator` (author/boost SKILL.md) · `mas-reviewer` + `mas-sec-reviewer` (gates).
+
 ## Ordering (hard sequence — do not reorder)
 1. **Phase A** — Analyze + group EVERYTHING (both repos). *(ECC done; cybersec pending)*
 2. **Phase B** — `intake-audit` improves ITSELF first (fold ECC patterns in, re-audit our skill).
@@ -104,7 +117,20 @@ Default (recommended): library at `packages/skills/library/<slug>/SKILL.md`, ind
 
 ---
 
-## Task C1..Cn: ECC keeper batches (effort-tiered, gated)
+## Task B3: Build the Harvest Engine scaffolding (before any keeper batch)
+
+**Files:**
+- Create: `docs/intake/2026-06-16-ecc-harvest/ledger.tsv` (seed from the 3 inventory TSVs, all rows `status=pending`)
+- Create: `docs/intake/2026-06-16-ecc-harvest/our-assets-index.md` (our current skills/agents/commands + 1-line summaries, for dedup lookup)
+- Create: `docs/intake/2026-06-16-ecc-harvest/decisions/` (shard dir)
+
+- [ ] **Step 1: Decompose with `mas-mission-planner`** → DAG of cluster-tasks (one node per cluster from `CLUSTERS.md`), with risk + token budget per node.
+- [ ] **Step 2: Seed `ledger.tsv`** — concat all inventories, 1 row/item, `status=pending`.
+- [ ] **Step 3: Build `our-assets-index.md`** — scan `.claude/skills/`, `.claude/agents/`, `.claude/commands/`, `packages/agents` → name + summary table.
+- [ ] **Step 4: Verify** — `wc -l ledger.tsv` ≈ 1297; index covers all our current assets.
+- [ ] **Step 5: Commit** `feat(intake): harvest engine — ledger + dedup index`
+
+## Task C1..Cn: ECC keeper batches (parallel, ledger-driven, gated)
 
 Process per `CLUSTERS.md`. **Each batch = one TodoWrite list, ~5–8 items, one phase gate.**
 
