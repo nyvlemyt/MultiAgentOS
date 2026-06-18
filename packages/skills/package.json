@@ -11,7 +11,8 @@
   "scripts": {
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "reindex": "tsx src/reindex.ts"
+    "reindex": "tsx src/reindex.ts",
+    "build-library-index": "tsx src/build-library-index.ts"
   },
   "dependencies": {
     "@mas/db": "workspace:*",
