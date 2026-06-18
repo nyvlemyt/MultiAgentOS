@@ -660,7 +660,7 @@ cyber-skill	cyber:vulnerability-management	building-vulnerability-aging-and-sla-
 cyber-skill	cyber:vulnerability-management	building-vulnerability-dashboard-with-defectdojo	pending		
 cyber-skill	cyber:vulnerability-management	building-vulnerability-exception-tracking-system	pending		
 cyber-skill	cyber:soc-operations	building-vulnerability-scanning-workflow	pending		
-cyber-skill	cyber:web-application-security	bypassing-authentication-with-forced-browsing	pending		
+cyber-skill	cyber:web-application-security	bypassing-authentication-with-forced-browsing	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:incident-response	collecting-indicators-of-compromise	pending		
 cyber-skill	cyber:threat-intelligence	collecting-open-source-intelligence	pending		
 cyber-skill	cyber:threat-intelligence	collecting-threat-intelligence-with-misp	pending		
@@ -720,7 +720,7 @@ cyber-skill	cyber:zero-trust-architecture	deploying-tailscale-for-zero-trust-vpn
 cyber-skill	cyber:ai-security	detecting-ai-model-prompt-injection-attacks	pending		
 cyber-skill	cyber:ot-ics-security	detecting-anomalies-in-industrial-control-systems	pending		
 cyber-skill	cyber:identity-access-management	detecting-anomalous-authentication-patterns	pending		
-cyber-skill	cyber:api-security	detecting-api-enumeration-attacks	pending		
+cyber-skill	cyber:api-security	detecting-api-enumeration-attacks	integrated	adapt	decisions/cyber-DA.md
 cyber-skill	cyber:network-security	detecting-arp-poisoning-in-network-traffic	pending		
 cyber-skill	cyber:ot-ics-security	detecting-attacks-on-historian-servers	pending		
 cyber-skill	cyber:ot-ics-security	detecting-attacks-on-scada-systems	pending		
@@ -733,7 +733,7 @@ cyber-skill	cyber:cloud-security	detecting-azure-service-principal-abuse	pending
 cyber-skill	cyber:cloud-security	detecting-azure-storage-account-misconfigurations	pending		
 cyber-skill	cyber:security-operations	detecting-beaconing-patterns-with-zeek	pending		
 cyber-skill	cyber:wireless-security	detecting-bluetooth-low-energy-attacks	pending		
-cyber-skill	cyber:api-security	detecting-broken-object-property-level-authorization	pending		
+cyber-skill	cyber:api-security	detecting-broken-object-property-level-authorization	integrated	adapt	decisions/cyber-DA.md
 cyber-skill	cyber:phishing-defense	detecting-business-email-compromise-with-ai	pending		
 cyber-skill	cyber:phishing-defense	detecting-business-email-compromise	pending		
 cyber-skill	cyber:cloud-security	detecting-cloud-threats-with-guardduty	pending		
@@ -791,7 +791,7 @@ cyber-skill	cyber:malware-analysis	detecting-rootkit-activity	pending
 cyber-skill	cyber:cloud-security	detecting-s3-data-exfiltration-attempts	pending		
 cyber-skill	cyber:cloud-security	detecting-serverless-function-injection	pending		
 cyber-skill	cyber:threat-hunting	detecting-service-account-abuse	pending		
-cyber-skill	cyber:api-security	detecting-shadow-api-endpoints	pending		
+cyber-skill	cyber:api-security	detecting-shadow-api-endpoints	integrated	adapt	decisions/cyber-DA.md
 cyber-skill	cyber:cloud-security	detecting-shadow-it-cloud-usage	pending		
 cyber-skill	cyber:phishing-defense	detecting-spearphishing-with-email-gateway	pending		
 cyber-skill	cyber:security-operations	detecting-sql-injection-via-waf-logs	pending		
@@ -812,35 +812,35 @@ cyber-skill	cyber:red-teaming	executing-red-team-engagement-planning	pending
 cyber-skill	cyber:penetration-testing	executing-red-team-exercise	pending		
 cyber-skill	cyber:red-teaming	exploiting-active-directory-certificate-services-esc1	pending		
 cyber-skill	cyber:red-teaming	exploiting-active-directory-with-bloodhound	pending		
-cyber-skill	cyber:api-security	exploiting-api-injection-vulnerabilities	pending		
+cyber-skill	cyber:api-security	exploiting-api-injection-vulnerabilities	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:network-security	exploiting-bgp-hijacking-vulnerabilities	pending		
-cyber-skill	cyber:api-security	exploiting-broken-function-level-authorization	pending		
-cyber-skill	cyber:web-application-security	exploiting-broken-link-hijacking	pending		
+cyber-skill	cyber:api-security	exploiting-broken-function-level-authorization	integrated	adapt	decisions/cyber-DC.md
+cyber-skill	cyber:web-application-security	exploiting-broken-link-hijacking	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:red-teaming	exploiting-constrained-delegation-abuse	pending		
 cyber-skill	cyber:mobile-security	exploiting-deeplink-vulnerabilities	pending		
-cyber-skill	cyber:api-security	exploiting-excessive-data-exposure-in-api	pending		
-cyber-skill	cyber:web-application-security	exploiting-http-request-smuggling	pending		
-cyber-skill	cyber:web-application-security	exploiting-idor-vulnerabilities	pending		
+cyber-skill	cyber:api-security	exploiting-excessive-data-exposure-in-api	integrated	adapt	decisions/cyber-DC.md
+cyber-skill	cyber:web-application-security	exploiting-http-request-smuggling	integrated	adapt	decisions/cyber-DD.md
+cyber-skill	cyber:web-application-security	exploiting-idor-vulnerabilities	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:mobile-security	exploiting-insecure-data-storage-in-mobile	pending		
-cyber-skill	cyber:web-application-security	exploiting-insecure-deserialization	pending		
+cyber-skill	cyber:web-application-security	exploiting-insecure-deserialization	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:network-security	exploiting-ipv6-vulnerabilities	pending		
-cyber-skill	cyber:api-security	exploiting-jwt-algorithm-confusion-attack	pending		
+cyber-skill	cyber:api-security	exploiting-jwt-algorithm-confusion-attack	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:red-teaming	exploiting-kerberoasting-with-impacket	pending		
-cyber-skill	cyber:web-application-security	exploiting-mass-assignment-in-rest-apis	pending		
+cyber-skill	cyber:web-application-security	exploiting-mass-assignment-in-rest-apis	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:red-teaming	exploiting-ms17-010-eternalblue-vulnerability	pending		
 cyber-skill	cyber:red-teaming	exploiting-nopac-cve-2021-42278-42287	pending		
-cyber-skill	cyber:web-application-security	exploiting-nosql-injection-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	exploiting-oauth-misconfiguration	pending		
-cyber-skill	cyber:web-application-security	exploiting-prototype-pollution-in-javascript	pending		
-cyber-skill	cyber:web-application-security	exploiting-race-condition-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	exploiting-server-side-request-forgery	pending		
+cyber-skill	cyber:web-application-security	exploiting-nosql-injection-vulnerabilities	integrated	adapt	decisions/cyber-DD.md
+cyber-skill	cyber:web-application-security	exploiting-oauth-misconfiguration	integrated	adapt	decisions/cyber-DD.md
+cyber-skill	cyber:web-application-security	exploiting-prototype-pollution-in-javascript	integrated	adapt	decisions/cyber-DE.md
+cyber-skill	cyber:web-application-security	exploiting-race-condition-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
+cyber-skill	cyber:web-application-security	exploiting-server-side-request-forgery	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:network-security	exploiting-smb-vulnerabilities-with-metasploit	pending		
 cyber-skill	cyber:penetration-testing	exploiting-sql-injection-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	exploiting-sql-injection-with-sqlmap	pending		
-cyber-skill	cyber:web-application-security	exploiting-template-injection-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	exploiting-type-juggling-vulnerabilities	pending		
+cyber-skill	cyber:web-application-security	exploiting-sql-injection-with-sqlmap	rejected	reject	decisions/cyber-DE.md
+cyber-skill	cyber:web-application-security	exploiting-template-injection-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
+cyber-skill	cyber:web-application-security	exploiting-type-juggling-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:vulnerability-management	exploiting-vulnerabilities-with-metasploit-framework	pending		
-cyber-skill	cyber:web-application-security	exploiting-websocket-vulnerabilities	pending		
+cyber-skill	cyber:web-application-security	exploiting-websocket-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:red-teaming	exploiting-zerologon-vulnerability-cve-2020-1472	pending		
 cyber-skill	cyber:digital-forensics	extracting-browser-history-artifacts	pending		
 cyber-skill	cyber:malware-analysis	extracting-config-from-agent-tesla-rat	pending		
@@ -891,14 +891,14 @@ cyber-skill	cyber:cryptography	implementing-aes-encryption-for-data-at-rest	pend
 cyber-skill	cyber:soc-operations	implementing-alert-fatigue-reduction	pending		
 cyber-skill	cyber:phishing-defense	implementing-anti-phishing-training-program	pending		
 cyber-skill	cyber:ransomware-defense	implementing-anti-ransomware-group-policy	pending		
-cyber-skill	cyber:api-security	implementing-api-abuse-detection-with-rate-limiting	pending		
-cyber-skill	cyber:api-security	implementing-api-gateway-security-controls	pending		
-cyber-skill	cyber:api-security	implementing-api-key-security-controls	pending		
-cyber-skill	cyber:api-security	implementing-api-rate-limiting-and-throttling	pending		
-cyber-skill	cyber:api-security	implementing-api-schema-validation-security	pending		
-cyber-skill	cyber:api-security	implementing-api-security-posture-management	pending		
-cyber-skill	cyber:api-security	implementing-api-security-testing-with-42crunch	pending		
-cyber-skill	cyber:api-security	implementing-api-threat-protection-with-apigee	pending		
+cyber-skill	cyber:api-security	implementing-api-abuse-detection-with-rate-limiting	integrated	adapt	decisions/cyber-DA.md
+cyber-skill	cyber:api-security	implementing-api-gateway-security-controls	integrated	adapt	decisions/cyber-DA.md
+cyber-skill	cyber:api-security	implementing-api-key-security-controls	integrated	adapt	decisions/cyber-DA.md
+cyber-skill	cyber:api-security	implementing-api-rate-limiting-and-throttling	integrated	adapt	decisions/cyber-DA.md
+cyber-skill	cyber:api-security	implementing-api-schema-validation-security	integrated	adapt	decisions/cyber-DA.md
+cyber-skill	cyber:api-security	implementing-api-security-posture-management	integrated	adapt	decisions/cyber-DB.md
+cyber-skill	cyber:api-security	implementing-api-security-testing-with-42crunch	integrated	adapt	decisions/cyber-DB.md
+cyber-skill	cyber:api-security	implementing-api-threat-protection-with-apigee	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:endpoint-security	implementing-application-whitelisting-with-applocker	pending		
 cyber-skill	cyber:devsecops	implementing-aqua-security-for-container-scanning	pending		
 cyber-skill	cyber:vulnerability-management	implementing-attack-path-analysis-with-xm-cyber	pending		
@@ -1044,7 +1044,7 @@ cyber-skill	cyber:incident-response	implementing-velociraptor-for-ir-collection	
 cyber-skill	cyber:vulnerability-management	implementing-vulnerability-management-with-greenbone	pending		
 cyber-skill	cyber:vulnerability-management	implementing-vulnerability-remediation-sla	pending		
 cyber-skill	cyber:vulnerability-management	implementing-vulnerability-sla-breach-alerting	pending		
-cyber-skill	cyber:web-application-security	implementing-web-application-logging-with-modsecurity	pending		
+cyber-skill	cyber:web-application-security	implementing-web-application-logging-with-modsecurity	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:cryptography	implementing-zero-knowledge-proof-for-authentication	pending		
 cyber-skill	cyber:identity-access-management	implementing-zero-standing-privilege-with-cyberark	pending		
 cyber-skill	cyber:zero-trust-architecture	implementing-zero-trust-dns-with-nextdns	pending		
@@ -1077,10 +1077,10 @@ cyber-skill	cyber:vulnerability-management	performing-agentless-vulnerability-sc
 cyber-skill	cyber:threat-intelligence	performing-ai-driven-osint-correlation	pending		
 cyber-skill	cyber:soc-operations	performing-alert-triage-with-elastic-siem	pending		
 cyber-skill	cyber:mobile-security	performing-android-app-static-analysis-with-mobsf	pending		
-cyber-skill	cyber:api-security	performing-api-fuzzing-with-restler	pending		
-cyber-skill	cyber:api-security	performing-api-inventory-and-discovery	pending		
-cyber-skill	cyber:api-security	performing-api-rate-limiting-bypass	pending		
-cyber-skill	cyber:api-security	performing-api-security-testing-with-postman	pending		
+cyber-skill	cyber:api-security	performing-api-fuzzing-with-restler	integrated	adapt	decisions/cyber-DC.md
+cyber-skill	cyber:api-security	performing-api-inventory-and-discovery	integrated	adapt	decisions/cyber-DB.md
+cyber-skill	cyber:api-security	performing-api-rate-limiting-bypass	integrated	adapt	decisions/cyber-DC.md
+cyber-skill	cyber:api-security	performing-api-security-testing-with-postman	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:network-security	performing-arp-spoofing-attack-simulation	pending		
 cyber-skill	cyber:vulnerability-management	performing-asset-criticality-scoring-for-vulns	pending		
 cyber-skill	cyber:vulnerability-management	performing-authenticated-scan-with-openvas	pending		
@@ -1132,8 +1132,8 @@ cyber-skill	cyber:malware-analysis	performing-firmware-malware-analysis	pending
 cyber-skill	cyber:application-security	performing-fuzzing-with-aflplusplus	pending		
 cyber-skill	cyber:cloud-security	performing-gcp-penetration-testing-with-gcpbucketbrute	pending		
 cyber-skill	cyber:cloud-security	performing-gcp-security-assessment-with-forseti	pending		
-cyber-skill	cyber:api-security	performing-graphql-depth-limit-attack	pending		
-cyber-skill	cyber:api-security	performing-graphql-introspection-attack	pending		
+cyber-skill	cyber:api-security	performing-graphql-depth-limit-attack	integrated	adapt	decisions/cyber-DC.md
+cyber-skill	cyber:api-security	performing-graphql-introspection-attack	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:web-application-security	performing-graphql-security-assessment	pending		
 cyber-skill	cyber:cryptography	performing-hardware-security-module-integration	pending		
 cyber-skill	cyber:cryptography	performing-hash-cracking-with-hashcat	pending		
@@ -1146,7 +1146,7 @@ cyber-skill	cyber:soc-operations	performing-ioc-enrichment-automation	pending
 cyber-skill	cyber:mobile-security	performing-ios-app-security-assessment	pending		
 cyber-skill	cyber:penetration-testing	performing-iot-security-assessment	pending		
 cyber-skill	cyber:threat-intelligence	performing-ip-reputation-analysis-with-shodan	pending		
-cyber-skill	cyber:api-security	performing-jwt-none-algorithm-attack	pending		
+cyber-skill	cyber:api-security	performing-jwt-none-algorithm-attack	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:red-teaming	performing-kerberoasting-attack	pending		
 cyber-skill	cyber:container-security	performing-kubernetes-cis-benchmark-with-kube-bench	pending		
 cyber-skill	cyber:container-security	performing-kubernetes-etcd-security-assessment	pending		
@@ -1202,7 +1202,7 @@ cyber-skill	cyber:web-application-security	performing-security-headers-audit	pen
 cyber-skill	cyber:cloud-security	performing-serverless-function-security-review	pending		
 cyber-skill	cyber:identity-access-management	performing-service-account-audit	pending		
 cyber-skill	cyber:identity-access-management	performing-service-account-credential-rotation	pending		
-cyber-skill	cyber:api-security	performing-soap-web-service-security-testing	pending		
+cyber-skill	cyber:api-security	performing-soap-web-service-security-testing	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:soc-operations	performing-soc-tabletop-exercise	pending		
 cyber-skill	cyber:governance-risk-compliance	performing-soc2-type2-audit-preparation	pending		
 cyber-skill	cyber:digital-forensics	performing-sqlite-database-forensics	pending		
@@ -1268,9 +1268,9 @@ cyber-skill	cyber:cloud-security	securing-kubernetes-on-cloud	pending
 cyber-skill	cyber:ot-ics-security	securing-remote-access-to-ot-environment	pending		
 cyber-skill	cyber:cloud-security	securing-serverless-functions	pending		
 cyber-skill	cyber:mobile-security	testing-android-intents-for-vulnerabilities	pending		
-cyber-skill	cyber:api-security	testing-api-authentication-weaknesses	pending		
-cyber-skill	cyber:api-security	testing-api-for-broken-object-level-authorization	pending		
-cyber-skill	cyber:api-security	testing-api-for-mass-assignment-vulnerability	pending		
+cyber-skill	cyber:api-security	testing-api-authentication-weaknesses	integrated	adapt	decisions/cyber-DB.md
+cyber-skill	cyber:api-security	testing-api-for-broken-object-level-authorization	integrated	adapt	decisions/cyber-DB.md
+cyber-skill	cyber:api-security	testing-api-for-mass-assignment-vulnerability	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:web-application-security	testing-api-security-with-owasp-top-10	pending		
 cyber-skill	cyber:web-application-security	testing-cors-misconfiguration	pending		
 cyber-skill	cyber:web-application-security	testing-for-broken-access-control	pending		
@@ -1286,9 +1286,9 @@ cyber-skill	cyber:penetration-testing	testing-for-xss-vulnerabilities	pending
 cyber-skill	cyber:web-application-security	testing-for-xxe-injection-vulnerabilities	pending		
 cyber-skill	cyber:web-application-security	testing-jwt-token-security	pending		
 cyber-skill	cyber:mobile-security	testing-mobile-api-authentication	pending		
-cyber-skill	cyber:api-security	testing-oauth2-implementation-flaws	pending		
+cyber-skill	cyber:api-security	testing-oauth2-implementation-flaws	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:incident-response	testing-ransomware-recovery-procedures	pending		
-cyber-skill	cyber:api-security	testing-websocket-api-security	pending		
+cyber-skill	cyber:api-security	testing-websocket-api-security	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:threat-intelligence	tracking-threat-actor-infrastructure	pending		
 cyber-skill	cyber:soc-operations	triaging-security-alerts-in-splunk	pending		
 cyber-skill	cyber:incident-response	triaging-security-incident-with-ir-playbook	pending		

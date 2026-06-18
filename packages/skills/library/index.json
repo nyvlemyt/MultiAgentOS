@@ -364,6 +364,20 @@
     "tier": "T2"
   },
   {
+    "id": "bypassing-authentication-with-forced-browsing",
+    "name": "bypassing-authentication-with-forced-browsing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on forced browsing / broken access control (OWASP A01): attackers reach unlinked admin routes, leftover backup/config files (.bak, .env, .git), and Spring Actuator endpoints, and bypass path-based auth via HTTP method swaps, case/encoding tricks, and path-normalization gaps. DETECT: WAF + access-log signatures (bursts of 401/403/404 on sensitive prefixes, requests to /.git//.env/.bak, method anomalies on admin routes). MITIGATE: enforce authn/authz in middleware (not per-route), default-deny then allowlist, web-server deny rules for backup/VCS extensions, exact URL normalization before authz, IP-restrict admin surfaces, disable/secure debug endpoints. Maps to MAOS Next.js middleware auth + §5 cross-project sandbox. No payloads, detection + secure-config only.",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/bypassing-authentication-with-forced-browsing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
     "id": "canary-watch",
     "name": "canary-watch",
     "description": "Use to verify a deployed or locally-running MAS surface after a release, merge, or dependency bump — checks HTTP status, console errors, network/API health, key content, performance regressions, static assets, and SSE streams against a recorded baseline. Do NOT use for interactive UI driving (use webapp-testing), for reviewing a diff (use mas-reviewer), or as the human gate for risky actions (use mas-sec-reviewer).",
@@ -765,6 +779,90 @@
     "tier": "T2"
   },
   {
+    "id": "defending-against-prototype-pollution",
+    "name": "defending-against-prototype-pollution",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team prototype-pollution defense for Next.js/Node. DETECT: log + WAF/ModSecurity signatures for `__proto__`, `constructor.prototype`, `prototype` keys in JSON bodies, query strings, and hash fragments; status/error-coercion anomalies signal a pollution attempt. MITIGATE: build config objects with `Object.create(null)`; `Object.freeze(Object.prototype)`; reject/strip `__proto__`/`constructor`/`prototype` keys before any deep-merge; prefer `Map` for user-controlled key/value data; pin/patch vulnerable deps (lodash merge, merge-deep). Map to MAOS §5 (untrusted input never reaches exec sinks) and mas-sec-reviewer. Weaponized RCE/gadget payloads are intentionally omitted — detection signatures and secure-code patterns only.",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/defending-against-prototype-pollution/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "defending-against-race-conditions",
+    "name": "defending-against-race-conditions",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team race-condition / TOCTOU defense. DETECT: log signature for N near-identical state-changing requests inside a tight window (single-packet/last-byte-sync bursts) on one session/resource; alert on limit-overrun (a one-time action succeeding >1×). MITIGATE: database-level locking (SELECT FOR UPDATE), optimistic concurrency with version columns, idempotency keys on state-changing requests, distributed locks for multi-server, atomic decrement for counters. In MAOS this directly hardens the budgets/quota counters (TOKEN_STRATEGY §8) and any worker job that mutates shared state — a check-then-act gap there could overrun the §11 quota cap. Offensive Turbo-Intruder weaponization omitted; only detection + safe-concurrency patterns retained.",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/defending-against-race-conditions/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "defending-against-ssrf",
+    "name": "defending-against-ssrf",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team SSRF defense for any server-side outbound fetch. DETECT: log + WAF signatures for requests whose URL targets RFC1918/loopback/link-local ranges or cloud metadata (169.254.169.254, metadata.google.internal); flag IP-encoding tricks (octal/hex/decimal/IPv6) and non-http schemes (file/gopher/dict). MITIGATE: strict outbound host ALLOWLIST (maps to config/permissions.json#allowed_hosts, §5), block private ranges, resolve-then-pin DNS to defeat rebinding, disable file/gopher/dict/ftp, prefer IMDSv2, route outbound through a controlled proxy. This is the canonical control behind MAOS §5 network gating and mas-sec-reviewer. Offensive payloads (metadata cred theft, gopher-to-Redis) are omitted; only detection signatures and the allowlist/SSRF-filter design are retained.",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/defending-against-ssrf/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "defending-against-template-injection",
+    "name": "defending-against-template-injection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team template-injection (SSTI/CSTI) defense. DETECT: log + WAF/ModSecurity signatures for template-probe payloads (`{{7*7}}`, `${7*7}`, `#{...}`, `<%= %>`) and engine-fingerprint strings in user-reflected parameters; a reflected arithmetic result (e.g. 49) is the tell. MITIGATE: never pass user input to a template-render call; keep data and template strictly separate; use a sandboxed environment (Jinja2 SandboxedEnvironment) or logic-less engines (Mustache/Handlebars); allowlist template variables; least-privilege OS user. For our Next.js/React surface, also covers CSTI (framework expression injection → XSS) — render as data/escape, never as an evaluated expression. Maps to §5 (untrusted input must not reach an exec sink) + mas-sec-reviewer. Offensive RCE chains (MRO/subclass traversa",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/defending-against-template-injection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "defending-against-type-juggling",
+    "name": "defending-against-type-juggling",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team type-juggling / loose-comparison defense. DETECT: static-analysis + log signatures for type-coercion bypass attempts — auth fields arriving as JSON `true`/`0`/`null`/`[]` instead of strings, password params sent as arrays, or known magic-hash inputs (`0e...` MD5/SHA1 collisions). MITIGATE: strict comparison only for security values (`===` in JS/TS, `===`/`hash_equals`/`password_verify` in PHP), validate/normalize input types at the boundary, never let an auth check read a coerced value. Maps to our Next.js/TS surface (`==`→`===`, no truthy auth checks) + mas-sec-reviewer. Offensive magic-hash exploitation tables are reframed as the *secure-coding lesson*; no weaponized bypass driver retained.",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/defending-against-type-juggling/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "defending-against-websocket-attacks",
+    "name": "defending-against-websocket-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team WebSocket / real-time defense. DETECT: log handshakes with their Origin and alert on cross-origin upgrades (CSWSH attempt); flag injection-shaped message payloads (SQLi/XSS/SSTI/path-traversal strings), IDOR-style channel/user-id flips, and message floods. MITIGATE: validate the Origin header and require a CSRF token on the WS upgrade; authorize EVERY message, not only the connection; sanitize/validate message payloads server-side; per-connection rate limits; use WSS (never plaintext WS); invalidate sockets on logout/session expiry; per-message auth tokens. Maps to MAOS's SSE/streaming channel (worker↔web) + §5. Offensive CSWSH exfil PoC and message-injection driver are omitted; only detection + secure-channel patterns retained.",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/defending-against-websocket-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
     "id": "defi-amm-security",
     "name": "defi-amm-security",
     "description": "Use to write or audit Solidity AMM / liquidity-pool / vault contracts and swap flows — reentrancy, CEI ordering, donation/inflation attacks, oracle manipulation, slippage, admin controls, safe reserve math. Triggers when a task touches swap/deposit/withdraw/mint/burn, share math using balanceOf, or DeFi admin setters. Do NOT use for generic web app auth (use django-security / mas-sec-reviewer), non-EVM chains, or off-chain payment flows.",
@@ -804,6 +902,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/design-system/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-eval",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-api-enumeration-attacks",
+    "name": "detecting-api-enumeration-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of API enumeration / Broken Object Level Authorization (BOLA/IDOR, OWASP API1:2023). Spot the three probing shapes — sequential numeric IDs, harvested-then-reused UUIDs, and user_id parameter tampering — via SIEM signals: many distinct object IDs per source in a short window, mixed 200/401/403 from one client, request velocity above the user baseline, and access outside the caller's scope. Ships Splunk/Elastic threshold logic and a Python log-analysis pattern (defensive, offline log parsing — not an attack tool). Mitigations: enforce object ownership at the data layer, prefer unpredictable identifiers, rate-limit per credential per endpoint. In MAOS this feeds mas-sec-reviewer and the §5 API-posture lens; any cost figure is subscription quota, never cash.",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-api-enumeration-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-broken-object-property-level-authorization",
+    "name": "detecting-broken-object-property-level-authorization",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection + mitigation of BOPLA (OWASP API3:2023): two property-level gaps — Excessive Data Exposure (sensitive fields like password_hash/ssn/role leaking in responses) and Mass Assignment (client injecting role/is_admin/balance into request bodies). Detection: compare response fields against an expected-fields allowlist and classify by sensitivity; review schemas for missing additionalProperties:false; flag GraphQL introspection. The source ships an active mutating scanner — here it is reframed as DEFENSIVE guidance (read-only response auditing + schema review on systems you own), never a runnable attack against third parties. Mitigation: explicit read/write field allowlists per role (serializers), additionalProperties:false, server-enforced readOnly. Feeds mas-sec-reviewer + §5",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-broken-object-property-level-authorization/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-shadow-api-endpoints",
+    "name": "detecting-shadow-api-endpoints",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive discovery + governance of shadow APIs — endpoints running outside the documented, tracked, secured set (deprecated versions, forgotten test envs, ungoverned side-deploys). Three detection methods on assets you own: (1) compare observed traffic (normalized paths) against the OpenAPI spec to surface undocumented routes; (2) mine source repos for route definitions (Express/Flask/Django/Spring) and diff vs spec; (3) enumerate cloud-managed surfaces (API Gateway, Lambda URLs, ALB rules). Risk-rank each shadow by auth-absence, traffic, source spread, write methods, and sensitive path tokens. Govern with a gateway policy that 404s unregistered routes. Feeds mas-sec-reviewer attack-surface lens + §5; cost is subscription quota, never cash.",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-shadow-api-endpoints/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
     "tier": "T1"
   },
   {
@@ -1052,6 +1192,160 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-research",
     "tier": "T2"
+  },
+  {
+    "id": "exploiting-api-injection-vulnerabilities",
+    "name": "exploiting-api-injection-vulnerabilities",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on API injection (SQLi/NoSQLi/OS-command/LDAP/SSRF, OWASP API8/API7). Detection: WAF/log signatures (SQL error strings, time-based latency spikes, $-operators in JSON, requests to 169.254.169.254 / internal hosts, shell metacharacters). Mitigation: parameterized queries / prepared statements, reject NoSQL operator objects, allow-list outbound URLs and block link-local metadata, never pass input to a shell, server-side input validation, WAF as defense-in-depth. In MAOS this feeds mas-sec-reviewer + CLAUDE.md §5 (network allowed_hosts, risky-action gating); cost framed as subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-api-injection-vulnerabilities/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-broken-function-level-authorization",
+    "name": "exploiting-broken-function-level-authorization",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on BFLA (OWASP API5:2023): regular users invoking admin/privileged API functions. Failure modes: authz only on the UI/frontend, method-dependent checks (GET blocked but PUT not), mass-assignment of role/is_admin, hidden admin params, shadow API versions (/v2, /internal), path-bypass tricks. Mitigation: enforce RBAC at the route/controller layer (deny-by-default), check role on every method, server-side allow-listing of writable properties, version parity, immutable audit logs, automated authz tests across every role×endpoint. Detection: privileged-endpoint hits with non-admin tokens, role-field writes, audit-log deletes. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-broken-function-level-authorization/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-broken-link-hijacking",
+    "name": "exploiting-broken-link-hijacking",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on broken-link hijacking / subdomain takeover (supply-chain, OWASP A06/A08). An external reference (third-party script, CDN package, image, or a subdomain CNAME) pointing at an expired domain or decommissioned cloud resource (S3, GitHub Pages, Azure Blob, Heroku, Shopify) can be claimed by an attacker, turning into full XSS, phishing, or cookie/OAuth theft on the trusting site. DETECT: monitor for dangling CNAMEs (CNAME resolves but target does not), dead/404 external links, and service-fingerprint error strings ('NoSuchBucket', \\\"There isn't a GitHub Pages site here\\\"); diff DNS against live inventory. MITIGATE: delete DNS records before deprovisioning the service (ordering matters), pin external scripts with Subresource Integrity, restrict script/connect sources via Conten",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-broken-link-hijacking/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-excessive-data-exposure-in-api",
+    "name": "exploiting-excessive-data-exposure-in-api",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on excessive data exposure / BOPLA (OWASP API3:2023): APIs serializing full DB objects and trusting the UI to hide sensitive fields (SSN, password hashes, internal IPs, risk scores, secrets), plus PII in nested user objects, debug headers, and stack traces. Mitigation: server-side DTOs/view-models that whitelist returned fields per endpoint per role, strip sensitive fields at serialization, GraphQL field-level authorization, schema validation at the gateway, suppress debug headers and stack traces, response-schema tests. Detection: responses containing sensitive field names/patterns, verbose error bodies. Feeds mas-sec-reviewer (secret/PII review) + CLAUDE.md §5; subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-excessive-data-exposure-in-api/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-http-request-smuggling",
+    "name": "exploiting-http-request-smuggling",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on HTTP request smuggling / desync (OWASP A05). When a front-end proxy/CDN and the back-end origin disagree on where a request ends — because one trusts Content-Length and the other Transfer-Encoding (CL.TE / TE.CL / TE.TE), or on HTTP/2->1.1 downgrade (H2.CL/H2.TE) — an attacker prepends bytes that the back-end treats as a second request, bypassing front-end WAF/auth, poisoning the cache, capturing other users' requests, or escalating XSS. DETECT: log/WAF signatures for requests carrying BOTH Content-Length and Transfer-Encoding, malformed/obfuscated TE headers, CRLF in HTTP/2 header values, and the timing/odd-response patterns of a desync. MITIGATE: reject any request with conflicting CL+TE, normalize requests at the edge, use HTTP/2 (or consistent HTTP/1.1 parsers) end-to",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-http-request-smuggling/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-idor-vulnerabilities",
+    "name": "exploiting-idor-vulnerabilities",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on IDOR / BOLA (OWASP A01, API1). When an endpoint trusts that a valid token means an authorized request and never checks the token owner actually owns the referenced object, changing the id in /users/{id}, ?id=, a JSON body field, a file path, a GraphQL arg, or a bulk-ids array exposes or modifies other users' data — horizontally (same privilege) or vertically (admin/cross-tenant). DETECT: log signatures for sequential/fuzzed id enumeration, one principal touching many distinct object ids, and cross-organization access. MITIGATE: enforce object-level authorization server-side on EVERY read and write (verify requesting user owns/permits the specific object), scope DB queries by owner (WHERE owner = current_user), validate ownership for body/path/GraphQL/bulk references too, ",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-idor-vulnerabilities/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-insecure-deserialization",
+    "name": "exploiting-insecure-deserialization",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on insecure deserialization (OWASP A08). Reconstructing an object from untrusted bytes can invoke magic methods (Java readObject, PHP __wakeup/__destruct, .NET formatters, Python pickle, Ruby Marshal, unsafe YAML) and chain existing library classes into remote code execution. Hotspots: session cookies, ASP.NET __VIEWSTATE, pickle/YAML in caches and message queues. DETECT: signatures for serialization markers in traffic (Java 0xACED0005 / rO0AB, PHP O:/a: strings, .NET /wE ViewState, pickle 0x80), inventory of known-vulnerable gadget libraries (e.g. commons-collections, outdated formatters), and out-of-band callback monitoring in test. MITIGATE: do not deserialize untrusted input at all; use data-only formats (JSON, Protocol Buffers); enforce class allowlists / Java deseriali",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-insecure-deserialization/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-jwt-algorithm-confusion-attack",
+    "name": "exploiting-jwt-algorithm-confusion-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on JWT algorithm/key confusion: servers that trust the token's alg header let an attacker downgrade RS256→HS256 (signing with the RSA public key as the HMAC secret), use alg:none to skip verification, or inject kid/jku/x5u to supply attacker keys. Mitigation: pin an explicit algorithm allow-list in verify() (never read alg from the token), use distinct key types per algorithm, reject none, ignore/validate kid against a fixed keyset, never fetch keys from token-supplied jku/x5u URLs (allow-list JWKS), prefer EdDSA, enforce exp/iat/aud. Detection: tokens with alg=none/HS256 where RS256 expected, kid path-traversal/SQLi values, jku to unknown hosts. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-jwt-algorithm-confusion-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-mass-assignment-in-rest-apis",
+    "name": "exploiting-mass-assignment-in-rest-apis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on mass assignment / auto-binding (OWASP API6, A08). ORM auto-binding maps every JSON field in a request onto model attributes; if the update is not constrained, injecting server-managed fields (role, isAdmin, is_admin, verified, email_verified, active, banned, balance, price, discount, plan, owner_id, organization_id, team_id, created_by) escalates privileges, bypasses verification, manipulates pricing/ownership, or forges audit fields. DETECT: log/alert on requests attempting to write restricted attributes; compare request body fields against the allowed schema. MITIGATE: use input allowlists (Rails strong_parameters, Django ModelForm fields/serializer fields, Laravel $fillable, Spring @JsonView/explicit binding) — never denylists; introduce DTOs/ViewModels so API input ne",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-mass-assignment-in-rest-apis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-nosql-injection-vulnerabilities",
+    "name": "exploiting-nosql-injection-vulnerabilities",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on NoSQL injection (OWASP A03). When a JSON body or query param flows unchecked into a MongoDB-style query, an attacker substitutes a query operator for a scalar — {\\\"username\\\":{\\\"$ne\\\":\\\"\\\"}} bypasses login, $regex extracts secrets character-by-character (blind boolean), and $where runs arbitrary server-side JavaScript (auth bypass, time-based exfil, potential RCE). Root cause is type confusion: an object arrives where a string was expected. DETECT: WAF/log signatures for request fields whose value is an object/array instead of a scalar, for keys beginning with $ ($ne/$gt/$regex/$where/$exists), and for $where/JS in input. MITIGATE: validate input types strictly (reject objects/arrays where strings expected), cast/coerce to expected primitive before querying, use the drive",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-nosql-injection-vulnerabilities/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "exploiting-oauth-misconfiguration",
+    "name": "exploiting-oauth-misconfiguration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on OAuth 2.0 / OIDC misconfiguration (OWASP A07). Classic failures: lax redirect_uri validation (subdomain/path-traversal/userinfo/@-host bypass) enabling code/token theft; implicit flow leaking tokens via Referer; missing/predictable state enabling login CSRF; authorization-code reuse; scope escalation on token exchange/refresh; client secrets exposed in JS/mobile; unverified-email or pre-auth account linking enabling takeover; long-lived/unrevoked tokens. DETECT: audit .well-known config; log-signal on redirect_uri mismatches, repeated use of one code, requests missing state, and scope-broadening on refresh. MITIGATE: exact-string redirect_uri allowlist (no wildcards/path-traversal), mandatory PKCE (S256) for all clients, cryptographically-random state bound to session, si",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-oauth-misconfiguration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
   },
   {
     "id": "fastapi-patterns",
@@ -1443,6 +1737,132 @@
     "summary": "Author hookify guard rules: markdown + YAML frontmatter (name verb-first, enabled, event bash|file|stop|prompt|all, action warn|block, pattern regex or multi-field conditions) plus a message body shown when the rule fires. warn is default and advisory; block prevents the operation. Write tight patterns (anchor and escape), test the regex before shipping, and store as project-local files. These rules are a defense-in-depth warning layer that complements — never replaces — the hard §5 risk gate in config/permissions.json.",
     "tags": [],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hookify-rules/SKILL.md"
+  },
+  {
+    "id": "implementing-api-abuse-detection-with-rate-limiting",
+    "name": "implementing-api-abuse-detection-with-rate-limiting",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive rate limiting as an abuse control. Three algorithms: token bucket (burst-tolerant, average-capped), sliding window (smooth, low false-positive), and an adaptive limiter that reads per-client behavior (auth-failure count, error rate, request velocity, unique-endpoint spread → threat level NORMAL/ELEVATED/HIGH/CRITICAL) and tightens limits + temporary blocks under attack, relaxing in calm. Backed by a distributed store (Redis) with atomic Lua so limits hold across instances. Defends brute force, credential stuffing, scraping, resource exhaustion. Always return 429 + Retry-After + X-RateLimit-* headers. Limit per credential (not per-IP alone). Layer with auth/authz/WAF — never the sole defense. Feeds mas-sec-reviewer + §5; tuning is in subscription quota, never cash.",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-abuse-detection-with-rate-limiting/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-api-gateway-security-controls",
+    "name": "implementing-api-gateway-security-controls",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive API-gateway hardening (Kong, AWS API Gateway, Azure APIM, Apigee, Envoy) as a centralized enforcement point. Controls: JWT/OAuth2/OIDC auth with short token TTL; per-credential (not per-IP) rate limiting; OpenAPI request validation with additionalProperties:false to block mass assignment + injection; request-size limits; IP allowlisting for admin routes; mTLS for service-to-service; response-transformer to strip Server/X-Powered-By and add HSTS/CSP/X-Frame-Options/nosniff; WAF rules (SQLi/XSS/rate-based); security-event metric filters + alarms on 401/403/429/5xx spikes. Defense in depth: the gateway is necessary, not sufficient — backends must still authorize and validate. Keep errors non-verbose. Feeds mas-sec-reviewer + §5; cost is subscription quota, never cash.",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-gateway-security-controls/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-api-key-security-controls",
+    "name": "implementing-api-key-security-controls",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive API-key lifecycle hardening. Generation: cryptographically random 256-bit body with an identifiable prefix (sk_live_/sk_test_) so leaks are detectable. Storage: never plaintext — store the SHA-256 hash only, cache validated keys with a TTL. Scoping: bind each key to endpoints, IP allowlist, and rate limit to shrink blast radius. Rotation: issue a new key with a grace window where both work, then revoke. Revocation: immediate, cache-invalidating. Leak defense: GitHub secret scanning + gitleaks regex on the prefix, auto-revoke detected keys and notify the owner. API keys suit server-to-server/dev access — not sole auth for user apps; never put keys in URL query params. Carries AI-security framework tags (NIST-AI-RMF, MITRE ATLAS). Feeds mas-sec-reviewer + §5 secrets handling; cost ",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-key-security-controls/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-api-rate-limiting-and-throttling",
+    "name": "implementing-api-rate-limiting-and-throttling",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive rate limiting / throttling implementation. Algorithms: sliding window (Redis sorted sets, smooth), token bucket (burst-tolerant), fixed window (simplest, boundary-burst caveat). Scope limits per user, per IP, and per endpoint, plus tiered quotas (free/premium/enterprise) and stricter auth-endpoint limits regardless of tier. Distribute via a shared store with atomic Lua so limits hold across all instances; degrade gracefully if the store is unreachable. Always return 429 with Retry-After and X-RateLimit-Limit/Remaining/Reset on every response. Defends brute force, credential stuffing, resource exhaustion, scraping. One layer — combine with authentication, authorization, and WAF. Don't trust X-Forwarded-For unvalidated. Feeds mas-sec-reviewer + §5; tuning is subscription quota, nev",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-rate-limiting-and-throttling/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-api-schema-validation-security",
+    "name": "implementing-api-schema-validation-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive API schema validation using OpenAPI 3.x / JSON Schema as a security contract. Block mass assignment with additionalProperties:false; block injection and DoS with typed fields, maxLength, pattern allowlists, enum, and numeric bounds; prevent data leakage by validating RESPONSE payloads against an explicit output schema (forbid extra fields); enforce readOnly server-side. Enforce at two layers: gateway runtime (Cloudflare API Shield / Kong OAS validation in blocking mode) and in-app strict models (Pydantic extra='forbid'). Shift left with CI schema linting + contract tests. Security anti-patterns table: missing additionalProperties:false, no maxLength/pattern, missing error schemas. Keep validation errors non-verbose. Schema validation complements — not replaces — parameterized que",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-schema-validation-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-api-security-posture-management",
+    "name": "implementing-api-security-posture-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Continuous API Security Posture Management doctrine: maintain a live inventory of all APIs (internal/external/partner/shadow/deprecated), evaluate per-endpoint security controls (authentication, transport encryption, rate limiting, CORS, security headers, input validation), compute a deterministic composite risk score weighted by control gaps + classification + sensitive-data exposure + documentation status, and enforce declarative policies (require-auth, enforce-TLS, no-wildcard-CORS, doc-required) shift-left across CI/CD. Blue-team only: continuous visibility and drift detection, never exploitation. Frameworks NIST CSF (PR.PS-01, ID.RA-01, PR.DS-10, DE.CM-01) + MITRE ATT&CK (T1190, T1059.007, T1552.001). In MAOS this feeds mas-sec-reviewer (§5) and rides subscription quota (§11), never p",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-security-posture-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-api-security-testing-with-42crunch",
+    "name": "implementing-api-security-testing-with-42crunch",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Contract-driven API security testing doctrine with 42Crunch: static API Audit scores an OpenAPI definition (0–100) against 300+ checks (data validation, authentication, transport security, error handling) with no running API; dynamic Conformance Scan tests the live API against its contract for OWASP API Top 10 (BOLA, BFLA, injection, SSRF, mass assignment, excessive data exposure); API Protect enforces the contract at runtime. Wire audit+scan into CI/CD with a min-score gate, triage by severity, fix the spec (add securitySchemes, type/format/pattern/maxLength, HTTPS servers, additionalProperties:false), re-audit. Defensive secure-design only. Frameworks NIST CSF (PR.PS-01, ID.RA-01, PR.DS-10, DE.CM-01) + MITRE ATT&CK (T1190, T1059.007, T1552.001). Tokens are secrets — never inline; referen",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-security-testing-with-42crunch/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-api-threat-protection-with-apigee",
+    "name": "implementing-api-threat-protection-with-apigee",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive API threat-protection doctrine on Google Apigee: front backend services with a reverse-proxy PreFlow that runs, in order, auth verification (OAuthV2 VerifyAccessToken / VerifyAPIKey), SpikeArrest rate limiting, JSON/XML Threat Protection (bound depth/entry/array/string sizes to stop structural DoS and XML bombs/XXE), RegularExpressionProtection (block SQLi/XSS/header-injection/path-traversal patterns), and CORS enforcement; on response, strip server-fingerprint headers (X-Powered-By, Server) and add security headers (nosniff, HSTS, X-Frame-Options, CSP, no-store). Enable Advanced API Security for ML abuse detection and IP deny actions. Shield-right defense, fail-closed. Frameworks NIST CSF (PR.PS-01, ID.RA-01, PR.DS-10, DE.CM-01) + MITRE ATT&CK (T1190, T1059.007, T1552.001, T1078",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-api-threat-protection-with-apigee/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-web-application-logging-with-modsecurity",
+    "name": "implementing-web-application-logging-with-modsecurity",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deploy + tune ModSecurity v3 with OWASP CRS v4 as the web-app DETECTION and audit-logging layer. Process: install with SecRuleEngine=DetectionOnly; set CRS paranoia level (PL1–PL4); configure SecAuditEngine for relevant-only logging; tune false positives via SecRuleRemoveById / exclusions; switch to SecRuleEngine=On after a tuning window; forward audit logs to SIEM (ELK/Splunk/Wazuh) for correlation. CRS rules detect SQLi (942xxx), XSS, RCE, LFI and the OWASP Top 10 — the shared signature source for our other defending-against-* skills and for prototype-pollution/SSTI/template-probe rules. This is the detection arm of MAOS §5 + mas-sec-reviewer. Purely defensive; configures WAFs for systems you operate, never to attack others.",
+    "tags": [
+      "cyber:web-application-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-web-application-logging-with-modsecurity/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:web-application-security",
+    "tier": "T1"
   },
   {
     "id": "inherit-legacy-style",
@@ -2072,6 +2492,118 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/parallel-execution-optimizer/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-agent",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-api-fuzzing-with-restler",
+    "name": "performing-api-fuzzing-with-restler",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive use of Microsoft RESTler for stateful fuzzing of your OWN staging API: compile the OpenAPI spec into a grammar, configure auth, run test/fuzz-lean/fuzz, and triage results. Security value is in the checkers — UseAfterFree (deleted resource still accessible), NamespaceRule (cross-tenant access), ResourceHierarchy, LeakageRule (info disclosure in errors) — each mapping to a concrete fix (revoke tokens on delete, enforce tenant isolation, generic errors). Guardrails: staging only, written authorization, bounded time budget, garbage collection on, never production/third-party (RESTler creates/deletes thousands of resources). Wire into CI for security regressions. Feeds mas-sec-reviewer; outbound test traffic respects CLAUDE.md §5 allowed_hosts; subscription quota, never per-token cas",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-api-fuzzing-with-restler/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-api-inventory-and-discovery",
+    "name": "performing-api-inventory-and-discovery",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized API inventory & discovery doctrine (OWASP API9:2023): build a complete catalog of an organization's own APIs and surface shadow (undocumented), zombie (deprecated-but-live), and undocumented endpoints. Four discovery lanes — passive HAR/proxy traffic analysis, authorized active path-probing of owned domains, JavaScript-source endpoint extraction (fetch/axios/relative-path regex), and cloud API-gateway inventory (AWS/Azure/GCP) — then normalize and diff against the documented catalog to classify shadow vs zombie, and flag any endpoint reachable without auth. Written authorization on named domains/ranges is a hard prerequisite. Defensive attack-surface mapping, never exploitation. Frameworks NIST CSF (PR.PS-01, ID.RA-01, PR.DS-10, DE.CM-01) + MITRE ATT&CK (T1190, T1059.007, T1552.",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-api-inventory-and-discovery/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-api-rate-limiting-bypass",
+    "name": "performing-api-rate-limiting-bypass",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on API rate-limit bypass (OWASP API4:2023). Bypass classes to close: trusting client X-Forwarded-For / X-Real-IP for identity, path variations (trailing slash, case, /v2 shadow versions) treated as distinct buckets, method/content-type swaps, parameter pollution making each request look unique, and non-atomic counter race conditions under concurrency. Mitigation: derive client IP at the trusted edge (strip client-supplied forwarding headers), key limits on authenticated identity not just IP, normalize/canonicalize paths before limiting, apply limits uniformly across versions/methods, use atomic counters (e.g. Redis INCR), add exponential backoff and protect auth/reset/MFA endpoints. Detection: 429-evasion patterns, spoofed forwarding headers, login-failure bursts. Feeds mas-",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-api-rate-limiting-bypass/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-api-security-testing-with-postman",
+    "name": "performing-api-security-testing-with-postman",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Repeatable API security regression doctrine with Postman/Newman for OWASP API Top 10: create per-role environments (unauthenticated, regular user, admin) with dynamic auth via collection-level pre-request scripts (never hardcoded tokens), then write assertion-based test scripts — BOLA (other-user object denied 401/403), broken auth (invalid/expired/missing token rejected, SQLi-in-login rejected, no account enumeration), excessive data exposure (no password_hash/mfa_secret/refresh_token in responses; security headers present; no Server/X-Powered-By), BFLA (regular user blocked from admin endpoints/functions), mass assignment (role/is_admin not bound), and rate limiting (429 + Retry-After). Run via Newman in CI/CD across all roles with fail-on-failure as a merge gate. Authorized staging targ",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-api-security-testing-with-postman/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-graphql-depth-limit-attack",
+    "name": "performing-graphql-depth-limit-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on GraphQL depth/complexity DoS (OWASP API4:2023): circular schema relationships (User→Posts→Author→Posts) let queries recurse, while aliases, fragment cycles, field duplication, and batch arrays amplify cost. Mitigation: enforce a query depth limit (e.g. graphql-depth-limit(5)), cost/complexity analysis with a max budget, cap alias count and batch size, set a query timeout, and rate-limit per query cost not per HTTP request. Detection: unusually deep/complex queries in logs, response-time spikes tied to query patterns, CPU/memory spikes on the GraphQL process, incrementally-growing complexity from one client. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-graphql-depth-limit-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-graphql-introspection-attack",
+    "name": "performing-graphql-introspection-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on GraphQL introspection/schema exposure: production introspection reveals all types/queries/mutations; sensitive fields (passwordHash, mfaSecret, databaseConnectionString) and dangerous mutations leak; even with introspection off, field-suggestion errors enable schema reconstruction; field-level authorization is often missing. Mitigation: disable introspection in production, disable field suggestions in errors, implement field-level authorization (@auth/@hasRole or resolver checks), remove sensitive fields from the schema, secure mutations, and pair with depth/complexity limits. Detection: introspection queries (__schema/__type) in logs, repeated 'did you mean' probing, alias-batched auth attempts. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, never per-token c",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-graphql-introspection-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-jwt-none-algorithm-attack",
+    "name": "performing-jwt-none-algorithm-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on the JWT alg:none attack (Tim McLean, 2015): libraries that honor an unsigned token when the header sets alg=none (or case variants None/NONE/nOnE) skip signature verification, letting forged claims pass. Mitigation: verify with an explicit algorithm allow-list (algorithms=[HS256]/[RS256]) so none is structurally impossible, require exp/iat/sub, keep the JWT library patched. Detection: tokens with alg=none or case variants, empty/missing signature segment (two base64 parts), abrupt alg changes within a session, role-escalation claims on unsigned tokens. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-jwt-none-algorithm-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-soap-web-service-security-testing",
+    "name": "performing-soap-web-service-security-testing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on SOAP/WSDL security (still common in enterprise/finance/healthcare): XXE (file read, OOB) and XML bombs (Billion Laughs) via DOCTYPE entities, XML/SQL/XPath injection in parameters, SOAPAction header spoofing, and WS-Security misconfig (missing/empty token, expired timestamp accepted). Mitigation: disable external entities and DTDs in the XML parser, cap entity expansion and message size, parameterize all backend queries, bind SOAPAction to the body operation, enforce WS-Security (signature/timestamp/token validation, replay protection), restrict WSDL exposure. Detection: DOCTYPE/ENTITY in requests, oversized/slow XML, SQL-error strings, mismatched SOAPAction. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-soap-web-service-security-testing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
     "tier": "T1"
   },
   {
@@ -2936,6 +3468,76 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:misc",
     "tier": "T2"
+  },
+  {
+    "id": "testing-api-authentication-weaknesses",
+    "name": "testing-api-authentication-weaknesses",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized API authentication assessment doctrine (OWASP API2:2023), test-then-harden: identify the auth mechanism (JWT/Bearer, API key, OAuth, session), scan for endpoints that enforce no authentication, analyze JWT configuration defensively (reject alg:none, require strong asymmetric signing, require exp/iss/aud/iat/sub, no sensitive data in payload), validate token lifecycle (server-side revocation on logout and password change, refresh-token rotation, no token in URL/query), and verify password-policy strength + account-enumeration resistance (identical responses for valid/invalid accounts). Each finding is paired with its remediation (RS256 over HS256, ≥256-bit secrets, token blacklist, short TTL + rotation, claim validation). Written authorization is mandatory; the proof is a single ",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/testing-api-authentication-weaknesses/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "testing-api-for-broken-object-level-authorization",
+    "name": "testing-api-for-broken-object-level-authorization",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized BOLA/IDOR testing doctrine (OWASP API1:2023), test-then-harden: enumerate endpoints carrying object IDs (path/query/body), classify ID predictability (sequential = critical, UUID = leak-dependent), capture baselines for two provided test accounts (A and B), then verify per-object authorization by attempting User A's token against User B's objects across read/modify/delete, parameter pollution, body-ID override, batch arrays, nested resource paths, method switching, and GraphQL node/relay IDs. A 200 on another account's object is the finding; pair it with the fix (object-level authz middleware, data-layer WHERE user_id = caller, UUIDs as defense-in-depth, per-endpoint authz tests in CI, per-user rate limiting). Written authorization + provided test accounts only; no enumeration o",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/testing-api-for-broken-object-level-authorization/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "testing-api-for-mass-assignment-vulnerability",
+    "name": "testing-api-for-mass-assignment-vulnerability",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized mass-assignment / auto-binding testing doctrine (OWASP API3:2023), test-then-harden: enumerate writable endpoints (register, profile update, order/product create) and their documented fields, then inject undocumented privileged fields — role/is_admin/is_superuser, permission/scope overrides, account-status (is_active/verified), financial (balance/price/discount), ownership (user_id/owner_id), and framework-specific binding shapes (Rails nested model, Django is_staff, Mongoose _id/operator, Spring authorities) — and verify whether the server binds them, confirming persistence by re-fetching. An accepted-and-persisted privileged field is the finding; pair it with the fix (per-endpoint per-role DTOs/input schemas, framework strong-params/serializer allowlists, never bind request bo",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/testing-api-for-mass-assignment-vulnerability/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "testing-oauth2-implementation-flaws",
+    "name": "testing-oauth2-implementation-flaws",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on OAuth2/OIDC flaws enabling account takeover: prefix/loose redirect_uri matching, missing or unvalidated state (CSRF), PKCE not enforced or downgraded to plain, scope escalation beyond consent, tokens not bound to client/audience, replayable (non-single-use) authorization codes, and the deprecated implicit flow leaking tokens in URLs. Mitigation: exact-string redirect_uri matching, enforce state on the client, require PKCE S256, validate scope against registration/consent, single-use short-TTL codes, validate aud/iss/nonce, disable implicit flow, bind refresh tokens to client. Detection: redirect_uri anomalies, code-replay attempts, tokens in URLs/Referer. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/testing-oauth2-implementation-flaws/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "testing-websocket-api-security",
+    "name": "testing-websocket-api-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive lens on WebSocket security: no auth on the upgrade, Cross-Site WebSocket Hijacking (CSWSH) when the server ignores the Origin header (an attacker page rides the victim's cookies), authentication checked only at handshake but not per message, unsanitized message payloads (SQLi/XSS/SSRF/command), and message-flood / oversized-frame / connection-exhaustion DoS. Mitigation: validate Origin against an allow-list, authenticate via Authorization/token (not just cookies), re-authorize every message and on reconnect, validate/sanitize message content, and rate-limit message volume, size, and connections per client. Detection: connections from unexpected Origins, message bursts, oversized frames, injection indicators in frames. Feeds mas-sec-reviewer + CLAUDE.md §5; subscription quota, nev",
+    "tags": [
+      "cyber:api-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/testing-websocket-api-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:api-security",
+    "tier": "T1"
   },
   {
     "id": "tinystruct-patterns",
