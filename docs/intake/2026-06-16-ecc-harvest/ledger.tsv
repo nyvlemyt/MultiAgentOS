@@ -1,25 +1,25 @@
 type	cluster	name	status	decision	dossier
 skill	skill:core-eval	accessibility	pending		
 skill	skill:core-memory	agent-architecture-audit	pending		
-skill	skill:core-agent	agent-eval	pending		
-skill	skill:core-agent	agent-harness-construction	pending		
-skill	skill:core-agent	agent-introspection-debugging	pending		
+skill	skill:core-agent	agent-eval	integrated	adapt	decisions/skill-core-agent-A.md
+skill	skill:core-agent	agent-harness-construction	integrated	adapt	decisions/skill-core-agent-A.md
+skill	skill:core-agent	agent-introspection-debugging	integrated	adapt	decisions/skill-core-agent-A.md
 skill	skill:core-token	agent-payment-x402	pending		
-skill	skill:core-agent	agent-self-evaluation	pending		
-skill	skill:core-agent	agent-sort	pending		
+skill	skill:core-agent	agent-self-evaluation	integrated	adapt	decisions/skill-core-agent-A.md
+skill	skill:core-agent	agent-sort	integrated	adapt	decisions/skill-core-agent-A.md
 skill	skill:core-token	agentic-engineering	pending		
 skill	skill:core-memory	agentic-os	pending		
-skill	skill:core-agent	ai-first-engineering	pending		
+skill	skill:core-agent	ai-first-engineering	integrated	adapt	decisions/skill-core-agent-A.md
 skill	skill:core-eval	ai-regression-testing	pending		
 skill	skill:eng-lang	android-clean-architecture	pending		
 skill	skill:eng-lang	angular-developer	pending		
 skill	skill:misc	api-connector-builder	pending		
 skill	skill:eng-arch	api-design	pending		
-skill	skill:core-agent	architecture-decision-records	pending		
+skill	skill:core-agent	architecture-decision-records	integrated	adapt	decisions/skill-core-agent-B.md
 skill	skill:misc	article-writing	pending		
 skill	skill:core-eval	automation-audit-ops	pending		
 skill	skill:core-memory	autonomous-agent-harness	pending		
-skill	skill:core-agent	autonomous-loops	pending		
+skill	skill:core-agent	autonomous-loops	rejected	reject	decisions/skill-core-agent-B.md
 skill	skill:eng-arch	backend-patterns	pending		
 skill	skill:core-eval	benchmark-methodology	pending		
 skill	skill:core-eval	benchmark-optimization-loop	pending		
@@ -34,7 +34,7 @@ skill	skill:core-eval	canary-watch	pending
 skill	skill:vertical	carrier-relationship-management	pending		
 skill	skill:core-eval	cisco-ios-patterns	pending		
 skill	skill:core-memory	ck	pending		
-skill	skill:core-agent	claude-devfleet	pending		
+skill	skill:core-agent	claude-devfleet	rejected	reject	decisions/skill-core-agent-B.md
 skill	skill:core-eval	click-path-audit	pending		
 skill	skill:eng-lang	clickhouse-io	pending		
 skill	skill:eng-arch	code-tour	pending		
@@ -50,9 +50,9 @@ skill	skill:core-eval	connections-optimizer	pending
 skill	skill:misc	content-engine	pending		
 skill	skill:core-memory	content-hash-cache-pattern	pending		
 skill	skill:core-token	context-budget	pending		
-skill	skill:core-agent	continuous-agent-loop	pending		
-skill	skill:core-agent	continuous-learning-v2	pending		
-skill	skill:core-agent	continuous-learning	pending		
+skill	skill:core-agent	continuous-agent-loop	integrated	adapt	decisions/skill-core-agent-B.md
+skill	skill:core-agent	continuous-learning-v2	integrated	adapt	decisions/skill-core-agent-B.md
+skill	skill:core-agent	continuous-learning	rejected	reject	decisions/skill-core-agent-B.md
 skill	skill:core-token	cost-aware-llm-pipeline	pending		
 skill	skill:core-token	cost-tracking	pending		
 skill	skill:core-research	council	pending		
@@ -63,8 +63,8 @@ skill	skill:eng-lang	csharp-testing	pending
 skill	skill:misc	customer-billing-ops	pending		
 skill	skill:vertical	customs-trade-compliance	pending		
 skill	skill:eng-lang	dart-flutter-patterns	pending		
-skill	skill:core-agent	dashboard-builder	pending		
-skill	skill:core-agent	data-scraper-agent	pending		
+skill	skill:core-agent	dashboard-builder	integrated	adopt	decisions/skill-core-agent-C.md
+skill	skill:core-agent	data-scraper-agent	integrated	adopt	decisions/skill-core-agent-C.md
 skill	skill:data-ml	data-throughput-accelerator	pending		
 skill	skill:eng-arch	database-migrations	pending		
 skill	skill:core-research	deep-research	pending		
@@ -76,19 +76,19 @@ skill	skill:eng-lang	django-patterns	pending
 skill	skill:core-security	django-security	pending		
 skill	skill:eng-lang	django-tdd	pending		
 skill	skill:eng-lang	django-verification	pending		
-skill	skill:core-agent	dmux-workflows	pending		
+skill	skill:core-agent	dmux-workflows	integrated	adopt	decisions/skill-core-agent-C.md
 skill	skill:eng-lang	docker-patterns	pending		
 skill	skill:core-research	documentation-lookup	pending		
 skill	skill:eng-lang	dotnet-patterns	pending		
-skill	skill:core-agent	dynamic-workflow-mode	pending		
+skill	skill:core-agent	dynamic-workflow-mode	integrated	adopt	decisions/skill-core-agent-C.md
 skill	skill:misc	e2e-testing	pending		
 skill	skill:core-skills-mgmt	ecc-guide	pending		
 skill	skill:core-token	ecc-tools-cost-audit	pending		
 skill	skill:core-eval	email-ops	pending		
 skill	skill:vertical	energy-procurement	pending		
-skill	skill:core-agent	enterprise-agent-ops	pending		
+skill	skill:core-agent	enterprise-agent-ops	integrated	adopt	decisions/skill-core-agent-C.md
 skill	skill:eng-arch	error-handling	pending		
-skill	skill:core-agent	eval-harness	pending		
+skill	skill:core-agent	eval-harness	integrated	adopt	decisions/skill-core-agent-C.md
 skill	skill:core-token	evm-token-decimals	pending		
 skill	skill:core-research	exa-search	pending		
 skill	skill:vertical	fal-ai-media	pending		
