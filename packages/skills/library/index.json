@@ -140,6 +140,34 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-api-gateway-access-logs",
+    "name": "analyzing-api-gateway-access-logs",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team API-gateway log hunt on authorized access logs: detect BOLA/IDOR via per-user distinct-resource-ID counts, rate-limit bypass through header manipulation, credential scanning via 401 surges from a single source, SQL/NoSQL injection in query params, and anomalous HTTP methods on read-only endpoints. Works on AWS API Gateway / Kong / Nginx logs with pandas group-by + anomaly thresholds. Map to MITRE ATT&CK (T1190/T1110.004/T1078.004/T1119) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only offline analysis of owned/authorized logs; mitigation (block source, tighten gateway) is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 API-posture lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-api-gateway-access-logs/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-azure-activity-logs-for-threats",
+    "name": "analyzing-azure-activity-logs-for-threats",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Azure threat hunt on authorized tenant logs: build KQL against Log Analytics to detect privilege escalation (role-assignment WRITE, Global Admin grants), impossible-travel and anomalous sign-ins, resource-group/subscription modifications, Key Vault secret access from new IPs, NSG rule changes, and conditional-access policy tampering. Uses azure-monitor-query with DefaultAzureCredential against owned workspaces. Map to MITRE ATT&CK (T1078.004/T1098.003/T1538/T1556.009/T1580) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only investigation of authorized tenant data; remediation (revoke role, isolate identity) is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 IAM/secrets lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-azure-activity-logs-for-threats/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-dns-logs-for-exfiltration",
     "name": "analyzing-dns-logs-for-exfiltration",
     "description": "|",
@@ -182,6 +210,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-memory-forensics-with-lime-and-volatility",
+    "name": "analyzing-memory-forensics-with-lime-and-volatility",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Linux memory forensics on an authorized host: acquire RAM with the LiME kernel module (format=lime/raw), then analyze with Volatility 3 — linux.pslist vs linux.psscan to find hidden processes, linux.bash for command history, linux.sockstat for network connections, linux.lsmod for rootkit modules, and linux.malfind for injected code. Detects process injection, credential dumping, defense-evasion rootkits, and hidden artifacts. Map to MITRE ATT&CK (T1055/T1003.001/T1620/T1564.001) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only analysis of an image from an authorized host; containment/reimage is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 IR lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-memory-forensics-with-lime-and-volatility/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-network-traffic-for-incidents",
     "name": "analyzing-network-traffic-for-incidents",
     "description": "|",
@@ -193,6 +235,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-network-traffic-for-incidents/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-powershell-script-block-logging",
+    "name": "analyzing-powershell-script-block-logging",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team PowerShell forensics on authorized EVTX: parse Event ID 4104 with python-evtx, reconstruct multi-block scripts via shared ScriptBlockId ordered by MessageNumber, then detect Base64/-EncodedCommand payloads, download cradles (DownloadString/Invoke-WebRequest/Net.WebClient), AMSI-bypass patterns (AmsiUtils/amsiInitFailed), and obfuscation (high Shannon entropy, tick-marks, string concatenation). Decode encoded commands (UTF-16LE) for analysis and produce risk-scored findings. Map to MITRE ATT&CK (T1059.001/T1027.010/T1140/T1105) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only analysis of authorized logs; remediation (block host, disable account) is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 endpoint lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-powershell-script-block-logging/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -221,6 +277,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-security-logs-with-splunk/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-tls-certificate-transparency-logs",
+    "name": "analyzing-tls-certificate-transparency-logs",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team CT-log monitoring for phishing/brand-impersonation: query Certificate Transparency (crt.sh via pycrtsh) for certificates matching a brand pattern, flag typosquatting/lookalike domains by Levenshtein distance and homoglyphs, certificates from unexpected CAs, wildcard certs on suspicious subdomains, and unauthorized issuance for owned domains, then cross-reference known phishing infrastructure. Map to MITRE ATLAS (AML.T0073/AML.T0052), MITRE ATT&CK (T1583.001/T1566.002/T1598.003/T1583.006) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only OSINT on public CT data; takedown/registration is owner guidance, not a MAOS action, and lookalike domains are not contacted. In MAOS this feeds mas-sec-reviewer and the §5 phishing/network lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-tls-certificate-transparency-logs/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-web-server-logs-for-intrusion",
+    "name": "analyzing-web-server-logs-for-intrusion",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team web-log intrusion hunt on authorized Apache/Nginx access logs: parse Combined/Nginx format (IP, time, method, URI, status, size, UA, referer) and detect SQL injection (UNION SELECT, OR 1=1, hex), LFI/path-traversal (../, /etc/passwd, php://filter), XSS (<script>, onerror=), scanner user-agents (nikto/sqlmap/dirbuster/gobuster/wfuzz), and brute force (>50 POSTs to login per source in 5 min) via OWASP regex; enrich with GeoIP and flag frequency/response-size outliers. Map to MITRE ATT&CK (T1190/T1059.007/T1110/T1595.002/T1505.003) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only offline analysis of owned logs; blocking/WAF tuning is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 web-app-security lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-web-server-logs-for-intrusion/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -1591,6 +1675,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-beaconing-patterns-with-zeek",
+    "name": "detecting-beaconing-patterns-with-zeek",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team C2-beaconing hunt on authorized Zeek conn.log: load with ZAT LogToDataFrame into pandas, group connections by (id.orig_h, id.resp_h), compute inter-arrival-time intervals, standard deviation, mean, and coefficient of variation, and flag source/destination pairs with low jitter (low CV relative to mean) and sufficient connection count as candidate beacons. Surfaces periodic callbacks even when the C2 channel is encrypted, by timing alone. Map to MITRE ATT&CK (T1071.001/T1071.004/T1573/T1008/T1095) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only offline analysis of owned network logs; blocking/isolation is owner guidance, not a MAOS action, and the suspected C2 host is not contacted. In MAOS this feeds mas-sec-reviewer and the §5 network/allowed_hosts lens; cost is quota units (§8), neve",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-beaconing-patterns-with-zeek/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-broken-object-property-level-authorization",
     "name": "detecting-broken-object-property-level-authorization",
     "description": "|",
@@ -1717,6 +1815,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-insider-data-exfiltration-via-dlp",
+    "name": "detecting-insider-data-exfiltration-via-dlp",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive UEBA for insider exfiltration: compute per-user daily upload baselines from owned DLP/endpoint/cloud-storage logs, alert when a user exceeds ~3x baseline, plus off-hours access, out-of-scope file reads, bulk downloads before resignation, and USB/external-device spikes. Read-only statistical anomaly detection (pandas) over authorized data — never surveillance without authorization, never exfiltration. In MAOS this rides mas-sec-reviewer / CLAUDE.md §5 (data-loss-prevention lens) and reports in subscription quota units, never per-token cash (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-insider-data-exfiltration-via-dlp/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-insider-threat-with-ueba",
     "name": "detecting-insider-threat-with-ueba",
     "description": "|",
@@ -1798,6 +1910,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-shadow-api-endpoints/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-sql-injection-via-waf-logs",
+    "name": "detecting-sql-injection-via-waf-logs",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive WAF-log analysis for SQL injection: parse ModSecurity audit logs and AWS WAF / Cloudflare JSON events, match SQLi signatures (UNION SELECT, OR 1=1, time-based SLEEP/BENCHMARK), classify by OWASP type (classic/blind/time-based/UNION), cluster persistent attacker IPs, correlate multi-stage campaigns, and emit an OWASP-classified incident report. Read-only over owned logs — never generates or sends payloads. In MAOS this feeds mas-sec-reviewer (web-application-security lens, CLAUDE.md §5) and reports in subscription quota units, never per-token cash (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-sql-injection-via-waf-logs/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-supply-chain-attacks-in-ci-cd",
+    "name": "detecting-supply-chain-attacks-in-ci-cd",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive CI/CD supply-chain audit: parse GitHub Actions YAML and pipeline configs to flag unpinned actions (using @main instead of a SHA), script injection via ${{ github.event }} expressions, overly permissive GITHUB_TOKEN scopes, third-party actions with repo write access, and dependency-confusion (public/private name collisions). Read-only static audit (PyGithub + YAML) over owned repos — never injects steps, never attacks foreign pipelines. In MAOS this feeds mas-sec-reviewer (devsecops / supply-chain lens, CLAUDE.md §5) and reports in subscription quota units, never per-token cash (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-supply-chain-attacks-in-ci-cd/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -2227,6 +2367,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/exploiting-oauth-misconfiguration/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "extracting-memory-artifacts-with-rekall",
+    "name": "extracting-memory-artifacts-with-rekall",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive memory forensics with Rekall: load an authorized Windows memory image, auto-detect the profile, list processes (pslist) and scan for hidden ones (psscan), detect injected/hollowed code in process VADs (malfind), inspect network connections (netscan), and extract suspicious DLLs/drivers (dlllist/modules). Read-only IR analysis of dumps you are authorized to handle — never produces malware, never analyzes unauthorized images. In MAOS this feeds mas-sec-reviewer (incident-response / forensics lens, CLAUDE.md §5) and reports in subscription quota units, never per-token cash (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/extracting-memory-artifacts-with-rekall/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -2677,6 +2831,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hookify-rules/SKILL.md"
   },
   {
+    "id": "hunting-credential-stuffing-attacks",
+    "name": "hunting-credential-stuffing-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive threat-hunting for credential stuffing / account takeover: analyze owned authentication logs for login-velocity anomalies, high unique-source-IP count per failed username, password-spray (one password across many accounts), ASN concentration from cloud/proxy providers, geographic impossibility, and user-agent uniformity. Read-only statistical analysis (pandas / Splunk) over authorized logs — never performs stuffing, never attacks accounts. In MAOS this feeds mas-sec-reviewer (identity-access / auth-abuse lens, CLAUDE.md §5) and reports in subscription quota units, never per-token cash (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-credential-stuffing-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-alert-fatigue-reduction",
     "name": "implementing-alert-fatigue-reduction",
     "description": "|",
@@ -2873,6 +3041,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-canary-tokens-for-network-intrusion",
+    "name": "implementing-canary-tokens-for-network-intrusion",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive deception engineering with canary tokens: design DNS/HTTP/AWS-key tripwires placed in bait locations (config files, internal wikis, .aws/credentials) across owned network zones, and route triggered alerts to a SOC via Slack/Teams/SIEM webhooks (Canarytokens.org or Thinkst Canary) with near-zero false positives. The AWS keys are fake decoys, never real. In MAOS the doctrine is a knowledge asset; live deployment makes outbound POSTs to canarytokens.org and webhook hosts (outside allowed_hosts, CLAUDE.md §5) so it is human-gated risk:high, never auto-executed. Reports in subscription quota units, never per-token cash (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-canary-tokens-for-network-intrusion/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-cloud-vulnerability-posture-management",
     "name": "implementing-cloud-vulnerability-posture-management",
     "description": "|",
@@ -2985,6 +3167,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-ebpf-security-monitoring",
+    "name": "implementing-ebpf-security-monitoring",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive eBPF runtime observability with Cilium Tetragon: install on owned Linux hosts / Kubernetes, stream process_exec/exit and author TracingPolicy CRDs (kprobe/tracepoint) to monitor sensitive-file access (/etc/shadow, k8s PKI), outbound TCP, setuid/commit_creds privilege escalation, reverse-shell and container-escape patterns; filter in-kernel (matchArgs/matchBinaries) and export JSON to a SIEM. Default to observe-only (action: Post). In MAOS enforcement (action: Sigkill/Signal) plus CAP_BPF/sudo loading is risk:blocking — human-gated, never auto-applied (CLAUDE.md §5). Reports in subscription quota units, never per-token cash (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-ebpf-security-monitoring/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-endpoint-detection-with-wazuh",
+    "name": "implementing-endpoint-detection-with-wazuh",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Wazuh endpoint-detection doctrine: authenticate to the Wazuh REST API with env-supplied JWT credentials (never inline secrets), inventory and health-check agents, query alerts by rule/severity/agent/time, and — the load-bearing move — validate every custom decoder + rule against sample log lines via the logtest endpoint BEFORE it ships, so detection logic is tested rather than asserted. Blue-team only: detection and rule coverage, never evasion or weaponization. In MAOS this is library doctrine for hardening an observed project; it does not gate MAOS's own risky actions (that stays mas-sec-reviewer, §5) and carries no per-token cost (subscription, §11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-endpoint-detection-with-wazuh/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-endpoint-dlp-controls",
     "name": "implementing-endpoint-dlp-controls",
     "description": "|",
@@ -3080,6 +3290,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-hashicorp-vault-dynamic-secrets/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-honeytokens-for-breach-detection",
+    "name": "implementing-honeytokens-for-breach-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive honeytoken/breach-detection doctrine: place INERT decoys an attacker cannot resist (fake AWS keys, DNS-canary hostnames in configs, beacon docs in sensitive shares, decoy DB rows) so any access raises an immediate alert — the value is the alert, never the secret, which is always inert. Route triggers to a local-first webhook into data/events rather than a paid SaaS where possible; DNS canaries are network signals aligned with §5 allowed_hosts. Blue-team only: detection, never weaponization or third-party baiting. No real credential is ever sown; subscription quota, no per-token cost (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-honeytokens-for-breach-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -3181,6 +3405,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-log-forwarding-with-fluentd",
+    "name": "implementing-log-forwarding-with-fluentd",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive log-forwarding doctrine: Fluent Bit forwards from endpoints, Fluentd aggregates, parses, enriches (record_transformer), drops noise (grep), and routes to multiple sinks. The load-bearing discipline is validate-before-promote — parse and syntax-check every Fluentd/Fluent Bit config and send a test event end-to-end before the pipeline carries real security logs, because a broken forwarder silently blinds every downstream detection. Reliable transport is the precondition for all upstream detection; this skill moves logs, the analyzing-*-logs skills consume them. Subscription quota, no per-token cost (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-log-forwarding-with-fluentd/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-log-integrity-with-blockchain",
+    "name": "implementing-log-integrity-with-blockchain",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Tamper-evident logging via SHA-256 hash chaining (NOT cryptocurrency — no coin, wallet, private key, or payment): each entry stores hash(prev_hash + timestamp + content), so modifying entry N invalidates the chain from N onward and identifies the exact tampered index. Ingest from syslog/JSON/text, persist a JSON ledger (index, content_hash, prev_hash, chain_hash), and verify by recomputing all hashes to detect breaks; optionally anchor checkpoints to an external timestamp authority. Maps to tamper-evidence for the MAOS events/audit log (§8). Pure deterministic local primitive — no PAYG, subscription quota only (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-log-integrity-with-blockchain/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-memory-protection-with-dep-aslr",
     "name": "implementing-memory-protection-with-dep-aslr",
     "description": "|",
@@ -3206,6 +3458,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-mitre-attack-coverage-mapping/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-mtls-for-zero-trust-services",
+    "name": "implementing-mtls-for-zero-trust-services",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Zero-trust mTLS doctrine: build an internal CA, issue per-service certs, and require CERT_REQUIRED client-certificate verification on BOTH ends so every service-to-service call proves identity — no implicit trust by network location. Validate the full chain, enforce expiry, and audit deployment. Private keys are generated locally and NEVER committed (§5 keystores/.env are human-gated). mTLS authenticates the channel; authorization stays a separate layer. Maps onto the MAOS apps/web ↔ apps/worker trust boundary (§5) and the verified-access principle. Subscription quota, no per-token cost (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-mtls-for-zero-trust-services/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -3433,6 +3699,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-security-chaos-engineering",
+    "name": "implementing-security-chaos-engineering",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Security chaos engineering: deliberately and reversibly degrade a control (WAF bypass, firewall-rule removal, log-pipeline disruption, EDR disablement) in an AUTHORIZED environment to verify detection + response fire within SLA, then roll back. This is defensive coverage validation, not an attack — but it is intrinsically destructive, so every experiment is risk:high/blocking (§5): it requires mas-sec-reviewer PASS, explicit human authorization, a bounded blast radius, and a fail-safe rollback (try/finally) that runs even on failure. Never in production without the gate; never adversarial evasion. Subscription quota, no per-token cost (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-security-chaos-engineering/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-security-monitoring-with-datadog",
+    "name": "implementing-security-monitoring-with-datadog",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive cloud-SIEM doctrine via Datadog Cloud SIEM / CSM / Workload Protection: deploy the Agent (runtime_security, FIM, compliance), ingest CloudTrail/VPC/GuardDuty/auth.log/Windows-Security sources, author detection rules (threshold, anomaly, impossible-travel) annotated with MITRE ATT&CK, build SOC dashboards, and route signals by severity with suppression queries to cut false positives. The load-bearing portable lens is the detection doctrine — rule design, ATT&CK mapping, FP suppression, severity escalation — usable on any backend. Datadog API/App keys come from env (DD_API_KEY/DD_APP_KEY), never committed; Datadog is a paid SaaS for the observed env, NOT a MAOS runtime dep and NOT Anthropic PAYG. Subscription quota, no per-token cost framing (§11).",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-security-monitoring-with-datadog/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-semgrep-for-custom-sast-rules",
     "name": "implementing-semgrep-for-custom-sast-rules",
     "description": "|",
@@ -3444,6 +3738,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-semgrep-for-custom-sast-rules/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-siem-correlation-rules-for-apt",
+    "name": "implementing-siem-correlation-rules-for-apt",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team correlation engineering for APT lateral movement. Chain multi-host, multi-event telemetry in sliding windows instead of relying on single-event alerts: RDP logon (4624 LogonType=10) → service install (7045) on same target ≤15 min; Pass-the-Hash NTLM logon (4624 LogonType=3) → admin-tool process create (4688); PsExec named-pipe (Sysmon 17/18) ↔ remote service create (7045). Express logic as Sigma YAML, convert to Splunk SPL (transaction/maxspan/near), deploy via Splunk ES REST, then audit existing rules for coverage gaps. Maps to MITRE T1078/T1021/T1550/T1059 and feeds mas-sec-reviewer threat context. Read-only against telemetry; credentials are operator-supplied at runtime, never embedded.",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-siem-correlation-rules-for-apt/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-siem-use-case-tuning",
+    "name": "implementing-siem-use-case-tuning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detection-engineering tuning loop to reduce false positives without losing coverage. Export per-rule alert volumes, compute FP rate from analyst disposition data, rank top noise generators, build environmental baselines (login counts, process spawns), whitelist known-good entities (service accounts, scanners) with context not blanket suppression, raise thresholds via mean + N·stddev, then prove impact with before/after precision and alert-to-incident ratio. Output: per-rule JSON recommendations (current FP rate, threshold change, whitelist entries, projected reduction). Covers Splunk correlation searches and Elastic detection rules; maps to MITRE T1078/T1190 noise classes. Tuning must never silence a true-positive class — measured, reversible, evidence-first.",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-siem-use-case-tuning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -3489,6 +3811,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-soar-playbook-for-phishing",
+    "name": "implementing-soar-playbook-for-phishing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SOAR automation for reported-phishing response. On a reported suspicious email: parse .eml headers (From/Reply-To/Return-Path/Received/Message-ID + SPF/DKIM/DMARC) and extract URLs/IPs; create a Splunk SOAR container for the incident; POST CEF artifacts (fromAddress, sourceAddress, requestURL, hashes) with run_automation deferred to the last artifact; trigger the investigation playbook via /rest/playbook_run; poll /rest/action_run to terminal state; aggregate verdicts (URL/domain reputation, IP geolocation, header auth). Output: incident + playbook + verdict JSON. Read-and-enrich on inbound IOCs; outbound containment actions stay risk-gated (§5). SOAR API token is operator-supplied at runtime, never embedded.",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-soar-playbook-for-phishing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-soar-playbook-with-palo-alto-xsoar",
     "name": "implementing-soar-playbook-with-palo-alto-xsoar",
     "description": "|",
@@ -3514,6 +3850,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-supply-chain-security-with-in-toto/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-syslog-centralization-with-rsyslog",
+    "name": "implementing-syslog-centralization-with-rsyslog",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive log-centralization backbone with rsyslog. Build server + client configs for a tamper-resistant SOC log pipeline: TLS listener on 6514 (imtcp, StreamDriver gtls, mode 1, x509/name mutual auth), per-host output templates (/var/log/remote/%HOSTNAME%/...), JSON formatting, and disk-assisted LinkedList queues (saveonshutdown, infinite resumeRetryCount) so no log is lost on link failure. Centralizing logs under integrity-protected transport is the precondition for every detection skill downstream — an attacker who can edit local logs defeats detection. Maps to NIST DE.CM-01 and resists T1070 log tampering / T1562 defense evasion. TLS certs and SSH deploy credentials are operator-supplied at runtime, never embedded.",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-syslog-centralization-with-rsyslog/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
@@ -4595,6 +4945,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-dns-tunneling-detection",
+    "name": "performing-dns-tunneling-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of DNS tunneling / covert exfil channels. Distinguish legitimate DNS from tunnels statistically: high Shannon entropy in subdomain labels (>3.5), unusually long query names (>50 chars), high TXT-record request volume to one domain, high unique-subdomain cardinality per parent, and non-standard label character distribution. Compute entropy over pcap (scapy rdpcap + DNSQR) and threshold; legitimate domains sit ~3.0-3.5 entropy, tunnels ~4.0-5.0. Read-only over captured DNS traffic; covers MITRE T1048/T1041 exfiltration over alternative protocol. Pure detection — no tunnel construction; capture is on authorized networks only.",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-dns-tunneling-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
     "id": "performing-docker-bench-security-assessment",
     "name": "performing-docker-bench-security-assessment",
     "description": "|",
@@ -5488,6 +5852,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/rules-distill/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-skills-mgmt",
+    "tier": "T1"
+  },
+  {
+    "id": "running-authorized-phishing-simulation",
+    "name": "running-authorized-phishing-simulation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized internal phishing-simulation for security-awareness training (own-org employees only). Governance first: written authorization, scope to your own organization, a teach-on-click landing page that redirects clickers to training material — never a credential-capture page. Automate GoPhish campaigns (email templates with tracking, SMTP profile, target group from CSV) and measure awareness metrics: open rate, click rate, report rate. Credential-submission capture is explicitly OUT — the objective is behavior measurement and training, not password collection. Strictly consented and authorized; targeting third parties or harvesting credentials is rejected. API keys are operator-supplied at runtime, never embedded.",
+    "tags": [
+      "cyber:security-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/running-authorized-phishing-simulation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:security-operations",
     "tier": "T1"
   },
   {
