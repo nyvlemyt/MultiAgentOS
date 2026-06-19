@@ -392,6 +392,34 @@
     "tier": "T1"
   },
   {
+    "id": "building-identity-federation-with-saml-azure-ad",
+    "name": "building-identity-federation-with-saml-azure-ad",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SAML 2.0 federation between on-prem AD (AD FS / third-party IdP) and Microsoft Entra ID, plus SaaS SSO. Covers federation models (federated/PHS/PTA/third-party), the SAML trust chain (token-signing cert, federation metadata, relying-party trust, claims rules, issuer URI), AD FS farm setup, Entra federated-domain config, claims-rule attribute mapping, SaaS SSO wiring (exact ACS/entity-id, no wildcards), and token-signing certificate lifecycle (auto-rollover or scheduled rotation). Hardening baseline: MFA at AD FS or Entra conditional access, smart/extranet lockout, health + cert-expiry monitoring, managed-auth DR fallback. In MAOS this feeds the §5 auth/identity posture and mas-sec-reviewer; all owner-scoped on systems you control, never reconnaissance of foreign trusts.",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-identity-federation-with-saml-azure-ad/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-identity-governance-lifecycle-process",
+    "name": "building-identity-governance-lifecycle-process",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive identity governance / lifecycle (IGA): a joiner-mover-leaver state machine (PRE_HIRE→ACTIVE→ROLE_CHANGE/LEAVE→TERMINATED→REHIRE/DELETED) driven by an authoritative HR source of truth, with automated actions and retention periods per state. Covers HR-source integration (delta sync), birthright/role-mining for auto-provisioning, risk-tiered access-request approval chains (LOW→CRITICAL with SoD checks, justification, time limits), and orphaned/uncorrelated-account detection + remediation SLAs by risk. Leaver disablement is fail-closed and fast (revoke AD/app/VPN/OAuth within the SLA). In MAOS this informs the §5 cross-project access model and mas-sec-reviewer; mapping/design only, never live provisioning into foreign systems.",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-identity-governance-lifecycle-process/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "building-patch-tuesday-response-process",
     "name": "building-patch-tuesday-response-process",
     "description": "|",
@@ -403,6 +431,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-patch-tuesday-response-process/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-role-mining-for-rbac-optimization",
+    "name": "building-role-mining-for-rbac-optimization",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive RBAC role mining: derive a minimal, least-privilege role set from existing user-permission assignments. Covers the UPA (user-permission) binary matrix, three approaches (bottom-up pattern discovery, top-down business design, hybrid), and four algorithms (permission clustering via Jaccard hierarchical clustering, Formal Concept Analysis of closed itemsets, graph-based dense-subgraph mining, Boolean matrix decomposition U≈R×P). Evaluates role sets by coverage (>95%), Weighted Structural Complexity (minimize), and deviation (<5%); chooses k by silhouette. Always closes with business validation so mined roles map to real functions. In MAOS this informs the §5 least-privilege model; analysis runs offline on owned exports, never live directory reads of foreign systems.",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-role-mining-for-rbac-optimization/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
     "tier": "T1"
   },
   {
@@ -623,6 +665,62 @@
     "summary": "Subtractive audit of a Claude Code config surface. Scans 8 channels (skills, memory, hooks, permissions, MCP, scheduled jobs, project history, caches) for staleness/redundancy, ranks candidates by confidence, then forces a per-item [y/n/skip] human gate. Soft-delete first (.disabled rename or _gc_trash/<date>/ move), log every action to gc_log.md with an undo path, never bulk-approve, never wander outside the .claude scope. The additive counterpart is intake-audit; run it on what survives.",
     "tags": [],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/config-gc/SKILL.md"
+  },
+  {
+    "id": "configuring-active-directory-tiered-model",
+    "name": "configuring-active-directory-tiered-model",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Active Directory tiered administration (ESAE / Enhanced Security Admin Environment): separate Tier 0 (identity/domain controllers), Tier 1 (servers/apps), and Tier 2 (workstations) so that a compromise at one tier cannot pivot to another. Covers tier separation, privileged access workstations (PAWs), administrative-forest design, authentication policy silos, and credential-theft mitigation (pass-the-hash/ticket, LSASS, lateral movement). Maps to NIST 800-53 AC-2/AC-3/AC-6/AU-3/IA-2 and audit-logging to SIEM. In MAOS this informs the §5 privilege-separation and sandbox model; design/config on owned domains only, tested in non-production, never tier-bypass against foreign domains.",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-active-directory-tiered-model/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-ldap-security-hardening",
+    "name": "configuring-ldap-security-hardening",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive LDAP hardening: protect directory services against credential harvesting, LDAP injection, anonymous binding, and channel-binding bypass (LDAP relay/MITM). Covers LDAPS (TLS) enforcement, channel binding and LDAP signing (to defeat NTLM relay), disabling anonymous/unsigned binds, least-privilege ACLs on directory objects, input sanitization against LDAP injection, and monitoring for enumeration/brute-force/relay patterns. Maps to NIST 800-53 AC-2/AC-3/AC-6/AU-3/IA-2 with audit forwarding to SIEM. In MAOS this informs the §5 auth-hardening posture and mas-sec-reviewer; config + monitoring on owned directories, tested non-production, never offensive LDAP probing of foreign systems.",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-ldap-security-hardening/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-multi-factor-authentication-with-duo",
+    "name": "configuring-multi-factor-authentication-with-duo",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Cisco Duo MFA deployment across VPN, RDP, SSH, and web apps. Covers the Duo Authentication Proxy (RADIUS/LDAP), Web SDK, OIDC/SAML SSO, Duo-for-RDP, and Duo-Unix PAM; factor strength ordering (WebAuthn/FIDO2 > Verified Push > Push > TOTP > hardware token > SMS/phone last-resort); adaptive policies by user/device/network (trusted networks, remembered devices, device-health gates); and phishing-resistant + MFA-fatigue-resistant deployment. Critical hardening: fail-mode = safe (deny when Duo unreachable) in production, phishing-resistant factors for privileged accounts, SMS/phone disabled for app-capable users, offline access for laptops, and auth-log forwarding to SIEM with fatigue/bypass alerting. Maps to NIST 800-63B AAL2/AAL3 and 800-53 IA-2/IA-3/IA-5. In MAOS this informs the §",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-multi-factor-authentication-with-duo/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-oauth2-authorization-flow",
+    "name": "configuring-oauth2-authorization-flow",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive OAuth 2.0/2.1 flow configuration. Covers grant-type selection (Authorization Code + PKCE for all clients incl. SPA/mobile; Client Credentials for M2M; Device Grant for input-constrained devices; refresh with rotation), PKCE (S256 code_verifier/challenge) to stop code interception, least-privilege scope design, and token security (short-lived access tokens, single-use rotating refresh tokens, httpOnly/keychain storage, DPoP sender-constrained tokens, revocation endpoint). Hardening per OAuth 2.1 / RFC 9700: mandatory PKCE, exact redirect-URI matching (no wildcards), state-parameter CSRF protection, refresh-token reuse detection, and blocking implicit grant + ROPC. Maps to NIST 800-53 AC-3/IA-5/SC-13/SC-23/AU-3. In MAOS this informs the §5 auth/token posture and mas-sec-reviewer; s",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-oauth2-authorization-flow/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
   },
   {
     "id": "content-engine",
@@ -1014,6 +1112,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-ai-model-prompt-injection-attacks/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:ai-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-anomalous-authentication-patterns",
+    "name": "detecting-anomalous-authentication-patterns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive authentication-anomaly detection (UEBA). Read-only/offline analysis of normalized auth logs (Entra/Okta/Windows AD 4624/4625/4768) to flag impossible travel (haversine speed test), brute force (failures/account/window), password spraying (many accounts/source, few attempts each), credential stuffing (high failures + some successes, low success-rate), and behavioral deviations (off-hours, new IP/country/device/app) against per-user baselines plus Isolation Forest multivariate scoring. Ships SIEM detection rules (Splunk SPL) and a weighted composite risk score → tiered recommended actions (suspend / force MFA / step-up / monitor). Maps to NIST AI RMF MEASURE/MAP, MITRE ATT&CK T1110/T1078/T1021 and ATLAS AML.T0043/T0018. In MAOS this feeds mas-sec-reviewer and the §5 detection postu",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-anomalous-authentication-patterns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
     "tier": "T1"
   },
   {
@@ -2089,6 +2201,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-aws-iam-permission-boundaries",
+    "name": "implementing-aws-iam-permission-boundaries",
+    "description": "|",
+    "domain": "planning",
+    "summary": "AWS IAM permission boundaries cap the maximum permissions an identity-based policy can grant to a user/role; effective access is the intersection of the boundary and the identity policy, so even AdministratorAccess is clipped. Pattern: define a managed boundary policy (allowed services + deny on boundary self-modification/removal), give developers a delegation policy that can only create roles WITH the boundary attached (Condition on iam:PermissionsBoundary), enforce a naming prefix, and block the privilege-escalation paths (removing/editing the boundary). Validate that role creation fails without the boundary. In MAOS this is the AWS lens of §5 least-privilege + sandbox-per-project: agents propose boundary diffs against an external project; they never apply IAM changes without a human gat",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-aws-iam-permission-boundaries/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-azure-ad-privileged-identity-management",
+    "name": "implementing-azure-ad-privileged-identity-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Microsoft Entra Privileged Identity Management (PIM) eliminates permanent admin privilege: assignments become 'eligible' and must be activated for a bounded window (e.g. 8h) with MFA, justification, ticket, and optional approval, then auto-deactivate. Pattern: audit standing roles, convert all but break-glass to eligible, set activation/assignment settings (max duration, require-MFA, require-approval for Global/Security Admin, expire eligibility after ~6 months), wire access reviews (quarterly) and PIM alerts (too-many-global-admins, role assigned outside PIM, stale eligibility), forward audit logs to SIEM. This is core Zero-Trust identity governance. In MAOS it is the Entra lens of §5 least-privilege + JIT: agents propose PIM config as a diff; activation/role changes against a real tenant",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-azure-ad-privileged-identity-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-cloud-vulnerability-posture-management",
     "name": "implementing-cloud-vulnerability-posture-management",
     "description": "|",
@@ -2114,6 +2254,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-code-signing-for-artifacts/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-conditional-access-policies-azure-ad",
+    "name": "implementing-conditional-access-policies-azure-ad",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Microsoft Entra Conditional Access (CA) enforces Zero-Trust by evaluating signals — user/sign-in risk, device compliance, location, application, client — before granting access, then applying grant controls (require MFA, compliant device, managed app) or session controls (sign-in frequency, restricted sessions). Maps to NIST 800-53 AC-2/AC-3/AC-6/AU-3/IA-2. Pattern: design policies signal-first (not allow-all), require MFA + compliant device for sensitive apps, escalate on risk, scope by named locations, test in report-only before enforce, exclude break-glass accounts, forward sign-in logs to SIEM. In MAOS this is the Entra lens of §5 verified-access: agents propose CA policies as a diff; tenant policy writes are §5-gated human actions, and report-only is the mandatory dry-run.",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-conditional-access-policies-azure-ad/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
     "tier": "T1"
   },
   {
@@ -2159,6 +2313,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-delinea-secret-server-for-pam",
+    "name": "implementing-delinea-secret-server-for-pam",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Delinea Secret Server is enterprise PAM: a vault for privileged and shared credentials with role-based folder permissions, automated Remote Password Changing (RPC), heartbeat validation, discovery of privileged/service accounts, session recording + keystroke logging, dual-control/approval workflows, and SIEM syslog forwarding. Pattern: deploy infra (HTTPS, SQL backend), design folder hierarchy + secret templates, run discovery, enable RPC starting in non-prod, roll out session launchers to replace direct RDP/SSH, gate Tier-0 accounts behind dual control, forward all secret events to SIEM, produce compliance reports. In MAOS this is the secrets-discipline lens of §11/§8: it protects an EXTERNAL project's privileged credentials; MAOS itself authenticates by subscription and never vaults a co",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-delinea-secret-server-for-pam/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-epss-score-for-vulnerability-prioritization",
     "name": "implementing-epss-score-for-vulnerability-prioritization",
     "description": "|",
@@ -2187,6 +2355,62 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-google-workspace-admin-security",
+    "name": "implementing-google-workspace-admin-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Google Workspace admin hardening: minimize super admins (2-3) and enroll them in Advanced Protection with FIDO2 keys + break-glass; enforce phishing-resistant 2-Step Verification (security keys / phone prompt, disallow SMS/voice); configure SPF + DKIM (2048-bit) + DMARC staged none→quarantine→reject; enable anti-spoofing/anti-phishing; deploy DLP rules (SSN/credit-card/confidential) with block/quarantine/warn; set OAuth third-party access to blocked-with-allowlist and audit/revoke tokens; restrict external Drive sharing to allowlisted domains and disable public links. Roll out MFA with an enrollment grace period and DMARC in monitoring first to avoid lockouts/mail loss. In MAOS this is the Workspace lens of §5/§11 (identity + secrets + outbound-data discipline): agents propose config as a ",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-google-workspace-admin-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-google-workspace-sso-configuration",
+    "name": "implementing-google-workspace-sso-configuration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Google Workspace SSO federates authentication to an external IdP via SAML 2.0, with Workspace as the Service Provider and the IdP handling auth + MFA. Key params: ACS URL https://www.google.com/a/{domain}/acs, Entity ID google.com/a/{domain}, NameID = primary email (emailAddress format), HTTP-POST binding. Pattern: configure the IdP SAML app (Okta/Entra/ADFS), upload the IdP signing cert to the Admin Console SSO profile, scope the profile to OUs/groups, optionally use network masks, and CRITICALLY keep break-glass super-admin accounts on native Google auth so an IdP outage or cert expiry never locks out admins. Test in incognito including failure cases (expired cert, unassigned user, clock skew). In MAOS this is the federation lens of §5 verified-access: agents propose the SSO profile as a",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-google-workspace-sso-configuration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-hashicorp-vault-dynamic-secrets",
+    "name": "implementing-hashicorp-vault-dynamic-secrets",
+    "description": "|",
+    "domain": "planning",
+    "summary": "HashiCorp Vault dynamic secrets eliminate static credentials: the database/AWS/PKI engines generate unique short-lived credentials per request, bound to a lease that auto-revokes on expiry; Vault takes exclusive ownership of the root credential via rotate-root so no human knows it. Pattern: deploy Vault HA (Raft) with auto-unseal (KMS) + audit logging + AppRole auth; configure least-privilege roles with creation/revocation statements and short TTLs; apps consume via AppRole and renew leases at ~70% TTL; emergency response = lease revoke -prefix. Maps to NIST 800-53 IA-5, PCI-DSS Req 8. In MAOS this is the dynamic-secrets lens of §11/§8: it protects an EXTERNAL project's credentials; MAOS authenticates by subscription, never stores a key. Vault writes against an external system are §5-gated",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-hashicorp-vault-dynamic-secrets/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-identity-governance-with-sailpoint",
+    "name": "implementing-identity-governance-with-sailpoint",
+    "description": "|",
+    "domain": "planning",
+    "summary": "SailPoint IdentityNow/IdentityIQ delivers Identity Governance and Administration (IGA): joiner-mover-leaver lifecycle automation, access-request workflows with approval, recurring certification campaigns, role mining, separation-of-duties (SoD) policy enforcement, and compliance reporting. Maps to NIST 800-53 AC-2 (account mgmt), AC-3 (enforcement), AC-6 (least privilege), AU-3 (audit), IA-2 (identification). Pattern: aggregate identities from authoritative sources, model birthright + requestable access via roles, automate provisioning/deprovisioning on lifecycle events, run periodic certifications with auto-revoke on non-response, enforce SoD to block toxic access combinations, forward audit to SIEM. Test in non-prod first. In MAOS this is the IGA lens of §5 least-privilege + account-life",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-identity-governance-with-sailpoint/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-image-provenance-verification-with-cosign",
     "name": "implementing-image-provenance-verification-with-cosign",
     "description": "|",
@@ -2212,6 +2436,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-infrastructure-as-code-security-scanning/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-just-in-time-access-provisioning",
+    "name": "implementing-just-in-time-access-provisioning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Just-In-Time (JIT) access provisioning to reach Zero Standing Privilege. Four JIT models: broker-and-remove, elevation-on-demand, ephemeral account creation/deletion, temporary group-membership toggle. Approval routing is risk-tiered: auto-approve pre-authorized low-risk (<1h), single approver for medium, dual approval (manager + security) for high, emergency break-glass with post-facto review. Every grant is time-bound with auto-revocation at expiry regardless of session state, a 15-min grace notice, and forced session termination. Integrate with IAM/IGA for provision/deprovision, PAM for credential checkout, ITSM for ticket correlation, SIEM for monitoring. Audit every request/approval/grant/revocation; track requested-but-unused access. In MAOS this is the conceptual core of §",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-just-in-time-access-provisioning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
     "tier": "T1"
   },
   {
@@ -2285,6 +2523,48 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-pam-for-database-access",
+    "name": "implementing-pam-for-database-access",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive PAM for database access (Oracle/SQL Server/PostgreSQL/MySQL). Core controls: route all privileged DB access through a session proxy so the DBA never sees the raw credential; vault credentials and rotate them automatically; prefer dynamic, short-lived credentials minted per session over long-lived shared logins; enforce least-privilege database roles (no blanket DBA); audit every query with the session recording forwarded to SIEM. NIST anchors: AC-2 lifecycle, AC-3 policy-based enforcement, AC-6 least privilege, AU-3 access-event logging, IA-2 identification. Test in non-production first; establish break-glass for vault unavailability. In MAOS this feeds mas-sec-reviewer and the §5 least-privilege lens for any external project exposing privileged DB access; any cost figure is subs",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-pam-for-database-access/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-passwordless-auth-with-microsoft-entra",
+    "name": "implementing-passwordless-auth-with-microsoft-entra",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive passwordless rollout on Microsoft Entra ID to kill phishing/credential-stuffing/brute-force. Enable FIDO2 security keys (attestation enforced, AAGUID-restricted to approved models), Windows Hello for Business (TPM-backed, Cloud Kerberos Trust for hybrid so no PKI needed), Authenticator passkeys, and certificate-based auth. Govern with Conditional Access authentication strength: report-only first, then enforce; require security keys for admin roles; block legacy auth protocols. Bootstrap registration with time-limited Temporary Access Pass; always issue a backup key to avoid lockout; keep break-glass accounts. Phase out SMS/voice. Track adoption via Graph reporting. Aligns with phishing-resistant-MFA mandates (EO 14028, CISA). In MAOS this feeds mas-sec-reviewer + the §5 identity-",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-passwordless-auth-with-microsoft-entra/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-passwordless-authentication-with-fido2",
+    "name": "implementing-passwordless-authentication-with-fido2",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive FIDO2/WebAuthn passwordless implementation at the protocol/relying-party level. Build the registration ceremony (create credential, verify attestation + challenge + origin, store the public key) and the assertion ceremony (verify the signed challenge against the stored public key, check origin and user presence/verification). Support both roaming security keys and platform authenticators (Touch ID/Windows Hello biometrics). Public-key cryptography means no shared secret leaves the device — phishing-resistant by construction. Enroll a backup credential to avoid lockout; align with NIST SP 800-63B AAL3. Carries AI-security framework tags (NIST-AI-RMF, MITRE ATLAS). Distinct from the Microsoft Entra skill (that is a vendor-IdP rollout; this is the protocol you implement in your own ",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-passwordless-authentication-with-fido2/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-patch-management-workflow",
     "name": "implementing-patch-management-workflow",
     "description": "|",
@@ -2327,6 +2607,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-privileged-access-management-with-cyberark",
+    "name": "implementing-privileged-access-management-with-cyberark",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive enterprise PAM with CyberArk. Vault: FIPS-validated encrypted storage of privileged credentials, reachable only from authorized components. Rotation lifecycle: discovery → onboarding → automated rotation → verification → reconciliation → decommission, with per-platform schedules (domain admin 24h, root 72h, network 7d, cloud keys 90d) and reconciliation accounts to avoid lockouts. Session isolation: users connect only through the Privileged Session Manager (PSM) — credentials never exposed — with video + keystroke recording stored tamper-proof in the vault. Master Policy enforces dual control, exclusive access, one-time passwords. Behavioral analytics (PTA) flags credential-theft indicators. JIT elevation removes standing privilege. Plan break-glass for vault unavailability; forw",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-privileged-access-management-with-cyberark/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-privileged-session-monitoring",
+    "name": "implementing-privileged-session-monitoring",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive privileged-session monitoring and recording. Architecture: route ALL privileged access through a PAM proxy/jump server (CyberArk PSM/PSMP, or open-source Teleport/Guacamole) — firewall denies direct RDP/SSH to targets, allows it only from the proxy; credentials are vaulted and never exposed to the admin. Record video + keystroke transcripts, store tamper-proof in the vault with compliance retention (PCI 1yr, SOX 7yr, HIPAA 6yr). Detect high-risk commands and credential-access tooling in real time (these are detection signatures, not commands to run) — alert, suspend, or terminate the session. Provide live monitoring (watch/suspend/terminate) and a searchable review workflow with risk markers. Forward session metadata + alerts to SIEM in CEF. In MAOS this feeds mas-sec-reviewer + ",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-privileged-session-monitoring/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-rapid7-insightvm-for-scanning",
     "name": "implementing-rapid7-insightvm-for-scanning",
     "description": "|",
@@ -2366,6 +2674,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-runtime-security-with-tetragon/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-saml-sso-with-okta",
+    "name": "implementing-saml-sso-with-okta",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SAML 2.0 SSO with Okta as IdP. Configure the SAML app (ACS URL, Audience URI / SP Entity ID, NameID format), map profile attributes and group memberships for RBAC, and support both SP-initiated and IdP-initiated flows. Security hardening is the core: enforce SHA-256 signatures (never SHA-1), encrypt assertions (AES-256) so attribute values are protected in transit, set an audience restriction to stop assertion replay across SPs, enforce NotBefore/NotOnOrAfter time windows against clock skew, and validate InResponseTo so a response matches its original AuthnRequest. Rotate signing certificates before expiry to avoid outage; implement Single Logout. Debug with a SAML tracer. In MAOS this feeds mas-sec-reviewer + the §5 identity/federation lens; any cost figure is subscription quota",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-saml-sso-with-okta/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-scim-provisioning-with-okta",
+    "name": "implementing-scim-provisioning-with-okta",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SCIM 2.0 (RFC 7644) automated user provisioning/deprovisioning with Okta as IdP. Build a SCIM-compliant server exposing the required endpoints (ServiceProviderConfig, ResourceTypes, Schemas, Users, Groups) with CRUD, the userName eq filter Okta needs, pagination (startIndex/count/totalResults), and bearer-token auth on every endpoint over HTTPS. Map Okta profile attributes to the SCIM schema (userName, name, emails, enterprise extension). Deactivation sets active:false — never hard-delete — so leaver events promptly cut access without losing audit. Conform error responses to the SCIM error schema; validate with the Okta SCIM test suite. The security value is timely automated deprovisioning, which closes the orphaned-account attack surface. In MAOS this feeds mas-sec-reviewer + th",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-scim-provisioning-with-okta/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
     "tier": "T1"
   },
   {
@@ -2478,6 +2814,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-web-application-logging-with-modsecurity/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-standing-privilege-with-cyberark",
+    "name": "implementing-zero-standing-privilege-with-cyberark",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Zero Standing Privilege (ZSP) for hybrid/multi-cloud via CyberArk Secure Cloud Access. No identity holds persistent privileged access; elevated cloud access is minted just-in-time as an ephemeral, minimally-scoped IAM role that exists only for the session and is destroyed at expiry — zero standing privilege remains. The TEA framework governs every session: Time (15 min–8 h, default 1 h), Entitlements (dynamically scoped roles with explicit deny on iam:*/org:*/sts:*), Approvals (auto / manager / multi-level, with bounded auto-approve for recent repeat requests). Integrate AWS/Azure/GCP via least-privilege trust, define usage-based policies, record sessions, route approvals through ITSM/ChatOps, and migrate off standing roles in phases driven by actual CloudTrail usage. Guard again",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-standing-privilege-with-cyberark/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
     "tier": "T1"
   },
   {
@@ -3139,6 +3489,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-access-recertification-with-saviynt",
+    "name": "performing-access-recertification-with-saviynt",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive identity-governance: run Saviynt EIC recertification campaigns. Choose the campaign type (User-Manager / Entitlement-Owner / Application / Role / Event-Based / Micro-Certification), scope it (exclude service & break-glass accounts), and enrich the reviewer view with Saviynt intelligence — risk score, last-access usage data, peer-group comparison, SoD-violation flags — so decisions (Certify / Revoke / Conditionally-Certify / Delegate / Abstain) are informed, not rubber-stamped. Reminders + escalation + default-revoke drive completion; remediation tickets execute revocations with a grace period and verification. In MAOS this is a blue-team IGA lens feeding mas-sec-reviewer + CLAUDE.md §5 (least privilege, account review); any actual revoke/disable is a risk:high action requiring th",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-access-recertification-with-saviynt/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-access-review-and-certification",
+    "name": "performing-access-review-and-certification",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive, tool-neutral access-review doctrine. Five review types (User / Entitlement / Role / Privileged / SoD) run through a 7-stage campaign lifecycle (plan → collect → distribute → certify → remediate → report → close). Risk-based prioritization buckets entitlements high/medium/low (privileged, financial, PII/PHI, external-facing = high) so review effort lands where it matters. Reviewer model is manager / application-owner / hybrid with delegate audit trail. Maps to NIST 800-53 AC-2/AC-2(3)/AC-5/AC-6/AU-6. Core failure modes: rubber-stamping, incomplete scope, paper-only revocation (revoked in the report but still live), and excluding non-human identities. In MAOS this is a blue-team IGA lens feeding mas-sec-reviewer + CLAUDE.md §5 (least privilege, periodic account review); any execut",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-access-review-and-certification/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "performing-active-directory-vulnerability-assessment",
     "name": "performing-active-directory-vulnerability-assessment",
     "description": "|",
@@ -3321,6 +3699,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-entitlement-review-with-sailpoint-iiq",
+    "name": "performing-entitlement-review-with-sailpoint-iiq",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive identity-governance on SailPoint IdentityIQ 8.2+. Configure a CertificationDefinition: manager certifications across direct reports (include entitlements/roles/accounts, exclude service accounts, default-revoke if unreviewed, reminder+escalation), plus targeted certifications scoped to high-risk apps (AD/AWS-IAM/Oracle-EBS/SAP-GRC/CyberArk) filtered to privileged entitlements with the application owner as certifier. SoD policies (e.g. AP/AR conflict) flag violations during the review; a remediation workflow builds a ProvisioningPlan to remove the entitlement, executes it, and notifies. Monitoring + audit reports give the SOX/HIPAA/PCI evidence. In MAOS this is a blue-team IGA lens feeding mas-sec-reviewer + CLAUDE.md §5 (least privilege, account review); BeanShell that executes a",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-entitlement-review-with-sailpoint-iiq/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "performing-graphql-depth-limit-attack",
     "name": "performing-graphql-depth-limit-attack",
     "description": "|",
@@ -3405,6 +3797,48 @@
     "tier": "T1"
   },
   {
+    "id": "performing-oauth-scope-minimization-review",
+    "name": "performing-oauth-scope-minimization-review",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive OAuth least-privilege review for third-party / cross-boundary consent grants. Inventory every service principal + delegated and application permission grant (admin-consented = all-users = highest risk), classify each scope critical/high/medium/low by data sensitivity (Mail.ReadWrite, Files.ReadWrite.All, Directory.ReadWrite.All = critical), score per-app aggregate risk (+weight for application-type and admin-consented grants). Detect over-permission: unapproved apps, scopes beyond the approved catalog, overly-broad ReadWrite-when-Read-suffices, and stale grants with no API activity in 90+ days. Output a priority-ranked remediation plan (revoke unapproved → remove excessive → downgrade broad → revoke stale) and add an admin-consent workflow to stop future uncontrolled grants. In M",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-oauth-scope-minimization-review/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-privileged-account-access-review",
+    "name": "performing-privileged-account-access-review",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive PAM access review. Categorize privileged accounts by risk and cadence (domain/cloud admins = critical/monthly; service & DBA = high/quarterly; break-glass = after each use) and run the four-pillar framework: DISCOVER (enumerate AD AdminCount/SPN/delegation, AWS/Azure/GCP admin roles, DB sysadmin/DBA) → VALIDATE (business justification, least-privilege fit, 90-day activity, MFA/password compliance, SoD, ownership) → REMEDIATE (reduce excess, disable orphaned, rotate creds, move to JIT) → MONITOR (anomaly detection, session recording, audit logging). A decision matrix maps each condition to certify / reduce / disable / reset. Maps to NIST AC-2/AC-3/AC-6 and CIS Control 5. In MAOS this is a blue-team PAM lens feeding mas-sec-reviewer + CLAUDE.md §5 (least privilege, periodic review)",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-privileged-account-access-review/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-privileged-account-discovery",
+    "name": "performing-privileged-account-discovery",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive privileged-account discovery (the inventory step before review). Enumerate elevated identities everywhere they hide: AD (Domain/Enterprise/Schema Admins, AdminCount=1, accounts with SPN, constrained/unconstrained delegation), cloud (AWS IAM with AdministratorAccess/PowerUser/iam:*, Azure Global/Privileged-Role/Security Admin, GCP Owner/Editor), and databases (SQL sysadmin/db_owner, Oracle DBA/SYSDBA, Postgres superuser/createrole). Each found account is risk-classified (critical/high/medium/low) by privilege scope, ownership, and activity, then onboarded to a PAM vault for managed access. Aligns to NIST AC-2/AC-3/AC-6, IA-2, AU-3 and forwards findings to SIEM. In MAOS this is a read-only blue-team discovery lens feeding mas-sec-reviewer + CLAUDE.md §5 (knowing the privileged surf",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-privileged-account-discovery/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
     "id": "performing-sca-dependency-scanning-with-snyk",
     "name": "performing-sca-dependency-scanning-with-snyk",
     "description": "|",
@@ -3416,6 +3850,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-sca-dependency-scanning-with-snyk/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-service-account-audit",
+    "name": "performing-service-account-audit",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive service-account audit. Discover non-human identities everywhere — AD (SPN-bearing accounts, gMSA vs traditional, PasswordNeverExpires), cloud (AWS IAM keys + last-used, Azure service principals/app-registrations/managed-identities, GCP service accounts + key age), databases and applications (connection/replication accounts, API keys, bot accounts) — then audit six dimensions: ownership, purpose, privileges, authentication, rotation, activity. Flag orphaned (no owner/app), over-privileged (admin group membership), stale credentials (>90d), shared passwords, and interactive-logon rights on service accounts. Risk-classify critical/high/medium/low and identify gMSA migration candidates. The cardinal rule: map dependencies BEFORE remediation — disabling a service account blind breaks ",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-service-account-audit/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-service-account-credential-rotation",
+    "name": "performing-service-account-credential-rotation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive credential-rotation automation for non-human accounts. Per type, the right mechanism: Windows AD → gMSA (AD auto-rotates a 240-byte password every 30 days, no human knows it); AWS IAM keys → Secrets Manager rotation (create new key, store, deactivate old); GCP keys → IAM key rotation; Azure SP → Key Vault rotation policy; database creds → Vault dynamic secrets (short-TTL, auto-expiring roles). The rotation architecture is fixed: generate new → update at source → propagate to ALL consumers (app config, CI/CD, K8s secrets, dependents) → verify service health (auth test + smoke test, with retries) → revoke old after a grace period; a tested rollback procedure is mandatory. Prefer gMSA / dynamic secrets so no human handles the secret. In MAOS this is a blue-team secrets-hygiene lens ",
+    "tags": [
+      "cyber:identity-access-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-service-account-credential-rotation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:identity-access-management",
     "tier": "T1"
   },
   {
