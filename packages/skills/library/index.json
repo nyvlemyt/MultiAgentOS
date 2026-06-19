@@ -210,6 +210,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-malicious-url-with-urlscan",
+    "name": "analyzing-malicious-url-with-urlscan",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive malicious-URL triage with URLScan.io: submit the suspicious URL for isolated detonation (private visibility), then read the evidence — screenshot for brand impersonation, redirect chain to the final destination, DOM for credential-harvesting forms, network/HAR for exfiltration endpoints, TLS certificate issuer/validity, and tech/IP/ASN fingerprint. Score phishing red flags (newly-registered domain <30d, free hosting, URL-shortener cloaking, deep subdomains, brand-in-subdomain-not-domain, non-standard ports, data/base64 URIs, JS-heavy minimal-HTML). Extract IOCs (domains, IPs, redirect URLs, resource/JS hashes) and cross-reference ≥2 sources (VirusTotal, PhishTank, Safe Browsing). In MAOS this is a knowledge playbook feeding mas-sec-reviewer and CLAUDE.md §5: the scanned URL is un",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-malicious-url-with-urlscan/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-memory-forensics-with-lime-and-volatility",
     "name": "analyzing-memory-forensics-with-lime-and-volatility",
     "description": "|",
@@ -418,6 +432,20 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:misc",
     "tier": "T2"
+  },
+  {
+    "id": "auditing-password-hash-strength",
+    "name": "auditing-password-hash-strength",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive password-hash-strength auditing: with explicit written authorization, assess your own org's stored password hashes against policy — identify the hash algorithm (and flag weak ones like raw MD5/SHA-1/NTLM vs bcrypt/argon2/sha512crypt), measure resistance of the corpus, and report a strength distribution that drives policy hardening (length, complexity, modern KDF). Strictly authorized self-audit: secure hashes in transit/at rest, report to asset owners, destroy material after the engagement. NOT for credential recovery-for-access, mass targeting, or evasion — those are §5-blocking and rejected. In MAOS this is policy validation, not an attack capability.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-password-hash-strength/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
+    "tier": "T1"
   },
   {
     "id": "automation-audit-ops",
@@ -697,6 +725,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-patch-tuesday-response-process/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-phishing-reporting-button-workflow",
+    "name": "building-phishing-reporting-button-workflow",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive phishing report-button workflow: deploy the report button across Outlook desktop/web/mobile (Microsoft built-in or Cofense/KnowBe4 alternatives) routing to a dedicated reporting mailbox + Microsoft; build an automated triage pipeline (SOAR-monitored mailbox auto-extracts URLs/attachments/sender/headers, submits to URL reputation + sandbox, checks threat-intel, auto-classifies confirmed-phishing/spam/simulation/legit); drive response actions (confirmed phishing → org-wide retract + sender-domain block; spam → junk; simulation → credit reporter; legit → return); close the feedback loop (thank-you within minutes, classification result, reporter-accuracy metrics, recognition feeding the awareness program); measure mean-time-to-triage, report rate, and threats-caught-by-users-vs-gatew",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-phishing-reporting-button-workflow/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
     "tier": "T1"
   },
   {
@@ -1143,6 +1185,20 @@
     "tier": "T1"
   },
   {
+    "id": "configuring-certificate-authority-with-openssl",
+    "name": "configuring-certificate-authority-with-openssl",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Two-tier CA doctrine (offline air-gapped Root CA → online Intermediate CA → server/client/code-signing leaf certs). Root key kept offline, ≥4096-bit RSA or P-384 ECDSA, path-length constraints on intermediates, critical basicConstraints/keyUsage, CRL distribution + OCSP responder for revocation, certificate-policy OIDs, and audited issuance. The trust hierarchy is only as strong as Root-key protection and revocation reachability. In MAOS a CA private key is a §5 secret: writing it to disk/.env/keystore is risk:high gated by a human, and it is never committed (§11.5); quota framing per §8, never cash.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-certificate-authority-with-openssl/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
+    "tier": "T1"
+  },
+  {
     "id": "configuring-host-based-intrusion-detection",
     "name": "configuring-host-based-intrusion-detection",
     "description": "|",
@@ -1154,6 +1210,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-host-based-intrusion-detection/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-hsm-for-key-storage",
+    "name": "configuring-hsm-for-key-storage",
+    "description": "|",
+    "domain": "planning",
+    "summary": "HSM key-storage doctrine via PKCS#11: keys generated and used inside tamper-resistant hardware never cross the device boundary (CKA_EXTRACTABLE=False). SoftHSM2 for dev, physical/cloud HSM (CloudHSM/Azure) for prod; sign/verify/encrypt/decrypt with HSM-resident keys; separate slots per application; multi-person key ceremony for CA roots; SO+user PINs; audit logging; backup/DR. FIPS 140-2 levels map protection to use case. The whole point: the private key is never exportable, so compromise of the host does not yield the key. In MAOS this is the gold-standard expression of §11 (credentials never in agent context); HSM PINs are §5 secrets, quota framing §8.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-hsm-for-key-storage/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -1210,6 +1280,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-oauth2-authorization-flow/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-tls-1-3-for-secure-communications",
+    "name": "configuring-tls-1-3-for-secure-communications",
+    "description": "|",
+    "domain": "planning",
+    "summary": "TLS 1.3 hardening doctrine (RFC 8446): 1-RTT handshake, mandatory perfect forward secrecy (ephemeral DH only, no static RSA key exchange), three AEAD cipher suites (AES-256-GCM / AES-128-GCM / ChaCha20-Poly1305), strong KX groups (x25519/secp256r1/secp384r1/x448), encrypted handshake, OCSP stapling, HSTS. Disable TLS 1.0/1.1 and CBC/RC4/3DES/SHA-1; treat 0-RTT early data as replayable (idempotent requests only). Validate with openssl s_client + testssl.sh. In MAOS this governs any outbound TLS the worker makes to §5 allowed_hosts; quota framing §8, never cash.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-tls-1-3-for-secure-communications/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -1801,6 +1885,34 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-business-email-compromise",
+    "name": "detecting-business-email-compromise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Rules-and-controls BEC detection (link-less, attachment-less fraud: CEO-fraud, account-compromise, false-invoice, attorney-impersonation, W-2/PII theft per FBI IC3): configure BEC-specific gateway rules (VIP display-name from external domain, financial keywords + urgency, first-time sender to finance, Reply-To/From domain mismatch); deploy behavioral analytics (per-user communication baselines, anomalous request/recipient/time detection, forwarding-rule-change monitoring T1114.003); enforce financial-process controls (dual-authorization above threshold, out-of-band phone-callback verification for payment-detail changes, vendor change verification, finance-team red-flag training); monitor account compromise (impossible travel, forwarding-rule creation, mailbox-delegation changes, inbox rule",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-business-email-compromise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-business-email-compromise-with-ai",
+    "name": "detecting-business-email-compromise-with-ai",
+    "description": "|",
+    "domain": "planning",
+    "summary": "AI/NLP-driven BEC detection (no malicious link/attachment — pure social engineering): deploy an API-based AI email-security platform (Abnormal/Tessian/Ironscales/Defender), connect via Graph/Workspace API, allow a baseline learning period; configure behavioral baselines (who-emails-whom, frequency, tone, per-user writing-style profiles, per-role request types, metadata of typical times/devices/locations) and flag deviations; deploy transformer models (BERT/GPT) to detect urgency/manipulation language and identity-vs-style mismatch; configure detection policies (VIP impersonation, vendor-lookalike payment-change, account-compromise behavior shift, supply-chain partner impersonation) with confidence thresholds for auto-block vs warning-banner vs analyst-review; integrate response (quarantine",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-business-email-compromise-with-ai/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-container-drift-at-runtime",
     "name": "detecting-container-drift-at-runtime",
     "description": "|",
@@ -1983,6 +2095,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-qr-code-phishing-with-email-security",
+    "name": "detecting-qr-code-phishing-with-email-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive QR-code phishing (quishing) detection — malicious URLs hidden in QR images bypass text URL scanners and shift the click to unmanaged personal mobiles: enable image-based threat detection (OCR on PNG/JPG/GIF/BMP, multimodal AI combining image+OCR+NLP, PDF-embedded QR scanning, ASCII/text-QR detection); extract QR-decoded URLs and apply the same reputation/sandbox/time-of-click policies as text URLs; deploy mobile-side protection (MTD with QR scanning, MDM warn-before-open, secure browser/VPN, mobile-proxy blocking); build detection rules (image-only minimal-text emails, QR from external first-time senders, urgency+QR, fake IT/MFA-setup QR, common themes MFA-reset/doc-sign/voicemail); counter 2025 evasion (split QR, nested QR, ASCII QR, styled QR, PDF-attachment QR); train users + ",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-qr-code-phishing-with-email-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-ransomware-encryption-behavior",
     "name": "detecting-ransomware-encryption-behavior",
     "description": "|",
@@ -2036,6 +2162,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-shadow-api-endpoints/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-spearphishing-with-email-gateway",
+    "name": "detecting-spearphishing-with-email-gateway",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SEG configuration against targeted spearphishing (personalized, researched, low-volume, impersonating trusted senders): layer the gateway's defenses — reputation filtering, SPF/DKIM/DMARC authentication checks, content/NLP analysis, impersonation detection (display-name + lookalike-domain similarity for protected VIPs), real-time URL detonation/redirect-following, attachment sandboxing, and behavioral anomaly detection. Configure: impersonation protection (Defender Anti-phishing or Proofpoint Impostor Classifier — protect CEO/CFO/HR, quarantine on hit); URL protection (Safe Links, time-of-click detonation, block newly-registered domains <30d, follow redirect chains); attachment sandboxing (Safe Attachments, dynamic delivery, 60s+ detonation, block external macro-docs); custom rul",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-spearphishing-with-email-gateway/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
     "tier": "T1"
   },
   {
@@ -2971,6 +3111,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-aes-encryption-for-data-at-rest",
+    "name": "implementing-aes-encryption-for-data-at-rest",
+    "description": "|",
+    "domain": "planning",
+    "summary": "AES-256-GCM at-rest doctrine: authenticated encryption (AEAD) so tampering is detected, keys derived from passwords via PBKDF2 (≥600k iters) or Argon2id (never raw passwords), 96-bit nonce from a CSPRNG that is NEVER reused with the same key (catastrophic in GCM), salt+nonce+ciphertext+tag stored together, streaming for large files, key wipe after use, periodic rotation. CBC/CTR lack integrity; prefer GCM/CCM, or AES-XTS for full-disk. In MAOS this encrypts sensitive state under data/; the encryption key is a §5 secret, never committed (§11.5); quota framing §8.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-aes-encryption-for-data-at-rest/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-alert-fatigue-reduction",
     "name": "implementing-alert-fatigue-reduction",
     "description": "|",
@@ -2982,6 +3136,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-alert-fatigue-reduction/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-anti-phishing-training-program",
+    "name": "implementing-anti-phishing-training-program",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive anti-phishing training program — the human layer: establish a baseline (initial authorized simulation measuring click/submit/report rate, identify high-risk departments/roles); design curriculum (general awareness for all, role-specific — finance/BEC, IT/credential, execs/whaling — progressive beginner→advanced, micro-learning over annual marathons); deploy the platform (KnowBe4/Proofpoint SAT/Cofense with org groups, automated enrollment, LMS completion tracking, dashboards); run continuous authorized simulations (monthly, varied scenarios incl. links/attachments/QR/BEC, just-in-time training on failure, progressive difficulty); reinforce positively (recognize correct reporters, not punish failers) and measure (90%+ completion, click-rate reduction over 6 months, report-rate inc",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-anti-phishing-training-program/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
     "tier": "T1"
   },
   {
@@ -3335,6 +3503,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-digital-signatures-with-ed25519",
+    "name": "implementing-digital-signatures-with-ed25519",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Ed25519 signature doctrine (Edwards Curve25519, 128-bit security, 32-byte keys, 64-byte signatures): deterministic signatures (no random nonce to leak), side-channel-resistant constant-time impl, no separate hash needed, fast verify. Sign the full message (Ed25519 hashes internally), validate public keys (reject low-order points), store private keys encrypted at rest. Faster/smaller than RSA-3072 and ECDSA P-256. Note: Ed448 is preferred for some NIST/federal use. In MAOS this signs artifacts/requests for integrity; the Ed25519 private key is a §5 secret, never committed (§11.5); quota framing §8.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-digital-signatures-with-ed25519/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-disk-encryption-with-bitlocker",
     "name": "implementing-disk-encryption-with-bitlocker",
     "description": "|",
@@ -3349,6 +3531,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-dmarc-dkim-spf-email-security",
+    "name": "implementing-dmarc-dkim-spf-email-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive email authentication — SPF + DKIM + DMARC stop domain spoofing: audit current state (dig SPF/DKIM-selector/DMARC TXT records); publish SPF (authorized sending IPs/includes, -all hard-fail after a ~all monitoring phase); implement DKIM (generate a 2048-bit RSA keypair, keep the private key on the MTA/secret store, publish only the public key in DNS at the selector); roll out DMARC in three staged phases (p=none monitor with rua/ruf reporting → p=quarantine pct ramp → p=reject pct=100) and analyze the aggregate XML reports to find unauthorized senders and spoofing before tightening. In MAOS this is a knowledge playbook: DNS writes target only authorized domains, the DKIM private key is a secret that is never committed (§11), .env/secret-file writes are gated (§5), and cost is quota",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-dmarc-dkim-spf-email-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-ebpf-security-monitoring",
     "name": "implementing-ebpf-security-monitoring",
     "description": "|",
@@ -3360,6 +3556,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-ebpf-security-monitoring/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-end-to-end-encryption-for-messaging",
+    "name": "implementing-end-to-end-encryption-for-messaging",
+    "description": "|",
+    "domain": "planning",
+    "summary": "E2EE messaging doctrine (simplified Signal Double Ratchet): only endpoints decrypt, server never can. X3DH (X25519) for initial key agreement; Double Ratchet (X25519 + HKDF + AES-256-GCM) for ongoing per-message keys; sending/receiving chains via HMAC-SHA256; root chain via HKDF. Forward secrecy: delete each message key immediately after use so compromising current state never reveals past messages. Handle out-of-order delivery, replay protection, AEAD on every message, and verify identity keys out-of-band (safety numbers). In MAOS: reference doctrine for confidential channels; identity keys are §5 secrets, never committed (§11.5); quota framing §8.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-end-to-end-encryption-for-messaging/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -3388,6 +3598,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-endpoint-dlp-controls/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-envelope-encryption-with-aws-kms",
+    "name": "implementing-envelope-encryption-with-aws-kms",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Envelope-encryption doctrine with KMS: a data key (DEK) encrypts data locally with AES-256-GCM; the master key (KEK) in KMS wraps the DEK. Flow: GenerateDataKey returns plaintext + encrypted DEK → encrypt locally → store encrypted DEK beside ciphertext → discard plaintext DEK from memory → decrypt by KMS-Decrypt on the encrypted DEK. Beats direct KMS (4KB cap, per-op round trip): unlimited data, local speed, fewer KMS calls. Use encryption context as authenticated metadata, restrictive key policies, CloudTrail logging, automatic rotation, exponential backoff. In MAOS the KMS call cost is reframed as quota/round-trip to minimize via caching (§11, never $); CloudTrail = §9 telemetry analogue.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-envelope-encryption-with-aws-kms/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -3584,6 +3808,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-just-in-time-access-provisioning/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-jwt-signing-and-verification",
+    "name": "implementing-jwt-signing-and-verification",
+    "description": "|",
+    "domain": "planning",
+    "summary": "JWT signing/verification doctrine (RFC 7519): sign with HS256/RS256/ES256/EdDSA; ALWAYS verify the alg header against an allowlist and NEVER accept alg=none. Defend the classic attacks: algorithm confusion (RS256→HS256 using the public key as HMAC secret), alg=none signature bypass, JWK header key injection, weak-HMAC-secret brute force, token replay. Validate standard claims (exp/nbf/aud), keep access-token expiry short (~15min) with refresh, rotate via JWK Sets, prefer asymmetric (RS256/ES256/EdDSA) for distributed systems. In MAOS: directly governs any auth tokens the cockpit/worker issues; JWT secrets/keys are §5 secrets never committed (§11.5); quota framing §8.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-jwt-signing-and-verification/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -3909,6 +4147,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-rsa-key-pair-management",
+    "name": "implementing-rsa-key-pair-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "RSA key-pair management doctrine: generate ≥3072-bit pairs, serialize PEM/DER/PKCS#8, protect private keys with AES-256 passphrase encryption + 0600 perms, sign with RSA-PSS and encrypt with RSA-OAEP (never PKCS#1 v1.5), compute fingerprints, and rotate at least annually while retaining old keys for verification. Defensive PKI hygiene only. In MAOS, secrets/keystores are §5-gated — never write a private key outside the active project sandbox, never commit a passphrase, and treat key material as quota-irrelevant but security-critical.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-rsa-key-pair-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-runtime-security-with-tetragon",
     "name": "implementing-runtime-security-with-tetragon",
     "description": "|",
@@ -3962,6 +4214,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-secret-scanning-with-gitleaks/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-secure-email-gateway",
+    "name": "implementing-secure-email-gateway",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Vendor-neutral secure-email-gateway defense doctrine for an org's own mail flow. Six protection layers in order: connection (IP reputation, rate-limit) → authentication (SPF/DKIM/DMARC inbound enforce) → content (ML/NLP classifiers for BEC + impersonation) → URL (rewrite + time-of-click sandbox) → attachment (static + dynamic detonation, dynamic-delivery hold) → post-delivery auto-retraction. Plan mail-flow (MX-based vs API-based vs hybrid), inventory legitimate senders, deploy policies, migrate MX with lowered TTL + IP allowlist, monitor false-positive/negative rates and tune weekly. Vendor delta table folds Proofpoint TAP/TRAP, Mimecast TTP (URL/Attachment/Impersonation/Internal Protect), and Google Workspace Safety + Advanced Protection Program. Read-only/propose under MAOS autonomy; an",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-secure-email-gateway/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
     "tier": "T1"
   },
   {
@@ -4242,6 +4508,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-web-application-logging-with-modsecurity/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:web-application-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-knowledge-proof-for-authentication",
+    "name": "implementing-zero-knowledge-proof-for-authentication",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Zero-knowledge authentication doctrine: implement Schnorr identification so the verifier learns nothing beyond statement truth, satisfy completeness/soundness/zero-knowledge, derive non-interactive proofs via Fiat-Shamir with a collision-resistant hash, and build a ZKPP where the server never receives the password. Use a CSPRNG for commitments, ensure unpredictable challenges, and combine with TLS for forward secrecy. Defensive auth primitive; the secret never leaves the prover. In MAOS this is privacy-preserving auth design, not a credential store — never log transcripts or secrets, and treat fetched verifier input as untrusted.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-knowledge-proof-for-authentication/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -5057,6 +5337,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-adversary-in-the-middle-phishing-detection",
+    "name": "performing-adversary-in-the-middle-phishing-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection and response to Adversary-in-the-Middle (AiTM) phishing, where a reverse proxy (Tycoon 2FA, EvilProxy, Evilginx, Sneaky 2FA) relays the victim through the real login to capture the post-MFA session cookie and bypass MFA. Primary control is phishing-resistant MFA (FIDO2 / Windows Hello) bound to origin domain — AiTM cannot replay it. Harden Conditional Access (managed-device requirement, block anonymous proxy/Tor, token binding, continuous access evaluation, sign-in risk policies). Detection rules: auth then session from a different IP within minutes, impossible travel, inbox-forwarding-rule or OAuth-consent created right after a risky sign-in, new MFA method registration. Hunt post-compromise (mailbox rules, mass download, BEC follow-up, lateral movement). Entirely blue",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-adversary-in-the-middle-phishing-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
+    "tier": "T1"
+  },
+  {
     "id": "performing-agentless-vulnerability-scanning",
     "name": "performing-agentless-vulnerability-scanning",
     "description": "|",
@@ -5225,6 +5519,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-cryptographic-audit-of-application",
+    "name": "performing-cryptographic-audit-of-application",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cryptographic-audit doctrine: systematically scan application code and configuration for weak hashing (MD5/SHA-1), insecure ciphers (DES/3DES/RC4) and modes (ECB), hardcoded keys/secrets, undersized keys, weak KDF iteration counts, predictable IVs/seeds, and deprecated TLS (SSLv3/TLS1.0/1.1). Emit a structured report with severity, location, and remediation, keeping false positives <10%. Defensive review only — read-and-report, never weaponize findings. In MAOS this feeds mas-sec-reviewer: hardcoded-secret findings are §5-critical, and the audit reads the project sandbox without writing to it.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cryptographic-audit-of-application/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
+    "tier": "T1"
+  },
+  {
     "id": "performing-cve-prioritization-with-kev-catalog",
     "name": "performing-cve-prioritization-with-kev-catalog",
     "description": "|",
@@ -5264,6 +5572,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-disk-forensics-investigation/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-dmarc-policy-enforcement-rollout",
+    "name": "performing-dmarc-policy-enforcement-rollout",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Phased DMARC enforcement rollout (p=none → p=quarantine → p=reject) to stop domain spoofing without blocking legitimate senders. SPF aligns the envelope (Return-Path) domain to the From header; DKIM aligns the signature d= domain; DMARC requires at least one aligned pass. Process: inventory every legitimate sending source (marketing, CRM, transactional, shadow IT), consolidate SPF under the 10-lookup limit, publish DKIM per source, deploy p=none with rua aggregate reporting, analyze reports until all legitimate mail passes, then ramp pct (10→25→50→75→100) through quarantine and again through reject with a 1–2 week soak at each step, plus an emergency rollback to quarantine. Google/Yahoo now require DMARC for bulk senders. DNS record writes are human-gated risky actions in MAOS (§5); the ro",
+    "tags": [
+      "cyber:phishing-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-dmarc-policy-enforcement-rollout/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:phishing-defense",
     "tier": "T1"
   },
   {
@@ -5376,6 +5698,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-graphql-introspection-attack/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-hardware-security-module-integration",
+    "name": "performing-hardware-security-module-integration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "HSM-integration doctrine: drive tamper-resistant key storage through the PKCS#11 interface — load the vendor library, open an authenticated session with the user PIN, generate RSA-2048/EC-P256 keys on-device, sign and verify using keys that never leave the module, enumerate stored objects and supported mechanisms, and produce a FIPS 140-2/3 compliance report. Defensive key-custody hardening. In MAOS, PINs/SO-PINs are §5-gated secrets (never logged or committed), and the HSM provider config (CloudHSM) is loaded from env/vault, never hardcoded.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-hardware-security-module-integration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -5502,6 +5838,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-oauth-scope-minimization-review/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-post-quantum-cryptography-migration",
+    "name": "performing-post-quantum-cryptography-migration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Post-quantum-migration doctrine per NIST FIPS 203 (ML-KEM), 204 (ML-DSA), 205 (SLH-DSA): build a cryptographic inventory to find quantum-vulnerable algorithms (RSA, ECDH, ECDSA, DH — broken by Shor's), test hybrid TLS 1.3 with X25519MLKEM768, validate ML-KEM key encapsulation and ML-DSA signatures at the right security level, assess crypto-agility (can algorithms swap without downtime?), and produce a roadmap prioritized by data sensitivity, exposure, and the IR 8547 2030/2035 deprecation timeline. Defensive migration planning, motivated by 'harvest-now-decrypt-later'. In MAOS, network TLS scans of external hosts honor §5 allowed_hosts; the assessment reads and reports, it never writes to scanned targets.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-post-quantum-cryptography-migration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {
@@ -5642,6 +5992,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-soc-tabletop-exercise/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ssl-certificate-lifecycle-management",
+    "name": "performing-ssl-certificate-lifecycle-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "SSL/TLS certificate-lifecycle doctrine: generate valid PKCS#10 CSRs, parse and validate X.509 certificates and their trust chains, monitor expiration across all assets before the threshold, automate renewal via ACME (Let's Encrypt), and check revocation via CRL and OCSP — preventing the outages and trust failures that poor cert management causes. Prefer ECDSA P-256, enable OCSP stapling, monitor Certificate Transparency logs, and plan for CA-compromise (pinning/backup CAs). Defensive PKI operations. In MAOS, private keys backing certs are §5-gated secrets kept in-sandbox, and CA/ACME endpoints are reached only via §5 allowed_hosts.",
+    "tags": [
+      "cyber:cryptography"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ssl-certificate-lifecycle-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cryptography",
     "tier": "T1"
   },
   {

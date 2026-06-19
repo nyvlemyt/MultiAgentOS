@@ -573,7 +573,7 @@ cyber-skill	cyber:digital-forensics	analyzing-linux-system-artifacts	pending
 cyber-skill	cyber:digital-forensics	analyzing-lnk-file-and-jump-list-artifacts	pending		
 cyber-skill	cyber:malware-analysis	analyzing-macro-malware-in-office-documents	pending		
 cyber-skill	cyber:malware-analysis	analyzing-malicious-pdf-with-peepdf	pending		
-cyber-skill	cyber:phishing-defense	analyzing-malicious-url-with-urlscan	pending		
+cyber-skill	cyber:phishing-defense	analyzing-malicious-url-with-urlscan	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:malware-analysis	analyzing-malware-behavior-with-cuckoo-sandbox	pending		
 cyber-skill	cyber:threat-intelligence	analyzing-malware-family-relationships-with-malpedia	pending		
 cyber-skill	cyber:malware-analysis	analyzing-malware-persistence-with-autoruns	pending		
@@ -643,7 +643,7 @@ cyber-skill	cyber:threat-intelligence	building-ioc-defanging-and-sharing-pipelin
 cyber-skill	cyber:threat-intelligence	building-ioc-enrichment-pipeline-with-opencti	pending		
 cyber-skill	cyber:incident-response	building-malware-incident-communication-template	integrated	adapt	decisions/cyber-DS.md
 cyber-skill	cyber:vulnerability-management	building-patch-tuesday-response-process	integrated	adapt	decisions/cyber-DK.md
-cyber-skill	cyber:phishing-defense	building-phishing-reporting-button-workflow	pending		
+cyber-skill	cyber:phishing-defense	building-phishing-reporting-button-workflow	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:ransomware-defense	building-ransomware-playbook-with-cisa-framework	integrated	adapt	decisions/cyber-EG.md
 cyber-skill	cyber:red-teaming	building-red-team-c2-infrastructure-with-havoc	pending		
 cyber-skill	cyber:identity-access-management	building-role-mining-for-rbac-optimization	integrated	adapt	decisions/cyber-DO.md
@@ -687,9 +687,9 @@ cyber-skill	cyber:red-teaming	conducting-spearphishing-simulation-campaign	pendi
 cyber-skill	cyber:penetration-testing	conducting-wireless-network-penetration-test	pending		
 cyber-skill	cyber:identity-access-management	configuring-active-directory-tiered-model	integrated	adapt	decisions/cyber-DO.md
 cyber-skill	cyber:zero-trust-architecture	configuring-aws-verified-access-for-ztna	rejected	fold	decisions/cyber-EI.md
-cyber-skill	cyber:cryptography	configuring-certificate-authority-with-openssl	pending		
+cyber-skill	cyber:cryptography	configuring-certificate-authority-with-openssl	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:endpoint-security	configuring-host-based-intrusion-detection	integrated	adapt	decisions/cyber-DV.md
-cyber-skill	cyber:cryptography	configuring-hsm-for-key-storage	pending		
+cyber-skill	cyber:cryptography	configuring-hsm-for-key-storage	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:zero-trust-architecture	configuring-identity-aware-proxy-with-google-iap	rejected	fold	decisions/cyber-EI.md
 cyber-skill	cyber:identity-access-management	configuring-ldap-security-hardening	integrated	adapt	decisions/cyber-DO.md
 cyber-skill	cyber:zero-trust-architecture	configuring-microsegmentation-for-zero-trust	integrated	adapt	decisions/cyber-EI.md
@@ -699,7 +699,7 @@ cyber-skill	cyber:identity-access-management	configuring-oauth2-authorization-fl
 cyber-skill	cyber:network-security	configuring-pfsense-firewall-rules	pending		
 cyber-skill	cyber:network-security	configuring-snort-ids-for-intrusion-detection	pending		
 cyber-skill	cyber:network-security	configuring-suricata-for-network-monitoring	pending		
-cyber-skill	cyber:cryptography	configuring-tls-1-3-for-secure-communications	pending		
+cyber-skill	cyber:cryptography	configuring-tls-1-3-for-secure-communications	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:endpoint-security	configuring-windows-defender-advanced-settings	integrated	adapt	decisions/cyber-DV.md
 cyber-skill	cyber:endpoint-security	configuring-windows-event-logging-for-detection	integrated	adapt	decisions/cyber-DV.md
 cyber-skill	cyber:zero-trust-architecture	configuring-zscaler-private-access-for-ztna	rejected	fold	decisions/cyber-EI.md
@@ -734,8 +734,8 @@ cyber-skill	cyber:cloud-security	detecting-azure-storage-account-misconfiguratio
 cyber-skill	cyber:security-operations	detecting-beaconing-patterns-with-zeek	integrated	adapt	decisions/cyber-EC.md
 cyber-skill	cyber:wireless-security	detecting-bluetooth-low-energy-attacks	pending		
 cyber-skill	cyber:api-security	detecting-broken-object-property-level-authorization	integrated	adapt	decisions/cyber-DA.md
-cyber-skill	cyber:phishing-defense	detecting-business-email-compromise-with-ai	pending		
-cyber-skill	cyber:phishing-defense	detecting-business-email-compromise	pending		
+cyber-skill	cyber:phishing-defense	detecting-business-email-compromise-with-ai	integrated	adapt	decisions/cyber-EK.md
+cyber-skill	cyber:phishing-defense	detecting-business-email-compromise	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:cloud-security	detecting-cloud-threats-with-guardduty	pending		
 cyber-skill	cyber:network-security	detecting-command-and-control-over-dns	pending		
 cyber-skill	cyber:cloud-security	detecting-compromised-cloud-credentials	pending		
@@ -783,7 +783,7 @@ cyber-skill	cyber:threat-hunting	detecting-privilege-escalation-attempts	pending
 cyber-skill	cyber:container-security	detecting-privilege-escalation-in-kubernetes-pods	integrated	adapt	decisions/cyber-DH.md
 cyber-skill	cyber:threat-hunting	detecting-process-hollowing-technique	pending		
 cyber-skill	cyber:malware-analysis	detecting-process-injection-techniques	pending		
-cyber-skill	cyber:phishing-defense	detecting-qr-code-phishing-with-email-security	pending		
+cyber-skill	cyber:phishing-defense	detecting-qr-code-phishing-with-email-security	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:ransomware-defense	detecting-ransomware-encryption-behavior	integrated	adapt	decisions/cyber-EG.md
 cyber-skill	cyber:ransomware-defense	detecting-ransomware-precursors-in-network	integrated	adapt	decisions/cyber-EG.md
 cyber-skill	cyber:threat-detection	detecting-rdp-brute-force-attacks	integrated	adapt	decisions/cyber-EB.md
@@ -793,7 +793,7 @@ cyber-skill	cyber:cloud-security	detecting-serverless-function-injection	pending
 cyber-skill	cyber:threat-hunting	detecting-service-account-abuse	pending		
 cyber-skill	cyber:api-security	detecting-shadow-api-endpoints	integrated	adapt	decisions/cyber-DA.md
 cyber-skill	cyber:cloud-security	detecting-shadow-it-cloud-usage	pending		
-cyber-skill	cyber:phishing-defense	detecting-spearphishing-with-email-gateway	pending		
+cyber-skill	cyber:phishing-defense	detecting-spearphishing-with-email-gateway	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:security-operations	detecting-sql-injection-via-waf-logs	integrated	adapt	decisions/cyber-ED.md
 cyber-skill	cyber:ot-ics-security	detecting-stuxnet-style-attacks	pending		
 cyber-skill	cyber:security-operations	detecting-supply-chain-attacks-in-ci-cd	integrated	adapt	decisions/cyber-ED.md
@@ -887,9 +887,9 @@ cyber-skill	cyber:threat-hunting	hunting-for-t1098-account-manipulation	pending
 cyber-skill	cyber:threat-hunting	hunting-for-unusual-network-connections	pending		
 cyber-skill	cyber:threat-hunting	hunting-for-unusual-service-installations	pending		
 cyber-skill	cyber:threat-hunting	hunting-for-webshell-activity	pending		
-cyber-skill	cyber:cryptography	implementing-aes-encryption-for-data-at-rest	pending		
+cyber-skill	cyber:cryptography	implementing-aes-encryption-for-data-at-rest	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:soc-operations	implementing-alert-fatigue-reduction	integrated	adapt	decisions/cyber-DY.md
-cyber-skill	cyber:phishing-defense	implementing-anti-phishing-training-program	pending		
+cyber-skill	cyber:phishing-defense	implementing-anti-phishing-training-program	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:ransomware-defense	implementing-anti-ransomware-group-policy	integrated	adapt	decisions/cyber-EG.md
 cyber-skill	cyber:api-security	implementing-api-abuse-detection-with-rate-limiting	integrated	adapt	decisions/cyber-DA.md
 cyber-skill	cyber:api-security	implementing-api-gateway-security-controls	integrated	adapt	decisions/cyber-DA.md
@@ -935,16 +935,16 @@ cyber-skill	cyber:identity-access-management	implementing-delinea-secret-server-
 cyber-skill	cyber:zero-trust-architecture	implementing-device-posture-assessment-in-zero-trust	integrated	adapt	decisions/cyber-EJ.md
 cyber-skill	cyber:application-security	implementing-devsecops-security-scanning	pending		
 cyber-skill	cyber:threat-intelligence	implementing-diamond-model-analysis	pending		
-cyber-skill	cyber:cryptography	implementing-digital-signatures-with-ed25519	pending		
+cyber-skill	cyber:cryptography	implementing-digital-signatures-with-ed25519	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:endpoint-security	implementing-disk-encryption-with-bitlocker	integrated	adapt	decisions/cyber-DW.md
-cyber-skill	cyber:phishing-defense	implementing-dmarc-dkim-spf-email-security	pending		
+cyber-skill	cyber:phishing-defense	implementing-dmarc-dkim-spf-email-security	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:ot-ics-security	implementing-dragos-platform-for-ot-monitoring	pending		
 cyber-skill	cyber:security-operations	implementing-ebpf-security-monitoring	integrated	adapt	decisions/cyber-ED.md
-cyber-skill	cyber:phishing-defense	implementing-email-sandboxing-with-proofpoint	pending		
-cyber-skill	cyber:cryptography	implementing-end-to-end-encryption-for-messaging	pending		
+cyber-skill	cyber:phishing-defense	implementing-email-sandboxing-with-proofpoint	rejected	fold	decisions/cyber-EL.md
+cyber-skill	cyber:cryptography	implementing-end-to-end-encryption-for-messaging	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:security-operations	implementing-endpoint-detection-with-wazuh	integrated	adapt	decisions/cyber-EE.md
 cyber-skill	cyber:endpoint-security	implementing-endpoint-dlp-controls	integrated	adapt	decisions/cyber-DW.md
-cyber-skill	cyber:cryptography	implementing-envelope-encryption-with-aws-kms	pending		
+cyber-skill	cyber:cryptography	implementing-envelope-encryption-with-aws-kms	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:vulnerability-management	implementing-epss-score-for-vulnerability-prioritization	integrated	adapt	decisions/cyber-DK.md
 cyber-skill	cyber:endpoint-security	implementing-file-integrity-monitoring-with-aide	integrated	adapt	decisions/cyber-DW.md
 cyber-skill	cyber:devsecops	implementing-fuzz-testing-in-cicd-with-aflplusplus	rejected	reject	decisions/cyber-DF.md
@@ -955,7 +955,7 @@ cyber-skill	cyber:compliance-governance	implementing-gdpr-data-protection-contro
 cyber-skill	cyber:privacy-compliance	implementing-gdpr-data-subject-access-request	pending		
 cyber-skill	cyber:devsecops	implementing-github-advanced-security-for-code-scanning	integrated	adapt	decisions/cyber-DF.md
 cyber-skill	cyber:identity-access-management	implementing-google-workspace-admin-security	integrated	adapt	decisions/cyber-DP.md
-cyber-skill	cyber:phishing-defense	implementing-google-workspace-phishing-protection	pending		
+cyber-skill	cyber:phishing-defense	implementing-google-workspace-phishing-protection	rejected	fold	decisions/cyber-EL.md
 cyber-skill	cyber:identity-access-management	implementing-google-workspace-sso-configuration	integrated	adapt	decisions/cyber-DP.md
 cyber-skill	cyber:identity-and-access-management	implementing-hardware-security-key-authentication	pending		
 cyber-skill	cyber:identity-access-management	implementing-hashicorp-vault-dynamic-secrets	integrated	adapt	decisions/cyber-DP.md
@@ -970,7 +970,7 @@ cyber-skill	cyber:ransomware-defense	implementing-immutable-backup-with-restic	i
 cyber-skill	cyber:devsecops	implementing-infrastructure-as-code-security-scanning	integrated	adapt	decisions/cyber-DF.md
 cyber-skill	cyber:compliance-governance	implementing-iso-27001-information-security-management	pending		
 cyber-skill	cyber:identity-access-management	implementing-just-in-time-access-provisioning	integrated	adapt	decisions/cyber-DQ.md
-cyber-skill	cyber:cryptography	implementing-jwt-signing-and-verification	pending		
+cyber-skill	cyber:cryptography	implementing-jwt-signing-and-verification	integrated	adapt	decisions/cyber-EM.md
 cyber-skill	cyber:container-security	implementing-kubernetes-network-policy-with-calico	integrated	adapt	decisions/cyber-DI.md
 cyber-skill	cyber:container-security	implementing-kubernetes-pod-security-standards	integrated	adapt	decisions/cyber-DI.md
 cyber-skill	cyber:ai-security	implementing-llm-guardrails-for-security	integrated	adapt	decisions/cyber-DN.md
@@ -978,7 +978,7 @@ cyber-skill	cyber:security-operations	implementing-log-forwarding-with-fluentd	i
 cyber-skill	cyber:security-operations	implementing-log-integrity-with-blockchain	integrated	adapt	decisions/cyber-EE.md
 cyber-skill	cyber:endpoint-security	implementing-memory-protection-with-dep-aslr	integrated	adapt	decisions/cyber-DW.md
 cyber-skill	cyber:zero-trust-architecture	implementing-microsegmentation-with-guardicore	integrated	adapt	decisions/cyber-EJ.md
-cyber-skill	cyber:phishing-defense	implementing-mimecast-targeted-attack-protection	pending		
+cyber-skill	cyber:phishing-defense	implementing-mimecast-targeted-attack-protection	rejected	fold	decisions/cyber-EL.md
 cyber-skill	cyber:soc-operations	implementing-mitre-attack-coverage-mapping	integrated	adapt	decisions/cyber-DY.md
 cyber-skill	cyber:mobile-security	implementing-mobile-application-management	pending		
 cyber-skill	cyber:security-operations	implementing-mtls-for-zero-trust-services	integrated	adapt	decisions/cyber-EE.md
@@ -1007,13 +1007,13 @@ cyber-skill	cyber:devsecops	implementing-policy-as-code-with-open-policy-agent	i
 cyber-skill	cyber:identity-access-management	implementing-privileged-access-management-with-cyberark	integrated	adapt	decisions/cyber-DQ.md
 cyber-skill	cyber:identity-and-access-management	implementing-privileged-access-workstation	pending		
 cyber-skill	cyber:identity-access-management	implementing-privileged-session-monitoring	integrated	adapt	decisions/cyber-DQ.md
-cyber-skill	cyber:phishing-defense	implementing-proofpoint-email-security-gateway	pending		
+cyber-skill	cyber:phishing-defense	implementing-proofpoint-email-security-gateway	integrated	adapt	decisions/cyber-EL.md
 cyber-skill	cyber:ot-ics-security	implementing-purdue-model-network-segmentation	pending		
 cyber-skill	cyber:ransomware-defense	implementing-ransomware-backup-strategy	integrated	adapt	decisions/cyber-EH.md
 cyber-skill	cyber:ransomware-defense	implementing-ransomware-kill-switch-detection	integrated	adapt	decisions/cyber-EH.md
 cyber-skill	cyber:vulnerability-management	implementing-rapid7-insightvm-for-scanning	integrated	adapt	decisions/cyber-DL.md
 cyber-skill	cyber:container-security	implementing-rbac-hardening-for-kubernetes	integrated	adapt	decisions/cyber-DI.md
-cyber-skill	cyber:cryptography	implementing-rsa-key-pair-management	pending		
+cyber-skill	cyber:cryptography	implementing-rsa-key-pair-management	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:application-security	implementing-runtime-application-self-protection	pending		
 cyber-skill	cyber:container-security	implementing-runtime-security-with-tetragon	integrated	adapt	decisions/cyber-DI.md
 cyber-skill	cyber:identity-access-management	implementing-saml-sso-with-okta	integrated	adapt	decisions/cyber-DQ.md
@@ -1045,7 +1045,7 @@ cyber-skill	cyber:vulnerability-management	implementing-vulnerability-management
 cyber-skill	cyber:vulnerability-management	implementing-vulnerability-remediation-sla	integrated	adapt	decisions/cyber-DL.md
 cyber-skill	cyber:vulnerability-management	implementing-vulnerability-sla-breach-alerting	integrated	adapt	decisions/cyber-DL.md
 cyber-skill	cyber:web-application-security	implementing-web-application-logging-with-modsecurity	integrated	adapt	decisions/cyber-DE.md
-cyber-skill	cyber:cryptography	implementing-zero-knowledge-proof-for-authentication	pending		
+cyber-skill	cyber:cryptography	implementing-zero-knowledge-proof-for-authentication	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:identity-access-management	implementing-zero-standing-privilege-with-cyberark	integrated	adapt	decisions/cyber-DQ.md
 cyber-skill	cyber:zero-trust-architecture	implementing-zero-trust-dns-with-nextdns	integrated	adapt	decisions/cyber-EJ.md
 cyber-skill	cyber:zero-trust-architecture	implementing-zero-trust-for-saas-applications	integrated	adapt	decisions/cyber-EJ.md
@@ -1072,7 +1072,7 @@ cyber-skill	cyber:incident-response	performing-active-directory-compromise-inves
 cyber-skill	cyber:red-team	performing-active-directory-forest-trust-attack	pending		
 cyber-skill	cyber:penetration-testing	performing-active-directory-penetration-test	pending		
 cyber-skill	cyber:vulnerability-management	performing-active-directory-vulnerability-assessment	integrated	adapt	decisions/cyber-DL.md
-cyber-skill	cyber:phishing-defense	performing-adversary-in-the-middle-phishing-detection	pending		
+cyber-skill	cyber:phishing-defense	performing-adversary-in-the-middle-phishing-detection	integrated	adapt	decisions/cyber-EL.md
 cyber-skill	cyber:vulnerability-management	performing-agentless-vulnerability-scanning	integrated	adapt	decisions/cyber-DL.md
 cyber-skill	cyber:threat-intelligence	performing-ai-driven-osint-correlation	pending		
 cyber-skill	cyber:soc-operations	performing-alert-triage-with-elastic-siem	integrated	adapt	decisions/cyber-DZ.md
@@ -1108,14 +1108,14 @@ cyber-skill	cyber:devsecops	performing-container-image-hardening	integrated	adap
 cyber-skill	cyber:container-security	performing-container-security-scanning-with-trivy	integrated	adapt	decisions/cyber-DI.md
 cyber-skill	cyber:web-application-security	performing-content-security-policy-bypass	pending		
 cyber-skill	cyber:red-teaming	performing-credential-access-with-lazagne	pending		
-cyber-skill	cyber:cryptography	performing-cryptographic-audit-of-application	pending		
+cyber-skill	cyber:cryptography	performing-cryptographic-audit-of-application	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:web-application-security	performing-csrf-attack-simulation	pending		
 cyber-skill	cyber:vulnerability-management	performing-cve-prioritization-with-kev-catalog	integrated	adapt	decisions/cyber-DM.md
 cyber-skill	cyber:threat-intelligence	performing-dark-web-monitoring-for-threats	pending		
 cyber-skill	cyber:soc-operations	performing-deception-technology-deployment	integrated	adapt	decisions/cyber-DZ.md
 cyber-skill	cyber:web-application-security	performing-directory-traversal-testing	pending		
 cyber-skill	cyber:incident-response	performing-disk-forensics-investigation	integrated	adapt	decisions/cyber-DU.md
-cyber-skill	cyber:phishing-defense	performing-dmarc-policy-enforcement-rollout	pending		
+cyber-skill	cyber:phishing-defense	performing-dmarc-policy-enforcement-rollout	integrated	adapt	decisions/cyber-EL.md
 cyber-skill	cyber:network-security	performing-dns-enumeration-and-zone-transfer	pending		
 cyber-skill	cyber:security-operations	performing-dns-tunneling-detection	integrated	adapt	decisions/cyber-EF.md
 cyber-skill	cyber:container-security	performing-docker-bench-security-assessment	integrated	adapt	decisions/cyber-DJ.md
@@ -1135,8 +1135,8 @@ cyber-skill	cyber:cloud-security	performing-gcp-security-assessment-with-forseti
 cyber-skill	cyber:api-security	performing-graphql-depth-limit-attack	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:api-security	performing-graphql-introspection-attack	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:web-application-security	performing-graphql-security-assessment	pending		
-cyber-skill	cyber:cryptography	performing-hardware-security-module-integration	pending		
-cyber-skill	cyber:cryptography	performing-hash-cracking-with-hashcat	pending		
+cyber-skill	cyber:cryptography	performing-hardware-security-module-integration	integrated	adapt	decisions/cyber-EN.md
+cyber-skill	cyber:cryptography	performing-hash-cracking-with-hashcat	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:web-application-security	performing-http-parameter-pollution-attack	pending		
 cyber-skill	cyber:ot-ics-security	performing-ics-asset-discovery-with-claroty	pending		
 cyber-skill	cyber:threat-intelligence	performing-indicator-lifecycle-management	pending		
@@ -1178,10 +1178,10 @@ cyber-skill	cyber:ot-ics-security	performing-ot-vulnerability-assessment-with-cl
 cyber-skill	cyber:ot-ics-security	performing-ot-vulnerability-scanning-safely	pending		
 cyber-skill	cyber:network-security	performing-packet-injection-attack	pending		
 cyber-skill	cyber:threat-intelligence	performing-paste-site-monitoring-for-credentials	pending		
-cyber-skill	cyber:phishing-defense	performing-phishing-simulation-with-gophish	pending		
+cyber-skill	cyber:phishing-defense	performing-phishing-simulation-with-gophish	rejected	reject	decisions/cyber-EL.md
 cyber-skill	cyber:red-teaming	performing-physical-intrusion-assessment	pending		
 cyber-skill	cyber:ot-ics-security	performing-plc-firmware-security-analysis	pending		
-cyber-skill	cyber:cryptography	performing-post-quantum-cryptography-migration	pending		
+cyber-skill	cyber:cryptography	performing-post-quantum-cryptography-migration	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:ot-ics-security	performing-power-grid-cybersecurity-assessment	pending		
 cyber-skill	cyber:privacy-compliance	performing-privacy-impact-assessment	pending		
 cyber-skill	cyber:penetration-testing	performing-privilege-escalation-assessment	pending		
@@ -1206,7 +1206,7 @@ cyber-skill	cyber:api-security	performing-soap-web-service-security-testing	inte
 cyber-skill	cyber:soc-operations	performing-soc-tabletop-exercise	integrated	adapt	decisions/cyber-EA.md
 cyber-skill	cyber:governance-risk-compliance	performing-soc2-type2-audit-preparation	pending		
 cyber-skill	cyber:digital-forensics	performing-sqlite-database-forensics	pending		
-cyber-skill	cyber:cryptography	performing-ssl-certificate-lifecycle-management	pending		
+cyber-skill	cyber:cryptography	performing-ssl-certificate-lifecycle-management	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:network-security	performing-ssl-stripping-attack	pending		
 cyber-skill	cyber:network-security	performing-ssl-tls-inspection-configuration	pending		
 cyber-skill	cyber:network-security	performing-ssl-tls-security-assessment	pending		
