@@ -154,6 +154,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-sbom-for-supply-chain-vulnerabilities",
+    "name": "analyzing-sbom-for-supply-chain-vulnerabilities",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive software-composition analysis. Parse a CycloneDX/SPDX SBOM for the active project, extract components (name/version/PURL/CPE), correlate each against NVD 2.0 + advisory databases for CVEs, build the dependency graph (in-degree = blast radius, depth-to-root = exploitability, betweenness = bottleneck), compute max-CVSS risk per component weighted by centrality, cross-validate with grype, and emit a prioritised report (CRITICAL=CVSS≥9 or CISA-KEV). Maps onto MAOS §5 dependency/supply-chain gating and feeds mas-sec-reviewer. Operates read-only on the active project's own SBOM; NVD calls must stay within allowed_hosts. No live host scanning, no offensive use. Quota tuning per §11, never per-token cash.",
+    "tags": [
+      "cyber:supply-chain-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-sbom-for-supply-chain-vulnerabilities/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:supply-chain-security",
+    "tier": "T1"
+  },
+  {
     "id": "android-clean-architecture",
     "name": "android-clean-architecture",
     "description": "|",
@@ -375,6 +389,62 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-devsecops-pipeline-with-gitlab-ci/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "building-patch-tuesday-response-process",
+    "name": "building-patch-tuesday-response-process",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive patch-management operating process: monthly vendor advisory triage (MSRC + CISA KEV cross-reference), risk-based CVE categorization (zero-day/KEV → 24-48h, critical RCE → 3-5d, down to next-window for low), ring-based deployment (emergency → pilot → prod servers → workstations → stragglers) with soak periods and documented rollback, post-patch re-scan + gap analysis, and exception handling with compensating controls. Feeds mas-sec-reviewer / §5 risk prioritization for an external project's remediation backlog. Tuning is measured in subscription quota, never cash (§11); MAOS never pushes patches outside the project sandbox (§5).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-patch-tuesday-response-process/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-vulnerability-aging-and-sla-tracking",
+    "name": "building-vulnerability-aging-and-sla-tracking",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive vulnerability aging + SLA tracking: severity-based remediation SLAs (critical 14d / high 30d / medium 60d / low 90d, aggressive + CISA-KEV overrides), adaptive modifiers (internet-facing -50%, KEV → 48h, EPSS>0.7 -50%, crown-jewel -25%, compensating-control +25%), aging engine computing age/overdue/SLA-%-elapsed from discovery date, KPIs (MTTR, SLA-compliance-rate, overdue count, aging distribution, exception rate), and tiered escalation (owner → manager → CISO → VP). Feeds mas-sec-reviewer / §5 remediation prioritization for an external project. Track the SLA clock from discovery, not report date; effort in subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-vulnerability-aging-and-sla-tracking/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-vulnerability-dashboard-with-defectdojo",
+    "name": "building-vulnerability-dashboard-with-defectdojo",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive vulnerability-aggregation dashboard pattern (DefectDojo as exemplar): central hub ingesting 200+ scanner formats (Nessus/ZAP/Trivy/Semgrep/Snyk/...), deduplication on engagement, a Product-Type → Product → Engagement → Test → Finding hierarchy, CI/CD import hooks, ticketing (Jira) and notification integration, and SLA-breach + severity metrics. Self-host locally; secrets (DB password, secret key, API token) are placeholders supplied by the operator, never committed, never MAOS-owned (§11). Feeds mas-sec-reviewer / §5 with a project's real finding inventory. MAOS reads/aggregates; it never exploits findings or writes outside the sandbox (§5).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-vulnerability-dashboard-with-defectdojo/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-vulnerability-exception-tracking-system",
+    "name": "building-vulnerability-exception-tracking-system",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive vulnerability exception / risk-acceptance tracking: categorized exception requests (remediation-delay 30d, no-fix 90d, business-critical 60d, false-positive, compensating-control 180d) with max durations and approver tiers, required compensating-controls covering detection/prevention/response/monitoring, an auditable schema (exception + audit-log tables) with discovery/approval/expiry timestamps, request→approve/reject workflow, and a daily expiration checker so exceptions auto-expire. Keeps accepted risk visible and time-boxed for PCI-DSS/SOC2/NIST-CSF. Feeds mas-sec-reviewer / §5; exception decisions are recorded risk acceptances, never silent skips. Effort in subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-vulnerability-exception-tracking-system/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
     "tier": "T1"
   },
   {
@@ -933,6 +1003,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-ai-model-prompt-injection-attacks",
+    "name": "detecting-ai-model-prompt-injection-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive prompt-injection detection for MAOS agents/LLM calls, per OWASP LLM01:2025. Three layers on every input BEFORE it reaches the model: regex (25+ known signatures — system-prompt override, role-play escape, delimiter injection, encoding tricks); heuristic 0-1 anomaly score (instruction density, special-char ratio, language mixing, capitalisation, suspicious token runs); DeBERTa classifier (protectai/deberta-v3-base-prompt-injection-v2, runs locally/offline after first download). Composite verdict (regex 0.3 / heuristic 0.2 / classifier 0.5). This is the runtime enforcement of the Prompt Defense Baseline shipped in every library skill, and the concrete control behind CLAUDE.md §5 untrusted-content handling + mas-sec-reviewer. Defense-in-depth only: combine with output validation + l",
+    "tags": [
+      "cyber:ai-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-ai-model-prompt-injection-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ai-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-api-enumeration-attacks",
     "name": "detecting-api-enumeration-attacks",
     "description": "|",
@@ -1028,6 +1112,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-shadow-api-endpoints/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-typosquatting-packages-in-npm-pypi",
+    "name": "detecting-typosquatting-packages-in-npm-pypi",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive supply-chain threat-hunting for npm/PyPI. From the active project's own package.json/lockfile/requirements, build a watchlist, normalise names (PEP 503 for PyPI, @scope for npm), generate typo candidates (omission/transposition/substitution/insertion/separator/combosquat), query the PyPI JSON + npm registry APIs to find which exist, then score each on Levenshtein distance (1-2 = high suspicion), publish recency (<90d vs an old namesake), download disparity, author mismatch, single-version, and starjacking. Threshold to HIGH/MEDIUM/LOW and emit a blocklist for the artifact proxy / CI deny-list. Feeds §5 dependency gating + mas-sec-reviewer. Name similarity alone is not proof — manual review before action. Registry calls stay within allowed_hosts (§5). Quota tuning per §11, never c",
+    "tags": [
+      "cyber:supply-chain-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-typosquatting-packages-in-npm-pypi/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:supply-chain-security",
     "tier": "T1"
   },
   {
@@ -1977,6 +2075,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-attack-path-analysis-with-xm-cyber",
+    "name": "implementing-attack-path-analysis-with-xm-cyber",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive attack-path / exposure-management lens (XM Cyber as exemplar, CTEM): continuously model how exposures (identity ~40%, misconfig ~38%, network, software CVEs, cloud) chain toward critical assets, score by reachability-to-crown-jewels not CVSS, and surface choke points — the ~2% of exposures on converging paths whose fix collapses many paths at once. Define critical assets first, deploy read-only/agentless sensors (read-only AD service account, cloud Reader roles), run scenario analysis on-prem→cloud, then prioritize remediation by paths-blocked × assets-protected. Analysis is modeling, not exploitation; all sensor access is read-only over owned assets and any action outside the sandbox is §5-gated. Effort in subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-attack-path-analysis-with-xm-cyber/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-cloud-vulnerability-posture-management",
+    "name": "implementing-cloud-vulnerability-posture-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive multi-cloud security posture management (CSPM): continuously detect cloud-native risks — IAM over-permission, public storage, unencrypted data, missing network controls, service misconfig — using AWS Security Hub, Azure Defender for Cloud, and open-source Prowler/ScoutSuite, all under read-only audit identities (SecurityAudit IAM policy, Azure Security Reader). Map to CIS/NIST/PCI standards, aggregate findings across providers by severity/service, and feed a prioritized posture report. Scanning uses read-only audit roles over owned cloud accounts only; no exploitation, no write access, cross-project actions §5-gated. Feeds mas-sec-reviewer / §5. Effort in subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cloud-vulnerability-posture-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-code-signing-for-artifacts",
     "name": "implementing-code-signing-for-artifacts",
     "description": "|",
@@ -2016,6 +2142,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-container-network-policies-with-calico/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-continuous-security-validation-with-bas",
+    "name": "implementing-continuous-security-validation-with-bas",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive continuous security validation via Breach and Attack Simulation (BAS — SafeBreach/AttackIQ/Picus/Cymulate as exemplars): safely emulate MITRE ATT&CK techniques across the kill chain against owned controls (EDR, NGFW, email gateway, SIEM, WAF), compute a control-effectiveness score (prevented+detected / total) per control, map gaps to ATT&CK tactics, and schedule daily/weekly/monthly validation plus regression after every control change. BAS is SAFE simulation, not exploitation; coordinate with the SOC, run safe-mode first, and never simulate against systems outside the project sandbox (§5). Feeds mas-sec-reviewer / §5 and SIEM detection-rule prioritization. Effort in subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-continuous-security-validation-with-bas/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-epss-score-for-vulnerability-prioritization",
+    "name": "implementing-epss-score-for-vulnerability-prioritization",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive exploitation-probability prioritization with EPSS (FIRST): query the EPSS API (api.first.org) for each CVE's probability of exploitation within 30 days (0.0-1.0) plus percentile, then combine EPSS × CVSS into priority tiers (EPSS>0.7 & CVSS>=9 → P0 24h; down to P4 90d) so remediation effort goes to what is actually likely to be exploited, not just what is theoretically severe. Percentile thresholds (top 1%/5%/10%) and EPSS-spike detection flag emerging threats. EPSS measures likelihood, CVSS measures severity — use both. API calls hit only the public FIRST endpoint (add to allowed_hosts per §5); no exploitation, no out-of-sandbox action. Feeds mas-sec-reviewer / §5. Effort in subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-epss-score-for-vulnerability-prioritization/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
     "tier": "T1"
   },
   {
@@ -2089,6 +2243,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-llm-guardrails-for-security",
+    "name": "implementing-llm-guardrails-for-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive input+output validation rails for LLM-powered MAOS surfaces. INPUT rails: block injection patterns, enforce topic boundaries, redact PII (Presidio: PERSON/EMAIL/PHONE/SSN/CREDIT_CARD) before the model. OUTPUT rails: filter toxic content, catch PII leakage, detect hallucination (ungrounded vs provided context), enforce JSON/schema compliance before the response reaches a user/downstream agent. Built from a JSON content policy (allowed/blocked topics + patterns + PII categories + max length + require-grounded) plus structured-output validation. This is the output-side complement to detecting-ai-model-prompt-injection-attacks and the runtime backstop for the Prompt Defense Baseline shipped on every library skill; maps to CLAUDE.md §5 untrusted-content + risky-action gating and feeds",
+    "tags": [
+      "cyber:ai-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-llm-guardrails-for-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ai-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-network-policies-for-kubernetes",
     "name": "implementing-network-policies-for-kubernetes",
     "description": "|",
@@ -2117,6 +2285,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-patch-management-workflow",
+    "name": "implementing-patch-management-workflow",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive patch-management discipline: a closed lifecycle (discover → assess → risk-prioritize → test → CAB-approve → phased rollout → verify → report) that shrinks attack surface while limiting operational blast radius. Risk-rank by severity + exploitability (EPSS/KEV) + asset criticality, never treat all patches equally. Always test in a non-prod ring before production; deploy in soak-gated rings (lab→early-adopters→pilot→general→mission-critical) with automatic rollback (snapshot before patch). Patch third-party + firmware, not just the OS. Verify with a post-patch scan; track compliance + exceptions. In MAOS, patch deployment to live hosts is a shell/exec action gated by §5 (reboots, fleet writes → confirm/human gate per autonomy level); the external project is read-only by default (§8",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-patch-management-workflow/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-pod-security-admission-controller",
     "name": "implementing-pod-security-admission-controller",
     "description": "|",
@@ -2142,6 +2324,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-policy-as-code-with-open-policy-agent/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-rapid7-insightvm-for-scanning",
+    "name": "implementing-rapid7-insightvm-for-scanning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive deployment of Rapid7 InsightVM for authorized vulnerability scanning: a Security Console (web UI, embedded PostgreSQL) orchestrates distributed Scan Engines placed close to target segments plus Insight Agents for roaming endpoints. Prefer authenticated/credentialed scanning (unauthenticated misses 60-80% of local vulns); enable safe-checks to avoid DoS on production; exclude fragile devices (printers, ICS/SCADA, medical); set scan windows + duration limits to avoid business-hours congestion; separate sites by segment/compliance scope. Drive scans + remediation projects via the v3 REST API. In MAOS, an active scan is a §5 network/exec action against hosts that must be in-scope (authorization required, no cross-project/cross-host leakage); scan credentials (SSH keys, WMI service ac",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-rapid7-insightvm-for-scanning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
     "tier": "T1"
   },
   {
@@ -2201,6 +2397,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-sigstore-for-software-signing",
+    "name": "implementing-sigstore-for-software-signing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive software-signing and provenance via Sigstore. Cosign keyless signing issues an ephemeral key, gets a short-lived Fulcio cert bound to an OIDC identity, signs the artifact DIGEST, and records the event in the Rekor transparency log; the private key is destroyed immediately. VERIFY by pinning BOTH --certificate-identity (or -regexp) AND --certificate-oidc-issuer, checking the Rekor inclusion proof and that the digest is unchanged. Enforce at CI (GitHub OIDC) and at Kubernetes admission (Policy Controller / Kyverno). Attach SLSA/SBOM attestations with cosign attest. Pitfalls: sign the digest not the tag; never leave issuer unpinned or identity-regexp = .*. Maps onto MAOS §5 supply-chain trust + mas-sec-reviewer. Quota tuning per §11, never cash.",
+    "tags": [
+      "cyber:supply-chain-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-sigstore-for-software-signing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:supply-chain-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-supply-chain-security-with-in-toto",
     "name": "implementing-supply-chain-security-with-in-toto",
     "description": "|",
@@ -2212,6 +2422,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-supply-chain-security-with-in-toto/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-vulnerability-management-with-greenbone",
+    "name": "implementing-vulnerability-management-with-greenbone",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive, scriptable vulnerability scanning with Greenbone/OpenVAS via python-gvm over the GMP protocol: connect (UnixSocketConnection or TLSConnection), authenticate, create a target (authorized hosts + port list), create a scan task (config + target + scanner), start it, poll task status, retrieve the report, and parse the XML into a JSON summary — total vulns, critical/high/medium/low breakdown, per-host findings with CVE refs + CVSS, and scan metadata (duration, NVT feed version). Open-source, 100k+ NVTs. In MAOS, launching a scan is a §5 network/exec action restricted to in-scope authorized hosts (no cross-host/out-of-sandbox targets); GMP credentials live in a vault, never committed (§5); the TLS connection is verified outside an explicitly-flagged lab; the scanned estate is externa",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-vulnerability-management-with-greenbone/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-vulnerability-remediation-sla",
+    "name": "implementing-vulnerability-remediation-sla",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive remediation-SLA program design: mandatory remediation timeframes set by severity (CVSS base) modulated by threat context (EPSS > 0.5 and CISA KEV accelerate the clock ~50%) and by asset tier (crown-jewels tighter than standard). Components: severity classification, asset tiering, a (severity × tier) timeframe matrix, a documented exception process (written justification + compensating controls + asset-owner AND security-leadership approval, max 90 days renewable), an escalation chain on breach, and KPIs — SLA compliance rate (>90%), MTTR by severity, backlog past SLA (<5%), exception rate (<10%), recurrence (<5%). Start achievable, tighten with maturity; never treat all assets equally. In MAOS, SLA timers and breach events map to the events/budgets-style ledger (telemetry, not ca",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-vulnerability-remediation-sla/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-vulnerability-sla-breach-alerting",
+    "name": "implementing-vulnerability-sla-breach-alerting",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SLA-breach alerting: a tracking store (finding_id, severity, CVSS, discovered_at, computed sla_deadline, remediated_at, status, escalation_level, last_alert_sent) plus deterministic breach-state logic — map CVSS to a tier, compute the deadline, then classify within_sla / approaching_breach (~80% elapsed) / breached_<n>d_overdue / remediated_within_sla / remediated_breach. Drive severity-tiered escalation (approaching → at-breach immediate + escalate → post-breach repeated) and a compliance dashboard (SLA compliance rate, MTTR, current overdue). In MAOS, the breach-state classification is pure deterministic scoring (no LLM, cheap); the SLA store maps to the events ledger (§9); outbound notifications (Slack/email/PagerDuty webhooks) are §5 outbound-send actions that are risk-gated ",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-vulnerability-sla-breach-alerting/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
     "tier": "T1"
   },
   {
@@ -2887,6 +3139,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-active-directory-vulnerability-assessment",
+    "name": "performing-active-directory-vulnerability-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "AUTHORIZED self-audit of Active Directory security posture (defensive): PingCastle for a health-check score (stale objects, privileged accounts, trusts, anomalies), Purple Knight for 130+ posture indicators, and BloodHound (SharpHound collector) to map attack paths to Domain Admin. Surfaces the canonical AD misconfigurations — Kerberoastable admin SPNs, unconstrained/constrained delegation, AS-REP roastable accounts, AdminSDHolder ACL drift, LDAP-signing not enforced, excessive Domain/Enterprise/Schema Admin membership — and turns each into a remediation (gMSA, constrained/RBCD, pre-auth enable, ACL restore, GPO enforce). HARD SCOPE: owned/administered domain only, with explicit authorization; collection runs least-privilege; this is assess-and-remediate, never weaponize the paths. In MAOS",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-active-directory-vulnerability-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-agentless-vulnerability-scanning",
+    "name": "performing-agentless-vulnerability-scanning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive agentless vulnerability scanning — assess systems with no endpoint agent installed: authenticated SSH (port 22) for Linux package/config enumeration, WinRM/WS-Man (5985/5986) for Windows hotfix + registry software inventory, cloud snapshot analysis (request disk snapshot via provider API → mount in an isolated analysis env → examine OS packages/config → DELETE the snapshot, no persistent copies), SNMPv3 for network-device fingerprinting, and the open-source Vuls scanner (NVD/OVAL) for Linux/FreeBSD. Ideal for cloud VMs, IoT, legacy, and OT where agents can't run. In MAOS, remote enumeration + snapshot creation are §5 network/exec/cloud-API actions restricted to in-scope authorized hosts (no cross-host/out-of-sandbox); use a dedicated least-privilege read-only service account; SSH",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-agentless-vulnerability-scanning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
     "id": "performing-api-fuzzing-with-restler",
     "name": "performing-api-fuzzing-with-restler",
     "description": "|",
@@ -2943,6 +3223,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-asset-criticality-scoring-for-vulns",
+    "name": "performing-asset-criticality-scoring-for-vulns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive asset-criticality scoring so remediation focuses on business risk, not raw CVSS: a deterministic weighted model — business-function impact (25%) + data sensitivity (25%) + regulatory scope (15%) + network exposure (15%) + recoverability (10%) + user population (10%) → a 1-5 score mapped to a tier (Crown Jewels -50% SLA, High Value -25%, Standard baseline, Low Impact +25%, Minimal +50%). The tier modifies the remediation SLA so a CVSS 9.0 on a payment DB outranks the same CVE on a test box. Best practice: involve business stakeholders (IT alone can't judge impact), review quarterly, start with a 3-tier model before 5, never classify everything 'critical'. In MAOS, the scorer is pure deterministic arithmetic (no LLM, cheap — §6); the tier feeds the SLA model and aligns with the §5 ",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-asset-criticality-scoring-for-vulns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-authenticated-scan-with-openvas",
+    "name": "performing-authenticated-scan-with-openvas",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authenticated OpenVAS/Greenbone (GVM) scanning doctrine: stand up gvmd/openvas-scanner with synced NVT feed, create least-privilege scan credentials (SSH key for Linux, SMB for Windows, ESXi for VMware) stored in a vault, build targets + a cloned scan config, run/schedule the task, then VALIDATE credential acceptance (auth-success NVTs) before trusting results. Authenticated scans find ~10-50x more local vulnerabilities than unauthenticated. Defensive only: owned + written-authorized infrastructure, read-only scanning; remediation is a gated risk:high action. Frameworks NIST CSF (ID.RA-01, ID.RA-02, ID.IM-02, ID.RA-06) + MITRE ATT&CK (T1190, T1203, T1068, T1003, T1110). In MAOS this feeds mas-sec-reviewer (§5) and rides subscription quota (§11), never per-token cash.",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-authenticated-scan-with-openvas/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
     "id": "performing-container-escape-detection",
     "name": "performing-container-escape-detection",
     "description": "|",
@@ -2982,6 +3290,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-container-security-scanning-with-trivy/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-cve-prioritization-with-kev-catalog",
+    "name": "performing-cve-prioritization-with-kev-catalog",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CISA KEV + EPSS + CVSS prioritization doctrine: fetch the CISA KEV catalog daily (BOD 22-01 living list of actively-exploited CVEs, ransomware-use flag, FCEB due dates), enrich with EPSS exploitation probability and CVSS severity, then weight a composite risk score (KEV 30% / EPSS 25% / CVSS 20% / asset criticality 15% / exposure 10%) into P1-P5 SLAs. Treat every KEV-listed CVE as P1 regardless of CVSS; never treat non-KEV as safe (not-yet-cataloged); flag ransomware-associated CVEs as highest urgency. Defensive only: exploitation-aware prioritization, never exploitation. Frameworks NIST CSF (ID.RA-01/02, ID.IM-02, ID.RA-06) + MITRE ATT&CK (T1190, T1203, T1068) + NIST AI RMF (MEASURE-2.7, MAP-5.1, MANAGE-2.4) + MITRE ATLAS (AML.T0070, AML.T0066, AML.T0082). In MAOS this feeds mas-sec-revie",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cve-prioritization-with-kev-catalog/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
     "tier": "T1"
   },
   {
@@ -3125,6 +3447,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-web-application-scanning-with-nikto",
+    "name": "performing-web-application-scanning-with-nikto",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Nikto web-server scanning doctrine: scan owned + written-authorized web servers for server-level issues — misconfigurations, dangerous default/backup files, outdated server software with known CVEs, dangerous HTTP methods (PUT/DELETE/TRACE), missing security headers (CSP/X-Frame-Options/HSTS), and SSL/TLS weaknesses — using -Pause to limit production load, multiple output formats for reporting, and manual validation against custom-404 false positives. Nikto covers server/config, NOT application logic — pair with ZAP/Burp. Defensive only: owned + authorized servers, read-only scanning, NO IDS-evasion options, remediation is a gated risk:high action. Frameworks NIST CSF (ID.RA-01, ID.RA-02, ID.IM-02, ID.RA-06) + MITRE ATT&CK (T1190, T1203, T1068). In MAOS this feeds mas-sec-reviewer (§5), eg",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-web-application-scanning-with-nikto/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-web-application-vulnerability-triage",
+    "name": "performing-web-application-vulnerability-triage",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Web-app vulnerability triage doctrine (OWASP Risk Rating): ingest DAST/SAST findings, dismiss common informational false positives (missing low-severity headers, context-dependent cookie flags), confirm true positives by scanner evidence + certainty, flag injection findings for manual code review, then rate each finding Risk = Likelihood × Impact (0-9 threat-agent + vulnerability factors × technical + business impact factors) into Note/Low/Medium/High/Critical, mapped to OWASP Top 10 / CWE. Reduces alert fatigue; focuses remediation. Defensive only: triage on your OWN application under authorization; any confirmation testing runs against owned apps in a non-prod environment. Frameworks NIST CSF (ID.RA-01, ID.RA-02, ID.IM-02, ID.RA-06) + MITRE ATT&CK (T1190, T1203, T1068). In MAOS this feed",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-web-application-vulnerability-triage/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
     "id": "perl-patterns",
     "name": "perl-patterns",
     "description": "|",
@@ -3207,6 +3557,20 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-agent",
     "tier": "T2"
+  },
+  {
+    "id": "prioritizing-vulnerabilities-with-cvss-scoring",
+    "name": "prioritizing-vulnerabilities-with-cvss-scoring",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CVSS (v4.0/v3.1) scoring and prioritization doctrine: assess base metrics (attack vector/complexity/requirements, privileges, user interaction, vulnerable + subsequent C/I/A), layer threat metrics (exploit maturity) and environmental metrics (CR/IR/AR, modified base), then NEVER prioritize on base score alone — fold in EPSS probability, CISA KEV listing, asset criticality, and network exposure to set P1-P5 SLAs. Document scoring rationale for an audit trail; re-evaluate as threat intel changes. Defensive only: scoring and prioritization, never exploitation. Frameworks NIST CSF (ID.RA-01, ID.RA-02, ID.IM-02, ID.RA-06) + MITRE ATT&CK (T1190, T1203, T1068). In MAOS this feeds mas-sec-reviewer (§5), is deterministic (no LLM call to rank), and rides subscription quota (§11), never per-token cas",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/prioritizing-vulnerabilities-with-cvss-scoring/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
   },
   {
     "id": "prisma-patterns",
@@ -3682,6 +4046,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-docker-images-with-trivy/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "scanning-infrastructure-with-nessus",
+    "name": "scanning-infrastructure-with-nessus",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Tenable Nessus infrastructure scanning doctrine: build a tuned scan policy (discovery → port scan → service detection → plugin selection), configure least-privilege vaulted credentials for authenticated scanning (45-60% more detection, fewer false positives), exclude fragile hosts (medical/SCADA), run in a maintenance window via the REST API, then interpret severity (Critical→Informational) and export (nessus/csv/html). Defensive only: owned + written-authorized infrastructure, read-only scanning; remediation is a gated risk:high action; validate critical findings manually. Frameworks NIST CSF (ID.RA-01, ID.RA-02, ID.IM-02, ID.RA-06) + MITRE ATT&CK (T1190, T1203, T1068, T1046). In MAOS this feeds mas-sec-reviewer (§5) and rides subscription quota (§11), never per-token cash.",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-infrastructure-with-nessus/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
     "tier": "T1"
   },
   {
@@ -4177,6 +4555,20 @@
     "summary": "Gives the user an upfront, explicit choice over response depth instead of guessing. Before answering: (1) estimate input tokens (prose words×1.3, code chars/4); (2) classify complexity (Simple 3-8x … Complex 15-40x) to get a response window; (3) present four depth levels — Essential 25% / Moderate 50% / Detailed 75% / Exhaustive 100% — with estimated token counts; (4) answer at the chosen level. Honors shortcuts ('tldr'→25%, 'detailed'→75%) and maintains a session-set level silently. Heuristic only (~85-90% accuracy, ±15%) — always shows the disclaimer; no real tokenizer. MAS variant: this is the user-facing surface of the §6 eco/standard/expert depth control and TOKEN_STRATEGY signal-density discipline — Essential maps to eco, Exhaustive to expert; it is a depth-negotiation skill, never a",
     "tags": [],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/token-budget-advisor/SKILL.md"
+  },
+  {
+    "id": "triaging-vulnerabilities-with-ssvc-framework",
+    "name": "triaging-vulnerabilities-with-ssvc-framework",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CISA/SEI SSVC decision-tree triage doctrine: evaluate five decision points per vulnerability — exploitation status (None/PoC/Active, checked against CISA KEV + EPSS), technical impact (Partial/Total), automatability (No/Yes), mission prevalence (Minimal/Support/Essential), public well-being impact (Minimal/Material/Irreversible) — then walk the tree to one of four stakeholder-specific outcomes: Track (90d), Track* (60d), Attend (14d), Act (48h). Unlike CVSS alone, SSVC encodes mission + societal context into an auditable, deterministic decision. Defensive only: triage and prioritization, never exploitation. Frameworks NIST CSF (ID.RA-01, ID.RA-02, ID.IM-02, ID.RA-06) + MITRE ATT&CK (T1190, T1203, T1068). In MAOS this feeds mas-sec-reviewer (§5), is deterministic (no LLM call to decide), on",
+    "tags": [
+      "cyber:vulnerability-management"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/triaging-vulnerabilities-with-ssvc-framework/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
   },
   {
     "id": "ui-demo",
