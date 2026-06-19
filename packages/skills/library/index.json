@@ -140,6 +140,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-kubernetes-audit-logs",
+    "name": "analyzing-kubernetes-audit-logs",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive analysis of Kubernetes API-server audit logs. Parse the JSON-lines audit stream and detect the high-signal events: pods/exec + pods/attach (shell into a container), secrets get/list/watch (credential enumeration), clusterrolebindings/roles create-update-bind-escalate (RBAC privilege escalation), privileged-pod creation, and system:anonymous / system:unauthenticated access. Each pattern becomes a SIEM/threat-hunt rule keyed on verb + objectRef.resource + user.username. In MAOS this is a detection-engineering lens that feeds mas-sec-reviewer and CLAUDE.md §5 (spotting escalation inside a supervised container workload); telemetry is recorded as MAOS quota/events, never per-token cash (§11). Offensive use against unowned clusters is out of scope.",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-kubernetes-audit-logs/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
     "id": "android-clean-architecture",
     "name": "android-clean-architecture",
     "description": "|",
@@ -347,6 +361,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/browser-qa/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-eval",
+    "tier": "T1"
+  },
+  {
+    "id": "building-devsecops-pipeline-with-gitlab-ci",
+    "name": "building-devsecops-pipeline-with-gitlab-ci",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Shift-left CI/CD security pipeline doctrine (GitLab CI reference): every change passes ordered security stages — SAST, dependency scan, container scan, secret detection, license check, then DAST against a deployed staging target — each as a blocking gate (fail-closed on HIGH/CRITICAL) before promotion. Scanners run in parallel, results consolidate into one vulnerability report, and a merge gate requires sign-off when critical findings appear. In MAOS this is the secure-pipeline lens for our own GitHub Actions: the lint-no-sdk-payg guard (§11) and the 5-verification-checks (§7) are exactly such gates; promotion is fail-closed, never advisory. Production deploy stays manual (§5). Tool-named seats (GitLab Ultimate) are a third-party licence, not MAOS quota (§11).",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-devsecops-pipeline-with-gitlab-ci/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
     "tier": "T1"
   },
   {
@@ -930,6 +958,62 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-broken-object-property-level-authorization/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-container-drift-at-runtime",
+    "name": "detecting-container-drift-at-runtime",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Runtime drift detection for containers under the immutable-infrastructure (DIE: Detect-Isolate-Evict) model: any change to a running container vs its source image is a potential IoC. DETECT the five drift types (binary, file, configuration, package, network) via Falco/eBPF rules (new-binary exec in upper layer, shell spawn, package-manager run, unexpected filesystem write) and continuous image-digest verification against the approved manifest. PREVENT via readOnlyRootFilesystem + allowPrivilegeEscalation:false + runAsNonRoot, tmpfs for writable paths, and Pod Security Standards (restricted). Response playbook: detect → validate → isolate (deny-all NetworkPolicy) → investigate → evict → remediate. In MAOS this hardens supervised container workloads and feeds mas-sec-reviewer / §5; cost fram",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-container-drift-at-runtime/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-container-escape-attempts",
+    "name": "detecting-container-escape-attempts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of container-escape attempts. Catalog the escape vectors defensively (privileged-container host mount, /var/run/docker.sock access, kernel CVEs like Dirty Pipe / runc, CAP_SYS_ADMIN/PTRACE abuse, sensitive mounts /proc/sysrq-trigger /proc/kcore cgroup release_agent, nsenter/unshare namespace escape) and map each to its MITRE ID. DETECT across five layers: syscall (eBPF/Falco), file integrity, process, network, auditd. Ships Falco rules that ALERT on these acts (not perform them), a seccomp profile that LOGS escape-relevant syscalls, and auditd rules for namespace/mount/module ops. In MAOS this is a detection lens for supervised container workloads feeding mas-sec-reviewer / §5; cost is quota, never cash (§11). Offensive breakout against unowned hosts is out of scope.",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-container-escape-attempts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-container-escape-with-falco-rules",
+    "name": "detecting-container-escape-with-falco-rules",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Falco-specific runtime detection of container escape. Falco (CNCF-graduated) watches Linux syscalls and fires rules on escape behavior. Ships a complete defensive rule set that ALERTS on: container mounting host filesystem, nsenter execution, privileged-container launch, writes to /proc/sysrq-trigger and cgroup release_agent (CVE-2022-0492), kernel-module loads, host /etc/shadow reads, and /var/run/docker.sock access — each tagged with its MITRE technique. Covers Helm/standalone install, falco.yaml + falcosidekick alert routing, and rule testing with the event generator. Best practices: DaemonSet coverage, eBPF driver, MITRE-tagged rules, permissive-mode testing, false-positive tuning. In MAOS this hardens supervised container workloads and feeds mas-sec-reviewer / §5; quota not cash (§11)",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-container-escape-with-falco-rules/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-privilege-escalation-in-kubernetes-pods",
+    "name": "detecting-privilege-escalation-in-kubernetes-pods",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection + prevention of privilege escalation in k8s pods. Maps each escalation vector (privileged:true, hostPID/hostNetwork, hostPath volumes, SYS_ADMIN/SYS_PTRACE/SYS_MODULE caps, allowPrivilegeEscalation:true, runAsUser:0, automountServiceAccountToken) to its control. PREVENT at admission: Pod Security Admission restricted, OPA Gatekeeper / Kyverno constraints that block dangerous caps and privileged mode. DETECT at runtime with Falco: setuid-binary exec, capset capability gains, dangerous-cap container start, writes to /etc/passwd. INVESTIGATE via audit policy + kubectl jq queries for privileged/root pods and hostPath. Best practice: PSS restricted, drop ALL caps, allowPrivilegeEscalation:false, runAsNonRoot, disable token automount, seccomp. In MAOS feeds mas-sec-reviewer /",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-privilege-escalation-in-kubernetes-pods/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
     "tier": "T1"
   },
   {
@@ -1581,6 +1665,34 @@
     "tier": "T2"
   },
   {
+    "id": "hardening-docker-containers-for-production",
+    "name": "hardening-docker-containers-for-production",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Production Docker hardening aligned to CIS Docker Benchmark v1.8.0 across host, daemon, image, and runtime. Dockerfile: pinned-digest multi-stage build onto a distroless/minimal base, non-root USER. Daemon.json: icc:false, no-new-privileges, seccomp profile, log rotation, live-restore, userland-proxy:false, TLS+tlsverify. Runtime: --read-only, tmpfs with noexec/nosuid, --cap-drop ALL (+ only-needed caps), --security-opt no-new-privileges/seccomp/apparmor, --pids-limit/--memory/--cpus, --user non-root, resource + health limits. Plus Docker Content Trust image signing and host auditd rules for docker files. VALIDATE with docker-bench-security, hadolint, dockle. Principles: least-privilege, immutability, minimalism, isolation, auditability. In MAOS hardens supervised containers and feeds mas-",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hardening-docker-containers-for-production/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "hardening-docker-daemon-configuration",
+    "name": "hardening-docker-daemon-configuration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Hardening of the root-privileged Docker daemon (dockerd) — the highest-value container target. Core hardened daemon.json: icc:false, userns-remap:default (maps container root to an unprivileged host UID, defeating breakout-to-host-root), no-new-privileges:true, seccomp profile, log rotation, live-restore, userland-proxy:false, overlay2, controlled address pools, optional gVisor runsc runtime. Remote API: TLS + tlsverify with a CA-signed server/client cert chain (never plaintext tcp). Plus rootless Docker, Docker Content Trust (signed-image pull), seccomp/AppArmor profiles, and strict /var/run/docker.sock ownership/permissions + audit (never mount the socket into a container). Verify with docker info + docker-bench. In MAOS hardens the supervised container host and feeds mas-sec-reviewer / ",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hardening-docker-daemon-configuration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
     "id": "healthcare-cdss-patterns",
     "name": "healthcare-cdss-patterns",
     "description": "Use to build Clinical Decision Support System (CDSS) logic: drug-interaction checking, dose validation, clinical scoring (NEWS2, qSOFA, GCS), and alert severity classification feeding an EMR workflow. CDSS is patient-safety critical — zero tolerance for false negatives. Use when implementing medication safety, lab interpretation, or early-warning scores in a clinical app. Do NOT use for non-clinical alerting, generic form validation, or UI styling unrelated to safety alerts.",
@@ -1851,6 +1963,258 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-aqua-security-for-container-scanning",
+    "name": "implementing-aqua-security-for-container-scanning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive container & supply-chain scanning with Trivy (Aqua): scan images layer-by-layer for OS-package and language-dependency CVEs, plus filesystem/repo, Kubernetes, and IaC misconfig scanning, generating an SBOM (CycloneDX/SPDX) per image. Gate the build fail-closed on CRITICAL (`--exit-code 1 --severity CRITICAL`), upload SARIF to the security dashboard, and time-box accepted risks in `.trivyignore` with an `exp:` date — never an open-ended suppression. In MAOS this is the dependency/supply-chain audit lens for our own Docker images and lockfiles, feeding mas-sec-reviewer; promotion is fail-closed, never advisory. Scan only artifacts you own (§5). No per-token cash: scan cost is quota units (§11).",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-aqua-security-for-container-scanning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-code-signing-for-artifacts",
+    "name": "implementing-code-signing-for-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Artifact integrity & provenance via code signing: sign release binaries/packages/containers and verify the signature before deployment, so a tampered or unauthentic artifact is rejected fail-closed. Prefer Sigstore keyless (cosign sign-blob + Rekor transparency log + Fulcio OIDC certs) over long-lived GPG keys held in CI secrets — ephemeral keys remove the key-compromise blast radius. Verify against a pinned certificate-identity and OIDC issuer, plus SHA256 checksums; npm publishes with `--provenance`. In MAOS this is the supply-chain integrity lens (§5): deploy is a human gate, signing keys are secrets (never committed, §11), and verification is fail-closed — an unsigned/unverified artifact never promotes. Sign only as identities you own.",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-code-signing-for-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-container-image-minimal-base-with-distroless",
+    "name": "implementing-container-image-minimal-base-with-distroless",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Minimal-base container images for attack-surface reduction. Distroless images carry only the app + runtime — no shell, package manager, coreutils, curl/wget, or user-management — cutting attack surface up to ~95% and typical CVEs from 50-200+ to 0-5. Pick the right base (static-debian12 for Go/Rust static, base for glibc, cc for C/C++, java21/python3/nodejs22 for those runtimes) and build multi-stage: compile in a full builder, copy only artifacts into the distroless runtime, run as USER nonroot:nonroot (UID 65534). Security payoff: no shell to exec into, no package manager to pull malware, no recon utilities. Debug shell-less images via :debug variant, kubectl debug ephemeral containers, or crane/dive inspection; confirm with Trivy. Docker Hardened Images (DHI) are an open alternative. In",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-container-image-minimal-base-with-distroless/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-container-network-policies-with-calico",
+    "name": "implementing-container-network-policies-with-calico",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Zero-trust microsegmentation for Kubernetes pods using Calico's CNI policy engine. Workflow: (1) audit existing NetworkPolicy/GlobalNetworkPolicy via calicoctl + kubectl to find unprotected namespaces; (2) apply per-namespace DEFAULT-DENY ingress AND egress as the zero-trust baseline; (3) add granular allow rules only for legitimate pod-to-pod / pod-to-service / required-egress (incl. DNS-based) traffic; (4) validate by testing pod-to-pod connectivity to confirm policies enforce. Output is an audit report of policies, unprotected namespaces, rule counts, and connectivity results. This is the network limb of CLAUDE.md §5 (allowed_hosts / egress gating) applied to container workloads — least-privilege networking that contains lateral movement after a single pod compromise. In MAOS feeds mas-",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-container-network-policies-with-calico/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-github-advanced-security-for-code-scanning",
+    "name": "implementing-github-advanced-security-for-code-scanning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SAST + secret-scanning on GitHub via GHAS/CodeQL: CodeQL compiles code to a queryable DB and runs CWE/OWASP-mapped semantic queries (lower false-positive than pattern matching); secret scanning + push protection block credentials before they reach history; dependency review + Dependabot gate vulnerable deps in PRs. Branch protection requires the CodeQL check and blocks merge on High/Critical. In MAOS this maps directly onto our own GitHub Actions: it is the secure-pipeline lens for our repo, sits alongside the lint-no-sdk-payg guard (§11) and the 5 verification checks (§7), and feeds mas-sec-reviewer. Gates are fail-closed, never advisory. Scan only repos you own (§5). Seats are a third-party licence, not MAOS quota (§11).",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-github-advanced-security-for-code-scanning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-image-provenance-verification-with-cosign",
+    "name": "implementing-image-provenance-verification-with-cosign",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Supply-chain image provenance with Sigstore Cosign. SIGN images key-based (cosign.key, KMS-backed for AWS/GCP/Vault) or keyless via OIDC (Fulcio cert + Rekor transparency log, no long-lived key). ATTEST SBOM (CycloneDX), vuln scans, and SLSA provenance alongside the signature. VERIFY by key or by OIDC identity (certificate-identity + oidc-issuer, regex-matchable). INTEGRATE in CI/CD (GitHub Actions id-token: write for keyless) signing by digest not tag. ENFORCE at admission with Sigstore policy-controller ClusterImagePolicy or Kyverno verifyImages so unsigned/unattested images are rejected. Verify the full chain: signature + Fulcio cert + Rekor inclusion. This is the trust-anchor for what containers MAOS allows; aligns with CLAUDE.md §5 (gating untrusted artifacts) and feeds mas-sec-review",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-image-provenance-verification-with-cosign/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-infrastructure-as-code-security-scanning",
+    "name": "implementing-infrastructure-as-code-security-scanning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive IaC misconfig scanning with Checkov/tfsec/KICS: catch insecure cloud config (public buckets, open security groups, unencrypted storage, privileged/limitless containers) in Terraform/CloudFormation/K8s/Helm/Dockerfiles *before* deploy, gating the PR fail-closed (`soft_fail:false`). Prefer Terraform-plan scanning over raw `.tf` (resolves computed values); author custom Checkov checks (Python/YAML) for project rules; time-box suppressions with a documented reason. Findings upload as SARIF to the dashboard. In MAOS this is the config-security lens for our own infra-as-config (Dockerfiles, any k8s/CI manifests we author), complementing container scanning (Trivy does light Dockerfile misconfig; this owns the policy-governance depth) and feeding mas-sec-reviewer. Scan only config you ow",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-infrastructure-as-code-security-scanning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-kubernetes-network-policy-with-calico",
+    "name": "implementing-kubernetes-network-policy-with-calico",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Calico zero-trust micro-segmentation: start with default-deny ingress AND egress per namespace, then allow DNS egress (UDP/TCP 53) BEFORE any egress deny or pods break; vanilla NetworkPolicy for pod/namespace selectors; Calico GlobalNetworkPolicy for cluster-wide baselines with explicit order, action:Deny rules, serviceAccounts selectors, and host-endpoint SSH restriction; organize into security/platform tiers. calicoctl get is read-only diagnosis; create/apply/replace mutate a live cluster and are human-gated (§5), never auto-run even in autopilot. Defensive harden lens feeding mas-sec-reviewer and §5 egress allowlisting; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-kubernetes-network-policy-with-calico/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-kubernetes-pod-security-standards",
+    "name": "implementing-kubernetes-pod-security-standards",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Pod Security Standards reference: three profiles (Privileged=unrestricted, Baseline=blocks known escalations/hostNetwork/hostPID/privileged, Restricted=non-root + drop ALL caps + seccomp RuntimeDefault + readOnlyRootFilesystem) enforced by the built-in Pod Security Admission controller (GA 1.25+) at namespace level via labels, in three modes (enforce rejects, audit logs, warn warns). Migrate gradually: audit+warn first, dry-run=server to preview violations, then enforce. Restricted-compliant Deployment spec provided (runAsNonRoot, drop ALL, allowPrivilegeEscalation:false, automountServiceAccountToken:false). enforce labels can reject running pods — human-gated (§5), never auto-applied. Defensive admission-control lens feeding mas-sec-reviewer; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-kubernetes-pod-security-standards/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-network-policies-for-kubernetes",
+    "name": "implementing-network-policies-for-kubernetes",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Portable (Calico/Cilium/Antrea) NetworkPolicy microsegmentation: default-deny ingress AND egress per namespace, then allow DNS egress (UDP/TCP 53 to kube-system) BEFORE any egress deny or service discovery breaks; app-specific pod-selector allows with explicit ports; cross-namespace monitoring scrape; egress restricted to named pods/CIDRs; and a metadata-SSRF block (egress 0.0.0.0/0 EXCEPT 169.254.169.254 AWS/GCP + 100.100.100.200 Azure) to stop cloud-credential theft. kubectl get is read-only; apply mutates a live cluster and is human-gated (§5), never auto-run. Egress rules are the in-cluster §5 host allowlist; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-network-policies-for-kubernetes/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-opa-gatekeeper-for-policy-enforcement",
+    "name": "implementing-opa-gatekeeper-for-policy-enforcement",
+    "description": "|",
+    "domain": "planning",
+    "summary": "OPA Gatekeeper policy-as-code: ConstraintTemplates (Rego blueprints) + Constraints (parameterized instances) validate/mutate/deny admission requests for policy beyond the three fixed PSS profiles. Ship constraints in dryrun first, review .status.violations, then switch to deny — never deny straight on a populated cluster. Common templates: required-labels, block-privileged, allowed-image-repos, require resource limits, block :latest tag, readOnlyRootFilesystem. Exempt kube-system/gatekeeper-system; version-control templates in Git; test Rego with opa test before deploy; layer with Pod Security Admission for defense-in-depth. Constraint deploys can reject workloads — human-gated (§5). Defensive admission lens feeding mas-sec-reviewer; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-opa-gatekeeper-for-policy-enforcement/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-pod-security-admission-controller",
+    "name": "implementing-pod-security-admission-controller",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Pod Security Admission operationalization: built-in controller (GA 1.25+), three profiles (Privileged/Baseline/Restricted) × three modes (enforce/audit/warn) at namespace level, PLUS cluster-wide defaults via AdmissionConfiguration (--admission-control-config-file) with per-namespace exemptions, and a PSP→PSA migration path (audit existing PSPs, map to profiles, label audit-first, fix, enforce). Set baseline as cluster default, restrict per namespace; pin enforce-version; dry-run=server to preview rejected pods; combine with Gatekeeper for custom policy. enforce labels reject running pods and AdmissionConfiguration changes restart kube-apiserver — human-gated (§5). Defensive admission lens feeding mas-sec-reviewer; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-pod-security-admission-controller/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-policy-as-code-with-open-policy-agent",
+    "name": "implementing-policy-as-code-with-open-policy-agent",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Policy-as-code with OPA/Rego: encode governance rules as version-controlled, testable policy and enforce them deterministically — conftest as a CI gate over YAML/JSON/HCL, OPA Gatekeeper as a Kubernetes admission controller (ConstraintTemplate + Constraint) blocking non-compliant resources (privileged containers, missing limits, :latest tags, missing labels). Roll out warn → deny with a remediation window and system-namespace exemptions; never deny on day one. In MAOS this is the lens for our own policy-as-code: config/permissions.json IS our declarative risk-category extension point (§5), and a deterministic Rego/conftest gate can enforce repo invariants (e.g. no @anthropic-ai/sdk import §11) in CI fail-closed. Policy enforces, never weakens, §5 gates. No per-token cash (§11).",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-policy-as-code-with-open-policy-agent/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-rbac-hardening-for-kubernetes",
+    "name": "implementing-rbac-hardening-for-kubernetes",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Kubernetes RBAC least-privilege hardening: eliminate cluster-admin sprawl (audit ClusterRoleBindings), prefer namespace Role/RoleBinding over ClusterRole, one dedicated ServiceAccount per workload with automountServiceAccountToken:false unless the app calls the API, and restrict escalation-enabling verbs/resources (secrets get/list, pods/exec, serviceaccounts/token create, clusterrole* create/update, nodes/proxy). Integrate OIDC for user auth; audit with kubectl get -o json | jq, rbac-lookup, rakkess access-matrix. Audit (get) is read-only and safe; create/apply/delete of roles/bindings can break workloads or self-escalate — human-gated (§5). This is the in-cluster analogue of §5 cross-project gating; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-rbac-hardening-for-kubernetes/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-runtime-security-with-tetragon",
+    "name": "implementing-runtime-security-with-tetragon",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cilium Tetragon eBPF runtime security: TracingPolicy CRDs attach kprobes to kernel functions to observe process lifecycle, file access, network, and syscalls with <1% overhead, and can enforce in-kernel via Sigkill (terminate), Signal, or Override (deny syscall return). Start every policy in observe (action:Post) mode; promote to Sigkill only after tuning and a human gate, since it kills processes. Example detections: container-escape via setns, sensitive-file reads (/etc/shadow, /var/run/secrets), crypto-miner binaries. Stream events with tetra getevents; export JSON to SIEM/Elasticsearch; Prometheus metrics at :2112. Enforcement (Sigkill) is high-risk — human-gated (§5). Defensive runtime-detection lens feeding mas-sec-reviewer; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-runtime-security-with-tetragon/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-secret-scanning-with-gitleaks",
+    "name": "implementing-secret-scanning-with-gitleaks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive secret scanning with Gitleaks: block hardcoded credentials at the pre-commit hook (`gitleaks protect --staged`) and as a CI gate (`detect --exit-code 1`), scan full history to find pre-existing secrets, manage a baseline so only NEW findings fail (while historical ones are rotated), and author custom org-specific rules. Remediation is rotate-first (revoke the live credential) THEN history-clean. In MAOS this is the single strongest §11 defense: it is how `ANTHROPIC_API_KEY` and provider keys never reach the repo (.env stays gitignored), reinforcing the lint-no-sdk-payg guard. The history rewrite (`git filter-repo` + force-push) is a §5 risk:high action requiring human validation and team coordination — never autopilot. No per-token cash (§11).",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-secret-scanning-with-gitleaks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-semgrep-for-custom-sast-rules",
+    "name": "implementing-semgrep-for-custom-sast-rules",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Custom Semgrep SAST authoring as a defensive secure-coding control: write YAML rules (single pattern, pattern-either, metavariable-regex, pattern-not exclusions, taint mode source→sink→sanitizer) tagged with CWE/OWASP metadata and a fix suggestion; prefer auto config first, then org-specific custom rules; validate every rule with `# ruleid:` / `# ok:` test annotations before trusting it; emit SARIF, run as a blocking ERROR-severity check, and tune false positives via .semgrepignore and nosemgrep rather than disabling rules wholesale. In MAOS this feeds the mas-sec-reviewer secure-coding lens (§5/§7) and produces diffs against the external read-only project, never silent rewrites; tuning effort is measured in subscription quota (§11), never per-token cash.",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-semgrep-for-custom-sast-rules/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-supply-chain-security-with-in-toto",
+    "name": "implementing-supply-chain-security-with-in-toto",
+    "description": "|",
+    "domain": "planning",
+    "summary": "in-toto software supply-chain integrity (CNCF graduated): a signed layout defines ordered steps (clone/build/scan/push), authorized functionaries (people/CI), inspections, and expected input/output artifacts; each step emits signed link metadata; verification chains artifact hashes between steps and checks functionary signatures before deploy. in-toto-verify gates deployment; a ValidatingWebhook (failurePolicy:Fail) can verify attestations at K8s admission. Maps to SLSA L1–L4 (documented → signed → hardened → two-party-review). Generate Ed25519 keys per functionary; NEVER commit private keys — layout carries public keyids only (§5 secrets gate). Defensive provenance lens feeding mas-sec-reviewer + dep-audit; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-supply-chain-security-with-in-toto/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-web-application-logging-with-modsecurity",
     "name": "implementing-web-application-logging-with-modsecurity",
     "description": "|",
@@ -1877,6 +2241,34 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-agent",
     "tier": "T2"
+  },
+  {
+    "id": "integrating-dast-with-owasp-zap-in-pipeline",
+    "name": "integrating-dast-with-owasp-zap-in-pipeline",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive DAST-in-pipeline with OWASP ZAP against an owned staging environment: run quick passive baseline scans in CI (2-5 min) for fast feedback, schedule active full scans (slow, attack traffic) off the critical path, run OpenAPI/Swagger-driven API scans, and tune findings with a rules.tsv (IGNORE/WARN/FAIL) so the gate FAILs on XSS/SQLi and WARNs on headers/cookies. Publish HTML/JSON reports as artifacts and block promotion to production on FAIL-level findings. Hard ownership boundary: ZAP active scans send attack payloads, so they run only against staging the team owns and coordinates — never production or third-party hosts (CLAUDE.md §5 network gating / allowed_hosts). In MAOS this feeds the mas-sec-reviewer web-app-security lens; scan effort is subscription quota (§11), not cash.",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/integrating-dast-with-owasp-zap-in-pipeline/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "integrating-sast-into-github-actions-pipeline",
+    "name": "integrating-sast-into-github-actions-pipeline",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SAST-in-CI with CodeQL + Semgrep on GitHub Actions: run code scanning on every PR/push (plus a weekly scheduled full scan), use CodeQL security-extended for deep dataflow and Semgrep for fast custom pattern rules, upload all results as SARIF under distinct categories, enforce a merge gate via branch protection requiring the scan checks to pass, and keep developer trust by tuning the false-positive rate below ~15% with CodeQL config excludes + .semgrepignore + scoped nosemgrep — never blanket rule deletion. Path-filter language matrices to control CI cost. In MAOS this is an enforcement arm of the mas-sec-reviewer secure-coding lens (§5/§7) operating on the external read-only project; scan effort is subscription quota (§11), and the SEMGREP_APP_TOKEN/GITHUB_TOKEN are CI secrets, n",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/integrating-sast-into-github-actions-pipeline/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
   },
   {
     "id": "intent-driven-development",
@@ -2551,6 +2943,62 @@
     "tier": "T1"
   },
   {
+    "id": "performing-container-escape-detection",
+    "name": "performing-container-escape-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive container-escape detection: read-only audit of K8s pods (kubernetes Python client) for escape vectors — privileged:true containers (full host access), CAP_SYS_ADMIN and other dangerous capabilities, host PID/Network/IPC namespace sharing, writable hostPath mounts to / or /etc, and Docker socket exposure (/var/run/docker.sock) enabling CVE-2022-0492-style cgroup abuse. Enumerate findings to feed mas-sec-reviewer and prioritize Pod Security Admission / RBAC remediation. This is posture audit only — NOT an escape playbook; the script reads pod specs, never exploits. Remediation is human-gated (§5). Defensive detection lens; cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-container-escape-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-container-image-hardening",
+    "name": "performing-container-image-hardening",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive container-image hardening to shrink attack surface: multi-stage builds that keep build deps out of the runtime image, minimal bases (distroless/slim/scratch), a non-root USER, removal of package managers/shells/setuid-setgid binaries/docs, base images pinned by SHA256 digest for reproducibility, and Kubernetes securityContext (runAsNonRoot, readOnlyRootFilesystem, allowPrivilegeEscalation:false, capabilities drop ALL, seccomp RuntimeDefault). Validate the result with Trivy + docker-bench-security and assert non-root/read-only behaviourally — hardening is verified, not assumed. In MAOS this feeds the mas-sec-reviewer / supply-chain lens; it produces a hardened Dockerfile diff against the external read-only project (§7/§8), and size/CVE reductions are reported as counts, never doll",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-container-image-hardening/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-container-security-scanning-with-trivy",
+    "name": "performing-container-security-scanning-with-trivy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Trivy container security scanning (Aqua Security, open-source): detect CVEs in OS packages and language deps, IaC/Dockerfile/K8s misconfigurations, exposed secrets, and license issues across images, filesystems, Git repos, and clusters; generate CycloneDX/SPDX SBOMs for supply-chain transparency; integrate as a CI/CD gate that blocks critical/high (SARIF for GitHub Advanced Security, JUnit XML for dashboards). Set severity thresholds; decide on ignore-unfixed deliberately; triage by CVSS + fixed-version availability. Scanning is read-only; remediation (dependency/image upgrade) mutates the project and is human-gated (§5). Defensive vuln-scan + SBOM lens feeding mas-sec-reviewer + dep-audit + supply-chain (pairs with in-toto); cost is quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-container-security-scanning-with-trivy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-docker-bench-security-assessment",
+    "name": "performing-docker-bench-security-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Docker Bench for Security audits a Docker host against the CIS Docker Benchmark — host configuration, daemon settings, image trust, runtime config, and security operations — emitting PASS/WARN/FAIL per control. Run it read-only (container form with read-only host mounts), fix FAIL before WARN, schedule for drift detection, and export JSON for the security record. In MAOS the scan itself is low-risk read-only; every remediation it implies (editing /etc/docker/daemon.json, no-new-privileges, icc=false, cap-drop, read-only rootfs, restarting the daemon) is a risk:high write that goes through mas-sec-reviewer + a human click (§5). Cost is measured in subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-docker-bench-security-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
     "id": "performing-graphql-depth-limit-attack",
     "name": "performing-graphql-depth-limit-attack",
     "description": "|",
@@ -2593,6 +3041,62 @@
     "tier": "T1"
   },
   {
+    "id": "performing-kubernetes-cis-benchmark-with-kube-bench",
+    "name": "performing-kubernetes-cis-benchmark-with-kube-bench",
+    "description": "|",
+    "domain": "planning",
+    "summary": "kube-bench runs the CIS Kubernetes Benchmark against control plane, etcd, worker nodes, and policies, producing PASS/FAIL/WARN with CIS control ids and managed-distro profiles (EKS/GKE/AKS/OpenShift). Run it read-only as a Job or binary, fix FAIL before WARN, export JSON for the security record, and schedule for drift. In MAOS the scan is low-risk read-only; every remediation it implies (editing kube-apiserver/kubelet manifests, --anonymous-auth=false, tightening RBAC, restarting components) is a risk:high write that passes mas-sec-reviewer + a human click (§5). Cost is subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-kubernetes-cis-benchmark-with-kube-bench/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-kubernetes-etcd-security-assessment",
+    "name": "performing-kubernetes-etcd-security-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "etcd is Kubernetes' backing store for every Secret, RBAC policy, and ConfigMap — unhardened, it exposes all cluster secrets in plaintext. This skill assesses five areas: encryption at rest (EncryptionConfiguration, verify ciphertext in etcd), TLS for client and peer transport, access control (loopback-only listen, cert file perms, single API-server client), backup encryption, and network isolation — mapped to CIS controls 2.1–2.7. Read-only assessment; remediation (EncryptionConfiguration edits, key rotation, re-encrypting Secrets, firewalling) is risk:high through mas-sec-reviewer + a human click (§5). Treat any extracted Secret material as confidential; never log it. Cost is subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-kubernetes-etcd-security-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-kubernetes-penetration-testing",
+    "name": "performing-kubernetes-penetration-testing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "DEFENSIVE Kubernetes self-assessment: run kube-hunter, kubescape, and kube-bench against a cluster you own and are authorized to test, to surface exposed API server/kubelet/etcd/Dashboard, anonymous access, over-broad RBAC, leaked Secrets, and missing NetworkPolicies — then fix them. The MITRE ATT&CK-for-Kubernetes matrix is used as a defensive surface map (what to detect and close), not an attack runbook. Scope is your own cluster only: external recon of third-party systems is out of scope and rejected. Every active probe that deploys a pod, exec's, or extracts a Secret is a risk:high action through mas-sec-reviewer + a human click (§5), with mandatory cleanup. Cost is subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-kubernetes-penetration-testing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-sca-dependency-scanning-with-snyk",
+    "name": "performing-sca-dependency-scanning-with-snyk",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SCA on open-source dependencies with Snyk: scan package manifests and lockfiles for known-vulnerable packages, distinguish direct from transitive, triage by exploit maturity (Mature/PoC) and reachability, remediate via automated fix PRs or by overriding/pinning the safe transitive version (npm overrides, Maven dependencyManagement), and record accepted risk in a .snyk policy with a reason and expiry — never an unbounded ignore. Gate CI on fixable critical/high via severity-threshold + monitor mode for newly-disclosed CVEs. MAOS framing: Snyk is a SaaS with a free tier and is OPT-IN under §11.bis — SNYK_TOKEN lives in CI secrets, a missing key disables the provider with a warning (never a crash), and Trivy/OWASP Dependency-Check/pip-audit are the documented free fallbacks. Effort ",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-sca-dependency-scanning-with-snyk/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
     "id": "performing-soap-web-service-security-testing",
     "name": "performing-soap-web-service-security-testing",
     "description": "|",
@@ -2604,6 +3108,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-soap-web-service-security-testing/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-threat-modeling-with-owasp-threat-dragon",
+    "name": "performing-threat-modeling-with-owasp-threat-dragon",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive design-phase threat modeling with OWASP Threat Dragon: scope the system (assets, external dependencies, compliance, trust boundaries), build a data flow diagram, then enumerate threats per element using STRIDE (Spoofing/Tampering/Repudiation/Info-disclosure/DoS/Elevation) and LINDDUN for privacy, mapping element type → applicable categories. Mark each threat Mitigated/Not-applicable/Open, attach a prevent-detect-respond-transfer mitigation with an owner and priority, generate a report, and treat the JSON model as a living, version-controlled artifact updated on architecture change. STRIDE/LINDDUN name what to DEFEND, never what to perform. In MAOS this is the structured front-end of the mas-sec-reviewer secure-design lens (§5) — the model surfaces risk:high/blocking surfaces a hu",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-threat-modeling-with-owasp-threat-dragon/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
     "tier": "T1"
   },
   {
@@ -3125,6 +3643,62 @@
     "tier": "T1"
   },
   {
+    "id": "scanning-container-images-with-grype",
+    "name": "scanning-container-images-with-grype",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Grype (Anchore) scans container images, filesystems, and SBOMs against NVD, GitHub Advisories, and OS-specific feeds, matching packages via Syft-generated SBOMs. Pick the source form (image/docker-archive/oci-dir/dir/sbom), gate CI with --fail-on high|critical, prefer --only-fixed for actionable findings, and suppress false positives only with a documented reason in .grype.yaml. Read-only by nature; the gating decision (block a build, accept a CVE) and any image rebuild are the risk-bearing actions reviewed by mas-sec-reviewer. Pin digests not :latest, scan --scope all-layers, keep the DB current, and track CVE counts over time. Cost is subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-container-images-with-grype/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "scanning-containers-with-trivy-in-cicd",
+    "name": "scanning-containers-with-trivy-in-cicd",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive container scanning with Trivy in CI/CD: scan built images for OS-package and language-dependency CVEs (`--severity CRITICAL,HIGH --exit-code 1 --ignore-unfixed`), scan Dockerfiles/IaC for misconfigurations (USER set, no :latest, no secrets in ENV/ARG, COPY over ADD), and generate an SBOM (CycloneDX/SPDX) decoupled from scanning. Block registry push on the exit code, upload SARIF for visibility, and record accepted risk in .trivyignore with a statement + expires (VEX) — never an open-ended ignore. Cache the vuln DB (and support air-gapped --skip-db-update) but not so aggressively that new CVEs lag. In MAOS this feeds the mas-sec-reviewer supply-chain lens and scans an image built from the external read-only project (§8); ignore-unfixed reduces noise without hiding fixable risk; ef",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-containers-with-trivy-in-cicd/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "scanning-docker-images-with-trivy",
+    "name": "scanning-docker-images-with-trivy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Trivy (Aqua) is a multi-scanner: vuln (CVEs in OS + language deps), misconfig (Dockerfile/K8s/Terraform), secret (hardcoded keys/tokens), and license. Scan images and IaC, filter --severity CRITICAL,HIGH, --ignore-unfixed for actionable findings, gate CI with --exit-code 1, emit SBOM (CycloneDX/SPDX) and SARIF to the security record. The secret scanner can surface real credentials in an image — treat any hit as confidential, never echo the value, and rotate the leaked credential (a risk:high action). The scan is read-only; the gate decision and CVE/secret suppression (.trivyignore with reason) are reviewed by mas-sec-reviewer. Pin digests, keep the DB current. Cost is subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-docker-images-with-trivy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "scanning-kubernetes-manifests-with-kubesec",
+    "name": "scanning-kubernetes-manifests-with-kubesec",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Kubesec (ControlPlane) statically analyzes Kubernetes manifests (Pod/Deployment/DaemonSet/StatefulSet) for exploitable risk — privileged, hostPID/hostNetwork, SYS_ADMIN/NET_RAW caps, writable host mounts, missing securityContext — and assigns a numeric score: positive for hardening (readOnlyRootFilesystem, runAsNonRoot, seccomp), zero/negative for danger. Use it as a CI pre-deploy gate (fail when score < 0) and shift-left advisory. Read-only static analysis; the fix is editing the manifest (internal edit) and the deploy is the gated action. Prefer the CLI/local API over sending manifests to the public v2.kubesec.io endpoint — manifests are untrusted-egress-sensitive. Cost is subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-kubernetes-manifests-with-kubesec/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
     "id": "scholar-evaluation",
     "name": "scholar-evaluation",
     "description": "|",
@@ -3164,6 +3738,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/search-first/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-research",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-container-registry-with-harbor",
+    "name": "securing-container-registry-with-harbor",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Harbor is an open-source registry with integrated security: Trivy scanning, Cosign/Notary signing, RBAC, content-trust policies, immutable tags, retention, and audit logging. Hardening means enabling auto-scan on push, prevent_vul to block vulnerable pulls, content trust to require signatures, least-privilege project RBAC, immutable release tags, and OIDC auth. All config is risk-bearing: project policy changes, RBAC grants, and auth-mode changes go through mas-sec-reviewer + a human click (§5). Admin passwords, DB passwords, secretKey, and GitHub tokens are secrets — keep them in .env/secret stores, never in committed values.yaml (§11.bis/§5). Use HTTPS/TLS and verify cert. Cost is subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-container-registry-with-harbor/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-github-actions-workflows",
+    "name": "securing-github-actions-workflows",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive hardening of GitHub Actions workflows against supply-chain compromise, credential theft, and privilege escalation: pin every action to an immutable SHA digest (Dependabot keeps them current), default `permissions: {}` then grant least-privilege per job, prevent script injection by passing untrusted input (PR title/body/branch) through `env:` vars instead of inline `${{ }}` interpolation, avoid `pull_request_target` and never check out fork-PR code with elevated permissions, gate production deploys behind environment protection, never echo secrets, and require CODEOWNERS review for `.github/workflows/` changes. This directly reinforces CLAUDE.md §5 (supply-chain/secrets are risky) and §11 (provider/ANTHROPIC keys never client-side or committed) and protects MAOS's own CI as well a",
+    "tags": [
+      "cyber:devsecops"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-github-actions-workflows/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-helm-chart-deployments",
+    "name": "securing-helm-chart-deployments",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Securing Helm means: verify chart provenance (GPG sign + helm verify / pull --verify), render templates and scan them (kubesec/checkov/trivy config/kube-linter) before deploy, enforce hardened securityContext defaults in values.yaml (runAsNonRoot, readOnlyRootFilesystem, drop ALL caps, seccomp RuntimeDefault, no privilege escalation, resource limits), pin image digests not tags, and restrict Helm RBAC to least privilege per namespace. Never store secrets in Helm values — use External Secrets or the helm-secrets plugin; a plaintext secret in values is a risk:high leak (§5). Render-and-scan is read-only; the helm install/upgrade is the gated action. Cost is subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:container-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-helm-chart-deployments/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:container-security",
     "tier": "T1"
   },
   {
