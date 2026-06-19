@@ -168,6 +168,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-cloud-storage-access-patterns",
+    "name": "analyzing-cloud-storage-access-patterns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team cloud-storage anomaly hunt on authorized logs: ingest CloudTrail S3 Data Events, GCS audit logs, and Azure Storage Analytics; build baselines (hourly request volume, per-principal object counts, source-IP history); flag after-hours access, bulk GetObject (>100/principal/hr), new source IPs vs a 30-day window, and ListBucket enumeration spikes as exfiltration/recon indicators. Read-only investigation of authorized data; remediation (revoke key, quarantine principal) is owner guidance, not a MAOS action. Map to MITRE ATT&CK (T1530/T1567.002/T1619/T1078.004/T1048) and ATLAS (AML.T0024/AML.T0056); NIST-CSF DE.CM-01/PR.IR-01. Cloud credentials are §5-gated secrets; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-cloud-storage-access-patterns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-dns-logs-for-exfiltration",
     "name": "analyzing-dns-logs-for-exfiltration",
     "description": "|",
@@ -249,6 +263,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-network-traffic-for-incidents/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-office365-audit-logs-for-compromise",
+    "name": "analyzing-office365-audit-logs-for-compromise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team O365/BEC hunt on an authorized tenant: authenticate to Microsoft Graph (read-only app permissions: AuditLog.Read.All, MailboxSettings.Read), query the Unified Audit Log for New-InboxRule/Set-Mailbox, enumerate inbox and forwarding rules across mailboxes, detect mailbox-delegation changes (Add-MailboxPermission), flag OAuth consent grants to suspicious apps, and surface anomalous sign-in patterns, producing a risk-scored compromise timeline. Read-only investigation of authorized tenant data; remediation (remove rule, revoke consent, reset credentials) is owner guidance, not a MAOS action. Map to MITRE ATT&CK (T1114.002/T1098.002/T1556.006/T1078.004); NIST-CSF DE.CM-01/PR.IR-01. Graph client secrets/certs are §5-gated; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-office365-audit-logs-for-compromise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -434,6 +462,90 @@
     "tier": "T2"
   },
   {
+    "id": "assessing-own-cloud-security-posture",
+    "name": "assessing-own-cloud-security-posture",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized own-cloud posture self-assessment (defensive reframe of a pentest-titled source): establish written scope under the shared-responsibility model, then VALIDATE controls rather than exploit them — read-only surface inventory (ScoutSuite/Prowler/CloudFox-style auditing for public buckets, IMDSv1 exposure, over-broad IAM, logging gaps), confirm IMDSv2 is enforced, IAM is least-privilege, CloudTrail/GuardDuty are on and alerting, and detection fires on test signals. Report findings mapped to MITRE ATT&CK Cloud with concrete remediation (enforce IMDSv2, scope roles, add permission boundaries, VPC-endpoint policies). HARD boundary: only your own/operated accounts, only with written authorization; exploitation-for-access, third-party targeting, persistence, and detection evasion are out",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/assessing-own-cloud-security-posture/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-aws-s3-bucket-permissions",
+    "name": "auditing-aws-s3-bucket-permissions",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team S3 posture audit on an authorized AWS account: enumerate buckets, check account- and bucket-level Block Public Access, flag public ACL grants (AllUsers/AuthenticatedUsers) and wildcard-principal bucket policies, verify default encryption, versioning and access logging, and corroborate with Prowler CIS checks plus IAM Access Analyzer external/public findings. Read-and-report: MAOS produces prioritized findings and remediation guidance (enable Block Public Access, SSE-KMS, versioning); applying changes to a user's account is owner action, not a MAOS action. AWS credentials are §5-gated secrets, never logged or committed; cross-account scope stays authorized-only. Map to MITRE ATT&CK (T1530/T1619/T1078.004/T1537/T1567.002) and NIST-CSF PR.IR-01/ID.AM-08. Cost is quota units (§8), ne",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-aws-s3-bucket-permissions/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-azure-active-directory-configuration",
+    "name": "auditing-azure-active-directory-configuration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Entra ID configuration audit on an authorized tenant: enumerate tenant security defaults and legacy-auth status, audit privileged role assignments (Global Admins, permanent vs PIM, service principals, guests), review conditional-access coverage and MFA gaps, find stale/guest accounts and unregistered-MFA users, and analyze sign-in logs for risky/legacy/impossible-travel activity, corroborated by ScoutSuite. Read-only (Global/Security Reader); remediation (enforce MFA, enable PIM, block legacy auth) is owner guidance, not a MAOS action. Map to MITRE ATT&CK (T1078.004/T1098.003/T1556.006/T1069.003/T1526); NIST-CSF PR.IR-01/ID.AM-08. Tenant credentials are §5-gated; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-azure-active-directory-configuration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-cloud-with-cis-benchmarks",
+    "name": "auditing-cloud-with-cis-benchmarks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team multi-cloud CIS benchmark audit on authorized accounts: select the correct CIS Foundations version per provider (AWS v5, Azure v4, GCP v4), run Prowler/ScoutSuite compliance scans, parse failed controls and compute per-section compliance scores, and prioritize remediation by Level 1 (hygiene) then Level 2 (defense-in-depth). Read-only audit creds (AWS SecurityAudit, Azure Reader, GCP Viewer); remediation is owner guidance staged via change control, not a MAOS action. Distinct from runtime detection: this measures configuration against a benchmark. Map to MITRE ATT&CK (T1078.004/T1530/T1098.003/T1685.002/T1580) and NIST AI-RMF GOVERN; NIST-CSF PR.IR-01/ID.AM-08. Cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-cloud-with-cis-benchmarks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-gcp-iam-permissions",
+    "name": "auditing-gcp-iam-permissions",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team GCP IAM audit on an authorized org/project: enumerate bindings at org/folder/project scope, flag primitive-role usage (Owner/Editor), inventory service accounts and user-managed keys, use IAM Recommender to surface excess permissions, run Policy Analyzer for effective-access (who-can-do-what) and allUsers/allAuthenticatedUsers exposure, and detect domain-wide delegation and impersonation paths (serviceAccountTokenCreator/User). Read-only (iam.securityReviewer, cloudAsset.viewer); remediation (replace primitive roles, delete keys, disable SAs) is owner guidance, not a MAOS action. Map to MITRE ATT&CK (T1078.004/T1098.003/T1528/T1548.005/T1580); NIST-CSF PR.IR-01/ID.AM-08. SA keys are §5-gated secrets; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-gcp-iam-permissions/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-kubernetes-cluster-rbac",
+    "name": "auditing-kubernetes-cluster-rbac",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Kubernetes RBAC audit on an authorized cluster: enumerate ClusterRoles/Roles with wildcard verbs/resources, secret-read access, and pods/exec; audit ClusterRoleBindings/RoleBindings for cluster-admin grants and bindings to system:authenticated/unauthenticated; run rbac-tool who-can queries, KubiScan risky-permission and privilege-escalation detection, and Kubeaudit security checks; review service-account token automounting and privileged/root pods. Read permissions only; remediation (scope roles, replace bindings, disable token mounts) is owner guidance, not a MAOS action. Map to MITRE ATT&CK (T1098.006/T1552.007/T1611/T1613/T1078.004); NIST-CSF PR.IR-01/ID.AM-08. Kubeconfig is a §5-gated secret; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-kubernetes-cluster-rbac/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "auditing-password-hash-strength",
     "name": "auditing-password-hash-strength",
     "description": "|",
@@ -445,6 +557,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-password-hash-strength/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cryptography",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-terraform-infrastructure-for-security",
+    "name": "auditing-terraform-infrastructure-for-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Terraform IaC security audit (shift-left): scan Terraform directories, plan JSON, and state with Checkov, tfsec, and Terrascan; write custom OPA/Rego policies for org standards (no wildcard IAM, mandatory encryption, no public ingress); wire scanning into CI/CD as a blocking gate with SARIF output; and triage findings by severity for remediation. Static analysis of authorized code; remediation is developer/owner action via PR, not a MAOS write to infrastructure. Map to MITRE ATT&CK (T1078.004/T1530/T1190/T1552.001/T1580); NIST-CSF PR.IR-01/ID.AM-08. Any secrets surfaced in code/state are §5-gated findings (redacted, flagged, never echoed); cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-terraform-infrastructure-for-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -585,6 +711,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-automated-malware-submission-pipeline/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-cloud-siem-with-sentinel",
+    "name": "building-cloud-siem-with-sentinel",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SIEM/SOAR doctrine on Microsoft Sentinel: provision a Log Analytics workspace + multi-cloud data connectors (AWS CloudTrail, Azure AD sign-in/audit, GCP), author scheduled KQL analytics rules each mapped to a MITRE ATT&CK technique (impossible-travel, credential abuse, mass-S3-deletion/ransomware, anomalous app registration), correlate cross-provider identity into Fusion detections, build SOAR playbooks that disable accounts/revoke sessions/enrich alerts, enable the data lake for long-horizon hunting, and integrate threat-intel indicator matching. Tune analytics-rule frequency to minimize MTTD; correlate identity across clouds or you miss the full chain. In MAOS this is library doctrine for SOC build-out, runs on subscription quota (TOKEN_STRATEGY §8) never per-token cash, and ev",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-cloud-siem-with-sentinel/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -1857,6 +1997,90 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-aws-cloudtrail-anomalies",
+    "name": "detecting-aws-cloudtrail-anomalies",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive CloudTrail anomaly detection: query events with the lookup API (paginated), aggregate a per-user/per-IP/per-source/per-event baseline of normal activity, then flag deviations — new event sources per user, first-time API calls, geographic IP shifts, elevated error rates, and sensitive API usage (IAM/KMS/S3 policy changes) — and emit a scored JSON report with top suspicious principals and recommended investigation actions. Read-only by construction (cloudtrail:LookupEvents); it surfaces signals, it does not act. In MAOS this is library detection doctrine that feeds mas-sec-reviewer and §5 risky-action awareness; the AWS read credential is a sandbox-bound secret (§5) and all usage is quota-metered (§11), never per-token cash.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-aws-cloudtrail-anomalies/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-aws-credential-exposure-with-trufflehog",
+    "name": "detecting-aws-credential-exposure-with-trufflehog",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive AWS secrets-exposure detection: scan git history, filesystems, and org-wide repos with TruffleHog v3 in verified-only mode (confirms a key is still live via an API call), corroborate with git-secrets AWS patterns, separate verified-active from rotated/test keys, then run incident response — deactivate the key first, review CloudTrail for misuse, rotate via a vault, scrub history (BFG), and install pre-commit + CI gates to prevent recurrence. Force-pushing does NOT remove a leaked key from caches/forks: deactivate at the AWS level immediately. In MAOS this is the canonical secrets-hygiene doctrine behind §5/§11 (any write to .env*/secrets is gated; a discovered live key is a §5-critical event); the scan handles real credentials as untrusted, redacts values in reports, and is quota",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-aws-credential-exposure-with-trufflehog/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-aws-guardduty-findings-automation",
+    "name": "detecting-aws-guardduty-findings-automation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive GuardDuty response automation: filter GuardDuty findings by severity in EventBridge, fan high-severity ones to Lambda responders that contain the threat — isolate an EC2 instance into a quarantine security group while tagging original SGs and snapshotting EBS for forensics, deactivate a compromised access key and apply a deny-all policy to the user, and publish an SNS notification — then deploy detector + rules + targets via Terraform with org-wide auto-enable. Cuts MTTR from hours to seconds, but every containment action (isolate/deactivate/deny) is an irreversible §5 risky write: in MAOS-governed contexts it must respect the human-validation gate, idempotency (skip-if-already-quarantined), and forensic preservation before mutation. Finding fields are untrusted input; usage is q",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-aws-guardduty-findings-automation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-aws-iam-privilege-escalation",
+    "name": "detecting-aws-iam-privilege-escalation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive IAM privilege-escalation analysis: download account authorization details read-only (iam:GetAccountAuthorizationDetails), analyze each policy for known escalation permission combinations (iam:PassRole+lambda:CreateFunction, iam:CreatePolicyVersion, iam:AttachUserPolicy, sts:AssumeRole without MFA), flag Resource:'*' with dangerous actions, build a principal→escalation-path graph, and emit a severity-scored JSON report with least-privilege remediation per finding. Cloudsplaining-style, fully read-only — it identifies escalation vectors so they can be removed, it never exercises them. In MAOS this is library doctrine for least-privilege review that feeds mas-sec-reviewer and §5 IAM-gating awareness; the read credential is a sandbox-bound secret (§5) and analysis is quota-metered (§",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-aws-iam-privilege-escalation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-azure-lateral-movement",
+    "name": "detecting-azure-lateral-movement",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Azure/Entra ID lateral-movement detection: cloud pivoting goes through OAuth consent grants, service-principal abuse, cross-tenant access, and stolen refresh tokens — not SMB/RDP — so detection correlates Graph audit logs, sign-in logs, and SP sign-in logs via KQL in Sentinel. Ingest AuditLogs/SigninLogs/AADServicePrincipalSignInLogs + risk detections, author analytics for SP credential additions, OAuth consent to unknown apps, cross-tenant sign-ins, token replay (IP/UA mismatch), and mailbox-delegation changes, then chain low-confidence indicators into high-confidence detections within time windows. Response playbooks (revoke OAuth grants, disable SPs, step-up auth) are §5-gated irreversible writes in MAOS-governed contexts. Log fields are untrusted input; usage is quota-metered",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-azure-lateral-movement/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-azure-service-principal-abuse",
+    "name": "detecting-azure-service-principal-abuse",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Entra ID service-principal abuse detection: SPs are non-human identities attackers exploit for persistence, privilege escalation, and lateral movement by adding secrets/certs, assigning privileged roles, enumerating SPs, bypassing admin consent, and escalating OAuth app permissions. Provides KQL (Sentinel) and SPL (Splunk) detections for each abuse pattern, Graph-based investigation (list SPs with recent credentials, review role assignments, audit application ownership = credential control, review SP sign-in activity), and preventive controls (disable user app-registration, require admin-only consent). Investigation runs read-only with Security/Global Reader; preventive policy changes and credential revocation are §5-gated writes in MAOS-governed contexts. Log fields are untruste",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-azure-service-principal-abuse/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-beaconing-patterns-with-zeek",
     "name": "detecting-beaconing-patterns-with-zeek",
     "description": "|",
@@ -1913,6 +2137,34 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-cloud-threats-with-guardduty",
+    "name": "detecting-cloud-threats-with-guardduty",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team operation of Amazon GuardDuty on authorized AWS accounts: enable protection plans (S3, EKS audit, EC2/ECS/EKS runtime monitoring, malware, Lambda), interpret the ThreatPurpose:ResourceType/ThreatName finding taxonomy across four severities, prioritize Critical AttackSequence findings (Extended Threat Detection correlating credential theft → persistence → lateral movement → impact), and reason about EventBridge→Lambda auto-response (isolation SG, key deactivation) plus Security Hub / Security Lake aggregation. Maps to MITRE ATT&CK (T1078.004/T1530/T1537/T1580/T1071) and NIST-CSF DE.CM/ID.AM/PR.IR/GV.SC. Read-only investigation of authorized findings; isolating an instance or revoking a key is owner remediation, never a MAOS action (§5). In MAOS this feeds mas-sec-reviewer and the ",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-cloud-threats-with-guardduty/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-compromised-cloud-credentials",
+    "name": "detecting-compromised-cloud-credentials",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of compromised cloud credentials across authorized AWS/Azure/GCP: GuardDuty UnauthorizedAccess/CredentialAccess findings + CloudTrail console-login and impossible-travel queries; Entra ID risky sign-ins, anonymized-IP, riskyUsers, suspicious app-consent; GCP SCC Event Threat Detection + audit logs for service-account-key abuse and Tor callers; cross-cloud SIEM correlation (impossible travel, credential stuffing). Containment (deactivate key, revoke sessions, disable service account) is owner remediation, never a MAOS action (§5). Maps to MITRE ATT&CK (T1078.004/T1530/T1537/T1580/T1003) and NIST-CSF DE.CM/ID.AM/PR.IR/GV.SC. In MAOS this feeds mas-sec-reviewer and the §5 IAM/secrets/cross-project lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-compromised-cloud-credentials/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-container-drift-at-runtime",
     "name": "detecting-container-drift-at-runtime",
     "description": "|",
@@ -1966,6 +2218,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-credential-dumping-techniques/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-cryptomining-in-cloud",
+    "name": "detecting-cryptomining-in-cloud",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of cloud cryptojacking on authorized accounts across four signals: cost-anomaly alerts (Cost Anomaly Detection / Azure Cost Management), compute-utilization spikes (CloudWatch/Monitor), mining-pool network traffic (VPC Flow Logs / Sentinel KQL on stratum ports 3333/4444/5555/8333/9999/14444), and GuardDuty CryptoCurrency:/Impact:/Runtime CryptoMiner findings; plus container-image inspection (xmrig/cpuminer) and CloudTrail tracing of the initial-access vector (leaked IAM key → RunInstances). Response (snapshot-then-isolate, terminate, disable termination-protection) is owner remediation, never a MAOS action (§5). Maps to MITRE ATT&CK (T1078.004/T1530/T1537/T1580/T1071) and NIST-CSF DE.CM/ID.AM/PR.IR/GV.SC. In MAOS this feeds mas-sec-reviewer and the §5 lens; cost is quot",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-cryptomining-in-cloud/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -2067,6 +2333,34 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-misconfigured-azure-storage",
+    "name": "detecting-misconfigured-azure-storage",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team audit of authorized Azure Storage accounts for misconfiguration: enumerate accounts (CLI + Resource Graph), detect public blob/container access, audit network ACL default-action and private endpoints, verify encryption at rest + min-TLS 1.2 + HTTPS-only, audit SAS/shared-key access and key rotation, and confirm diagnostic logging. Risk-scores findings (Critical/High/Med/Low) against CIS Azure Benchmark. Maps to MITRE ATT&CK (T1078.004/T1530/T1537/T1580/T1610) and NIST-CSF DE.CM/ID.AM/PR.IR/GV.SC; ATLAS AML.T0070/T0066/T0082. Read-only audit of authorized data; disabling public access / rotating keys is owner remediation, never a MAOS action (§5). In MAOS this feeds mas-sec-reviewer and the §5 secrets/cross-project lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-misconfigured-azure-storage/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-oauth-token-theft",
+    "name": "detecting-oauth-token-theft",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of OAuth token theft/replay in authorized Entra ID/M365: map the token attack surface (access/refresh/PRT/session-cookie/device-code with theft vectors), enable Identity-Protection risk detections (anomalous/issuer token, unfamiliar sign-in, impossible travel, malicious IP), query SigninLogs/AADNonInteractive KQL for token replay (same CorrelationId from multiple IPs) and device-code abuse, and recommend Token Protection (TPM-bound tokens), Continuous Access Evaluation, risk-based conditional access, and MDCA session policies. Response (revoke refresh tokens, reset password, remove rogue OAuth grants/forwarding rules) is owner remediation, never a MAOS action (§5). Maps to MITRE ATT&CK (T1078.004/T1530/T1537/T1580) and NIST-CSF DE.CM/ID.AM/PR.IR/GV.SC. In MAOS this feed",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-oauth-token-theft/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-pass-the-ticket-attacks",
     "name": "detecting-pass-the-ticket-attacks",
     "description": "|",
@@ -2151,6 +2445,34 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-s3-data-exfiltration-attempts",
+    "name": "detecting-s3-data-exfiltration-attempts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of S3 exfiltration on authorized accounts: enable CloudTrail S3 data events + GuardDuty S3 Protection, query CloudTrail (Athena/Logs Insights) for top downloaders by volume, anomalous source IPs, and cross-account CopyObject/ReplicateObject, review GuardDuty Exfiltration:S3/Discovery:S3 findings, correlate Macie sensitivity findings to assess data impact, and build CloudWatch/EventBridge detection rules. Preventive controls (VPC-endpoint and bucket policies) are owner remediation, never a MAOS action (§5). Maps to MITRE ATT&CK (T1530/T1567.002/T1537/T1119) and NIST-CSF DE.CM/ID.AM/PR.IR/GV.SC. In MAOS this feeds mas-sec-reviewer and the §5 secrets/data lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-s3-data-exfiltration-attempts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-serverless-function-injection",
+    "name": "detecting-serverless-function-injection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team audit of authorized serverless functions for injection: enumerate the attack surface (functions, event-source mappings, API-Gateway/S3 triggers, env vars, overprivileged exec roles), run SAST (Semgrep p/command-injection, Bandit B102/B301/B307/B602-607) to find event data flowing into eval/exec/os.system/child_process/pickle/yaml sinks, detect event-source poisoning (S3 key / SQS body / DynamoDB-Stream / API-Gateway header injection), audit Lambda layer changes (CloudTrail UpdateFunctionConfiguration, /opt module-hijack), and detect IAM privesc (UpdateFunctionCode + PassRole → role-credential exfiltration). Recommends input validation, least-privilege roles, function-URL IAM auth, and SCPs as owner remediation (§5). Maps to MITRE ATT&CK (T1190/T1059/T1648/T1078.004/T1068) and NIS",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-serverless-function-injection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-shadow-api-endpoints",
     "name": "detecting-shadow-api-endpoints",
     "description": "|",
@@ -2162,6 +2484,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-shadow-api-endpoints/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-shadow-it-cloud-usage",
+    "name": "detecting-shadow-it-cloud-usage",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive shadow-IT discovery: parse proxy/DNS/netflow logs, extract destination domains with traffic volumes, aggregate by domain with pandas (bytes, request counts, unique users), classify against a known-SaaS catalogue (storage/email/dev/AI), flag services absent from the approved-app list, and risk-score by data volume + user count + service category. Output is a JSON discovery report ranking unauthorized services by exfiltration risk. READ-AND-REPORT only — blocking/allowlisting is a recommendation to the network owner. In MAOS, log hosts are untrusted input, cloud targets stay allowed_hosts-gated (§5), and any cost is quota units (§11), never $/€.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-shadow-it-cloud-usage/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -2204,6 +2540,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-supply-chain-attacks-in-ci-cd/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-suspicious-oauth-application-consent",
+    "name": "detecting-suspicious-oauth-application-consent",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of illicit-consent-grant attacks in Azure AD / Entra ID: authenticate to Microsoft Graph (MSAL client-credentials, read-only scopes), enumerate /oauth2PermissionGrants and service-principal app permissions, query directory audit logs for 'Consent to application' events, and flag apps with high-risk scopes (Mail.Read, Files.ReadWrite.All) or unverified publishers. Output is a JSON risk report plus a consent-event audit trail. READ-AND-REPORT only — revoking grants / disabling apps is a recommendation to the tenant owner. In MAOS the Graph client-secret is a §5 secret (never logged/committed), Graph is allowed_hosts-gated, and cost is quota units (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-suspicious-oauth-application-consent/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -3321,6 +3671,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-aws-config-rules-for-compliance",
+    "name": "implementing-aws-config-rules-for-compliance",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive AWS Config compliance design: enable Config recording + delivery channel, deploy AWS-managed rules mapped to CIS controls (S3 public-read/encryption, IAM root-key/MFA/password-policy, restricted-ssh, vpc-flow-logs, encrypted-volumes, rds-encrypted), author Lambda-backed custom rules (e.g. required-tags), plan SSM-Automation remediation, and aggregate org-wide compliance via a Config aggregator. Output is a compliance report (per-account scores, top non-compliant rules). READ-AND-PLAN — applying rules / auto-remediation in the user's account is the owner's action (§5). Auto-remediating network/SG rules is risk:high and always gated. Cost is quota units (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-aws-config-rules-for-compliance/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-aws-iam-permission-boundaries",
     "name": "implementing-aws-iam-permission-boundaries",
     "description": "|",
@@ -3335,6 +3699,48 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-aws-macie-for-data-classification",
+    "name": "implementing-aws-macie-for-data-classification",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Macie data-classification design: enable Macie + automated discovery, plan ONE_TIME/SCHEDULED classification jobs scoped to buckets/prefixes, define custom data identifiers (regex + severity thresholds) and allow-lists to suppress false positives, leverage 300+ managed identifiers (PII/financial/credentials/health), and route High/Critical findings to Security Hub + EventBridge for review. Output is a findings/coverage report. READ-AND-PLAN — enabling Macie and running jobs in the user's account is owner-action (§5). Discovered sensitive values are §5 secrets: report locations and types, never the raw data. Cost is quota units (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-aws-macie-for-data-classification/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-aws-nitro-enclave-security",
+    "name": "implementing-aws-nitro-enclave-security",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Nitro Enclave confidential-computing design: build signed EIFs capturing PCR0/1/2 (and PCR8 from a signing cert), author KMS key policies that gate kms:Decrypt on kms:RecipientAttestation PCR conditions, implement vsock-only parent↔enclave channels with attestation-attached KMS calls, and validate COSE_Sign1 attestation documents (cert chain to the AWS Nitro root CA, PCR match, nonce freshness). Output is a security-posture assessment (PCR table, policy verification, PASS/WARN/FAIL). READ-AND-PLAN — launching enclaves / editing KMS policies in the user's account is owner-action (§5). Signing keys + KMS material are §5 secrets; debug-mode in prod breaks isolation. Cost is quota units (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-aws-nitro-enclave-security/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-aws-security-hub",
+    "name": "implementing-aws-security-hub",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive AWS Security Hub CSPM design (superset, folds implementing-aws-security-hub-compliance): enable standards (CIS/FSBP/PCI DSS/NIST 800-53), designate an org delegated admin with auto-enroll + cross-region finding aggregator, integrate GuardDuty/Inspector/Macie + third-party findings via ASFF (batch-import custom findings), build custom insights (publicly-accessible / unencrypted resources, grouped by ResourceType/AccountId), and plan EventBridge+Lambda remediation with batch-update-findings workflow status. Output is an org compliance report (per-standard scores, top failed controls, finding counts). READ-AND-PLAN — enabling Security Hub / running auto-remediation / updating findings in the user's account is owner-action (§5); SG/network remediation is risk:high + gated. Cost is qu",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-aws-security-hub/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-azure-ad-privileged-identity-management",
     "name": "implementing-azure-ad-privileged-identity-management",
     "description": "|",
@@ -3346,6 +3752,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-azure-ad-privileged-identity-management/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-azure-defender-for-cloud",
+    "name": "implementing-azure-defender-for-cloud",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Microsoft Defender for Cloud design: enable CSPM (CloudPosture) + CWP plans (Servers P1/P2, Containers, Storage, SQL, Key Vault, App Service), plan Log-Analytics agent auto-provisioning, retrieve and prioritize security recommendations by secure-score impact, enable the regulatory-compliance dashboard (CIS Azure 2.0 / PCI DSS 4.0 / NIST 800-53 R5), and plan alert automation (Logic Apps), Just-In-Time VM access, and adaptive application controls. Output is a deployment/posture report (plans enabled, secure score, compliance %, recommendations by severity). READ-AND-PLAN — enabling plans / granting JIT / remediating in the user's subscriptions is owner-action (§5). Defender P2 cost is the owner's Azure bill; MAOS cost is quota units (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-azure-defender-for-cloud/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -3391,6 +3811,48 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-cloud-dlp-for-data-protection",
+    "name": "implementing-cloud-dlp-for-data-protection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud DLP doctrine: discover and classify sensitive data (PII/PHI/PCI/credentials) across S3/GCS/BigQuery/Azure storage with Macie, Cloud DLP, and Purview; scope scans to high-risk object types to control cost; define custom data identifiers for org-specific formats; recommend de-identification transforms (mask/tokenize/redact) and pipeline DLP gates; report findings by sensitivity category and severity. Defensive read-and-report — MAOS surfaces unprotected-data findings and proposes controls; it never runs scans or de-identification against a user's live cloud tenant (that is owner-executed, §5 cross-tenant/risk:high). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash, and any discovered secret/credential is a §5-critical finding redacted in reports.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cloud-dlp-for-data-protection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-cloud-security-posture-management",
+    "name": "implementing-cloud-security-posture-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CSPM doctrine: continuously assess AWS/Azure/GCP posture against CIS/SOC2/PCI/NIST using cloud-native CSPM (Security Hub, Defender for Cloud, SCC) plus Prowler and ScoutSuite; run scans with read-only audit credentials; normalize and deduplicate findings across tools by resource ID; triage by severity; detect drift from the security baseline. Defensive read-and-report — MAOS surfaces misconfiguration findings and a prioritized remediation plan; auto-remediation and policy enforcement on a live tenant are owner-executed (§5 cross-tenant/risk:high), never autonomous MAOS actions. In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash, and CSPM credentials are read-only secrets gated under §5.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cloud-security-posture-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-cloud-trail-log-analysis",
+    "name": "implementing-cloud-trail-log-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CloudTrail analysis doctrine: ensure comprehensive trail configuration (org-wide, multi-region, log-file validation), then query API activity with Athena and CloudWatch Logs Insights to detect privilege escalation, console login without MFA, root usage, trail tampering (StopLogging/DeleteTrail), and AccessDenied bursts; build CIS metric filters/alarms; reconstruct attack timelines for IR. Defensive read-and-report — MAOS analyzes logs and emits findings; configuring trails, alarms, or remediation on a live account is owner-executed (§5 cross-tenant/risk:high). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash; identities, ARNs, and IPs in logs are handled as sensitive and not leaked.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cloud-trail-log-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-cloud-vulnerability-posture-management",
     "name": "implementing-cloud-vulnerability-posture-management",
     "description": "|",
@@ -3402,6 +3864,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cloud-vulnerability-posture-management/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-cloud-waf-rules",
+    "name": "implementing-cloud-waf-rules",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud WAF doctrine: protect cloud-hosted apps against OWASP Top 10 with managed rule sets deployed in Count (detection) mode first, rate-based rules for login brute-force/credential-stuffing, geo and IP-reputation controls, then tune false positives from WAF logs (Athena) before switching managed rules to Block mode after a 7-14 day validation window. WAF is a compensating control, never a replacement for secure code. Defensive read-and-report — MAOS designs and tunes the rule plan; deploying or flipping rules to Block on a live application is owner-executed (§5 cross-tenant/risk:high). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash; redact authorization headers in logged requests.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cloud-waf-rules/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-cloud-workload-protection",
+    "name": "implementing-cloud-workload-protection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud workload protection (CWPP) doctrine: monitor running EC2/GCE workloads for runtime threats — process anomalies (xmrig/minerd cryptominers, reverse shells), suspicious network connections (C2 callbacks), file-integrity drift on critical system files, CPU/resource spikes, and unauthorized binaries via hash comparison. Use agent-based runtime telemetry; commands like SSM run-shell against live instances are owner-executed, never autonomous MAOS actions. Defensive read-and-report — MAOS reasons over runtime signals and emits findings; containment/remediation on live workloads is owner-executed (§5 cross-tenant/risk:high). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash, and is distinct from CSPM (which assesses static config, not runtime).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cloud-workload-protection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -3640,6 +4130,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-file-integrity-monitoring-with-aide/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-gcp-binary-authorization",
+    "name": "implementing-gcp-binary-authorization",
+    "description": "|",
+    "domain": "planning",
+    "summary": "GCP Binary Authorization doctrine: enforce deploy-time supply-chain integrity so only attested container images reach GKE/Cloud Run. Stand up KMS-backed attestors and Container Analysis notes, write a default-deny policy (REQUIRE_ATTESTATION, ENFORCED_BLOCK_AND_AUDIT_LOG) with explicit whitelist patterns and per-cluster rules, attest images in CI/CD only after vulnerability scans pass, enable continuous validation to log running-pod violations, and keep break-glass overrides audited via ticket. Defensive read-and-report — MAOS designs/audits the policy; importing policy or enforcing on a live cluster is owner-executed (§5 cross-tenant/risk:high). KMS signing keys are §5-gated secrets; in MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-gcp-binary-authorization/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-gcp-organization-policy-constraints",
+    "name": "implementing-gcp-organization-policy-constraints",
+    "description": "|",
+    "domain": "planning",
+    "summary": "GCP Organization Policy doctrine: enforce preventive guardrails across the resource hierarchy (org/folder/project) using list, boolean, and custom constraints — deny VM external IPs, restrict resource locations, disable SA key creation and default-SA grants, require OS Login, enforce uniform bucket-level access, restrict public Cloud SQL. Policies inherit from the lowest enforced ancestor; always dry-run to measure violation impact before enforcing; audit existing policy with Cloud Asset Inventory. Defensive read-and-report — MAOS designs/audits the baseline policy set; setting or enforcing policy on a live organization is owner-executed (§5 cross-tenant/risk:high). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-gcp-organization-policy-constraints/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-gcp-vpc-firewall-rules",
+    "name": "implementing-gcp-vpc-firewall-rules",
+    "description": "|",
+    "domain": "planning",
+    "summary": "GCP VPC firewall doctrine: audit firewall rules for overly permissive configs (0.0.0.0/0 ingress, all-protocol allows, SSH/RDP open to internet, disabled rules); build least-privilege ingress (target by service account over mutable tags), default-deny egress with explicit allows (Google APIs restricted VIP, DNS), and hierarchical org/folder policies to block threat-intel IPs and enforce HTTPS-only; enable VPC Flow Logs to baseline traffic before removing rules. Defensive read-and-report — MAOS audits and designs the rule plan; creating/modifying/deleting firewall rules on a live VPC is owner-executed (§5 cross-tenant/risk:high), and rule deletion without a flow-log baseline causes outages. In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash; external CIDRs map t",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-gcp-vpc-firewall-rules/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
