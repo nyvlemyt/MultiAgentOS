@@ -252,6 +252,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-ransomware-payment-wallets",
+    "name": "analyzing-ransomware-payment-wallets",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ransomware-attribution forensics: take a wallet address from a ransom note and trace it READ-ONLY against public blockchain explorers (Blockstream, blockchain.com, WalletExplorer/OXT) to map fund flow (consolidation, peel chains, mixer/exchange cashout), cluster reused infrastructure across incidents via common-input-ownership heuristics, and check against the OFAC SDN sanctioned-address list — producing an attribution/IR report for responders and law enforcement. This is passive OSINT for attribution, NEVER making or facilitating a payment: ransom payment is an outbound send and is risk:blocking (§5), out of MAOS scope; the skill only observes the chain after the fact. Validate address format before querying; cross-reference timestamps with incident timelines; confirm exchange/e",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-ransomware-payment-wallets/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-sbom-for-supply-chain-vulnerabilities",
     "name": "analyzing-sbom-for-supply-chain-vulnerabilities",
     "description": "|",
@@ -683,6 +697,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-patch-tuesday-response-process/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-ransomware-playbook-with-cisa-framework",
+    "name": "building-ransomware-playbook-with-cisa-framework",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CISA-framework ransomware readiness doctrine: build/assess a playbook against the CISA #StopRansomware Guide + NIST CSF. Lead with the PREVENTION-readiness checklist (offline/encrypted backups tested for restore, exercised IRP, IT/OT segmentation, MFA on remote+privileged, EDR everywhere, RDP restricted behind VPN, 48h patch SLA for internet-facing, email filtering + macros off, app allowlisting, quarterly restore tests with documented RTO/RPO), then phase Detection (mass rename/new extensions, ransom notes, vssadmin shadow deletion, Sysmon-11 spikes, double-extortion exfil check), Containment (isolate not power-off, disable shares, reset compromised creds, block IOCs, preserve forensics), Eradication+Recovery (rebuild from clean images, restore from verified offline backups, reset krbtgt ",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-ransomware-playbook-with-cisa-framework/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
     "tier": "T1"
   },
   {
@@ -1143,6 +1171,20 @@
     "tier": "T1"
   },
   {
+    "id": "configuring-microsegmentation-for-zero-trust",
+    "name": "configuring-microsegmentation-for-zero-trust",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Microsegmentation enforces least-privilege between workloads at the application/identity layer, not VLANs — eliminating implicit trust inside a segment so a compromised workload cannot move laterally (mitigates T1021/T1210/T1570). Workflow: discover & map flows → design identity-based policies (workload identity, not IP) → enforce host-based or network-based → operate/maintain as workloads change. Tools: Illumio Core, VMware NSX, Calico, Cisco ACI. In MAOS this is the internal twin of §5 least-privilege: each agent/task touches only its sandbox, lateral reach between project sandboxes is default-deny, mirroring the cross-project-leakage gate. Validate by proving denied lateral paths fail-closed. No PAYG; figures in quota units (§11).",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-microsegmentation-for-zero-trust/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
     "id": "configuring-multi-factor-authentication-with-duo",
     "name": "configuring-multi-factor-authentication-with-duo",
     "description": "|",
@@ -1577,6 +1619,34 @@
     "tier": "T1"
   },
   {
+    "id": "deploying-cloudflare-access-for-zero-trust",
+    "name": "deploying-cloudflare-access-for-zero-trust",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deploy a cloud zero-trust access broker: an outbound Cloudflare Tunnel publishes a private/self-hosted app with no inbound IP; Cloudflare Access enforces per-app, per-request identity (IdP/SSO), device posture (WARP), and least-privilege policies — replacing VPN network-trust. Workflow: tunnel → IdP integration → Access applications + policies → WARP enrolment → posture checks → audit logging. Representative of the broker pattern; a vendor-delta table folds AWS Verified Access (Cedar policy), Zscaler ZPA (App Connectors), Palo Alto Prisma Access (HIP posture), Google IAP (Access Context Manager). In MAOS this IS the §5 doctrine: no implicit network trust; the broker allowlist mirrors config/permissions.json#allowed_hosts; every access decision is gated and audited. Cost in quota units, nev",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deploying-cloudflare-access-for-zero-trust/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
+    "id": "deploying-decoy-files-for-ransomware-detection",
+    "name": "deploying-decoy-files-for-ransomware-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive file-canary ransomware detection: place decoy documents (.docx/.xlsx/.pdf/.sql) named to sort FIRST and LAST in each directory (ransomware enumerates A–Z / Z–A) across file-share roots, endpoint Documents/Desktop, finance/HR/legal shares, and backup staging; watch them with a FIM / OS watchdog (inotify/ReadDirectoryChangesW/FSEvents) for modify/rename/delete; any touch is a near-zero-false-positive ransomware indicator because legitimate users never open them. Tier response: single canary modified → CRITICAL alert + identify PID + isolate; renamed-with-new-extension → check against known ransomware extensions; multiple canaries in 60s → EMERGENCY network-wide isolation. Alerts route LOCAL-FIRST into data/events; email/Slack/syslog-to-SIEM are outbound sends, human-gated (§5, risk",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deploying-decoy-files-for-ransomware-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
+  },
+  {
     "id": "deploying-edr-agent-with-crowdstrike",
     "name": "deploying-edr-agent-with-crowdstrike",
     "description": "|",
@@ -1602,6 +1672,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deploying-osquery-for-endpoint-monitoring/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "deploying-software-defined-perimeter",
+    "name": "deploying-software-defined-perimeter",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Software-Defined Perimeter (CSA v2.0) makes infrastructure a 'dark cloud' — services are invisible until a client proves identity via Single Packet Authorization (SPA), then a one-to-one mutual-TLS tunnel connects the verified user to one specific resource. Components: SDP controller (policy/auth brain), SDP gateway (enforces, hides resources), SDP client (sends SPA). Workflow: deploy controller → deploy gateway → deploy client → validate against NIST SP 800-207. Unlike VPN, no broad network access. This is the vendor-neutral architecture the ZTNA brokers implement — useful as the doctrine reference for MAOS §5 'invisible until authorized' ingress. Mitigates scanning/exposed-service entry (T1190/T1133/T1046). No PAYG; quota units (§11).",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deploying-software-defined-perimeter/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
+    "id": "deploying-tailscale-for-zero-trust-vpn",
+    "name": "deploying-tailscale-for-zero-trust-vpn",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Tailscale is a WireGuard-based zero-trust MESH VPN: every device in the tailnet gets end-to-end encrypted peer-to-peer links (Curve25519 / Noise) with no central concentrator; identity-aware ACLs define which node may reach which node/port, default-deny. Features: exit nodes, subnet routers, MagicDNS, Tailscale SSH. Self-hostable via Headscale (open-source control server) — directly relevant to MAOS local-first. Workflow: install/auth nodes via IdP → write deny-by-default ACLs → optional exit/subnet routing & SSH → harden (key expiry, tag ownership) → monitor. Maps to §5: ACLs are the device-level allowlist twin of config/permissions.json. Mitigates lateral/exposed-service abuse (T1021/T1133/T1572). No PAYG; quota units (§11).",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deploying-tailscale-for-zero-trust-vpn/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
     "tier": "T1"
   },
   {
@@ -1882,6 +1980,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-privilege-escalation-in-kubernetes-pods/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-ransomware-encryption-behavior",
+    "name": "detecting-ransomware-encryption-behavior",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive behavioral ransomware detection: catch unknown variants by behavior, not signature, by fusing Shannon entropy of written bytes (encrypted ≈ 7.8–8.0 vs text 2–5; text files give the biggest jump), per-process file-I/O rate (>20–50 files/min), extension-change count, ransom-note creation, and shadow-copy deletion (vssadmin/wmic/Remove-WmiObject) into a composite 0–100 score. NEVER entropy-alone — ZIP/JPEG/MP4 are naturally high-entropy and cause false positives; require an entropy DELTA (read 3.5 → write 7.9, Δ>3.0) plus I/O and rename signals. Tier thresholds: 25–50 alert SOC, 50–75 suspend+snapshot, 75–100 kill+isolate. Watch for evasion (base64/partial encryption defeating entropy). In MAOS detection is read-only telemetry; automated kill/network-isolation is risk:high §5 (human",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-ransomware-encryption-behavior/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-ransomware-precursors-in-network",
+    "name": "detecting-ransomware-precursors-in-network",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive pre-ransomware network detection: catch the kill-chain BEFORE encryption (Cobalt Strike→encrypt can be ~17 min) by mapping network-observable phases — initial access (RDP brute force, VPN stuffing), C2 (CS/Sliver/Brute-Ratel beacons via Zeek SSL/HTTP/DNS, JA3/JA4), credential harvest (DCSync DRS GetNCChanges, Kerberoasting TGS-REQ), recon (internal port scan, LDAP/SMB enum), lateral movement (PsExec/WMI/WinRM, admin-share access), staging (large SMB transfer, archive/upload) — to detection sources. Deploy Suricata/Zeek sensors on TAP/SPAN, write SIEM correlation (Splunk SPL / Sentinel KQL) that CHAINS low-severity events (failed-RDP + admin-share + service-install) into one high-confidence alert, and integrate ransomware IOC feeds (abuse.ch Feodo/URLhaus/ThreatFox, CISA KEV). Pit",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-ransomware-precursors-in-network/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
     "tier": "T1"
   },
   {
@@ -2859,6 +2985,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-anti-ransomware-group-policy",
+    "name": "implementing-anti-ransomware-group-policy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Windows GPO anti-ransomware hardening: block ransomware execution and spread via Group Policy — AppLocker/WDAC DENY rules for user-writable staging paths (%TEMP%, AppData\\\\Local\\\\Temp, Roaming, Downloads, Desktop) with signed-Windows/Program-Files allow defaults and Application Identity service on; Controlled Folder Access (Block mode) protecting Documents/Desktop and finance/HR/legal shares with an explicit trusted-app allowlist; Attack Surface Reduction rules (block executable content from email, Office child-process/exec-content/injection, JS/VBScript downloads, obfuscated scripts, Win32 calls from macros); lateral-movement lockdown (disable SMBv1, restrict RDP to specific groups, block inbound remote WMI, disable AutoPlay, signed-only PowerShell); then audit with gpresult/Get",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-anti-ransomware-group-policy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-api-abuse-detection-with-rate-limiting",
     "name": "implementing-api-abuse-detection-with-rate-limiting",
     "description": "|",
@@ -3041,6 +3181,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-beyondcorp-zero-trust-access-model",
+    "name": "implementing-beyondcorp-zero-trust-access-model",
+    "description": "|",
+    "domain": "planning",
+    "summary": "BeyondCorp is the canonical zero-trust ACCESS MODEL (not a product): trust is removed from the network perimeter and shifted to per-request decisions based on identity + device posture + context. Workflow on GCP: define Access Context Manager access levels (trust tiers) → deploy IAP on apps → bind IAM with access-level conditions → deploy Endpoint Verification → add threat protection → monitor/audit decisions. The model itself is vendor-portable doctrine. For MAOS this is the reference framing for autonomy gating (§4/§5): the autonomy level + risk tag + sandbox boundary ARE a context-aware access decision per task — never 'on the network'. Mitigates credential/perimeter abuse (T1078/T1190). No PAYG; quota units (§11).",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-beyondcorp-zero-trust-access-model/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-canary-tokens-for-network-intrusion",
     "name": "implementing-canary-tokens-for-network-intrusion",
     "description": "|",
@@ -3052,6 +3206,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-canary-tokens-for-network-intrusion/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-cisa-zero-trust-maturity-model",
+    "name": "implementing-cisa-zero-trust-maturity-model",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CISA Zero Trust Maturity Model v2.0 as a defensive maturity scaffold: inventory assets across five pillars (Identity/Devices/Networks/Applications/Data), score each capability on the four stages (Traditional→Initial→Advanced→Optimal), run a gap analysis against a target stage, and emit a priority-ranked roadmap weighted toward the lowest-maturity controls. Three cross-cutting capabilities (Visibility & Analytics, Automation & Orchestration, Governance) span all pillars. In MAOS this is the doctrinal frame behind CLAUDE.md §5 risky-action gating — the dispatcher's sandbox + cross-project write block + risk-tagged human gates are the runtime expression of Networks/Applications/Data pillars. Deterministic stage scoring (no LLM), framed in quota units not cash (§11).",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-cisa-zero-trust-maturity-model/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
     "tier": "T1"
   },
   {
@@ -3150,6 +3318,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-delinea-secret-server-for-pam/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-device-posture-assessment-in-zero-trust",
+    "name": "implementing-device-posture-assessment-in-zero-trust",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Device-posture-as-access-control for zero trust: collect real-time endpoint health (CrowdStrike ZTA score, Intune/Jamf compliance, encryption, OS/patch, secure-boot, TPM, EDR-running) and gate access through a conditional-access engine (Entra ID, Okta device assurance) so non-compliant or unmanaged devices are blocked or downgraded. Tier access by posture score, run policies in report/grace mode before enforce, and continuously monitor posture drift to revoke access when health degrades. Implements the CISA ZTMM Devices pillar. In MAOS this maps to CLAUDE.md §5: the active project sandbox is the analogue of a verified-device boundary — nothing trusted runs outside an assessed, gated context. Fail-closed on missing posture data; quota units not cash (§11).",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-device-posture-assessment-in-zero-trust/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
     "tier": "T1"
   },
   {
@@ -3293,6 +3475,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-honeypot-for-ransomware-detection",
+    "name": "implementing-honeypot-for-ransomware-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deception-based early ransomware detection doctrine: deploy canary files named to be encrypted first (alphabetical/directory-order traversal bait), decoy honeypot shares where every access is by-definition suspicious, and canary tokens that report accessor identity on open. Monitor canary modification/rename/delete in real time and screen for known ransomware extensions; near-zero false positives make it a high-confidence supplementary layer over EDR/SIEM/backups, never the sole control. Pitfalls: root-only placement, obvious names sophisticated families skip, untested end-to-end alerting, alert fatigue from legit migrations. In MAOS this is library knowledge feeding mas-sec-reviewer and our data/ protection discipline; any automated containment (isolate/quarantine) is a §5-gated risky act",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-honeypot-for-ransomware-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-honeytokens-for-breach-detection",
     "name": "implementing-honeytokens-for-breach-detection",
     "description": "|",
@@ -3321,6 +3517,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-identity-verification-for-zero-trust",
+    "name": "implementing-identity-verification-for-zero-trust",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Continuous identity verification as the zero-trust foundation (CISA ZTMM Identity pillar): federate to one authoritative IdP, enrol phishing-resistant MFA (FIDO2/WebAuthn) and disable phishable SMS/voice, enforce risk-adaptive conditional access (device + location + sign-in risk signals), require step-up auth for sensitive operations, enable continuous access evaluation (token revocation in minutes on critical events), and automate identity lifecycle + periodic access reviews. Identity is dynamic and strictly enforced before every grant (NIST SP 800-207). In MAOS this is the doctrinal frame behind CLAUDE.md §5 human-validation gates — risk:high/blocking actions are the runtime step-up: re-verify a human before a consequential action proceeds. Quota units not cash (§11); ATLAS AML.T0052 (ph",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-identity-verification-for-zero-trust/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-image-provenance-verification-with-cosign",
     "name": "implementing-image-provenance-verification-with-cosign",
     "description": "|",
@@ -3332,6 +3542,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-image-provenance-verification-with-cosign/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-immutable-backup-with-restic",
+    "name": "implementing-immutable-backup-with-restic",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Immutable backup doctrine with restic: encrypted (AES-256) deduplicated repository on S3-compatible object-lock storage in Compliance mode, where even root cannot delete or overwrite objects before retention expires — defeating ransomware that targets backups via compromised admin accounts. Retention must exceed typical ransomware dwell time (set 30-90 days, not days). Verify every backup with restic check --read-data (downloads and re-hashes every blob) and prove recoverability with scheduled restore tests comparing checksums against source. Implements the +1 (immutable) and +0 (zero verification errors) of 3-2-1-1-0. Not a sole solution: object lock protects logical deletion, not physical failure — keep an offline copy. In MAOS this protects the data/ state folder; figures are RPO/RTO ti",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-immutable-backup-with-restic/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
     "tier": "T1"
   },
   {
@@ -3444,6 +3668,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-memory-protection-with-dep-aslr/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-microsegmentation-with-guardicore",
+    "name": "implementing-microsegmentation-with-guardicore",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Microsegmentation to block lateral movement (CISA ZTMM Networks pillar, Advanced/Optimal): deploy agents for process-level east-west visibility, map application dependencies (Guardicore Reveal), author least-privilege allow rules plus deny and ring-fence policies (e.g. PCI CDE isolation), validate every new policy in reveal/log-only mode before enforcing, then monitor violations via SIEM. Default-deny is the invariant: only explicitly-allowed flows pass. In MAOS this is the doctrinal frame behind CLAUDE.md §5 cross-project isolation — the active project sandbox is a micro-segment; writes outside the project path or network calls to hosts not in config/permissions.json#allowed_hosts are the cross-segment flows that are denied by default and gated. Reveal-before-enforce mirrors the §5 dry-ru",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-microsegmentation-with-guardicore/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
     "tier": "T1"
   },
   {
@@ -3612,6 +3850,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-privileged-session-monitoring/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-ransomware-backup-strategy",
+    "name": "implementing-ransomware-backup-strategy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Ransomware-resilient backup doctrine on 3-2-1-1-0 (3 copies, 2 media, 1 offsite, 1 immutable/air-gapped, 0 restore-verification errors). Classify assets into recovery tiers with explicit RPO/RTO and dependency order (identity/DNS recover before app tiers). The decisive control is credential isolation: ransomware operators reach backups by compromising backup-admin accounts through the production AD domain — so backup admins must be off-domain, on an isolated segment, with hardware MFA and no RDP. Immutable retention must outlast dwell time. Automate restore testing (full application-stack, not single-VM) — untested backups are the gap discovered during the real incident. Backups are the last line of defense, never primary prevention. In MAOS this protects the data/ state folder; metrics ar",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-ransomware-backup-strategy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-ransomware-kill-switch-detection",
+    "name": "implementing-ransomware-kill-switch-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ransomware kill-switch doctrine. Many families use an execution guard: a named mutex (exit if it already exists), a domain check (exit if it resolves — WannaCry's sinkholed domain), or a registry/file marker. Mutex VACCINATION turns this against the malware: pre-create known ransomware mutex names on endpoints so the sample reads 'another instance running' and self-terminates before encrypting. Detection side: monitor mutex-creation (Sysmon EID 17/18, EDR) and kill-switch-domain DNS lookups (newly-registered, high-entropy), and enumerate active mutants during IR. Supplementary only — not all families implement kill switches and newer builds remove them; re-apply vaccination at startup (mutexes die on reboot). Analyze live samples in an isolated sandbox exclusively. In MAOS this i",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-ransomware-kill-switch-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
     "tier": "T1"
   },
   {
@@ -3990,6 +4256,62 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-standing-privilege-with-cyberark/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-trust-dns-with-nextdns",
+    "name": "implementing-zero-trust-dns-with-nextdns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "DNS as a zero-trust control point with NextDNS (CISA ZTMM Networks pillar): every connection starts with a DNS query, so encrypted resolution (DoH/DoT/DoQ) plus threat-intel blocking (DGA, newly-registered domains, typosquatting, cryptojacking, DNS-rebinding) turns DNS into an exfiltration and C2 chokepoint. Enforce per-device policy with allowlist/denylist, block plaintext port-53 at the firewall, deploy at both endpoint and router for defense-in-depth, and use Windows 11 ZTDNS so endpoints can only reach domains resolved through the protected resolver. In MAOS this is the doctrinal frame behind CLAUDE.md §5 allowed_hosts — outbound to a host not on config/permissions.json#allowed_hosts is the cockpit's DNS-deny: default-deny egress, explicit allowlist. Block-first on threat signals; quot",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-trust-dns-with-nextdns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-trust-for-saas-applications",
+    "name": "implementing-zero-trust-for-saas-applications",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Zero trust for SaaS (CISA ZTMM Applications pillar): federate every SaaS app to one IdP, enforce conditional access (MFA + compliant device) before access, deploy CASB to discover shadow IT and apply session controls (block downloads on unmanaged devices, DLP on uploads), govern OAuth app consent (review high-privilege grants, require admin approval), and run SSPM to detect SaaS security-config drift. The recurring threat is excessive OAuth consent and shadow IT — third-party apps granted broad scopes (Mail.ReadWrite, Files.ReadWrite.All) become a standing breach path. In MAOS this maps to CLAUDE.md §5 third-party/outbound gating: an external API call or message-send is a risk:high/blocking action requiring a human gate, and OAuth-consent governance mirrors config/permissions.json as the s",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-trust-for-saas-applications/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-trust-network-access-with-zscaler",
+    "name": "implementing-zero-trust-network-access-with-zscaler",
+    "description": "|",
+    "domain": "planning",
+    "summary": "ZTNA with Zscaler Private Access (ZPA) to replace VPN (CISA ZTMM Networks pillar): broker identity-based, context-aware access to private apps without placing users on the corporate network. Both Client Connector and App Connector make outbound-only TLS tunnels to the Zero Trust Exchange, so there are no inbound listeners and the VPN attack surface disappears. Access is per-application-segment (microsegmentation, least-privilege), policies AND identity + group + device posture, and browser access serves unmanaged/third-party users clientlessly. DELTA vs a Zscaler-Internet-Access/SWG skill: ZPA is private-app access (north-south to internal apps), not outbound web filtering — keep distinct. In MAOS this is the doctrinal frame behind CLAUDE.md §5: the active project sandbox grants least-priv",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-trust-network-access-with-zscaler/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-trust-with-hashicorp-boundary",
+    "name": "implementing-zero-trust-with-hashicorp-boundary",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Identity-aware zero-trust infrastructure access with HashiCorp Boundary: default-deny by design (users start with no access, granted explicitly per resource), OIDC authentication mapped to roles via managed groups, and Vault-brokered dynamic/just-in-time credentials so users never see or hold the underlying secret — eliminating credential sprawl. Sessions are time-boxed, connection-limited, and recorded for audit, with credentials auto-revoked at session end. In MAOS this is the doctrinal frame behind CLAUDE.md §5 (default-deny, least-privilege grants, no standing access) and §11 (single LLM injection point + no secrets in code): Boundary's broker-never-expose model mirrors how MAOS keeps credentials out of agent context. Note KMS/Vault tokens in source config are placeholders — never comm",
+    "tags": [
+      "cyber:zero-trust-architecture"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-trust-with-hashicorp-boundary/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:zero-trust-architecture",
     "tier": "T1"
   },
   {
@@ -5239,6 +5561,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-ransomware-tabletop-exercise",
+    "name": "performing-ransomware-tabletop-exercise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Ransomware tabletop (TTX) doctrine: a discussion-based exercise that tests plans, decisions, and communication — not technical controls. Design a multi-phase scenario from current threat-actor TTPs (LockBit/ALPHV/Cl0p) with injects that escalate pressure (double extortion, backups encrypted, leak-site publication, regulatory clock). Force the hard decision points: when to declare an incident, whether/how to pay (with sanctions check and legal review), when to notify regulators/customers/public, recovery priority order. Use an independent facilitator, prevent technical teams from dominating while legal/comms/exec stay passive, and produce an after-action report with severity-rated gaps and OWNED remediation actions — unfollowed AARs negate the exercise. Realistic TTP-based scenarios only; u",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ransomware-tabletop-exercise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
+  },
+  {
     "id": "performing-sca-dependency-scanning-with-snyk",
     "name": "performing-sca-dependency-scanning-with-snyk",
     "description": "|",
@@ -5741,6 +6077,20 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:eng-lang",
     "tier": "T2"
+  },
+  {
+    "id": "recovering-from-ransomware-attack",
+    "name": "recovering-from-ransomware-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Ransomware recovery doctrine (NIST/CISA). Recovery starts only AFTER containment and forensic scoping — premature restore re-infects. Build a clean isolated recovery VLAN, then recover identity FIRST (AD/DNS before any domain-joined system); reset krbtgt password TWICE with a replication gap to invalidate all Kerberos tickets and defeat Golden Ticket persistence, and reset all privileged accounts. Verify the backup predates compromise and scan it clean before restoring (attackers poison recent backups). Restore in dependency order (identity → databases → apps → file/web → dev), hunt persistence (scheduled tasks, services, WMI subscriptions, run keys) on each recovered host, then reconnect the network in phases under aggressive EDR with all IOCs loaded. In MAOS this is library knowledge; it",
+    "tags": [
+      "cyber:ransomware-defense"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/recovering-from-ransomware-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ransomware-defense",
+    "tier": "T1"
   },
   {
     "id": "recsys-pipeline-architect",
