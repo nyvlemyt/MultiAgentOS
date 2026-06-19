@@ -154,6 +154,34 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-linux-audit-logs-for-intrusion",
+    "name": "analyzing-linux-audit-logs-for-intrusion",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Host-based intrusion analysis with Linux auditd: verify the daemon and rule set, deploy intrusion-focused rules (credential files /etc/passwd-shadow-sudoers, SSH keys, ptrace process-injection, exec-from-/tmp, kernel-module load, network sockets, cron + log tampering), then query with ausearch (failed logins, per-user EXECVE, file access, key-tagged events) and summarize with aureport, reconstructing a timeline mapped to MITRE ATT&CK (T1059.004/T1070/T1548.003/T1543.002) and NIST-CSF RS.MA/RS.AN/RC.RP. Read-only/owner-scoped: analysis on an authorized host, never probing third-party systems. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; any host change is owner guidance, never an outbound action from MAOS.",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-linux-audit-logs-for-intrusion/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-network-traffic-for-incidents",
+    "name": "analyzing-network-traffic-for-incidents",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Network-incident forensics on authorized captures: acquire traffic (tap/SPAN or existing PCAP), then triage with Wireshark filters, Zeek logs (conn.log/dns.log/http.log/ssl.log via zeek-cut), and NetFlow — to confirm C2 beaconing (regular-interval low-jitter connections), quantify exfiltration (large orig_bytes flows, anomalous protocols/ICMP tunneling), and trace lateral movement (internal-to-internal SMB/RDP). Map indicators to MITRE ATT&CK (T1071/T1095/T1573/T1572) and NIST-CSF RS.MA/RS.AN/RC.RP. Read-only analysis of authorized traffic, never live interception of third-party systems. In MAOS this feeds mas-sec-reviewer, the §5 risk lens, and the allowed_hosts network guardrail; no outbound action.",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-network-traffic-for-incidents/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-sbom-for-supply-chain-vulnerabilities",
     "name": "analyzing-sbom-for-supply-chain-vulnerabilities",
     "description": "|",
@@ -165,6 +193,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-sbom-for-supply-chain-vulnerabilities/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:supply-chain-security",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-security-logs-with-splunk",
+    "name": "analyzing-security-logs-with-splunk",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Splunk/SPL incident investigation on authorized indexes: correlate across log sources (Windows event, firewall, proxy, authentication) with stats/transaction/join, reconstruct an incident timeline, hunt known TTPs and IOCs, and analyze authentication anomalies, lateral movement, and exfiltration. Map findings to MITRE ATT&CK (T1110/T1550.002/T1021.001/T1059.001/T1003.001), MITRE ATLAS (AML.T0070/T0066/T0082), D3FEND, NIST-AI-RMF, and NIST-CSF RS.MA/RS.AN/RC.RP. Read-only investigation of authorized data, scoped indexes and time ranges; no destructive SPL. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; the ATLAS/AI-RMF tags make it a priority input for agent-security reasoning.",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-security-logs-with-splunk/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
     "tier": "T1"
   },
   {
@@ -420,6 +462,48 @@
     "tier": "T1"
   },
   {
+    "id": "building-incident-response-playbook",
+    "name": "building-incident-response-playbook",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Reusable IR playbook design for a single incident type: scope one scenario, structure phases on NIST SP 800-61r3 / SANS PICERL (Prepare, Identify, Contain, Eradicate, Recover, Lessons-learned), encode decision trees, escalation criteria, and a RACI matrix (Incident Commander, SOC, sysadmin, legal, comms), and prepare for SOAR automation. Map to MITRE ATT&CK scenarios (T1486 ransomware, T1566 phishing, T1190 exploit, T1041 exfil, T1078 valid-accounts) and NIST-CSF RS.MA/RS.AN/RC.RP. Playbooks are reusable procedure documents, not case reports; automated steps stay non-destructive and any risky action keeps a human gate (§5). In MAOS this is a knowledge/governance doc that informs mas-sec-reviewer and the §5 risk lens.",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-incident-response-playbook/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "building-incident-timeline-with-timesketch",
+    "name": "building-incident-timeline-with-timesketch",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Collaborative forensic timeline with Timesketch (Google, open-source): deploy via Docker, ingest multi-source events — Plaso/log2timeline for disk-image artifacts (winevtx, prefetch, amcache, shimcache, userassist), plus CSV/JSONL and Sigma-rule analyzers — into a unified searchable sketch on OpenSearch, then tag, annotate, and build the attack-chain story. Map to MITRE ATT&CK (T1059.001/T1021.002/T1547.001/T1053.005/T1070.006), D3FEND, and NIST-CSF RS.MA/RS.AN/RC.RP. Work on authorized case data; store secrets via environment, never literal passwords; no outbound mutation from MAOS. In MAOS this feeds incident reconstruction for mas-sec-reviewer and the §5 risk lens.",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-incident-timeline-with-timesketch/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "building-malware-incident-communication-template",
+    "name": "building-malware-incident-communication-template",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Structured communication templates for malware incidents: severity classification (P1 ransomware/wiper to P4 single-endpoint) driving notification timelines and audiences, plus channel selection (out-of-band calls, encrypted messaging, secure email) and ready templates — initial internal notification, executive briefing, technical advisory, customer notice, regulatory disclosure — adapted by malware type (ransomware/wiper/trojan/worm). Map to MITRE ATT&CK (T1486/T1490/T1657/T1041/T1566) and NIST-CSF RS.MA/RS.AN/RC.RP. Templates only: actually sending any notification is risk:high|blocking and always pauses for a human (§5). In MAOS this is a governance/comms artifact informing the IR process; impact stated qualitatively, never in cash (§11).",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-malware-incident-communication-template/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "building-patch-tuesday-response-process",
     "name": "building-patch-tuesday-response-process",
     "description": "|",
@@ -616,6 +700,34 @@
     "tier": "T1"
   },
   {
+    "id": "collecting-indicators-of-compromise",
+    "name": "collecting-indicators-of-compromise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Systematic IOC collection on authorized incident evidence: extract and categorize network (IPs, domains, URLs), host (file hashes, paths, registry keys, services), email (sender, subject, attachment hashes), and behavioral indicators from SIEM/EDR/memory/disk/network sources; enrich with threat-intel context; represent in STIX 2.1 and manage/share via MISP/OpenCTI/TAXII with ISACs and partners. Map to MITRE ATT&CK (T1071.001/T1071.004/T1053.005/T1547.001/T1059.001/T1041) and NIST-CSF RS.MA/RS.AN/RC.RP. Collection is read-only on owned evidence; sharing scoped to agreements. In MAOS this enriches the threat/memory context and feeds mas-sec-reviewer and the §5 risk lens; no outbound action without a gate.",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/collecting-indicators-of-compromise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "collecting-volatile-evidence-from-compromised-host",
+    "name": "collecting-volatile-evidence-from-compromised-host",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Volatile evidence collection from an authorized compromised host, following order of volatility: capture RAM (WinPmem/LiME) and network connections, running processes, logged-in users, open files, and system state before isolation/shutdown destroys them; run trusted tools from external media (never install on the host), hash everything for integrity, and maintain chain of custody. Map to MITRE ATT&CK (T1059.001/T1057/T1049/T1003.001/T1543.003) and NIST-CSF RS.MA/RS.AN/RC.RP. Strictly owner-scoped with legal/HR authorization; MAOS does not collect from systems it is not authorized to touch (§5). In MAOS this feeds incident reconstruction for mas-sec-reviewer and the §5 risk lens.",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/collecting-volatile-evidence-from-compromised-host/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "competitive-platform-analysis",
     "name": "competitive-platform-analysis",
     "description": "|",
@@ -658,6 +770,76 @@
     "tier": "T2"
   },
   {
+    "id": "conducting-cloud-incident-response",
+    "name": "conducting-cloud-incident-response",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud incident response on accounts you administer (AWS/Azure/GCP): confirm the incident from cloud-native logs (CloudTrail, Azure Activity/Sign-in, GCP Audit) — suspicious console logins, access-key creation, public-bucket policy changes, log tampering — then contain primarily as an identity operation (disable keys, deny-all policy, revoke sessions, isolate instances), preserve volatile and snapshot evidence in an isolated forensic account, and analyze. Map to MITRE ATT&CK (T1078/T1537/T1580/T1525) and NIST-CSF RS.MA/RS.AN/RC.RP. Containment commands are guidance for the cloud owner; MAOS does not execute mutating cloud actions against third-party accounts (§5). Impact stated operationally, never in cash (§11).",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/conducting-cloud-incident-response/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "conducting-malware-incident-response",
+    "name": "conducting-malware-incident-response",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive malware IR lifecycle: confirm the EDR/AV detection (hash, process tree, delivery), scope the infection across endpoints (hash sweep, SMB/WMI/PsExec spread, email-gateway recipients, C2 callbacks), contain (EDR network-isolate, block C2 + hash org-wide, quarantine the delivery email, disable compromised accounts), analyze (sandbox detonation, enumerate every persistence mechanism, extract network IOCs, map to MITRE ATT&CK), eradicate (kill processes, delete artifacts, remove persistence, reimage when confidence is low), then recover and validate (staged reconnect, 72h monitoring, password resets, IOC sharing). In MAOS this is a knowledge playbook that feeds mas-sec-reviewer and CLAUDE.md §5: every destructive step (isolation, deletion, account disable) is a human-gated risk:high a",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/conducting-malware-incident-response/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "conducting-memory-forensics-with-volatility",
+    "name": "conducting-memory-forensics-with-volatility",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive RAM-dump analysis with Volatility 3: acquire memory forensically (WinPmem/DumpIt/Magnet RAM Capture on Windows, AVML on Linux) with chain-of-custody metadata, auto-identify the OS (windows.info), analyze processes (pslist vs psscan to find rootkit-hidden EPROCESS, pstree for abnormal parent-child), investigate connections (netscan correlated to PIDs), detect injection (malfind for PAGE_EXECUTE_READWRITE non-file-backed regions, yarascan), and extract artifacts (hashdump, cmdline, handles, dumpfiles). Volatile evidence (processes, sockets, ransomware keys) is lost at power-off, so capture before isolating. In MAOS this is a forensic knowledge playbook feeding mas-sec-reviewer and CLAUDE.md §5; acquisition and credential-extraction stay within an owned, authorized sandbox and are h",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/conducting-memory-forensics-with-volatility/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "conducting-phishing-incident-response",
+    "name": "conducting-phishing-incident-response",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive phishing IR lifecycle: triage the report (extract .eml/.msg, read headers — Return-Path, From/Reply-To mismatch, SPF/DKIM/DMARC results, originating IP — and classify confirmed/suspicious/spam/legit), analyze malicious content safely (sandbox URLs and attachments, detect AiTM credential-harvesters, decode QR-code quishing), scope impact (recipients → opened → clicked → credentials entered → attachment opened, via gateway/proxy/EDR telemetry), contain (purge the email from all mailboxes, block sender domain + URL + attachment hash, and for credential-entering users force password reset, revoke sessions/OAuth tokens, audit inbox-forwarding rules), eradicate and recover (72h account monitoring, exfil check), then harden (DMARC enforcement, report/takedown, awareness). In MAOS this i",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/conducting-phishing-incident-response/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "conducting-post-incident-lessons-learned",
+    "name": "conducting-post-incident-lessons-learned",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blameless post-incident review lifecycle: gather incident data (timeline export, SIEM detection/response metrics, compiled responder actions), run a structured 90-minute blameless post-mortem (summary, timeline walkthrough, what-worked, what-needs-improvement, root cause, action items, playbook updates), perform root-cause analysis (5 Whys / fishbone to the systemic cause, not the person), compute response metrics (dwell time, MTTD, MTTC, MTTR), document findings into owned/dated action items, and update IR playbooks plus detection rules (e.g. Sigma) from the learnings. The discipline is systems-not-individuals: assume best intent with available information. In MAOS this is a knowledge playbook for after-action review that feeds memory candidates and mas-reviewer; effort/cost framed as quo",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/conducting-post-incident-lessons-learned/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "config-gc",
     "name": "config-gc",
     "description": "|",
@@ -678,6 +860,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-active-directory-tiered-model/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-host-based-intrusion-detection",
+    "name": "configuring-host-based-intrusion-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive host-based intrusion detection: deploy Wazuh/OSSEC/AIDE agents to Windows + Linux endpoints, configure file-integrity monitoring (FIM) on critical binaries/config/registry-Run keys, enable rootkit detection, write detection rules for binary/SSH/temp changes, gate active-response behind testing, and forward alerts to SIEM. Establish a 48h baseline before trusting deltas; exclude noisy files; never auto-block in production untested. In MAOS this is a knowledge/defensive skill feeding mas-sec-reviewer and CLAUDE.md §5 posture — it audits and configures endpoints the user owns, never reaches a path outside the active project, and any rm/service-disable/firewall change stays a gated risky action.",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-host-based-intrusion-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
     "tier": "T1"
   },
   {
@@ -720,6 +916,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-oauth2-authorization-flow/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-windows-defender-advanced-settings",
+    "name": "configuring-windows-defender-advanced-settings",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Microsoft Defender for Endpoint hardening: enable ASR rules (block Office child-processes, LSASS credential theft, obfuscated scripts, PSExec/WMI), controlled folder access for ransomware, network protection, exploit protection (DEP/SEHOP/CFG), cloud-delivered protection + Block-at-First-Sight, PUA, and tamper protection; deploy via Intune/SCCM/GPO; monitor with Advanced Hunting KQL. Always run ASR and controlled-folder-access in Audit mode 2-4 weeks before Block to avoid false positives on line-of-business apps. In MAOS this is a knowledge/defensive skill feeding mas-sec-reviewer and CLAUDE.md §5 posture — it configures endpoints the user owns; any setting that weakens protection or reaches outside the active project stays a gated risky action.",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-windows-defender-advanced-settings/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-windows-event-logging-for-detection",
+    "name": "configuring-windows-event-logging-for-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Windows detection logging: enable Advanced Audit Policy via GPO (credential validation, logon/logoff, special logon, object access, sensitive privilege use, process creation), turn on command line in 4688, size Security log to >=1GB, and forward high-value events (4624/4625/4648/4672/4688/4720/4728/7045/1102) via Windows Event Forwarding to SIEM. Use advanced (not basic) audit policy exclusively; without command-line logging 4688 is near-worthless; forward off-host because ransomware wipes local logs. Maps key Event IDs to authentication, process, account, and lateral-movement detection. In MAOS this is a knowledge/defensive skill feeding mas-sec-reviewer and CLAUDE.md §5 posture on endpoints the user owns.",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-windows-event-logging-for-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "containing-active-breach",
+    "name": "containing-active-breach",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive active-breach containment lifecycle: assess scope first (compromised hosts, lateral-movement paths from 4624 Type 3/10, compromised credentials, C2 channels, whether the adversary holds domain admin) to avoid partial containment that tips off the attacker; execute short-term containment (EDR network-isolate hosts keeping agent comms, block + sinkhole C2, disable not delete compromised accounts, revoke sessions/tokens, double-reset KRBTGT if domain admin is compromised, terminate malicious processes); execute long-term containment (network ACLs/microsegmentation, jump hosts, enhanced monitoring, advanced Kerberos audit, canary accounts); validate effectiveness (no new C2 callbacks, disabled accounts producing 4625, no new IOC hosts); preserve evidence during containment (memory + ",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/containing-active-breach/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
     "tier": "T1"
   },
   {
@@ -1073,6 +1311,34 @@
     "tier": "T1"
   },
   {
+    "id": "deploying-edr-agent-with-crowdstrike",
+    "name": "deploying-edr-agent-with-crowdstrike",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive CrowdStrike Falcon EDR deployment: install the sensor with the Customer ID (CID) on Windows/macOS/Linux via SCCM/Intune/GPO/Ansible, tune prevention policies (cloud+sensor ML, behavioral on-write, exploit/memory-scan, ransomware+shadow-copy protection) per endpoint group, configure response policies (RTR, network containment, automated remediation), validate connectivity + a test detection, and stream telemetry to SIEM. Separate policies for workstations vs servers; always pass CID at install; pre-approve macOS system extensions via MDM. In MAOS this is a knowledge/defensive skill feeding mas-sec-reviewer and CLAUDE.md §5 — deploy only to owned endpoints; network containment, automated kill/quarantine, and sensor removal are gated risky actions; Falcon licensing is a third-party ",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deploying-edr-agent-with-crowdstrike/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "deploying-osquery-for-endpoint-monitoring",
+    "name": "deploying-osquery-for-endpoint-monitoring",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive osquery endpoint visibility: install osquery on Windows/macOS/Linux, schedule SQL queries (processes with no on-disk binary = fileless, listening ports, startup_items persistence, package inventory, SUID binaries, crontab, unsigned executables), run threat-hunting queries (external-IP connections, unexpected SSH keys, recently-modified system binaries), and centralize with FleetDM/Kolide over TLS. Tune intervals (300-3600s) and use differential mode to avoid CPU spikes and data floods; osquery is periodic/on-demand, not real-time alerting. In MAOS this is a knowledge/defensive skill feeding mas-sec-reviewer and CLAUDE.md §5 — read-only visibility on owned endpoints, scoped query packs, no third-party probing.",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deploying-osquery-for-endpoint-monitoring/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
     "id": "deployment-patterns",
     "name": "deployment-patterns",
     "description": "|",
@@ -1196,6 +1462,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-container-escape-with-falco-rules/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-email-account-compromise",
+    "name": "detecting-email-account-compromise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of email account compromise (EAC/BEC/account-takeover): pull Microsoft 365 Unified Audit Logs / Graph audit data and hunt the high-signal indicators — inbox rules forwarding to external addresses (ForwardTo/RedirectTo), rules that delete or move messages matching financial keywords like invoice/payment (evidence-hiding), Azure AD sign-ins from impossible-travel or unusual locations, non-human user agents (python-requests, PowerShell, curl), and suspicious third-party OAuth consent grants — then correlate findings across users to surface campaign-level compromise and emit a severity-scored report with containment recommendations. In MAOS this is a detection-engineering knowledge lens feeding mas-sec-reviewer and CLAUDE.md §5; it reads audit metadata under authorization, ",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-email-account-compromise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-evasion-techniques-in-endpoint-logs",
+    "name": "detecting-evasion-techniques-in-endpoint-logs",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive defense-evasion hunting (MITRE ATT&CK TA0005): detect log clearing (1102/104, wevtutil cl, Clear-EventLog), timestomping (Sysmon 2 vs 11 / MDE FileTimestampModified), process injection (Sysmon 8/10/25, suspicious GrantedAccess), security-tool disabling (Set-MpPreference -Disable*, service stops, DisableRealtimeMonitoring registry), masquerading (system-name binaries from non-System32 paths, OriginalFileName mismatch, double extensions), and LOLBin abuse (mshta/certutil/regsvr32/rundll32/MSBuild), then correlate 3+ weak signals into high-confidence detections. Allowlist legitimate injectors, capture Sysmon 8/10, use parent-process context. This is DEFENSIVE detection — it finds evasion in telemetry, never performs it. In MAOS it feeds mas-sec-reviewer and CLAUDE.md §5 posture, rea",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-evasion-techniques-in-endpoint-logs/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-fileless-attacks-on-endpoints",
+    "name": "detecting-fileless-attacks-on-endpoints",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive fileless-attack detection: enable PowerShell Script Block + Module + Transcription logging, AMSI, and Sysmon (1/7/8/10/19-21), then detect malicious PowerShell (encoded commands, IEX download cradles, AMSI-bypass strings in 4104), process injection (reflective DLL via Sysmon 7 unusual paths, hollowing via 1+10 correlation, CreateRemoteThread), WMI persistence (Sysmon 19/20/21, __EventFilter/__EventConsumer), and registry-resident payloads (Sysmon 13 with long Base64 in Run keys). File-based AV misses these entirely — behavioral telemetry + AMSI are required; detect AMSI-bypass attempts as high priority. This is DEFENSIVE detection only. In MAOS it feeds mas-sec-reviewer and CLAUDE.md §5 posture, read-only over logs the user owns.",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-fileless-attacks-on-endpoints/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
     "tier": "T1"
   },
   {
@@ -1434,6 +1742,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/enterprise-agent-ops/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-agent",
+    "tier": "T1"
+  },
+  {
+    "id": "eradicating-malware-from-infected-systems",
+    "name": "eradicating-malware-from-infected-systems",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive malware eradication lifecycle (runs after containment + forensic scoping): map ALL persistence mechanisms (Autoruns, registry Run/RunOnce keys, scheduled tasks, WMI event subscriptions, services on Windows; cron, init.d, systemd, rc.local, shell profiles, SSH authorized_keys on Linux); identify every artifact (family-specific YARA, multi-engine AV, hash sweep against baseline, web-shell hunt, unauthorized SSH keys); remove files/tasks/WMI/registry/services after forensic imaging; rotate all compromised credentials (user passwords, KRBTGT double-reset, service accounts, Azure AD token revocation, API keys); patch the initial-access vulnerability so re-infection cannot recur; then validate (updated-signature full scan, no remaining persistence, no rogue processes/connections, clean",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/eradicating-malware-from-infected-systems/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
     "tier": "T1"
   },
   {
@@ -1903,6 +2225,34 @@
     "tier": "T1"
   },
   {
+    "id": "hardening-linux-endpoint-with-cis-benchmark",
+    "name": "hardening-linux-endpoint-with-cis-benchmark",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Linux CIS hardening: disable unused filesystem modules, enforce nodev/nosuid/noexec mounts, secure GRUB, minimize services, configure NTP, apply sysctl network hardening (no ip_forward/redirects, rp_filter, syncookies), enable firewall (allow SSH first), harden sshd (no root login, no password auth, MaxAuthTries), set password/PAM policy, configure auditd rules (identity/sudoers/time/perm/module), and validate with OpenSCAP. Test SSH/firewall changes from a second session to avoid lockout; apply server vs workstation profiles correctly; stage sysctl changes. In MAOS this is a knowledge/defensive skill feeding mas-sec-reviewer and CLAUDE.md §5 — harden only owned endpoints; sshd/firewall/sysctl changes that can lock out or break networking are gated risky actions.",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hardening-linux-endpoint-with-cis-benchmark/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "hardening-windows-endpoint-with-cis-benchmark",
+    "name": "hardening-windows-endpoint-with-cis-benchmark",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Windows CIS hardening: choose L1 (corporate) or L2 (high-security) profile by data classification, import CIS GPO Build Kits and link to a pilot OU first, apply account policies (14-char passwords, lockout), audit policy (logon, process creation), security options (no last-username, NTLMv2-only, UAC admin-approval), and Windows Firewall (on, block inbound) per profile, then validate with CIS-CAT (target 95% L1 / 90% L2) and document exceptions with compensating controls + review dates. Stage GPOs to a pilot OU before fleet rollout; reserve L2 for sensitive endpoints; track benchmark version updates. In MAOS this is a knowledge/defensive skill feeding mas-sec-reviewer and CLAUDE.md §5 — harden only owned endpoints; GPO rollout that can break line-of-business apps is staged, and we",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hardening-windows-endpoint-with-cis-benchmark/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
     "id": "healthcare-cdss-patterns",
     "name": "healthcare-cdss-patterns",
     "description": "Use to build Clinical Decision Support System (CDSS) logic: drug-interaction checking, dose validation, clinical scoring (NEWS2, qSOFA, GCS), and alert severity classification feeding an EMR workflow. CDSS is patient-safety critical — zero tolerance for false negatives. Use when implementing medication safety, lab interpretation, or early-warning scores in a clinical app. Do NOT use for non-clinical alerting, generic form validation, or UI styling unrelated to safety alerts.",
@@ -2173,6 +2523,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-application-whitelisting-with-applocker",
+    "name": "implementing-application-whitelisting-with-applocker",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Windows application whitelisting with AppLocker (default-deny execution control). Inventory approved software (Get-AppLockerFileInformation); prefer publisher rules (survive updates) over path rules (bypassable via writable dirs) over hash rules (break on update); add deny rules for abused LOLBins (mshta, wscript, regsvr32, certutil, msbuild) and for user-writable dirs (%TEMP%, Downloads, %APPDATA%); require AppIDSvc running. Mandatory rollout: Audit mode 2-4 weeks (event IDs 8003/8006), refine from blocked-app logs, then phased Enforce (EXE→Script→MSI→optional DLL). Admins bypass AppLocker by default — pair with WDAC for full coverage. Frameworks: NIST CSF PR.PS, MITRE ATT&CK T1059/T1036/T1027/T1055. Knowledge skill: MAOS knows this control to inform mas-sec-reviewer (§5), it do",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-application-whitelisting-with-applocker/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-aqua-security-for-container-scanning",
     "name": "implementing-aqua-security-for-container-scanning",
     "description": "|",
@@ -2327,6 +2691,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-disk-encryption-with-bitlocker",
+    "name": "implementing-disk-encryption-with-bitlocker",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Windows data-at-rest protection with BitLocker full-disk encryption. Verify TPM 2.0 + UEFI/Secure Boot (Get-Tpm, Confirm-SecureBootUEFI); enforce via GPO/Intune (require TPM, XTS-AES-256 for OS+fixed drives, AES-CBC-256 for removable cross-platform). Critical: escrow recovery keys to AD DS/Azure AD BEFORE encrypting (Backup-BitLockerKeyProtector) — keys lost if TPM fails otherwise; gate 'do not enable until recovery info stored'. Use TPM+PIN on laptops (TPM-only is vulnerable to cold-boot/evil-maid). Full-disk (not used-space-only) on repurposed drives or deleted data stays unencrypted in free space. Enforce BitLocker To Go on removable media; pre-provision in SCCM OSD. Verify with manage-bde -status / ProtectionStatus==On. Frameworks: NIST CSF PR.PS/PR.IR, MITRE ATT&CK T1573. Kn",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-disk-encryption-with-bitlocker/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-endpoint-dlp-controls",
+    "name": "implementing-endpoint-dlp-controls",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive endpoint DLP to stop PII/PHI/PCI exfiltration from the device. Define Sensitive Information Types (built-in CC/SSN/health, or custom regex+keywords with confidence levels); build content-inspection policies on endpoint activities (cloud upload, copy-to-USB, network share, print, clipboard, unallowed browser/app, RDP copy) with audit / block-with-override / block actions. Mandatory rollout: deploy in test/audit mode 2-4 weeks, review Activity Explorer, tune SIT false positives (phone numbers/dates match PCI/SSN — raise confidence, require corroborating keywords), then enforce. Show policy tips so users learn; monitor override rate (high overrides = policy too tight or ignored). Incident triage: assess accidental vs intentional, escalate intentional exfiltration. Frameworks: NIST C",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-endpoint-dlp-controls/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-epss-score-for-vulnerability-prioritization",
     "name": "implementing-epss-score-for-vulnerability-prioritization",
     "description": "|",
@@ -2338,6 +2730,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-epss-score-for-vulnerability-prioritization/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-file-integrity-monitoring-with-aide",
+    "name": "implementing-file-integrity-monitoring-with-aide",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Linux host-based file integrity monitoring with AIDE. Generate aide.conf rules over critical dirs (/etc, /bin, /sbin, /usr/bin, /boot); initialize a cryptographic-checksum baseline (aide --init); run aide --check to diff current state vs baseline; parse added/removed/changed files into a severity-classified report; schedule via cron with alerting. Core discipline: the baseline DB must be protected/stored off-box (an attacker who rewrites the baseline blinds the monitor); checks are detective not preventive (FIM flags tampering after the fact — pair with response). Re-baseline only via a controlled, reviewed change after legitimate patching, never silently. Frameworks: NIST CSF DE.CM-01/PR.PS, MITRE ATT&CK T1059/T1036/T1547. Knowledge skill: MAOS knows this control for mas-sec-rev",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-file-integrity-monitoring-with-aide/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
     "tier": "T1"
   },
   {
@@ -2492,6 +2898,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-llm-guardrails-for-security/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:ai-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-memory-protection-with-dep-aslr",
+    "name": "implementing-memory-protection-with-dep-aslr",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Windows memory-protection / exploit-mitigation hardening. System-wide: bcdedit nx AlwaysOn (DEP), Set-ProcessMitigation -System -Enable DEP,SEHOP,ForceRelocateImages,BottomUp,HighEntropy (ASLR). Per-app on high-risk targets (Office, browsers, PDF readers): DEP, SEHOP, ForceRelocateImages, CFG, StrictHandle; export exploit_protection.xml and deploy via Intune ASR / GPO Exploit Guard. Key tradeoffs: legacy 32-bit apps may crash under DEP AlwaysOn (use OptOut + exceptions); Mandatory ASLR/ForceRelocateImages can break non-ASLR-compatible apps (test before enforcing); CFG only works for binaries compiled with /guard:cf — cannot be retrofitted. Test compatibility before fleet enforcement. Frameworks: NIST CSF PR.PS, MITRE ATT&CK T1055/T1190. Knowledge skill: MAOS knows this control fo",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-memory-protection-with-dep-aslr/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
     "tier": "T1"
   },
   {
@@ -2758,6 +3178,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-supply-chain-security-with-in-toto/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-usb-device-control-policy",
+    "name": "implementing-usb-device-control-policy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive USB / removable-media device control. Inventory current USB usage (Get-PnpDevice, USBSTOR registry, EDR device activity); block the removable-mass-storage class while whitelisting approved devices by VID/PID or Device Instance ID via GPO (Removable Storage Access + Device Installation Restrictions), Intune, or EDR (Defender Device Control XML, CrowdStrike). Key discipline: block the mass-storage class, NOT all USB — keyboards/mice are USB HID; distinguish USB storage from USB-C/Thunderbolt docks/charging. Always notify users on block (silent blocks = helpdesk tickets) and provide an approved-device exception process (encrypted, vetted media). Audit via event IDs 6416 (new device) / 4663 (file access) and EDR UsbDriveMounted events. Frameworks: NIST CSF PR.PS, MITRE ATT&CK T1048 (",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-usb-device-control-policy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-velociraptor-for-ir-collection",
+    "name": "implementing-velociraptor-for-ir-collection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive endpoint collection with Velociraptor (Rapid7, open-source): deploy the client-server architecture (server frontend, repacked MSI/agent clients, Fleetspeak comms, optional Docker) across Windows/Linux/macOS; collect forensic artifacts via VQL (Windows event logs, prefetch, shimcache/amcache, MFT, scheduled tasks, process list with hashes, netstat, DNS cache, PowerShell history, persistence/WMI; Linux auth logs, bash history, crontab, SSH authorized_keys, systemd); run fleet-wide hunts (hash-hunter, YARA-in-memory, Sigma import, suspicious scheduled tasks, C2-connection sweep) with offline clients picking up hunts on reconnect; monitor in real time (process creation, file/registry watches); and integrate with Splunk/Elastic. ATT&CK-mapped VQL turns endpoints into queryable evidenc",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-velociraptor-for-ir-collection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
     "tier": "T1"
   },
   {
@@ -3517,6 +3965,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-active-directory-compromise-investigation",
+    "name": "performing-active-directory-compromise-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Active Directory compromise investigation: since most breaches involve compromised credentials, AD is the primary enterprise target. Investigate across five areas — NTDS.dit/DCSync exfiltration (4662 replication access, 4742, VSS 8222, ntdsutil/vssadmin, replication from non-DC sources), Kerberos attacks (Golden/Silver tickets, Kerberoasting via 4768/4769/4771, RC4 0x17, TGT without AS-REQ), Group Policy abuse (5136 GPO modifications, scheduled tasks, login scripts), privileged-group enumeration (Domain/Enterprise/Schema Admins, DnsAdmins, Protected Users), and trust-relationship analysis (4706 new trusts, SID-history injection). Methodology runs scoping+evidence collection → authentication-log analysis (pass-the-hash, lateral movement) → persistence/backdoor detection (AdminSDHo",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-active-directory-compromise-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "performing-active-directory-vulnerability-assessment",
     "name": "performing-active-directory-vulnerability-assessment",
     "description": "|",
@@ -3629,6 +4091,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-cloud-incident-containment-procedures",
+    "name": "performing-cloud-incident-containment-procedures",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud-native containment playbook for compromised AWS/Azure/GCP resources. Order is fixed: forensic snapshot BEFORE isolation, then revoke credentials/sessions/keys, apply quarantine security-group/NSG/firewall (deny-all in+out), tag the resource, preserve logs to write-protected (Object-Lock/immutable) storage with hashed chain-of-custody. Per-platform controls: AWS (deny-all IAM policy, token-issue-time revoke, quarantine SG, S3 public-access-block + Object Lock, Lambda reserved-concurrency 0), Azure (Revoke-AzureADUserAllRefreshToken, deny-all NSG, disk snapshot, key regen), GCP (remove IAM bindings, disable SA + delete keys, deny-all firewall, snapshot, drop external IP). In MAOS every real containment action is risk:high §5 — human gate, active-project sandbox only, never against a th",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-incident-containment-procedures/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "performing-container-escape-detection",
     "name": "performing-container-escape-detection",
     "description": "|",
@@ -3685,6 +4161,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-disk-forensics-investigation",
+    "name": "performing-disk-forensics-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Disk forensics investigation with legal-grade rigor. Spine: secure+document evidence (chain of custody, write blocker) → create a verified bit-for-bit image (E01/dcfldd, source-hash == image-hash) → analyze the file system (MFT/inode, deleted files, file carving, ADS) → reconstruct a timeline (Autopsy / Sleuth Kit fls+mactime) → recover and parse artifacts (prefetch, event logs, registry, browser, USBSTOR, $MFT via Eric Zimmerman tools) → document facts vs interpretations reproducibly. Tools: FTK Imager, Autopsy, The Sleuth Kit, KAPE, X-Ways. Cardinal rule: never touch evidence media without a write blocker; hash everything (SHA-256); image before the workstation is reassigned. In MAOS the source tree is read-only — image FROM the target, write artifacts to data/ (§8); destructive or cross",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-disk-forensics-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "performing-docker-bench-security-assessment",
     "name": "performing-docker-bench-security-assessment",
     "description": "|",
@@ -3696,6 +4186,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-docker-bench-security-assessment/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-endpoint-forensics-investigation",
+    "name": "performing-endpoint-forensics-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive endpoint forensics / incident investigation. Collect by order of volatility (RAM → network → processes → disk → media → logs); acquire memory first (WinPMEM/FTK/LiME), then write-blocked disk image with verified SHA-256 hash. Analyze memory with Volatility 3 (pslist/psscan, netscan, malfind for injection, cmdline, dlllist, hashdump/lsadump for credential theft). Parse Windows artifacts with Eric Zimmerman tools: prefetch (PECmd, execution history), ShimCache (existed-on-system even if deleted), AmCache (SHA1+install time), $MFT (MFTECmd, file timeline incl. deleted), event logs (EvtxECmd), registry (RECmd). Build a super-timeline (KAPE + plaso/log2timeline) and filter to the incident window. Iron rules: image before analysis (live tools alter evidence), hash everything at collect",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-endpoint-forensics-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-endpoint-vulnerability-remediation",
+    "name": "performing-endpoint-vulnerability-remediation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive endpoint vulnerability remediation. Prioritize beyond raw CVSS: combine CVSS + EPSS (exploitation probability) + CISA KEV membership + asset criticality + network exposure into P1-P4 with SLAs (P1 14d, P2 30d, P3 60d, P4 90d). Pick remediation type: patch, config change, upgrade, workaround, compensating control, or documented risk-accept with sign-off. Deploy via WSUS/SCCM/Intune update rings or PSWindowsUpdate. Config hardening examples: disable SMBv1 (EternalBlue), Spooler on non-print servers (PrintNightmare), LLMNR, restrict NTLM. Zero-day with no patch: vendor workaround + EDR detection + network blocking + dated mitigation doc. Iron rules: test patches before production (BSOD/compat risk), weight EPSS (CVSS 7.5 @ EPSS 0.95 beats CVSS 9.8 @ EPSS 0.01), ALWAYS re-scan to val",
+    "tags": [
+      "cyber:endpoint-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-endpoint-vulnerability-remediation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:endpoint-security",
     "tier": "T1"
   },
   {
@@ -3738,6 +4256,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-graphql-introspection-attack/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-insider-threat-investigation",
+    "name": "performing-insider-threat-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Insider-threat investigation blending digital forensics, UBA, and HR/legal coordination. Lifecycle: validate the allegation and obtain legal+HR authorization BEFORE any monitoring → collect evidence covertly (DLP, cloud/email/VPN/badge/print/USB logs; UAM and endpoint forensics only if legally approved) → build a behavioral baseline vs anomaly profile → reconstruct an activity timeline → assess data/regulatory/contractual impact → preserve evidence to legal-admissibility standards (chain of custody, hashing, legal hold). Cardinal rules: never investigate alone (security + legal + HR), never alert the subject before evidence is preserved, never monitor without authorization. Tools: Microsoft Purview, Exabeam/Securonix, Digital Guardian, Magnet AXIOM, Relativity. In MAOS the restricted case ",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-insider-threat-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
     "tier": "T1"
   },
   {
@@ -3836,6 +4368,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-privileged-account-discovery/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ransomware-response",
+    "name": "performing-ransomware-response",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Structured ransomware IR from detection through hardening. Steps: identify the variant (ransom note/extension, ID-Ransomware, NoMoreRansom decryptor check) → contain FAST (disconnect segments, isolate domain controllers on GPO deployment, disable deployment accounts, block SMB/RDP/WinRM, keep one encrypted host powered-on for memory) → assess scope + verify backups are NOT encrypted/deleted, check exfiltration + OFAC → recovery decision matrix (restore-from-backup vs free-decryptor vs rebuild; ransom payment is legal/exec-only and out of MAOS scope) → execute clean recovery (rebuild DCs from clean media, reset ALL passwords, restore in priority order, reimage workstations) → harden (MFA, 3-2-1-1-0 backups, segmentation, LAPS). Cardinal rules: do NOT power off encrypted systems (keys in mem",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ransomware-response/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
     "tier": "T1"
   },
   {
@@ -4982,6 +5528,20 @@
     "tier": "T1"
   },
   {
+    "id": "testing-ransomware-recovery-procedures",
+    "name": "testing-ransomware-recovery-procedures",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cold validation that ransomware recovery actually works under realistic conditions. Workflow: define tiered RTO/RPO scope (Tier 1 mission-critical <1h/<15min … Tier 4 <72h/<24h) → prepare an isolated, network-segmented recovery environment (no routes to production) → execute restore and measure the FULL timeline (detect→decide→locate→restore→validate→service, Actual RTO = T4-T0, Actual RPO = T0-backup_timestamp) → validate data integrity post-restore (file counts, DB consistency, SHA-256 hash match) → re-establish security (rotate credentials, MFA, EDR, patches) → document gap vs target (MEETS/FAILS). Cardinal rules: include WRT (restore completion ≠ recovery completion), never test on production, respect recovery sequencing (DB before app), require immutable/air-gapped backups. Tools: Vee",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/testing-ransomware-recovery-procedures/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
     "id": "testing-websocket-api-security",
     "name": "testing-websocket-api-security",
     "description": "|",
@@ -5017,6 +5577,34 @@
     "summary": "Gives the user an upfront, explicit choice over response depth instead of guessing. Before answering: (1) estimate input tokens (prose words×1.3, code chars/4); (2) classify complexity (Simple 3-8x … Complex 15-40x) to get a response window; (3) present four depth levels — Essential 25% / Moderate 50% / Detailed 75% / Exhaustive 100% — with estimated token counts; (4) answer at the chosen level. Honors shortcuts ('tldr'→25%, 'detailed'→75%) and maintains a session-set level silently. Heuristic only (~85-90% accuracy, ±15%) — always shows the disclaimer; no real tokenizer. MAS variant: this is the user-facing surface of the §6 eco/standard/expert depth control and TOKEN_STRATEGY signal-density discipline — Essential maps to eco, Exhaustive to expert; it is a depth-negotiation skill, never a",
     "tags": [],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/token-budget-advisor/SKILL.md"
+  },
+  {
+    "id": "triaging-security-incident",
+    "name": "triaging-security-incident",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Methodology-first triage of a security incident using NIST SP 800-61r3 + SANS PICERL. Steps: collect alert context (source, timestamps/dwell-time, affected assets, rule fidelity, raw evidence) → classify the type (Unauthorized Access, DoS, Malicious Code, Improper Usage, Reconnaissance, Web App Attack) → assign severity P1-P4 from an impact matrix f(asset criticality, threat type, data sensitivity, lateral-movement potential) with SLA targets → enrich (TI/IOC lookup, CMDB asset context, identity anomalies, historical correlation) → document a structured triage record and route to the right tier → initiate a containment hold for P1/P2. Focus is classification and prioritization, not deep investigation. In MAOS triage is read+propose (manual-safe); the resulting containment actions are risk:",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/triaging-security-incident/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "triaging-security-incident-with-ir-playbook",
+    "name": "triaging-security-incident-with-ir-playbook",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Playbook-orchestrated triage: turn an alert into an initiated IR playbook with an assigned team. Steps: receive+acknowledge the alert (SIEM/TheHive) to prevent duplicate triage → enrich IOCs (VirusTotal/AbuseIPDB reputation, CMDB asset lookup) → classify type by matching playbook trigger conditions and MITRE technique → score severity (0-16: asset criticality + data sensitivity + scope + threat status → P1-P4) → select and initiate the matching playbook, create the case → assign the response team from the on-call schedule (page by severity) → document the triage decision and hand off. Distinct from the methodology-only variant: this is tool-driven orchestration (trigger_conditions.yaml lookup, severity scoring, playbook launch, on-call paging). In MAOS network/API enrichment calls obey §5 ",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/triaging-security-incident-with-ir-playbook/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
   },
   {
     "id": "triaging-vulnerabilities-with-ssvc-framework",
@@ -5059,6 +5647,20 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:misc",
     "tier": "T2"
+  },
+  {
+    "id": "validating-backup-integrity-for-recovery",
+    "name": "validating-backup-integrity-for-recovery",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Post-backup validation that a backup can actually be recovered. Workflow: generate a SHA-256 baseline manifest of every file at backup time → verify archive integrity (restic check --read-data, borg check --verify-data, gzip -t, S3 checksum) → restore-test to an isolated environment and diff baseline vs restored manifests → validate completeness (file counts, total size, DB object counts) → scan the backup for ransomware artifacts (encrypted extensions, ransom-note filenames, file entropy >7.9/8.0 = likely encrypted) → automate+schedule validation (nightly verify, weekly full restore test). Cardinal rules: never trust an untested restore; check data integrity not just archive integrity; verify incremental-chain integrity; use SHA-256 not MD5; require immutable/air-gapped backups. Tools: Re",
+    "tags": [
+      "cyber:incident-response"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/validating-backup-integrity-for-recovery/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:incident-response",
+    "tier": "T1"
   },
   {
     "id": "video-editing",
