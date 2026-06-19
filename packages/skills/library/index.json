@@ -140,6 +140,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-dns-logs-for-exfiltration",
+    "name": "analyzing-dns-logs-for-exfiltration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team DNS exfiltration hunt on authorized logs: detect DNS tunneling via subdomain-length and Shannon-entropy analysis, DGA domains, TXT-record abuse, anomalous query-volume z-scores, known tunneling-tool signatures (dnscat/iodine/dns2tcp), and DoH bypass to public resolvers; correlate suspicious DNS with endpoint/Sysmon process data and estimate exfiltrated byte volume. Map to MITRE ATT&CK (T1048.003/T1071.004/T1567), MITRE ATLAS (AML.T0024/T0056/T0086) and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only investigation of authorized DNS data with scoped indexes and time ranges; remediation (sinkhole/isolation) is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 risk/network lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-dns-logs-for-exfiltration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-kubernetes-audit-logs",
     "name": "analyzing-kubernetes-audit-logs",
     "description": "|",
@@ -207,6 +221,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-security-logs-with-splunk/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-windows-event-logs-in-splunk",
+    "name": "analyzing-windows-event-logs-in-splunk",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Windows event-log investigation in Splunk on authorized data: detect brute force / password spray / post-failure success (4625/4624), privilege escalation (4720/4732/4672, token manipulation via Sysmon 10), persistence (scheduled tasks 4698, Run-key 13, WMI subscriptions 20/21), and lateral movement (Logon Type 3/10, PsExec, RDP); reconstruct a forensic timeline and enrich via Event-ID lookups. Map to MITRE ATT&CK (T1110/T1053.005/T1547.001/T1021.002/T1558.003/T1003.006), D3FEND, and NIST-CSF DE.CM/DE.AE/RS.MA. Read-only, scoped to authorized indexes and time ranges; remediation is owner guidance. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-windows-event-logs-in-splunk/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
     "tier": "T1"
   },
   {
@@ -420,6 +448,48 @@
     "tier": "T1"
   },
   {
+    "id": "building-automated-malware-submission-pipeline",
+    "name": "building-automated-malware-submission-pipeline",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SOC malware-triage pipeline doctrine: collect quarantined samples from EDR/email-gateway sources, hash and pre-screen against VirusTotal/MalwareBazaar to skip known files, detonate only unknowns in an ISOLATED sandbox (Cuckoo/Joe/CAPE) with no production connectivity, extract IOCs (IPs/domains/URLs/hashes/registry/dropped files), compute a combined verdict (malicious/suspicious/PUP/clean) and confidence, and push verdict+IOCs to the SIEM (Splunk HEC). Map to MITRE ATT&CK (T1204.002/T1566.001/T1027/T1055/T1497) and NIST-CSF DE.CM/DE.AE/RS.MA. Sandbox isolation is mandatory; blocking/sinkhole IOCs is owner remediation, not a MAOS action. In MAOS this is knowledge feeding mas-sec-reviewer and the §5 risk lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-automated-malware-submission-pipeline/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-detection-rule-with-splunk-spl",
+    "name": "building-detection-rule-with-splunk-spl",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detection-engineering doctrine for Splunk SPL correlation searches: build threshold, sequence (failed→success), baseline-anomaly (stdev z-score), lateral-movement (Logon Type 3 fan-out), data-exfiltration (bytes_out), and suspicious-PowerShell detections; map each rule to a MITRE ATT&CK technique, enrich with asset/identity/threat-intel lookups, optimize with tstats/data-models/summary-indexing, and validate precision and false-positive rate against historical data before deploying. Map to MITRE ATT&CK (T1059.001/T1003.001/T1021.002/T1110.003/T1053.005/T1048), D3FEND, and NIST-CSF DE.CM/DE.AE/RS.MA. Detection-as-code on authorized data; tuning targets low FP, not coverage theater. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-detection-rule-with-splunk-spl/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-detection-rules-with-sigma",
+    "name": "building-detection-rules-with-sigma",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detection-engineering doctrine for portable Sigma rules: author vendor-agnostic YAML detection logic from a threat report/ATT&CK technique (selection + filters + condition + falsepositives), validate syntax with pySigma, convert to Splunk SPL / Elastic Lucene-EQL / Microsoft Sentinel KQL via pySigma backends and pipelines, tag every rule with ATT&CK technique IDs, track coverage with the ATT&CK Navigator, backtest false positives over 7 days, and manage rules as detection-as-code in Git/CI. Map to MITRE ATT&CK (T1059.001/T1003.001/T1055/T1053.005/T1547.001), D3FEND, and NIST-CSF DE.CM/DE.AE/RS.MA. Sigma is for batch/scheduled searches, not streaming. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-detection-rules-with-sigma/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "building-devsecops-pipeline-with-gitlab-ci",
     "name": "building-devsecops-pipeline-with-gitlab-ci",
     "description": "|",
@@ -459,6 +529,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-identity-governance-lifecycle-process/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-incident-response-dashboard",
+    "name": "building-incident-response-dashboard",
+    "description": "|",
+    "domain": "planning",
+    "summary": "IR dashboarding doctrine for Splunk Dashboard Studio / Elastic Kibana / Grafana: build active-incident situational-awareness panels — incident summary single-values, affected-systems/containment status, IOC tracking and spread timeline, chronological response timeline, SOC-operations metrics (MTTD/MTTR, analyst workload, alert disposition), and a non-technical executive briefing view — backed by lookups and scheduled searches that auto-refresh. Map to MITRE ATT&CK (T1486/T1071.001/T1021.002/T1041/T1566) and NIST-CSF DE.CM/DE.AE/RS.MA. Visualizes authorized data for coordination and reporting; the dashboard informs, it does not contain or remediate. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-incident-response-dashboard/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
     "tier": "T1"
   },
   {
@@ -532,6 +616,76 @@
     "tier": "T1"
   },
   {
+    "id": "building-soc-escalation-matrix",
+    "name": "building-soc-escalation-matrix",
+    "description": "|",
+    "domain": "planning",
+    "summary": "SOC escalation-matrix design doctrine: define the Tier 1/2/3 + management role structure, P1–P4 severity classification with response/escalation/resolution SLAs, a context-driven escalation matrix (severity × asset criticality, not severity alone), automatic escalation triggers (ransomware, domain-admin compromise, active exfiltration → immediate Tier 3 + management) and time-based SLA-breach escalation, P1 communication templates and cadence, and SOAR-encoded escalation playbooks. Map to MITRE ATT&CK (T1078/T1071/T1041) and NIST-CSF DE.CM/DE.AE/RS.MA. Process/governance knowledge, not executable code. In MAOS this feeds mas-sec-reviewer and the §5 risk lens (mirroring its risk-enum gating); cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-soc-escalation-matrix/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-soc-metrics-and-kpi-tracking",
+    "name": "building-soc-metrics-and-kpi-tracking",
+    "description": "|",
+    "domain": "planning",
+    "summary": "SOC metrics/KPI doctrine: define a core framework (MTTD/MTTA/MTTI/MTTC/MTTR, FP rate, TP rate, ATT&CK coverage, dwell time, escalation rate) with targets mapped to NIST CSF functions; measure MTTD/MTTR (avg/median/p90/p95, trends) from SIEM notable-event data; track alert disposition, signal-to-noise, analyst productivity and shift workload; monitor ATT&CK and data-source coverage; and build executive scorecards plus continuous-improvement initiative tracking. Metrics drive process improvement, never individual punishment. Map to MITRE ATT&CK (T1078/T1071), MITRE ATLAS (AML.T0070/T0066/T0082), NIST-AI-RMF and NIST-CSF DE.CM/DE.AE/RS.MA. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-soc-metrics-and-kpi-tracking/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-soc-playbook-for-ransomware",
+    "name": "building-soc-playbook-for-ransomware",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ransomware IR playbook doctrine (NIST SP 800-61): define early detection triggers — mass file encryption (Sysmon 11 volume), shadow-copy/backup deletion (T1490 vssadmin/wbadmin/bcdedit), ransom-note creation, Elastic EQL sequences — then a triage decision tree (isolate, don't power off; count affected hosts; check exfiltration/double-extortion), containment via EDR network isolation and emergency firewall/AD actions, volatility-ordered evidence preservation, variant identification (ID-Ransomware/No-More-Ransom) and enterprise IOC scan, and recovery from verified offline/immutable backups with 72h monitoring. Map to MITRE ATT&CK (T1486/T1490/T1489/T1566/T1059.001), D3FEND, and NIST-CSF DE.CM/DE.AE/RS.MA. Pre-built and rehearsed, never authored as malware; containment is owner acti",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-soc-playbook-for-ransomware/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-threat-intelligence-enrichment-in-splunk",
+    "name": "building-threat-intelligence-enrichment-in-splunk",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for SOC TI enrichment in Splunk ES: feed IOCs (STIX/TAXII, CSV, API modular inputs) into typed KV Store collections (ip/domain/file/url/email_intel), expose them as lookups, and run correlation searches that join live telemetry against indicators with confidence/severity + asset context, escalating only on isnotnull matches. Disciplines: source provenance + confidence scoring, feed-freshness monitoring (stale/aging/fresh), and false-positive suppression. In MAOS this is knowledge feeding mas-sec-reviewer and threat memory, never a deployed pipeline; efficiency is measured in subscription quota units (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-threat-intelligence-enrichment-in-splunk/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-threat-intelligence-feed-integration",
+    "name": "building-threat-intelligence-feed-integration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for TI feed integration: catalog sources by format/IOC-type/cadence/provenance, ingest STIX/TAXII + open-source (Abuse.ch, OTX, CISA AIS) + commercial feeds, normalize everything to STIX 2.1, deduplicate across sources while preserving multi-source attribution, score IOCs by source reliability + corroboration, apply type-based expiry (IP~30d, domain~90d, hash~1y), and push to SIEM/MISP TI frameworks. Track feed health via detection match-rate per source to find high-value feeds. In MAOS this is knowledge feeding mas-sec-reviewer and threat memory, never a deployed TIP; efficiency is quota units (TOKEN_STRATEGY §8), feed Cost columns describe external sources not MAOS (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-threat-intelligence-feed-integration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "building-vulnerability-aging-and-sla-tracking",
     "name": "building-vulnerability-aging-and-sla-tracking",
     "description": "|",
@@ -571,6 +725,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-vulnerability-exception-tracking-system/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "building-vulnerability-scanning-workflow",
+    "name": "building-vulnerability-scanning-workflow",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for a vulnerability-scanning workflow: define scan scope/cadence (credentialed where possible), process results with risk-based prioritization (CVSS × asset criticality, boosted by CISA KEV + EPSS, not raw CVSS), assign SLA tiers (P1 KEV/critical=24h … P4 low=90d), correlate scan findings with SIEM IDS/IPS signals to surface actively-exploited vulns on critical assets, and track remediation via SLA dashboards + ticketing. Anti-pattern killed: 'patch all criticals' — prioritize by exploitation + exposure + business impact. In MAOS this is knowledge feeding mas-sec-reviewer/dep-audit; never run scanners or auto-patch user hosts; efficiency in quota units (TOKEN_STRATEGY §8), never cash (§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-vulnerability-scanning-workflow/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
     "tier": "T1"
   },
   {
@@ -1031,6 +1199,20 @@
     "tier": "T1"
   },
   {
+    "id": "correlating-security-events-in-qradar",
+    "name": "correlating-security-events-in-qradar",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for event correlation in IBM QRadar SIEM: investigate offenses with AQL (Ariel Query Language), pivot on source IP, build reusable building blocks (e.g. multiple failed logins) and chain them into offense-generating correlation rules detecting multi-stage attacks (brute-force→success, lateral movement, exfil), enrich rules with reference sets (whitelists/watchlists), and tune offense generation by analyzing closed-as-false-positive contributors, raising thresholds, and coalescing. Concepts: offense, building block, magnitude, QID, reference set. In MAOS this is knowledge feeding mas-sec-reviewer and detection doctrine, never an operated QRadar; quota units not cash (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/correlating-security-events-in-qradar/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "cost-aware-llm-pipeline",
     "name": "cost-aware-llm-pipeline",
     "description": "|",
@@ -1465,6 +1647,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-credential-dumping-techniques",
+    "name": "detecting-credential-dumping-techniques",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of Windows credential dumping (T1003): alert on Sysmon EventID 10 ProcessAccess to lsass.exe with high-privilege GrantedAccess bitmasks (0x1010, 0x1FFFFF), comsvcs.dll MiniDump and procdump targeting the LSASS PID, reg.exe export of SAM/SECURITY/SYSTEM hives, and ntdsutil/vssadmin shadow-copy creation for NTDS.dit theft; correlate with user/host context for risk scoring; output a JSON report mapped to MITRE ATT&CK and NIST-CSF DE.CM/DE.AE. Detection only on an authorized estate — never the attack. In MAOS this feeds mas-sec-reviewer and the §5 credential-access risk lens; any host change is owner guidance, never an action MAOS executes.",
+    "tags": [
+      "cyber:threat-detection"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-credential-dumping-techniques/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-email-account-compromise",
     "name": "detecting-email-account-compromise",
     "description": "|",
@@ -1507,6 +1703,62 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-golden-ticket-forgery",
+    "name": "detecting-golden-ticket-forgery",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of Kerberos Golden Ticket forgery (T1558.001): establish an AES-only encryption baseline, then alert on EventID 4769 TGS requests using RC4 (0x17) where AES is enforced, ticket lifetimes exceeding MaxTicketAge, TGS requests with no corresponding 4768 TGT request (forged-ticket indicator), and krbtgt password-age anomalies; correlate with host/user context and risk-score; output a JSON report mapped to MITRE ATT&CK and NIST-CSF DE.CM/DE.AE. Detection only on an authorized domain — never forging. In MAOS this feeds mas-sec-reviewer and the §5 credential-access risk lens; any DC change is owner guidance, never an action MAOS executes.",
+    "tags": [
+      "cyber:threat-detection"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-golden-ticket-forgery/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-insider-threat-with-ueba",
+    "name": "detecting-insider-threat-with-ueba",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team insider-threat detection via UEBA on Elasticsearch/OpenSearch: ingest and normalise auth, file-access, VPN, DLP and email logs under a unified identity; build 30-day rolling behavioral baselines (login times, data volume, app usage, access patterns); compute per-user risk via z-score deviation and peer-group comparison; correlate multiple low-confidence indicators (off-hours + large download + new-system access) into composite high-confidence alerts mapped to T1078/T1048/T1041 and NIST-CSF DE.CM/DE.AE. Authorized estate only — never covert surveillance of third parties. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; output is a report, never an action MAOS executes.",
+    "tags": [
+      "cyber:threat-detection"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-insider-threat-with-ueba/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-living-off-the-land-attacks",
+    "name": "detecting-living-off-the-land-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of LotL/LOLBAS abuse of signed Windows binaries (certutil/mshta/rundll32/regsvr32/msbuild/bitsadmin/wmic): deploy a LOLBin-focused Sysmon config, build a prioritised LOLBin watchlist, author Sigma rules for known abuse (certutil URL download, mshta remote/inline script, regsvr32 Squiblydoo), correlate suspicious command-line args, flag LOLBins making outbound connections, detect anomalous parent-child chains (Office→LOLBin, wmiprvse→shell), risk-score and report, and optionally harden via AppLocker/WDAC. Detect on anomalous context, never block legitimate use outright. Mapped to T1218/T1105/T1059/T1047/T1127.001 and NIST-CSF DE.CM/DE.AE. Authorized estate only; host hardening is owner guidance, never a MAOS action.",
+    "tags": [
+      "cyber:threat-detection"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-living-off-the-land-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-pass-the-ticket-attacks",
+    "name": "detecting-pass-the-ticket-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of Kerberos Pass-the-Ticket (T1550.003): enable Kerberos audit on DCs, forward EventID 4768 (TGT), 4769 (TGS) and 4771 (pre-auth failure), then detect RC4 downgrade (TicketEncryptionType 0x17), the same ticket replayed across multiple source IPs/hosts, and per-user/host TGS-volume anomalies against a learned baseline; enrich from Active Directory, risk-score, and output a JSON report mapped to MITRE ATT&CK and NIST-CSF DE.CM/DE.AE. Detection only on an authorized domain — never replaying tickets. In MAOS this feeds mas-sec-reviewer and the §5 credential-access/lateral-movement risk lens; any DC change is owner guidance, never an action MAOS executes.",
+    "tags": [
+      "cyber:threat-detection"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-pass-the-ticket-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-privilege-escalation-in-kubernetes-pods",
     "name": "detecting-privilege-escalation-in-kubernetes-pods",
     "description": "|",
@@ -1518,6 +1770,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-privilege-escalation-in-kubernetes-pods/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-rdp-brute-force-attacks",
+    "name": "detecting-rdp-brute-force-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of RDP brute-force/password-spray (T1021.001/T1110): export Windows Security logs to EVTX, parse EventID 4625 failed logons (Logon Type 10 RemoteInteractive / Type 3 NLA) for source IP, target user, and failure sub-status, then identify attack patterns — many failures per source IP in a time window, username-spray from one IP, and 4625 failures followed by a 4624 success from the same IP (likely compromise); detect NLA-bypass attempts and output a JSON report (top attacking IPs, targeted accounts, time-series intensity, compromise indicators) mapped to MITRE ATT&CK and NIST-CSF DE.CM/DE.AE. Authorized hosts only — detection, never the attack. In MAOS this feeds mas-sec-reviewer and the §5 risk lens; any host change is owner guidance, never a MAOS action.",
+    "tags": [
+      "cyber:threat-detection"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-rdp-brute-force-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-detection",
     "tier": "T1"
   },
   {
@@ -2411,6 +2677,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hookify-rules/SKILL.md"
   },
   {
+    "id": "implementing-alert-fatigue-reduction",
+    "name": "implementing-alert-fatigue-reduction",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for SOC alert-fatigue reduction: first MEASURE per-rule alert quality (volume, FP/TP rate, signal-to-noise, alerts-per-analyst) over 90d; then convert noisy threshold alerts to Risk-Based Alerting (entities accrue risk; one high-context alert fires only above a cumulative threshold); tune top false-positive rules with exclusions verified against ATT&CK tests (never blind disable); consolidate duplicate alerts within time windows; tier-route by confidence/severity (auto-close low → analyst → priority); and re-measure to confirm FP drops with coverage maintained. In MAOS this is knowledge feeding mas-sec-reviewer and detection doctrine; quota units not cash (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-alert-fatigue-reduction/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-api-abuse-detection-with-rate-limiting",
     "name": "implementing-api-abuse-detection-with-rate-limiting",
     "description": "|",
@@ -2915,6 +3195,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-mitre-attack-coverage-mapping",
+    "name": "implementing-mitre-attack-coverage-mapping",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for MITRE ATT&CK coverage mapping: export active detection rules + their technique mappings, build an ATT&CK Navigator layer, and score each technique on a four-part rubric (data-source + rule-quality + validation + enrichment, 0–100) so 'covered' means validated-with-emulation, not 'a rule exists'. Map available data sources → detectable techniques to expose true gaps; prioritize gaps by prevalence × impact × feasibility; sequence a quarterly roadmap (close critical gaps → improve partial → mature → excellence with continuous BAS testing). Tracks detection maturity over time. In MAOS this is knowledge feeding mas-sec-reviewer and detection doctrine; quota units not cash (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-mitre-attack-coverage-mapping/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-network-policies-for-kubernetes",
     "name": "implementing-network-policies-for-kubernetes",
     "description": "|",
@@ -3153,6 +3447,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-siem-use-cases-for-detection",
+    "name": "implementing-siem-use-cases-for-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for SIEM detection-engineering: treat use cases as software — assess ATT&CK gaps, write a standardized use-case spec (technique, data sources, log sources, FP sources, tuning notes, SLA, owner), implement equivalent detection logic across Splunk SPL / Elastic EQL / Sentinel KQL, VALIDATE with attack simulation (Atomic Red Team, Caldera) + backtest before production, deploy through a lifecycle (proposed→dev→testing→staging→production→review→deprecated), and maintain a versioned library with health metrics (TP rate, detection latency, ATT&CK coverage). In MAOS this is knowledge feeding mas-sec-reviewer and detection doctrine; quota units not cash (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-siem-use-cases-for-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-sigstore-for-software-signing",
     "name": "implementing-sigstore-for-software-signing",
     "description": "|",
@@ -3167,6 +3475,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-soar-automation-with-phantom",
+    "name": "implementing-soar-automation-with-phantom",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for SOAR automation in Splunk SOAR (Phantom): model the platform (assets = connected tool configs, containers = ingested events, artifacts = IOCs, playbooks = Python action workflows), automate the SAFE layer — enrichment and triage of high-volume alerts (reputation lookups, geo/whois, auto-close clean, auto-escalate malicious) — and require an analyst approval gate (phantom.prompt with timeout + options) before ANY high-impact containment (quarantine device, disable user, block IP/URL). Measure with playbook run metrics. In MAOS auto-containment maps to risk:high/blocking (§5) and ALWAYS pauses for a human; this is knowledge for mas-sec-reviewer, never wired autonomous; quota units not cash (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-soar-automation-with-phantom/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-soar-playbook-with-palo-alto-xsoar",
+    "name": "implementing-soar-playbook-with-palo-alto-xsoar",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Knowledge skill for IR playbooks in Cortex XSOAR (Demisto): model the hierarchy (incident type → layout → pre-processing rules → playbook → sub-playbooks/tasks/conditions/scripts → war room → closing report), compose declarative YAML playbooks chaining enrichment sub-playbooks + a DBotScore verdict condition + response actions, and use a MANUAL task type to require analyst approval before any high-impact containment (block sender, purge mailbox, isolate endpoint, disable account, block IP). Reuse common playbooks (malware, account-compromise, DDoS) and 900+ integration packs. In MAOS auto-containment maps to risk:high/blocking (§5) and ALWAYS pauses for a human; knowledge for mas-sec-reviewer, never wired autonomous; quota units not cash (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-soar-playbook-with-palo-alto-xsoar/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-supply-chain-security-with-in-toto",
     "name": "implementing-supply-chain-security-with-in-toto",
     "description": "|",
@@ -3178,6 +3514,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-supply-chain-security-with-in-toto/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-threat-modeling-with-mitre-attack",
+    "name": "implementing-threat-modeling-with-mitre-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Threat modeling with MITRE ATT&CK as a continuous, defensive loop: select threat actors relevant to the asset/sector, build their TTP layers (ATT&CK Navigator), map current detection rules to technique IDs, run a gap analysis (covered vs. uncovered techniques, prioritized by kill-chain phase and asset criticality), produce a phased remediation roadmap, and validate with owner-scoped adversary emulation (Atomic Red Team / Caldera) on systems you control. Feeds mas-sec-reviewer + CLAUDE.md §5 risk classification by grounding which adversary behaviors a project must detect. In MAOS this rides subscription quota, never per-token cash, and never launches emulation against systems you do not own.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-threat-modeling-with-mitre-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-ticketing-system-for-incidents",
+    "name": "implementing-ticketing-system-for-incidents",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Incident-ticketing system design for SOC: define a severity/category taxonomy with response and resolution SLAs, auto-create tickets/cases from SIEM notable events via platform APIs (ServiceNow ITSM, Jira SM, TheHive), route by severity to the right tier, track SLA with auto-escalation on breach, and report MTTR/SLA-compliance metrics. The ticket is the audit trail (compliance evidence) and the coordination spine across SOC/IT/Legal. In MAOS this is process/automation doctrine: platform credentials are owner-scoped and §5-gated, never committed; outbound writes to a third-party ITSM are gated; cost is subscription quota, never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-ticketing-system-for-incidents/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
     "tier": "T1"
   },
   {
@@ -3347,6 +3711,34 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:vertical",
     "tier": "T2"
+  },
+  {
+    "id": "investigating-insider-threat-indicators",
+    "name": "investigating-insider-threat-indicators",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Insider-threat investigation as an authorized, evidence-led process: (0) confirm legal/HR/Privacy authorization and a documented referral BEFORE any monitoring; (1) build a SIEM activity timeline for the subject across DLP/endpoint/email/proxy/auth/badge sources; (2) detect exfiltration indicators (bulk downloads, USB/removable media, external email-with-attachment, cloud-storage uploads); (3) analyze out-of-scope access and after-hours/weekend anomalies vs. role baseline; (4) correlate with HR resignation timeline and physical access; (5) preserve evidence with SHA-256 hashes + chain of custody for Legal. The investigation is read-only analysis of owned telemetry; authorization is the hard gate. In MAOS this is §5/§8-bound, owner-scoped, never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/investigating-insider-threat-indicators/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "investigating-phishing-email-incident",
+    "name": "investigating-phishing-email-incident",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Phishing-incident investigation: extract and analyze headers (SPF/DKIM/DMARC, Received chain, true origin), detonate URLs and attachments in a sandbox (URLScan, Any.Run, VT, MalwareBazaar) without local execution, determine campaign scope via message-trace/Graph search, identify who clicked and who submitted credentials from proxy POST logs, then take CONTAINMENT — mailbox purge, sender/URL/hash blocking, DNS sinkhole, credential reset + token revocation — each a §5 high-risk action gated to a human and scoped to the owned tenant. Document the full timeline, defanged IOCs, scope, and remediation. In MAOS this is owner-scoped defensive IR; cost is subscription quota, never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/investigating-phishing-email-incident/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
   },
   {
     "id": "investor-materials",
@@ -4007,6 +4399,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-alert-triage-with-elastic-siem",
+    "name": "performing-alert-triage-with-elastic-siem",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Systematic alert triage in Elastic Security: (1) initial assessment of the alert panel (severity, risk score, MITRE mapping, host/user/process context); (2) context gathering with ES|QL across endpoint/auth/alert indices (related events, same-user activity, lateral-movement signals); (3) threat-intel enrichment of IPs/hashes; (4) classification — true positive / benign true positive / false positive / needs-investigation — using a risk-score × asset-criticality prioritization matrix and SLA; (5) documentation + escalation rationale. AI features (Attack Discovery, AI Assistant) accelerate but do not replace analyst judgment. Read-only investigation over owned telemetry; in MAOS escalation feeds the ticketing/IR path and cost is subscription quota, never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-alert-triage-with-elastic-siem/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "performing-api-fuzzing-with-restler",
     "name": "performing-api-fuzzing-with-restler",
     "description": "|",
@@ -4161,6 +4567,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-deception-technology-deployment",
+    "name": "performing-deception-technology-deployment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deception-technology deployment as a high-fidelity defensive detection layer: map attack-surface segments where attackers traverse, deploy decoy systems (Canary file/DB servers), plant honeytoken accounts and cached fake credentials in Active Directory, scatter canary documents/tokens (Word, AWS keys) in sensitive paths, and integrate every interaction as a CRITICAL SIEM alert (no legitimate user touches a decoy). All decoy credentials are deliberate leak-traps with fictional values, deployed only on owned infrastructure. Automated response (isolate host, block IP) is a §5 high-risk action gated to a human. Deception is a detection layer, never a replacement for prevention. In MAOS this is owner-scoped; cost is subscription quota, never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-deception-technology-deployment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "performing-disk-forensics-investigation",
     "name": "performing-disk-forensics-investigation",
     "description": "|",
@@ -4231,6 +4651,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-false-positive-reduction-in-siem",
+    "name": "performing-false-positive-reduction-in-siem",
+    "description": "|",
+    "domain": "planning",
+    "summary": "SIEM false-positive reduction as a disciplined tuning loop: identify the noisiest rules and their FP rate, then apply techniques — threshold tuning, allowlist/exclusion management (with expiry + approver), single-event→multi-signal correlation, time-based exclusions for maintenance/batch windows, behavioral-baseline integration (3-sigma), and threat-intel filtering — on a weekly identify / bi-weekly tune / monthly validate / quarterly report cadence. The non-negotiable gate is re-validation: after every tune, confirm true positives still trigger (e.g. owner-scoped Atomic Red Team on owned systems) so precision rises without blinding the detection. In MAOS this is detection-engineering hygiene; cost is subscription quota, never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-false-positive-reduction-in-siem/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "performing-graphql-depth-limit-attack",
     "name": "performing-graphql-depth-limit-attack",
     "description": "|",
@@ -4270,6 +4704,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-insider-threat-investigation/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ioc-enrichment-automation",
+    "name": "performing-ioc-enrichment-automation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "IOC enrichment automation for SOC triage: a unified engine enriches IPs/domains/hashes across VirusTotal, AbuseIPDB, Shodan, GreyNoise, URLScan, and MalwareBazaar, honoring each source's rate limits, then computes a composite risk score and disposition (clean / low / suspicious / malicious). GreyNoise RIOT subtracts score for known-benign services to cut false positives. Enrichment is context, not a blocking verdict — analyst review precedes any block. Outbound lookups must go only to §5 allowed_hosts; API keys are owner-scoped secrets, never committed; IOCs are defanged in reports. In MAOS this feeds alert-triage and phishing IR; cost is subscription quota, never per-token cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ioc-enrichment-automation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
     "tier": "T1"
   },
   {
@@ -4329,6 +4777,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-lateral-movement-detection",
+    "name": "performing-lateral-movement-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team lateral-movement detection doctrine: hunt internal host-to-host pivots after initial compromise via SIEM correlation of Windows Security logs (4624/4625/4648/4672/4769/5140/7045/4698), Sysmon (process/pipe/network) and netflow, mapped to ATT&CK TA0008. Covers PtH/overpass/golden-ticket (NTLM type-3 fan-out, RC4 4769), remote exec (PsExec service+pipe, WMI WmiPrvSE children, WinRM wsmprovhost, RDP type-10 chains), SMB admin-share (C$/ADMIN$ EventCode 5140), DCOM and remote scheduled tasks, plus a movement-graph and kill-chain correlation. In MAOS this is knowledge feeding mas-sec-reviewer/§5: SPL shown is read-only telemetry analysis; any isolation/containment is a human-gated risky action, and cost is quota-measured not cash.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-lateral-movement-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-log-source-onboarding-in-siem",
+    "name": "performing-log-source-onboarding-in-siem",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team SIEM log-source onboarding doctrine: integrate a new data source for monitoring via a tiered priority framework (AD/firewall/EDR/VPN/DNS/email first; web-proxy/cloud/DB next), configure collection (rsyslog UDP/TCP/TLS, Splunk universal-forwarder inputs.conf, AWS CloudTrail), build parsers (props.conf/transforms.conf), normalize fields to CIM/ECS, then validate arrival, field-extraction coverage, CIM compliance, and timestamp lag, before enabling correlation searches. Prioritize sources by security value relative to ingestion cost (NCSC). In MAOS this is defensive visibility knowledge: ingestion 'cost' is reframed as subscription quota/data-budget (§8/§11), never per-GB cash, and any production change stays change-managed and §5-gated.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-log-source-onboarding-in-siem/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "performing-oauth-scope-minimization-review",
     "name": "performing-oauth-scope-minimization-review",
     "description": "|",
@@ -4368,6 +4844,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-privileged-account-discovery/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-purple-team-exercise",
+    "name": "performing-purple-team-exercise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive purple-team doctrine: an AUTHORIZED, COORDINATED, collaborative exercise whose purpose is validating that blue-team detections fire for targeted ATT&CK techniques. Scope and authorize (CISO/change-request, isolated or approved scope, real-time red↔blue comms), build an ATT&CK-mapped test matrix with expected alerts, execute controlled emulation (Atomic Red Team/Caldera) technique-by-technique with cleanup, measure detection Y/N + latency live in the SIEM, then collaboratively build/tune detection rules for each gap and re-test to confirm closure, and report coverage before/after. In MAOS this stays strictly defensive: emulation is a means to measure and improve detection, always coordinated and authorized; cost is quota-measured (§8/§11) and any live execution stays §5-gated.",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-purple-team-exercise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
     "tier": "T1"
   },
   {
@@ -4441,6 +4931,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-soc-tabletop-exercise",
+    "name": "performing-soc-tabletop-exercise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SOC tabletop doctrine: a discussion-based, no-production-impact exercise that validates IR playbooks, escalation paths, cross-functional communication (SOC/IT/Legal/PR/Exec), and decision-making under pressure. Design a realistic multi-phase scenario (e.g. ransomware), release timed injects with guided questions, facilitate in-character discussion against actual playbooks, score responses with an evaluation rubric (detection/containment/communication/business-continuity), then produce an after-action report with prioritized gaps, owners, and due dates, and track remediation to closure. In MAOS this is purely defensive process-rehearsal knowledge: it executes nothing against systems; any real follow-up action stays §5-gated, and cost is quota-measured (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-soc-tabletop-exercise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-threat-hunting-with-elastic-siem",
+    "name": "performing-threat-hunting-with-elastic-siem",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Elastic-SIEM threat-hunting doctrine: proactive, hypothesis-driven hunting for threats that evade automated detection. Start from a hypothesis (threat-intel/ATT&CK/anomaly), scope data sources and time range, hunt with KQL in Discover (LOLBins like certutil/powershell with suspicious args, excluding known-good), use EQL for multi-step sequences (process injection, credential-dump-then-dmp, PsExec auth→psexesvc), investigate collaboratively in Timeline (ECS fields), then convert validated hunts into Elastic detection rules with ATT&CK mapping and update an ATT&CK Navigator coverage layer. In MAOS this is defensive read-only analysis: KQL/EQL queries observe telemetry; deploying a rule or isolating a host is a §5-gated human action, and cost is quota-measured (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-threat-hunting-with-elastic-siem/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
     "id": "performing-threat-modeling-with-owasp-threat-dragon",
     "name": "performing-threat-modeling-with-owasp-threat-dragon",
     "description": "|",
@@ -4452,6 +4970,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-threat-modeling-with-owasp-threat-dragon/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-user-behavior-analytics",
+    "name": "performing-user-behavior-analytics",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team UEBA doctrine: detect compromised accounts and insider threats by deviation from behavioral baselines built on 30–90 days of auth/access history. Build per-user baselines (IPs, countries, apps, login-hour mean/stdev), then detect impossible travel (haversine speed > ~900 km/h), off-hours/weekend logins beyond baseline, unusual data-access volume (z-score > 3 or GB threshold), and privilege abuse (4672/4624/4648 host fan-out vs baseline). Aggregate signals into a composite risk score weighted by asset criticality and rank top-N for investigation. In MAOS this is defensive read-only analysis: UEBA findings are INDICATORS for human review, never proof or grounds for automated/disciplinary action; cost is quota-measured (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-user-behavior-analytics/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
     "tier": "T1"
   },
   {
@@ -5577,6 +6109,20 @@
     "summary": "Gives the user an upfront, explicit choice over response depth instead of guessing. Before answering: (1) estimate input tokens (prose words×1.3, code chars/4); (2) classify complexity (Simple 3-8x … Complex 15-40x) to get a response window; (3) present four depth levels — Essential 25% / Moderate 50% / Detailed 75% / Exhaustive 100% — with estimated token counts; (4) answer at the chosen level. Honors shortcuts ('tldr'→25%, 'detailed'→75%) and maintains a session-set level silently. Heuristic only (~85-90% accuracy, ±15%) — always shows the disclaimer; no real tokenizer. MAS variant: this is the user-facing surface of the §6 eco/standard/expert depth control and TOKEN_STRATEGY signal-density discipline — Essential maps to eco, Exhaustive to expert; it is a depth-negotiation skill, never a",
     "tags": [],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/token-budget-advisor/SKILL.md"
+  },
+  {
+    "id": "triaging-security-alerts-in-splunk",
+    "name": "triaging-security-alerts-in-splunk",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Splunk ES alert-triage doctrine for SOC Tier 1: work the Incident Review queue by urgency (severity×priority), group related notables by src/dest to see attack chains not isolated alerts, pivot to raw events for context, correlate across proxy/firewall/DNS/endpoint, check threat-intel framework matches, then classify disposition — true positive (escalate Tier 2 + ticket), benign true positive (close + suppress), false positive (close + tune), or undetermined (assign Tier 2) — and document source/sources-examined/correlation/rationale/next-steps, tracking MTTD/MTTR metrics. In MAOS this is defensive read-only analysis: SPL observes telemetry; escalation/containment (account disable, isolation) is a §5-gated human action, and cost is quota-measured (§8/§11).",
+    "tags": [
+      "cyber:soc-operations"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/triaging-security-alerts-in-splunk/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:soc-operations",
+    "tier": "T1"
   },
   {
     "id": "triaging-security-incident",
