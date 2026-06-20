@@ -378,6 +378,34 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-persistence-mechanisms-in-linux",
+    "name": "analyzing-persistence-mechanisms-in-linux",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only Linux persistence-hunting playbook. Enumerates the canonical vectors (user/system crontab, /etc/cron.d, systemd service+timer units, /etc/ld.so.preload + LD_PRELOAD, shell profiles, SSH authorized_keys, init scripts), checks timestamps/integrity, and correlates with auditd file-watch logs to build an installation timeline. Maps to MITRE ATT&CK T1053.003 (cron), T1543.002 (systemd service), T1574.006 (LD_PRELOAD), T1546.004 (.bashrc), T1098.004 (SSH authorized_keys); NIST CSF DE.CM-01/DE.AE-02/DE.AE-07/ID.RA-05. Output is a risk-scored JSON finding set + timeline + remediation, never an automated removal. Detection only; the source tree under projects.path is read-only-by-default (§8).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-persistence-mechanisms-in-linux/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-powershell-empire-artifacts",
+    "name": "analyzing-powershell-empire-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of PowerShell Empire C2 artifacts in authorized Windows logs. Hunt Script Block Logging (Event 4104) and Module Logging (4103) for Empire's default launcher (powershell -noP -sta -w 1 -enc + Base64 blob), stager IOCs (System.Net.WebClient, DownloadData/DownloadString, FromBase64String), known module invocations (Invoke-Mimikatz, Invoke-Kerberoast, Invoke-TokenManipulation, Invoke-PSInject, Invoke-DCOM), default Empire HTTP user agents, and default staging URIs (/login/process.php, /admin/get.php). Decode Base64 (UTF-16LE) for analysis, build a timeline, and produce risk-scored findings mapped to MITRE ATT&CK (T1059.001 PowerShell, T1071.001 web C2, T1003.001 LSASS, T1558.003 Kerberoast, T1027.010 command obfuscation) and NIST-CSF (DE.CM/DE.AE/ID.RA). Read-only over auth",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-powershell-empire-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-powershell-script-block-logging",
     "name": "analyzing-powershell-script-block-logging",
     "description": "|",
@@ -389,6 +417,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-powershell-script-block-logging/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-ransomware-network-indicators",
+    "name": "analyzing-ransomware-network-indicators",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team ransomware network-indicator analysis over authorized Zeek conn.log / NetFlow: detect the pre-encryption and exfiltration footprint — C2 beaconing via inter-connection interval statistics (mean/stdev/coefficient of variation), connections to known TOR exit nodes (cross-referenced against a current TOR exit list), data-exfiltration flows (unusually high outbound-byte ratios to external IPs), and DGA-like / high-entropy DNS — then apply composite risk scoring across indicator types and map to MITRE ATT&CK (T1071.001 C2, T1573 encrypted channel, T1048 exfiltration over alternative protocol, T1567.002 exfil to cloud, T1486 data encrypted for impact). Read-only offline analysis of owned logs; suspected infrastructure is never contacted; containment and recovery are owner guidance. NIS",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-ransomware-network-indicators/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -1201,6 +1243,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-threat-actor-profile-from-osint/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "building-threat-hunt-hypothesis-framework",
+    "name": "building-threat-hunt-hypothesis-framework",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Methodology doctrine for threat hunting: convert threat intel, attacker TTPs, and environmental data into testable, falsifiable hypotheses. Drives the four hypothesis types — intelligence-driven (APT report), gap-driven (ATT&CK coverage analysis), anomaly-driven (UEBA alert), and situational (sector threat) — and for each defines the testable statement, required data sources, the queries that would confirm or refute it, validation criteria, and documentation/feedback into detection rules. Spans the kill chain (TA0001 initial access → TA0003 persistence → TA0008 lateral movement → TA0010 exfiltration). This is the planning layer that precedes the technique-specific hunt skills. In MAOS read-only and quota-budgeted: any resulting response action is human-gated (§5); effort in quota units, ne",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-threat-hunt-hypothesis-framework/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -2711,6 +2767,34 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-dcsync-attack-in-active-directory",
+    "name": "detecting-dcsync-attack-in-active-directory",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive DCSync detection (T1003.006). Inventory legitimate DC replication sources, enable Audit Directory Service Access (Event 4662, AccessMask 0x100), alert on any non-DC account touching replication GUIDs (DS-Replication-Get-Changes 1131f6aa, -All 1131f6ad, -In-Filtered-Set 89e95b76), corroborate with MS-DRSR/DrsGetNCChanges RPC from non-DC IPs, filter known replication services (Azure AD Connect, SCCM), then hunt follow-on KRBTGT abuse (Golden Ticket). Read-only Splunk/KQL/Sigma queries; no hash extraction. Consolidates the detecting + hunting variants. In MAOS this informs mas-sec-reviewer credential-access context; all queries are read-only telemetry, no $/€ — cost is subscription quota (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-dcsync-attack-in-active-directory/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-dll-sideloading-attacks",
+    "name": "detecting-dll-sideloading-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of DLL side-loading / search-order hijacking (MITRE T1574.001/.002/.006/.008). Hunt Sysmon Event 7 (Image Loaded, with hashes) and EDR DLL-load telemetry for: DLLs loaded from a path differing from the app's expected directory; unsigned/untrusted DLLs loaded by signed executables; legitimate signed apps running from anomalous locations (Temp, AppData, Public) acting as decoy wrappers; DLL hashes mismatching known-good; and DLL proxying (malicious DLL forwarding exports to the real one). Correlate post-load host behavior (network, child processes). Reference LOLBAS / sideload databases for vulnerable apps. Read-only analysis of authorized telemetry; quarantine and rule updates are owner guidance. Maps to MITRE ATT&CK T1574 and NIST-CSF DE.CM/DE.AE/ID.RA. In MAOS this fee",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-dll-sideloading-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-dns-exfiltration-with-dns-query-analysis",
     "name": "detecting-dns-exfiltration-with-dns-query-analysis",
     "description": "|",
@@ -2736,6 +2820,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-email-account-compromise/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-email-forwarding-rules-attack",
+    "name": "detecting-email-forwarding-rules-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for malicious email forwarding rules (MITRE T1114.003): formulate a testable hypothesis, identify data sources (mail-platform audit logs — O365/Exchange/Workspace — plus SIEM and OAuth grant logs), query for inbox/transport rules auto-forwarding to external domains, rules that delete or move security alerts, and additional email delegate permissions (T1098.002), validate TP vs FP by context, link to BEC and remote email collection (T1114.002), and report with evidence. Scenarios: BEC external forward, rule deleting alerts, CEO-mail forwarding, OAuth-app transport rule. In MAOS detection-only: rule deletion, mailbox disable, or OAuth revocation is risk:high/blocking, human-gated (§5); effort in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-email-forwarding-rules-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -2767,6 +2865,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-golden-ticket-attacks-in-kerberos-logs",
+    "name": "detecting-golden-ticket-attacks-in-kerberos-logs",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Golden Ticket detection (T1558.001). KRBTGT hash (often stolen via DCSync/NTDS.dit) forges arbitrary TGTs. Signals from DC events 4768/4769/4771: TGS (4769) appearing with no preceding TGT (4768) from same account/IP; RC4 (0x17) encryption where domain enforces AES; ticket lifetimes exceeding Kerberos policy; arbitrary/non-existent SIDs; KRBTGT not rotated since a known compromise (single rotation leaves prior hash valid). PAC validation (KB5008380+) rejects forged PACs — monitor PAC failures. Read-only Splunk/KQL. Pivots from DCSync detection. In MAOS feeds mas-sec-reviewer; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-golden-ticket-attacks-in-kerberos-logs/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-golden-ticket-forgery",
     "name": "detecting-golden-ticket-forgery",
     "description": "|",
@@ -2795,6 +2907,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-insider-threat-behaviors",
+    "name": "detecting-insider-threat-behaviors",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for insider-threat behaviors (UEBA lens, MITRE T1078 valid accounts): formulate a testable hypothesis, identify data sources (EDR, SIEM, DLP, HR-context where authorized), baseline normal per-user behavior, then flag deviations — unusual/off-hours data access, mass file downloads, privilege/role-mismatch access, and resignation-correlated bulk activity — correlate to cloud-data access (T1530) and exfil-over-web-service (T1567), validate TP vs FP, and report with evidence. Scenarios: pre-resignation bulk download, admin accessing HR data, service-account misuse, contractor copying source. In MAOS detection-only and privacy-bounded: account disable, suspension, or HR action is risk:high/blocking, human-gated (§5); effort in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-insider-threat-behaviors/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-insider-threat-with-ueba",
     "name": "detecting-insider-threat-with-ueba",
     "description": "|",
@@ -2806,6 +2932,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-insider-threat-with-ueba/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-kerberoasting-attacks",
+    "name": "detecting-kerberoasting-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Kerberoasting detection (T1558.003 / AS-REP roasting T1558.004). Attackers request TGS for SPN-bearing service accounts then crack the RC4-encrypted ticket offline. Signals from DC Event 4769: a single account requesting many distinct service tickets in a short window; RC4 (TicketEncryptionType 0x17) requests where AES is the norm; targeting of high-privilege service accounts; AS-REP roasting = 4768 for accounts with DONT_REQUIRE_PREAUTH. Validate with SIEM/EDR (Sysmon, threat-intel correlation). Tools to recognize (not run): Rubeus kerberoast, Impacket GetUserSPNs. Read-only SIEM queries. In MAOS feeds mas-sec-reviewer; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-kerberoasting-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -2823,6 +2963,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-lateral-movement-with-splunk",
+    "name": "detecting-lateral-movement-with-splunk",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team lateral-movement hunt over authorized Windows logs in Splunk: scope the techniques (RDP/SMB/WinRM/PsExec/WMI/DCOM/SSH), query network (Type 3) and remote-interactive (Type 10) logons plus explicit-credential 4648 events, build source→destination auth graphs, flag first-time host pairs against the historical baseline, correlate auth with downstream process creation on the destination, and surface sensitive-server access, off-hours activity, service-account misuse, and rapid multi-host fan-out. Read-only offline analysis of owned SIEM data; containment is owner guidance, never a MAOS action, and no suspected host is contacted. Maps to MITRE ATT&CK T1021/T1021.001-006, T1047, T1570, T1569.002 and NIST-CSF DE.CM/DE.AE. In MAOS this feeds mas-sec-reviewer and the §5 network/cross-proj",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-lateral-movement-with-splunk/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-living-off-the-land-attacks",
     "name": "detecting-living-off-the-land-attacks",
     "description": "|",
@@ -2834,6 +2988,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-living-off-the-land-attacks/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-malicious-scheduled-tasks-with-sysmon",
+    "name": "detecting-malicious-scheduled-tasks-with-sysmon",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Sysmon-tooled detection facet for malicious scheduled tasks (MITRE T1053.005 + lateral-movement angle), distinct from the broad hunt by its event-correlation recipe. Sysmon Event 1 captures schtasks.exe/at.exe process creation with full command line; Event 11 captures the task XML written to C:\\\\Windows\\\\System32\\\\Tasks\\\\; Windows Security Event 4698/4702 logs registration. Build detection that correlates these to flag tasks created from public/user-writable directories, with -enc/encoded payloads, suspicious parent processes (cmd/wscript), or remote creation via schtasks /s (lateral-movement indicator). NIST CSF DE.CM-01/DE.AE-02/DE.AE-07/ID.RA-05. Read-only detection-engineering; remediation gated (§5); subscription quota, never cash (§11). Pairs with the canonical hunting-for-suspicious",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-malicious-scheduled-tasks-with-sysmon/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-mimikatz-execution-patterns",
+    "name": "detecting-mimikatz-execution-patterns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Mimikatz detection (T1003.001 + enabled T1003.006/T1558.003/T1558.001). Signals: command-line module names (sekurlsa::logonpasswords, lsadump::dcsync, kerberos::list/golden/ptt, crypto::); LSASS handle opens with high GrantedAccess from non-allowlisted processes (Sysmon EventID 10); reflective/in-memory loading (Invoke-Mimikatz, PowerShell AMSI/script-block hits, no-disk module strings); known binary/driver (mimidrv) indicators. Recognize follow-on: DCSync from non-DC, golden-ticket creation. Read-only Splunk/KQL(MDE)/Sigma + script-block log analysis. In MAOS feeds mas-sec-reviewer; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-mimikatz-execution-patterns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -2879,6 +3061,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-ntlm-relay-with-event-correlation",
+    "name": "detecting-ntlm-relay-with-event-correlation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive NTLM relay detection (T1557.001, T1187). Core signal: Event 4624 LogonType 3 NTLM where WorkstationName's IP ≠ source IpAddress (relayed). Add rapid multi-host spraying, NTLM from non-inventory IPs, NTLMv1 downgrade, machine-account ($) auth from unexpected IP (PetitPotam/DFSCoerce/PrinterBug coercion → AD CS / LDAP), Responder LLMNR(5355)/NBT-NS(137)/mDNS(5353) poisoning, and Event 8004 NTLM-operational audit. Posture audit: SMB signing Required, LDAP signing + channel binding, LmCompatibilityLevel. Splunk/KQL/Sigma + read-only PowerShell config reads (Get-*, no Set-*). Consolidates detecting + hunting variants. In MAOS this feeds mas-sec-reviewer auth context; all queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-ntlm-relay-with-event-correlation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-oauth-token-theft",
     "name": "detecting-oauth-token-theft",
     "description": "|",
@@ -2890,6 +3086,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-oauth-token-theft/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-pass-the-hash-attacks",
+    "name": "detecting-pass-the-hash-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Pass-the-Hash detection (T1550.002, + Pass-the-Ticket T1550.003). PtH reuses a stolen NTLM hash to authenticate without the plaintext. Signals: Event 4624 LogonType 3 with NTLM where the host/user normally uses Kerberos; LogonProcessName/AuthenticationPackageName anomalies (NtLmSsp on domain-joined assets); same account authenticating to many hosts rapidly (lateral spread via psexec/wmic/CrackMapExec); correlation with prior LSASS dumping. Recognize tools (don't run): Mimikatz sekurlsa::pth, Impacket psexec.py, CrackMapExec, WMI lateral movement. Read-only SIEM/EDR (4624/4648, Sysmon). In MAOS feeds mas-sec-reviewer; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-pass-the-hash-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -2921,6 +3131,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-privilege-escalation-attempts",
+    "name": "detecting-privilege-escalation-attempts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive privilege-escalation detection (T1134 token manipulation, T1548.002 UAC bypass, T1574.009 unquoted service path, T1068 exploitation). Signals: token-impersonation/SeImpersonate abuse (Potato family, PrintSpoofer service→SYSTEM); service binaries spawned from writable/unquoted paths; integrity-level jumps without consent; CVE/kernel-exploit process behavior; Linux sudo/doas misconfig + SUID abuse. Recognize tools (don't run): JuicyPotato, RoguePotato, PrintSpoofer. Read-only Splunk/KQL/Sigma over Sysmon (1/10/13) + 4688/4672. Overlaps detecting-t1548 (UAC) — this is the broader privesc umbrella. In MAOS feeds mas-sec-reviewer; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-privilege-escalation-attempts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-privilege-escalation-in-kubernetes-pods",
     "name": "detecting-privilege-escalation-in-kubernetes-pods",
     "description": "|",
@@ -2932,6 +3156,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-privilege-escalation-in-kubernetes-pods/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-process-hollowing-technique",
+    "name": "detecting-process-hollowing-technique",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of process hollowing (MITRE T1055.012, a.k.a. RunPE), distinct from general T1055 injection. Mechanics: malware spawns a legitimate process with CREATE_SUSPENDED, unmaps its memory (NtUnmapViewOfSection), writes a malicious PE (WriteProcessMemory), and resumes (ResumeThread) — the process keeps a trusted name but runs attacker code. Hunt authorized Sysmon (Event 1 CREATE_SUSPENDED, Event 8 CreateRemoteThread, Event 25 ProcessTampering on v13+) and EDR memory telemetry for: suspended-create→write→resume sequences; in-memory image diverging from the on-disk binary (image mismatch); processes behaving inconsistently with their binary name (svchost/explorer/rundll32 making odd network calls); and suspicious NtUnmapViewOfSection/WriteProcessMemory call traces. Corroborate wi",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-process-hollowing-technique/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -3019,6 +3257,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-service-account-abuse",
+    "name": "detecting-service-account-abuse",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive service-account-abuse detection (T1078.002, + T1021 remote services, T1098 account manipulation, T1550.002 PtH). Service accounts have a tight behavioral envelope (specific hosts, non-interactive, scheduled). Signals: interactive (LogonType 2) or RDP (LogonType 10) logons by accounts meant to be non-interactive; access to resources outside the service's normal scope; off-hours activity; sudden privilege use (DA-level service account performing DCSync). Build a per-account baseline (hosts, logon types, hours, resources) then alert on deviation. Read-only SIEM/EDR (4624/4672/4768). In MAOS feeds mas-sec-reviewer; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-service-account-abuse/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-shadow-api-endpoints",
     "name": "detecting-shadow-api-endpoints",
     "description": "|",
@@ -3100,6 +3352,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-suspicious-oauth-application-consent/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-t1003-credential-dumping-with-edr",
+    "name": "detecting-t1003-credential-dumping-with-edr",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive credential-dumping detection (T1003.*). LSASS access via Sysmon EventID 10 (ProcessAccess) with suspicious GrantedAccess masks (0x1FFFFF/0x1F3FFF/0x143A/0x0040) from non-allowlisted source images; tool command-line signatures (sekurlsa/lsadump, procdump -ma lsass, comsvcs.dll MiniDump, ntdsutil IFM, reg save HKLM\\\\SAM|SECURITY|SYSTEM, vssadmin create shadow); NTDS.dit via shadow copy; SAM hive export; DCSync via Event 4662 replication GUIDs. Validate LSASS protections (Credential Guard, RunAsPPL). Read-only Splunk/KQL(MDE DeviceEvents)/Sigma. In MAOS feeds mas-sec-reviewer; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-t1003-credential-dumping-with-edr/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-t1055-process-injection-with-sysmon",
+    "name": "detecting-t1055-process-injection-with-sysmon",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of process injection (MITRE T1055.*) via authorized Sysmon telemetry + EDR. Primary signals: Event 8 (CreateRemoteThread where SourceImage != TargetImage into high-value targets svchost/lsass/explorer/winlogon); Event 10 (ProcessAccess cross-process handles with PROCESS_VM_WRITE 0x0020 / VM_OPERATION 0x0008 / CREATE_THREAD 0x0002 / 0x1FFFFF); Event 7 (DLLs loaded from temp/download dirs into system processes); Event 25 (ProcessTampering = hollowing image mismatch). Build a source→target injection graph, filter known-good cross-process actors (AV/debuggers/RMM/accessibility), and classify the ATT&CK sub-technique (T1055.001 DLL, .002 PE, .003 thread hijack, .004 APC, .005 TLS, .012 hollowing, .013 doppelganging). Ships Splunk SPL, Microsoft Defender KQL, and Sigma rules.",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-t1055-process-injection-with-sysmon/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-t1548-abuse-elevation-control-mechanism",
+    "name": "detecting-t1548-abuse-elevation-control-mechanism",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive elevation-control abuse detection (T1548.001-.004). Windows UAC bypass: Sysmon 12/13 registry writes to HKCU\\\\Software\\\\Classes\\\\(ms-settings|mscfile|exefile|Folder)\\\\shell\\\\open\\\\command, and auto-elevating LOLBins (fodhelper, computerdefaults, eventvwr, sdclt, slui, cmstp) launched by non-standard parents (not explorer/svchost/services), spawning cmd/powershell at high integrity without a UAC consent event. Linux: setuid/setgid + sudo/caching abuse. Read-only Splunk/KQL(DeviceRegistryEvents)/Sigma. In MAOS feeds mas-sec-reviewer privilege-escalation context; queries read-only, cost = subscription quota, no $/€ (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-t1548-abuse-elevation-control-mechanism/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -4074,6 +4368,384 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-credential-stuffing-attacks/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-anomalous-powershell-execution",
+    "name": "hunting-for-anomalous-powershell-execution",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team hypothesis-driven hunt for malicious PowerShell across EDR (CrowdStrike/MDE/SentinelOne), SIEM (Splunk/Elastic/Sentinel), and Windows logs. Primary source = Script Block Logging Event 4104 (records deobfuscated script text); reassemble multi-part blocks via ScriptBlock ID, plus Module Logging 4103 and process-creation. Detect: Base64/-EncodedCommand payloads, AMSI-bypass patterns (reflection patching, amsiInitFailed), IEX/Net.WebClient/Invoke-WebRequest download cradles, constrained-language-mode evasion, credential-dumping keywords, and Empire C2 agents. Method: formulate hypothesis → identify data sources → query → analyze → validate TP vs FP → correlate to attack chain/TTPs → document + update detection rules (Sigma). Read-only over authorized logs; containment is owner guidan",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-anomalous-powershell-execution/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-beaconing-with-frequency-analysis",
+    "name": "hunting-for-beaconing-with-frequency-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team C2-beaconing detection via statistical frequency analysis — the generic, framework-agnostic CANONICAL method for the beaconing family. Over authorized proxy/firewall/Zeek/NetFlow data (≥24h): for each source→destination pair compute inter-connection intervals, mean, standard deviation, and coefficient of variation; flag CV < 0.20 with ≥50 connections and 30s–24h average interval; apply jitter analysis to catch randomized beacons (e.g. Sunburst 15min ±90s); filter known-good periodic traffic (Windows Update, AV, NTP, SaaS heartbeats, CDN health checks); test payload-size CV; enrich with WHOIS/domain-age (<30d), CT logs, passive DNS, VirusTotal; correlate to endpoint via DHCP + Sysmon EID 1/3; then score and prioritize. Read-only offline analysis of owned logs; the suspected host i",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-beaconing-with-frequency-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-cobalt-strike-beacons",
+    "name": "hunting-for-cobalt-strike-beacons",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Cobalt Strike Beacon detection over authorized network telemetry: this is the CS-specific facet of the beaconing family — fingerprint default and known artifacts (TLS certificate serial 8BB00EE, JA3/JA3S/JARM, named-pipe naming) and match HTTP malleable-C2 profiles (URI paths, headers, user-agents), then run interval/jitter analysis (default 60s + configurable jitter) and fuse signals (TLS + timing + HTTP profile) into a composite confidence score. Uses Zeek ssl.log/conn.log, Suricata + Emerging Threats ruleset, RITA scoring, and offline scapy/dpkt PCAP analysis. Read-only offline analysis of owned captures; the suspected team server is never contacted; containment is owner guidance, not a MAOS action. Maps to MITRE ATT&CK T1071/T1071.001 and NIST-CSF DE.CM/DE.AE. Pairs with hunt",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-cobalt-strike-beacons/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-command-and-control-beaconing",
+    "name": "hunting-for-command-and-control-beaconing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team C2-beaconing hunt as a full workflow facet over authorized telemetry: define beaconing characteristics (regular intervals, small payloads, consistent destinations, jitter), aggregate proxy/DNS/Zeek/NetFlow data, apply frequency analysis (stdev/CV), filter known-good periodic traffic (Update/AV/NTP/heartbeats), score domain/IP reputation (TI, WHOIS, CT logs), investigate endpoint context (process/user/file changes), then confirm and respond. Its added value over the statistical-only skill is the broad technique map it hunts across — T1071/T1071.001/T1071.004, T1573 encrypted channel, T1572 protocol tunneling, T1568 dynamic resolution (DGA/fast-flux), T1132 encoding, T1095 non-application-layer — and a DNS/reputation lens. The pure CV math is canonical in hunting-for-beaconing-with",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-command-and-control-beaconing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-data-exfiltration-indicators",
+    "name": "hunting-for-data-exfiltration-indicators",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for data exfiltration: enumerate channels (HTTPS upload, DNS/ICMP tunnel, email, personal cloud, removable media, encrypted non-C2), baseline 30-day outbound volume per user/host/destination, flag volume + destination anomalies (newly-registered domains, foreign infra, personal cloud), inspect protocol abuse (large/frequent DNS TXT), correlate to file-access on sensitive shares, then report with evidence and an exposure estimate. Covers T1041/T1048/T1052/T1567/T1029/T1537/T1020 and D3FEND content/protocol analysis. In MAOS this is detection-only: any containment, block, or outbound action is risk:high/blocking and pauses for a human (§5); cost in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-data-exfiltration-indicators/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-data-staging-before-exfiltration",
+    "name": "hunting-for-data-staging-before-exfiltration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for data staging (the pre-exfil step, MITRE T1074): detect archiver process creation (7z.exe/rar.exe/tar/zip/WinRAR with compression args via Sysmon EID 1 / Windows 4688), flag writes into staging paths (%TEMP%, ProgramData, Recycle Bin, hidden dirs), find multi-source-read → single-dir-write consolidation, track bulk reads from document/DB/network-share paths, analyze archive metadata (size/ctime/source), score staging risk heuristically, and emit a timelined hunt report mapped to T1074.001/.002/T1560. Distinct from exfil egress hunting — staging precedes the wire. In MAOS detection-only: any process kill, quarantine, or block is risk:high/blocking, human-gated (§5); effort in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-data-staging-before-exfiltration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-dcom-lateral-movement",
+    "name": "hunting-for-dcom-lateral-movement",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team DCOM lateral-movement hunt (T1021.003) over authorized Windows telemetry: detect MMC20.Application, ShellWindows, and ShellBrowserWindow abuse by correlating Sysmon EID 1 (process create) parent-child chains — mmc.exe/dllhost.exe/explorer.exe spawning cmd/powershell/wscript/mshta — with EID 3 inbound RPC connections on port 135 and dynamic high ports, plus WMI-Activity (5857/5860/5861) and 4624 Type-3 logons. Ships portable Sigma rules and Splunk/KQL/Zeek detection queries, plus a DCOM attack-surface audit and GPO hardening guidance. Read-only detection of owned estate; the attack-simulation block is commented and lab-only; containment is owner guidance, never a MAOS action. Maps to MITRE ATT&CK T1021/T1021.003 and NIST-CSF DE.CM/DE.AE. In MAOS this feeds mas-sec-reviewer and the",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-dcom-lateral-movement/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-defense-evasion-via-timestomping",
+    "name": "hunting-for-defense-evasion-via-timestomping",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team detection of anti-forensic timestomping (MITRE T1070.006). Core technique: $STANDARD_INFORMATION (0x10) timestamps are user-mode-writable, but $FILE_NAME (0x30) timestamps are kernel-only — so SI older than FN signals manipulation. Parse the $MFT (MFTECmd/analyzeMFT) to CSV with both 0x10 and 0x30 columns, then detect: SI_Created < FN_Created (high), SI_Modified < FN_Created (impossible normally, high), zeroed-nanosecond SI artifacts left by tools (medium), SI/FN gaps > 1 year (high), and SI entry-modified years after creation (medium). Corroborate with USN Journal (BASIC_INFO_CHANGE → critical), ShimCache/Amcache, and $LogFile; baseline against known-clean images to control FPs (installers/backup software legitimately reset times). Catches Timestomp/NTimeStomp/SetMACE/Set-ItemPr",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-defense-evasion-via-timestomping/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-dns-based-persistence",
+    "name": "hunting-for-dns-based-persistence",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Hunt DNS-based persistence that survives credential rotation and host reimaging because it lives in the DNS infrastructure layer: record hijacking, dangling CNAMEs (subdomain takeover), wildcard-DNS abuse, and unauthorized NS/MX delegation changes. Method: baseline authorized A/AAAA/CNAME/MX/NS/TXT records, pull passive-DNS history (e.g. SecurityTrails) and provider audit logs (Route53/Azure DNS/Cloudflare), diff for anomalies, then correlate resolution targets against threat intel. Maps MITRE T1546/T1547-class persistence + NIST CSF DE.CM-01/DE.AE-02/DE.AE-07/ID.RA-05. Read-only detection only; outbound API/DNS calls go through config/permissions.json#allowed_hosts (§5); subscription quota, never per-token cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-dns-based-persistence/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-dns-tunneling-with-zeek",
+    "name": "hunting-for-dns-tunneling-with-zeek",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team DNS-tunneling / DNS-exfiltration hunt (T1071.004, T1048.003) over authorized Zeek dns.log: detect covert channels by query-length distribution (tunneling queries often >50 chars vs 20-30 normal), Shannon entropy of subdomain labels (>3.5 bits/char indicates Base32/Base64 encoding), unique-subdomain count per parent domain (hundreds/thousands), DNS record-type skew (excess TXT/NULL/CNAME/MX), high query volume (>100/hr/source), and query-timing frequency analysis (beacon vs burst). Cross-reference conn.log to attribute the source process, and validate domains against WHOIS/CT/TI. Catches iodine, dnscat2, DNSExfiltrator, DoH tunneling, and CS DNS beacons. Read-only offline analysis of owned logs; the suspected domain is never queried by the hunt; containment is owner guidance. NIST",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-dns-tunneling-with-zeek/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-domain-fronting-c2-traffic",
+    "name": "hunting-for-domain-fronting-c2-traffic",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team domain-fronting C2 detection (T1090.004) — the SNI/Host facet of the beaconing family — over authorized proxy/web-gateway logs: parse connections carrying both TLS SNI and HTTP Host-header fields, compare them for mismatch, extract TLS certificate Subject/SAN/issuer (offline, pyOpenSSL/cryptography) to identify CDN providers (CloudFront, Azure CDN, Cloudflare), flag high-confidence fronting where SNI (legitimate, high-reputation domain) differs from Host (attacker domain) on CDN IP ranges, and score on the reputation differential. Requires TLS inspection on the proxy for Host visibility. Read-only offline analysis of owned logs/certs; the suspected endpoint is never contacted; containment is owner guidance. Maps to MITRE ATT&CK T1090.004 (and the broader T1071 C2 lens) and NIST-C",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-domain-fronting-c2-traffic/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-lateral-movement-via-wmi",
+    "name": "hunting-for-lateral-movement-via-wmi",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team WMI lateral-movement hunt (T1047) over authorized Windows process telemetry: parse Event ID 4688 (with command line) and Sysmon Event ID 1 for processes whose parent is WmiPrvSE.exe — the signature of remote 'wmic process call create' / Win32_Process.Create() execution — flag suspicious command lines (cmd /q /c, redirection to admin$ shares, encoded PowerShell), and inspect WMI-Activity/Operational events (5857/5860/5861) for event-consumer subscriptions used as persistence. Distinct mechanism from DCOM (this is the WMI provider host, that is COM/RPC). Read-only offline parsing of owned EVTX/SIEM data; containment is owner guidance, never a MAOS action, and no host is contacted. Maps to MITRE ATT&CK T1021/T1047 and NIST-CSF DE.CM/DE.AE. In MAOS this feeds mas-sec-reviewer and the",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-lateral-movement-via-wmi/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-living-off-the-cloud-techniques",
+    "name": "hunting-for-living-off-the-cloud-techniques",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team hypothesis-driven hunt for Living-off-the-Cloud (LOTC) abuse: adversaries riding legitimate cloud/SaaS (Azure/AWS/GCP, Discord, Telegram, Google Docs, Notion) for C2, data staging, and exfiltration so traffic blends with allowed services. Scenarios: C2 over Discord webhooks, exfil to Telegram bot API, dynamic C2 via Azure Functions, staging stolen data on Google Docs/Notion. Method: hypothesis → data sources (EDR process+network, SIEM, Sysmon, proxy/DNS) → query → analyze anomalies → validate TP/FP → correlate to attack chain → document + tune rules (Sigma). Detection leans on egress to high-trust SaaS hosts that a given host/process should not normally reach, beaconing cadence, and unusual process→cloud-endpoint pairings — feeds the §5 allowed_hosts network-egress lens. Read-onl",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-living-off-the-cloud-techniques/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-lolbins-execution-in-endpoint-logs",
+    "name": "hunting-for-lolbins-execution-in-endpoint-logs",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team hunt for LOLBin abuse (MITRE T1218 + relatives) in authorized endpoint logs — adversaries proxy malicious execution through trusted signed Windows binaries to evade AV/application-control. Sources: Sysmon Event 1 + Windows Security 4688 with full command-line, EDR parent-child, Sysmon Event 3 for egress; reference LOLBAS. Method: build a high-risk LOLBin watchlist (certutil, mshta, rundll32, regsvr32, msbuild, installutil, cmstp, wmic, wscript/cscript, bitsadmin, powershell) → baseline normal usage (args/parent/user, ~30d) → hunt anomalous arguments (certutil -urlcache/-decode, mshta http, regsvr32 /s /i:URL Squiblydoo, rundll32 temp-DLL) → flag suspicious parents (winword/outlook spawning LOLBins) → flag execution from unusual paths/renamed binaries → correlate egress → score. S",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-lolbins-execution-in-endpoint-logs/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-persistence-mechanisms-in-windows",
+    "name": "hunting-for-persistence-mechanisms-in-windows",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Umbrella Windows persistence-hunt methodology. Step 1 builds the full persistence map (Run keys, services, scheduled tasks, WMI, startup folder, DLL search-order, COM, AppInit DLLs, IFEO, Winlogon); steps 2-7 collect endpoint artifacts (EDR/Sysmon/Velociraptor/Autoruns), baseline against known-good (Autoruns snapshots, GPO/SCCM), flag new/unsigned/unknown entries, then investigate binary signature/hash/creation-time and correlate to process+network+logon. Covers MITRE T1547.001 (Run/startup), T1543.003 (service), T1053.005 (scheduled task), T1546.003 (WMI), T1546.015 (COM), T1546.012 (IFEO), T1546.010 (AppInit), T1547.004 (Winlogon), T1574.001 (DLL search order); TA0003. Delegate deep dives to the per-vector skills. Read-only detection; subscription quota (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-persistence-mechanisms-in-windows/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-persistence-via-wmi-subscriptions",
+    "name": "hunting-for-persistence-via-wmi-subscriptions",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Canonical WMI event-subscription persistence hunt (MITRE T1546.003, the fileless persistence favored by APT29/Turla/FIN8). Enumerate permanent subscriptions in root\\\\subscription / root\\\\default (a clean host has near-zero), watch Sysmon Event 19 (EventFilter) / 20 (EventConsumer) / 21 (FilterToConsumerBinding) plus Windows Event 5861, flag the dangerous consumer types (ActiveScriptEventConsumer, CommandLineEventConsumer), inspect filter WQL triggers (Win32_ProcessStartTrace, logon, interval timers), hunt WmiPrvSe.exe child processes, and detect mofcomp.exe MOF compilation. Ships Splunk SPL, Sentinel KQL, PowerShell enum, and a Sigma rule. Read-only detection; subscription quota (§11). Supersedes the thinner detecting-wmi-persistence.",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-persistence-via-wmi-subscriptions/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-registry-persistence-mechanisms",
+    "name": "hunting-for-registry-persistence-mechanisms",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Broad Windows registry persistence hunt across the four registry vectors: Run/RunOnce keys (T1547.001), Winlogon Helper Shell/Userinit (T1547.004), Image File Execution Options debugger injection (T1546.012), and COM InprocServer32 hijacking (T1546.015). Hypothesis-driven loop: formulate from threat-intel/ATT&CK gap, identify data sources (Sysmon Reg events 12/13/14, EDR, SIEM), execute detection queries, analyze + validate true vs false positives, correlate to attack chains, report. Maps NIST CSF DE.CM-01/DE.AE-02/DE.AE-07/ID.RA-05. Delegates the deep Run-key Sysmon-13 analysis to hunting-for-registry-run-key-persistence. Read-only detection; remediation gated for a human (§5); subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-registry-persistence-mechanisms/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-registry-run-key-persistence",
+    "name": "hunting-for-registry-run-key-persistence",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deep, Sysmon-driven hunt for registry Run/RunOnce-key persistence (MITRE T1547.001), distinct from the broad registry skill by its Event-ID-13 focus. Collect Sysmon Event 13 (RegistryEvent — Value Set) filtered to HKLM/HKCU ...CurrentVersion\\\\Run and RunOnce; parse TargetObject, Details (value written), Image (modifying process); flag values in temp/AppData/ProgramData, encoded PowerShell, and LOLBins (mshta/rundll32/regsvr32/wscript); flag unusual modifying processes; chain with Event 1 (Process Create) and Event 11 (FileCreate) to confirm the payload was recently dropped and executed; output a finding report + generated Sigma/Splunk rules. NIST CSF DE.CM-01/DE.AE-02/DE.AE-07/ID.RA-05. Read-only detection; remediation gated (§5); subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-registry-run-key-persistence/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-shadow-copy-deletion",
+    "name": "hunting-for-shadow-copy-deletion",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team hunt for Volume Shadow Copy deletion / Inhibit System Recovery (MITRE T1490) — a high-confidence pre-encryption ransomware indicator and anti-forensic move. Detect, in authorized process-creation logs (Sysmon 1 / Security 4688) and EDR: 'vssadmin delete shadows /all /quiet', 'wmic shadowcopy delete', PowerShell 'Get-WmiObject Win32_ShadowCopy | Remove-WmiObject', and 'bcdedit' disabling recovery (recoveryenabled no / bootstatuspolicy ignoreallfailures). Method: hypothesis → data sources → query → analyze → validate TP/FP (admin maintenance vs attack) → correlate to attack chain (often immediately precedes T1486 encryption / T1485 destruction) → document + tune rules (Sigma). Because shadow-copy deletion is rarely legitimate at scale, this is a near-real-time alert candidate. Read",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-shadow-copy-deletion/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-spearphishing-indicators",
+    "name": "hunting-for-spearphishing-indicators",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for spearphishing (MITRE T1566): formulate a testable hypothesis, identify data sources (email gateway logs, EDR endpoint telemetry, network data, Sysmon), query for spearphishing attachment (.001), link (.002), and via-service (.003) indicators, then correlate the lure to downstream execution (macro→PowerShell, HTML smuggling→ISO/LNK, credential-harvest links, QR-in-PDF), validate TP vs FP by context, link to actor TTPs, and report with evidence. In MAOS detection-only: mailbox purge, sender block, or user notification is risk:high/blocking, human-gated (§5); running a phishing simulation is also gated; effort in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-spearphishing-indicators/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-startup-folder-persistence",
+    "name": "hunting-for-startup-folder-persistence",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detect Windows startup-folder persistence — the filesystem half of MITRE T1547.001 (Boot/Logon Autostart: Registry Run Keys / Startup Folder). Files dropped in %APPDATA%\\\\Microsoft\\\\Windows\\\\Start Menu\\\\Programs\\\\Startup or the all-users C:\\\\ProgramData\\\\...\\\\Startup run automatically at logon. Method: enumerate both startup directories, analyze file type/creation-time/digital-signature, flag risky extensions (.bat/.vbs/.ps1/.lnk/.exe) and files created in the last 7 days as candidate implants, optionally watch in real time with a filesystem-event handler, and correlate Windows Event ID 4663 (object access). NIST CSF DE.CM-01/DE.AE-02/DE.AE-07/ID.RA-05. Read-only detection; remediation gated for a human (§5); subscription quota, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-startup-folder-persistence/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-supply-chain-compromise",
+    "name": "hunting-for-supply-chain-compromise",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for supply-chain compromise (MITRE T1195): formulate a testable hypothesis, identify data sources (EDR, SIEM, build/update telemetry, Sysmon, threat intel), query for trojanized update mechanisms, backdoored npm/PyPI dependencies, tampered build-server artifacts, and abused trusted relationships (T1199), correlate update/build events with anomalous post-install behavior, validate TP vs FP, link to actor TTPs, and report with evidence. Scenarios: SolarWinds-style update, malicious package, tampered build server, vendor VPN update. In MAOS detection-only: artifact quarantine, rollback, or vendor-access revocation is risk:high/blocking, human-gated (§5); effort in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-supply-chain-compromise/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-suspicious-scheduled-tasks",
+    "name": "hunting-for-suspicious-scheduled-tasks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Canonical Windows scheduled-task persistence hunt (MITRE T1053.005, covers Cobalt Strike/ransomware/APT timer abuse). Enumerate the full task inventory (schtasks /query /fo CSV /v or Get-ScheduledTask), track Event ID 4698/4699/4702 (Created/Deleted/Updated) + the TaskScheduler/Operational log + Register-ScheduledTask, analyze each task's action (PowerShell/cmd/wscript, user-writable paths, encoded commands) and triggers (startup/logon/short-interval), surface hidden/disguised tasks (Security-Descriptor concealment, names mimicking Windows tasks, COM-handler actions), correlate execution with process logs, and baseline-diff. Ships Splunk SPL + Sentinel KQL detections. Folds the generic hunting-for-scheduled-task-persistence; defers the Sysmon Event-1/11/4698 correlation to detecting-malici",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-suspicious-scheduled-tasks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-t1098-account-manipulation",
+    "name": "hunting-for-t1098-account-manipulation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for account manipulation (MITRE T1098): parse Windows Security Event Logs — 4738 (account changed), 4728/4732/4756 (member added to security groups), 4670 (permissions changed), 5136 (directory object modified) — flag additions to Domain/Enterprise/Schema Admins, Administrators, Backup Operators, detect shadow-admin indicators (AdminSDHolder protection, direct privilege assignment, SID-history injection), and correlate account changes with authentication events to map initial compromise vs persistence. Emits a timeline-correlated report of privileged changes and shadow-admin indicators. In MAOS detection-only: account/AD modification, disable, or privilege change is risk:high/blocking, human-gated (§5); effort in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-t1098-account-manipulation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-unusual-network-connections",
+    "name": "hunting-for-unusual-network-connections",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team hypothesis-driven hunt for unusual network connections over authorized EDR/SIEM/Sysmon telemetry: follow the structured hunt loop — formulate a testable hypothesis (from threat intel or ATT&CK gap analysis), identify required data sources, execute detection queries, analyze results across sources, validate true vs false positives by context, correlate findings to broader attack chains/TTPs, and document with recommended actions. Targets rare destinations, non-standard ports (T1571), non-application-layer protocols (T1095), and anomalous frequencies — covering backdoor C2 on odd ports, DNS exfiltration to attacker nameservers, internal-network scanning, and cryptominer pool connections. The general-purpose entry point; deep statistical beaconing and DNS-tunneling have dedicated fa",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-unusual-network-connections/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-unusual-service-installations",
+    "name": "hunting-for-unusual-service-installations",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team hunt for malicious Windows service installations (T1543.003 — Create or Modify System Process: Windows Service) over authorized System event logs: parse Event ID 7045 (new service installed) from .evtx/SIEM, extract service name, binary path, service type, and account; flag suspicious binary paths (temp directories, encoded commands, cmd.exe/powershell.exe service binaries), detect PowerShell-based service-creation patterns, identify services running as LocalSystem from unusual paths, and cross-reference a baseline of known-legitimate services. A persistence/privilege-escalation detection facet. Read-only offline parsing of owned logs; no host is contacted; remediation is owner guidance, never a MAOS action. Maps to MITRE ATT&CK T1543.003 (and T1547 persistence lens) and NIST-CSF",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-unusual-service-installations/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
+    "tier": "T1"
+  },
+  {
+    "id": "hunting-for-webshell-activity",
+    "name": "hunting-for-webshell-activity",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only threat-hunt doctrine for web shells (MITRE T1505.003): formulate a testable hypothesis from threat-intel/ATT&CK gaps, identify data sources (EDR process+network telemetry, SIEM web logs, Sysmon, Windows Security log), run detection queries for file creation in web roots + web-server (w3wp/httpd/tomcat) processes spawning cmd/powershell + anomalous HTTP patterns, validate true vs false positives by context, correlate to T1190 (exploit public-facing app) and T1059.001, and document with process trees and evidence. Scenarios: China Chopper/IIS, ASPXSpy upload, PHP-in-image, JSP via Tomcat manager. In MAOS detection-only: file deletion, process kill, or host isolation is risk:high/blocking, human-gated (§5); effort in quota units, never cash (§11).",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-for-webshell-activity/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
@@ -7686,6 +8358,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-threat-hunting-with-elastic-siem/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-threat-hunting-with-yara-rules",
+    "name": "performing-threat-hunting-with-yara-rules",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only/batch threat-hunt doctrine for YARA: author rules over strings, hex byte patterns, and modules (pe header inspection, math.entropy packing detection), scan files/directories/memory dumps via yara-python for malware families and IOCs, generate candidate rules from samples (yarGen), and integrate community rule sets (signature-base, YARA-Rules) — always with true-positive validation against a malware corpus AND false-positive testing against goodware. Best for batch hunting, triage, and post-collection analysis where scan latency is acceptable, not real-time protection (use EDR). In MAOS detection-only: any tool install, repo clone, or file deletion/quarantine is risk:high/blocking, human-gated (§5); rules and samples are handled in the sandbox, no secrets; effort in quota units, n",
+    "tags": [
+      "cyber:threat-hunting"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-threat-hunting-with-yara-rules/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-hunting",
     "tier": "T1"
   },
   {
