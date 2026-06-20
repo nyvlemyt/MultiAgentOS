@@ -14,6 +14,20 @@
     "tier": "T2"
   },
   {
+    "id": "acquiring-disk-image-with-dd-and-dcfldd",
+    "name": "acquiring-disk-image-with-dd-and-dcfldd",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized, write-blocked, bit-for-bit forensic disk acquisition with dd/dcfldd. Identify the target (lsblk/fdisk), enforce read-only on the SOURCE (hardware write-blocker preferred, blockdev --setro fallback), pre-hash the source, acquire with dcfldd (built-in sha256/md5 hashwindow, split, error log) or dd (conv=noerror,sync), then verify image==source hash and re-hash the source to prove no mutation. ddrescue first for failing drives. Document chain of custody. Source is read-only evidence; this is acquisition only, never analysis. In MAOS any write outside the active project path or any rm/destructive op is §5-gated and human-approved; no $/€, effort tracked in subscription quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/acquiring-disk-image-with-dd-and-dcfldd/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "agent-architecture-audit",
     "name": "agent-architecture-audit",
     "description": "Use to run a full-stack diagnostic of an agent / LLM application when its behaviour degrades, tools are skipped, memory leaks across sessions, or hidden retry loops mutate answers. Audits the 12-layer agent stack and produces severity-ranked, code-first findings. In MultiAgentOS, use for self-audits of the agent/skill stack (CLAUDE.md §13) and before shipping any agentic feature. Do NOT use for plain code review (use mas-reviewer), convention compliance (use quality-controller), output-vs-brief verification (use mas-reviewer), or memory-candidate triage (use mas-memory-keeper).",
@@ -266,6 +280,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-disk-image-with-autopsy",
+    "name": "analyzing-disk-image-with-autopsy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only forensic analysis of an acquired disk image with Autopsy + Sleuth Kit (TSK). Verify the image (img_stat), map partitions (mmls), enumerate files including deleted (fls -rd), recover by inode (icat / tsk_recover), inspect metadata (istat), run Autopsy ingest modules (Recent Activity, Hash Lookup vs NSRL, file-type ID, keyword search, EXIF, encryption detection), and build a timeline (fls -m + mactime, or the Autopsy Timeline). Operate read-only on the evidence; recovered PII is investigation-scoped, never disclosed/exfiltrated (§5). This is analysis, not acquisition. No $/€; effort in subscription quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-disk-image-with-autopsy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-dns-logs-for-exfiltration",
     "name": "analyzing-dns-logs-for-exfiltration",
     "description": "|",
@@ -278,6 +306,34 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
     "tier": "T1"
+  },
+  {
+    "id": "analyzing-docker-container-forensics",
+    "name": "analyzing-docker-container-forensics",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Docker container forensics for authorized DFIR: preserve state (docker export/commit/save, logs --timestamps, top, inspect → JSON; hash exports), analyze image layers with dive + container-diff to find the layer that introduced malicious content, audit security config from inspect JSON (Privileged mode, dangerous CapAdd like SYS_ADMIN/SYS_PTRACE, RW host mounts of / /etc /var /root, host PID/network namespace, root user, secrets in env), enumerate runtime filesystem changes via docker diff (added webshells/backdoors, changed passwd/crontab/ssh), and scan image+fs with Trivy (vulns + secrets, redacted). Read-only/preserve-first on evidence; discovered secrets redacted; quota units not cash (§11).",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-docker-container-forensics/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-email-headers-for-phishing-investigation",
+    "name": "analyzing-email-headers-for-phishing-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive email-header analysis to trace a phishing email and detect spoofing. Extract raw headers (EML/MSG, or via PST), then parse From/Reply-To/Return-Path/Message-ID/X-Originating-IP and the Received chain (read bottom-up = chronological). Validate authentication: SPF (dig TXT v=spf1 + pyspf check against sending IP), DKIM (selector lookup), DMARC (_dmarc TXT policy), and Authentication-Results. High-signal phishing indicators: SPF/DKIM/DMARC fail, From≠Reply-To mismatch, lookalike/typosquat domain (Levenshtein ratio), recently-registered sender domain (WHOIS age), and href≠display-text URL obfuscation. Extract + SHA-256 body URLs and attachments. Remember: From/Reply-To are forgeable but the Received chain is harder to fake. Tools: Python email lib, dig/nslookup, pyspf, dkimpy, whois,",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-email-headers-for-phishing-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
   },
   {
     "id": "analyzing-golang-malware-with-ghidra",
@@ -347,6 +403,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-linux-elf-malware/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-linux-kernel-rootkits",
+    "name": "analyzing-linux-kernel-rootkits",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Linux kernel-rootkit detection for authorized DFIR: acquire/receive a memory dump (LiME/AVML/kcore), run Volatility3 linux plugins (check_syscall for hooked syscalls, lsmod/hidden_modules for unlinked LKMs, check_idt for IDT tampering), cross-view /proc vs /sys vs task_struct to find hidden processes/modules, and corroborate live with rkhunter/chkrootkit + binary-hash checks. Output is a report of hooks, hidden modules/processes/connections, modified binaries, and probable rootkit family. Read-only on evidence; matching symbol table required; quota units not cash (§11); high-impact live acquisition is §5-gated.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-linux-kernel-rootkits/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-linux-system-artifacts",
+    "name": "analyzing-linux-system-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Linux host-compromise artifact analysis for authorized DFIR: mount the image read-only, collect logs/config/user/persistence/network artifacts, audit accounts (UID 0 anomalies, system accounts with shells, weak/MD5 hashes), review auth history (wtmp/btmp via last/lastb), enumerate persistence (cron, systemd units, authorized_keys, rc.local, profile.d, LD_PRELOAD, modules, PAM backdoors), grep shell history for suspicious commands, and check SUID/SGID + /tmp + /dev/shm + hidden files + modified binaries. Output is a findings report (anomalous accounts, persistence, IoCs). Evidence read-only; recovered secrets are evidence; quota units not cash (§11).",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-linux-system-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
     "tier": "T2"
   },
   {
@@ -462,6 +546,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-mft-for-deleted-file-recovery",
+    "name": "analyzing-mft-for-deleted-file-recovery",
+    "description": "|",
+    "domain": "planning",
+    "summary": "NTFS deleted-file recovery from the Master File Table. Each file = a 1024-byte $MFT record (signature FILE) with $STANDARD_INFORMATION, $FILE_NAME, $DATA; deletion clears the InUse flag but leaves metadata until reallocation. Parse $MFT with MFTECmd/analyzeMFT, filter InUse=False, read original path/size/timestamps; parse $UsnJrnl:$J for FILE_DELETE/RENAME reason codes, $LogFile for deallocation transactions, and MFT slack for prior-record remnants. Correlate with $Recycle.Bin ($I/$R) and Volume Shadow Copies; detect timestomping by $SI<$FN deltas. Read-only on evidence; recovered PII is case-scoped, never disclosed (§5). Distinct from the volume-wide artifacts skill (adds ADS + slack carving). No $/€; quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-mft-for-deleted-file-recovery/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-network-flow-data-with-netflow",
     "name": "analyzing-network-flow-data-with-netflow",
     "description": "|",
@@ -530,6 +628,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
     "tier": "T1"
+  },
+  {
+    "id": "analyzing-outlook-pst-for-email-forensics",
+    "name": "analyzing-outlook-pst-for-email-forensics",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized forensic analysis of Outlook PST/OST mailbox containers (MAPI/binary; Unicode 4KB pages up to 50GB, legacy ANSI 2GB). Distinct from single-header analysis: this works the whole mailbox. Locate PST/OST (Documents\\\\Outlook Files, %LOCALAPPDATA%\\\\Microsoft\\\\Outlook). Export with pffexport (-m all / items / recovered for deleted) and inspect with pffinfo; or parse with pypff to walk folders recursively, extract per-message transport headers (From/To/Date/Message-ID/X-Originating-IP/Received), creation/delivery/modification timestamps, and attachment metadata. Save attachments to disk and SHA-256 each for malware/exfil review. Recover deleted emails from the Recoverable Items folder. Keyword hits + sent-to-personal-account + encrypted-attachment patterns surface phishing entry and ex",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-outlook-pst-for-email-forensics/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
   },
   {
     "id": "analyzing-packed-malware-with-upx-unpacker",
@@ -658,6 +770,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-slack-space-and-file-system-artifacts",
+    "name": "analyzing-slack-space-and-file-system-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Volume-wide NTFS forensic sweep on a verified image (read-only). Extract $MFT, $UsnJrnl:$J, $LogFile and all slack (TSK blkls -s) at the right offset (mmls); parse MFT (MFTECmd/analyzeMFT) for deleted entries and $SI-vs-$FN timestomping; carve/search slack with strings, foremost, and bulk_extractor; parse the USN Journal for create/delete/rename sequences (data-staging patterns); enumerate Alternate Data Streams via fls and extract with icat inode:stream, reading Zone.Identifier download-origin metadata. Broader than the MFT-only recovery skill: adds ADS + slack carving across the volume. Read-only on evidence; recovered PII case-scoped, never disclosed (§5). No $/€; quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-slack-space-and-file-system-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-supply-chain-malware-artifacts",
     "name": "analyzing-supply-chain-malware-artifacts",
     "description": "|",
@@ -714,6 +840,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-usb-device-connection-history",
+    "name": "analyzing-usb-device-connection-history",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Windows USB connection-history forensics: build a device timeline from registry + logs (acquired read-only). USBSTOR (SYSTEM\\\\ControlSet\\\\Enum\\\\USBSTOR) gives vendor/product/revision/serial + key Last-Write (last-connected); MountedDevices maps drive letters/volume GUIDs to devices; per-user MountPoints2 (NTUSER.DAT) shows which user accessed which volume; SetupAPI (setupapi.dev.log) records first-install timestamps; Event Logs (DriverFrameworks-UserMode 2003/2010/2100/2102, System, Security 6416) give connect/disconnect events. Identify each device by VID/PID/serial, resolve its drive letter and user, and establish first/last-connected times. Investigation lenses: departing-employee exfil, unauthorized device, USB malware delivery, tracking one serial across multiple systems. Maps to MITR",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-usb-device-connection-history/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-web-server-logs-for-intrusion",
     "name": "analyzing-web-server-logs-for-intrusion",
     "description": "|",
@@ -728,6 +868,34 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-windows-amcache-artifacts",
+    "name": "analyzing-windows-amcache-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Windows Amcache forensic analysis: Amcache.hve (C:\\\\Windows\\\\appcompat\\\\Programs\\\\Amcache.hve, plus .LOG1/.LOG2 transaction logs) records metadata about files, programs, and drivers for app-compatibility. Acquire the hive AND its logs read-only; AmcacheParser replays uncommitted transactions for complete recovery and emits CSVs: AssociatedFileEntries (SHA-1, FullPath, FileSize, FileKeyLastWriteTimestamp, Publisher, LinkDate), UnassociatedFileEntries, ProgramEntries (name/publisher/version/install date), DeviceContainers, DevicePnps, DriverBinaries (DriverInBox/DriverSigned/SHA-1). Triage unsigned exes in temp/appdata/downloads, install-window programs, RATs/hacking tools, unsigned out-of-box drivers (BYOVD), and timestomping via LinkDate≪FileKeyLastWriteTimestamp. Amcache proves file exist",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-windows-amcache-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-windows-event-logs-artifacts",
+    "name": "analyzing-windows-event-logs-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Windows Event Log (EVTX) forensic analysis: acquire .evtx read-only (Security, System, Application, Sysmon Operational, PowerShell Operational, TerminalServices, TaskScheduler, WinRM, BITS, Defender). Run Chainsaw with bundled Sigma rules for detections, Hayabusa for fast CSV/JSON timelines + logon-summary, EvtxECmd for normalized CSV, and python-evtx for targeted Event-ID parsing. Critical IDs: 4624/4625 logon/fail (LogonType 3=network,9=NewCredentials,10=RDP), 4634 logoff, 4648 explicit-cred, 4672 special privileges, 4688 process create (cmdline), 4697 service install, 4698 scheduled task, 4720 account create, 4728/4732/4756 group add, 4104 PS script-block, 1102/104 log cleared. Attack patterns: pass-the-hash (4624 type 9 + NTLM), lateral movement (network/RDP NTLM logons), privesc (4672",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-windows-event-logs-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-windows-event-logs-in-splunk",
     "name": "analyzing-windows-event-logs-in-splunk",
     "description": "|",
@@ -740,6 +908,62 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
     "tier": "T1"
+  },
+  {
+    "id": "analyzing-windows-lnk-and-jumplist-artifacts",
+    "name": "analyzing-windows-lnk-and-jumplist-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Windows LNK + Jump List forensic analysis: LNK files (created when a user opens a file via Explorer/Open-Save dialog) store target path, target/LNK timestamps, volume serial, drive type, UNC share, NetBIOS machine ID and MAC (TrackerDataBlock); Jump Lists (Win7+) keep per-application recent/pinned lists keyed by AppID hash. Both persist after the target file is deleted. Acquire LNK/Jump Lists read-only from a mounted image (Recent, Desktop, Startup, AutomaticDestinations, CustomDestinations), parse with LECmd/JLECmd (CSV/JSON) or LnkParse3, then triage removable-media (drive-type Removable + volume serial vs USBSTOR), network-share (UNC) and Startup-persistence entries, and build a timeline. Maps to MITRE ATT&CK T1547.009/T1547.001 (registry/startup persistence), T1204.002 (user execution)",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-windows-lnk-and-jumplist-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-windows-prefetch-execution-history",
+    "name": "analyzing-windows-prefetch-execution-history",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Windows Prefetch forensic analysis: .pf files (C:\\\\Windows\\\\Prefetch, format versions 17/23/26/30; Win10 MAM-compressed) record executable name, path-derived hash in the filename, run count, last-run timestamps (1 on Vista/7, up to 8 on Win8+), referenced files/directories from the first ~10s of execution, and volume serial. Prefetch existence proves a program executed at least once — corroborate with Amcache + ShimCache. Acquire read-only from the image, parse with PECmd (CSV/JSON, keyword filter for powershell/cmd/wscript) or Python (windowsprefetch / prefetch); flag attacker tools (mimikatz/psexec/procdump/rclone/sdelete/wevtutil), renamed/masquerading binaries by comparing the executable name against referenced DLLs/paths (T1036.005), Prefetch-directory clearing, and build an execution",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-windows-prefetch-execution-history/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-windows-registry-artifacts",
+    "name": "analyzing-windows-registry-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Windows Registry forensic analysis: extract hives read-only — SAM (accounts), SYSTEM (services, USBSTOR, MountedDevices, NIC, timezone), SOFTWARE (Run keys, Uninstall, NetworkList), NTUSER.DAT (per-user Run, UserAssist, RecentDocs, TypedPaths/TypedURLs, MountPoints2), UsrClass.dat (ShellBags) — plus .LOG transaction logs for dirty-hive recovery. Analyze with RegRipper (plugin reports), Registry Explorer/RECmd (EZ), or python-registry. Targets: autorun/persistence (Run/RunOnce/RunServices/Policies Run — T1547.001), UserAssist (ROT13-encoded execution+timestamps), MRU/RecentDocs/TypedPaths (user activity), BAM/DAM and ShimCache/Amcache (execution), USBSTOR+MountedDevices+MountPoints2 (removable-media exfil), NetworkList (wireless history). Maps to MITRE ATT&CK T1012, T1547.001, T1112, T1003.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-windows-registry-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-windows-shellbag-artifacts",
+    "name": "analyzing-windows-shellbag-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Windows ShellBag forensic analysis: ShellBags record how a user interacted with folders via Explorer/Open-Save/Control Panel — view settings plus a reconstructable folder hierarchy — and PERSIST after folder deletion, drive disconnection, and profile reset. Stored in NTUSER.DAT and UsrClass.dat under Shell\\\\BagMRU (folder tree of SHITEMID shell items: type, 8.3 + Unicode name, timestamps, MFT entry/seq) and Shell\\\\Bags (view settings). Acquire hives read-only; parse with SBECmd (CSV: AbsolutePath, CreatedOn/ModifiedOn/AccessedOn, ShellType) or ShellBags Explorer (GUI tree). Proves folder browsing on local/USB/network/zip paths; correlate USB ShellBags with USBSTOR + MountPoints2 and network paths with share-access logs; flag deleted-folder entries (anti-forensics). Limits: folder-level onl",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-windows-shellbag-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
   },
   {
     "id": "android-clean-architecture",
@@ -4176,6 +4400,34 @@
     "tier": "T1"
   },
   {
+    "id": "extracting-browser-history-artifacts",
+    "name": "extracting-browser-history-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized browser forensics across Chromium (Chrome/Edge/Brave/Opera/Vivaldi) and Firefox. Locate profile dirs per OS, copy artifact files (Chrome History/Cookies/Web Data/Login Data/Bookmarks; Firefox places.sqlite/cookies.sqlite/formhistory.sqlite/logins.json), and SHA-256 them. Two parsing paths: (1) direct read-only SQLite queries (open with mode=ro) — Chrome urls+visits (epoch: microseconds since 1601, /1e6 -11644473600), downloads, keyword_search_terms, cookies; Firefox moz_places+moz_historyvisits (Unix microseconds), moz_bookmarks, moz_formhistory; (2) Hindsight (pyhindsight) for a unified Chromium timeline incl. cache/Local-Storage/extensions/session — CLI or web UI, XLSX/JSONL output. Saved passwords/cookies are DPAPI/keychain-encrypted; extract login URLs+usernames only, never ",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/extracting-browser-history-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "extracting-credentials-from-memory-dump",
+    "name": "extracting-credentials-from-memory-dump",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized-IR credential-exposure assessment from an acquired memory dump: verify dump + locate LSASS, run Volatility hashdump/lsadump/cachedump, dump LSASS and parse with pypykatz to enumerate which NTLM/Kerberos/WDigest/DPAPI/cached/cloud credentials were resident — purpose is to SCOPE the breach and prioritise rotation (krbtgt double-reset, key rotation), never to reuse them. Recovered credentials are evidence: never disclosed, reused, stored outside the case, or exfiltrated. risk:high, §5-gated (requires Authorization & Handling Gate + human approval). Read-only on evidence; quota units not cash (§11).",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/extracting-credentials-from-memory-dump/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "extracting-memory-artifacts-with-rekall",
     "name": "extracting-memory-artifacts-with-rekall",
     "description": "|",
@@ -7017,6 +7269,20 @@
     "tier": "T1"
   },
   {
+    "id": "investigating-ransomware-attack-artifacts",
+    "name": "investigating-ransomware-attack-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Ransomware incident artifact analysis for authorized DFIR: PRESERVE first (capture memory before reboot — keys may be resident), collect ransom notes + encrypted samples, identify variant by extension/note IoCs (BTC/Tor/email), reconstruct timeline (earliest/latest encrypted file, Prefetch, EVTX 4624/4625/4648/4672/4688/4697/1102, vssadmin shadow-copy deletion), trace initial access (RDP brute force logon-type 10, phishing downloads) and lateral movement, assess scope and recovery (shadow copies, backups, No More Ransom decryptors, memory key recovery). Read-only on evidence; defensive/recovery-focused; quota units not cash (§11); memory capture is §5-gated high-impact.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/investigating-ransomware-attack-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "investor-materials",
     "name": "investor-materials",
     "description": "|",
@@ -7997,6 +8263,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-cloud-forensics-investigation",
+    "name": "performing-cloud-forensics-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized cloud-provider (IaaS) forensics across AWS/Azure/GCP: preserve evidence FAST (cloud resources are volatile) — snapshot EBS/disks with case tags, capture instance metadata + security groups + network interfaces, then isolate the instance into a forensic SG. Collect API logs (CloudTrail lookup-events, Athena at scale, VPC Flow Logs, Azure Activity Log, GCP Audit Logs) for the incident window. Analyze IAM abuse: source-IP clustering, access errors, and critical actions (CreateUser/CreateAccessKey/StopLogging/DeleteTrail). Acquire VM disks by creating a volume from the snapshot and mounting READ-ONLY in an isolated forensic VPC. Watch for anti-forensics (CloudTrail disabled, log groups deleted). Tools: AWS/Azure/gcloud CLI, CloudTrail, Athena, ScoutSuite, Prowler, CADO. Snapshot cre",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-forensics-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "performing-cloud-forensics-with-aws-cloudtrail",
     "name": "performing-cloud-forensics-with-aws-cloudtrail",
     "description": "|",
@@ -8065,6 +8345,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
     "tier": "T1"
+  },
+  {
+    "id": "performing-cloud-storage-forensic-acquisition",
+    "name": "performing-cloud-storage-forensic-acquisition",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized SaaS cloud-storage forensic acquisition (Drive/OneDrive/Dropbox/Box) via two complementary methods. (1) API-based remote: with valid credentials + legal authorization, enumerate all files INCLUDING trashed, capture metadata (md5, owners, permissions, sharing, parents), download contents, and pull revision/activity history — log every action with timestamps + SHA-256 for chain of custody. (2) Local endpoint artifacts: cloud-synced files exist in multiple states (synced, cloud-only, cached, deleted-but-recoverable); collect sync-client databases (OneDrive SyncEngineDatabase, Google DriveFS metadata_sqlite, Dropbox filecache.dbx, Box sync_db) + logs + caches with KAPE. Sharing-history + revision diffs reveal exfiltration and anti-forensic reverts. Tools: google-api-python-client, m",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-storage-forensic-acquisition/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
   },
   {
     "id": "performing-container-escape-detection",
@@ -8277,6 +8571,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-file-carving-with-foremost",
+    "name": "performing-file-carving-with-foremost",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Header-footer signature file carving with Foremost (Scalpel as fast alternative). Recovers files from raw images and unallocated space independent of file-system state, by matching magic-byte headers/footers (e.g. JPEG FFD8..FFD9, ZIP/OOXML PK..). Extract unallocated space first with TSK blkls, run foremost -t <types>/-c custom.conf into a separate output tree, then validate carved files (file/jpeginfo), drop zero-byte/corrupt, hash (sha256), extract EXIF/keywords, and catalog. Header-based carving differs from PhotoRec's broader 300+ format engine — keep both. Read-only on evidence; recovered PII case-scoped, never disclosed (§5). No $/€; quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-file-carving-with-foremost/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "performing-firmware-malware-analysis",
     "name": "performing-firmware-malware-analysis",
     "description": "|",
@@ -8459,6 +8767,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-linux-log-forensics-investigation",
+    "name": "performing-linux-log-forensics-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Linux log forensics for authorized DFIR: analyze plain-text logs (auth.log/secure, syslog, kern.log) plus the systemd binary journal (journalctl --output=json) and the audit framework (ausearch/aureport) to extract SSH accepted/failed logins, sudo command execution, account creation, brute-force source IPs (threshold grouping), and kernel/USB events; build a chronological timeline. Includes a Python auth.log parser (regex → structured JSON, brute-force detection). Output is a timeline + findings report. Read-only on log evidence (hash sources); log clearing/tampering is itself a finding; Linux-specific (vs the general multi-source skill); quota units not cash (§11).",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-linux-log-forensics-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "performing-log-analysis-for-forensic-investigation",
+    "name": "performing-log-analysis-for-forensic-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "General multi-source log forensics for authorized DFIR: collect and hash logs from Windows EVTX (Security 4624/4625/4648/4672/4688/4697/4698/4720/1102, PowerShell, Sysmon), Linux (auth/syslog/audit), and web servers; parse EVTX (python-evtx/evtxexport) and syslog; normalize timestamps to a common schema and correlate events by time/IP/user/session into a unified timeline; detect logon-type patterns (network/RDP), lateral movement, and Event 1102 log clearing. Output is a correlated timeline + forensic report. Read-only on evidence (NTP-synced timestamps assumed, hash sources); broader than the Linux-specific skill; quota units not cash (§11).",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-log-analysis-for-forensic-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "performing-log-source-onboarding-in-siem",
     "name": "performing-log-source-onboarding-in-siem",
     "description": "|",
@@ -8471,6 +8807,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
     "tier": "T1"
+  },
+  {
+    "id": "performing-malware-persistence-investigation",
+    "name": "performing-malware-persistence-investigation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cross-platform malware-persistence enumeration for authorized DFIR: on Windows, parse offline registry hives for auto-start services and HKLM/HKCU Run keys, parse scheduled-task XML for encoded-PowerShell/LOLBin commands, scan WMI OBJECTS.DATA for event-consumer subscriptions, check COM/DLL-search-order hijacking, startup folders, and boot config; on Linux, enumerate cron, systemd units, authorized_keys, rc.local, profile.d, LD_PRELOAD, modules, PAM backdoors. Goal: find EVERY mechanism so remediation is complete (and verify post-remediation against a baseline). Read-only on evidence; recovered artifacts are IoCs not tools; quota units not cash (§11).",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-malware-persistence-investigation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
   },
   {
     "id": "performing-malware-triage-with-yara",
@@ -8487,6 +8837,20 @@
     "tier": "T2"
   },
   {
+    "id": "performing-memory-forensics-with-volatility3",
+    "name": "performing-memory-forensics-with-volatility3",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Volatility 3 memory-forensics workflow for authorized DFIR: verify dump integrity (sha256) and identify OS (windows.info/banners), enumerate processes (pslist vs psscan cross-view to find hidden), detect injection (malfind), map connections (netscan/netstat), inspect registry/services/cmdline, scan memory with YARA, and dump suspect artifacts for offline analysis. Evidence is read-only; outputs are scoped to the case directory; findings are investigative, never weaponized. In MAOS this is a cold-library T2 skill; any high-impact step (live acquisition, host writes) is §5-gated and any cost is quota units, never cash (§11).",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-memory-forensics-with-volatility3/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "performing-memory-forensics-with-volatility3-plugins",
     "name": "performing-memory-forensics-with-volatility3-plugins",
     "description": "|",
@@ -8498,6 +8862,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-memory-forensics-with-volatility3-plugins/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "performing-mobile-device-forensics",
+    "name": "performing-mobile-device-forensics",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lawful-access mobile-device forensics on a SEIZED, authorized device. Isolate first: airplane mode / Faraday bag to block remote wipe, then document state (make, model, IMEI, serial, OS, lock type) and photograph. Extraction tiers: logical (app data/contacts/messages) < file-system (databases) < physical (bit-for-bit incl. deleted). Cellebrite UFED for licensed acquisition incl. supported-model lock bypass under lawful authority; open-source path = libimobiledevice (iOS backup), ADB (Android backup/app pull), ALEAPP/iLEAPP for parsing. Extract messages (WhatsApp msgstore.db, iOS sms.db), call logs, geotagged-photo GPS, and location history. Tools: UFED, Physical Analyzer, ALEAPP, iLEAPP, libimobiledevice, MEAT, Magnet AXIOM. Lock bypass / physical extraction are §5-gated and require record",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-mobile-device-forensics/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
+    "id": "performing-network-packet-forensics",
+    "name": "performing-network-packet-forensics",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized network-packet forensics on PCAP/PCAPNG evidence: hash the capture for integrity first, then triage with protocol-hierarchy + conversation stats, filter for suspicious DNS/HTTP/TLS-SNI and known-bad ports, export transferred objects (HTTP/SMB/FTP) and hash them, follow TCP streams, extract cleartext credentials and TLS certs, detect beaconing via inter-arrival variance, and report IOCs (IPs/domains/hashes). Tools: Wireshark, tshark, tcpdump, NetworkMiner, Scapy, capinfos, zeek. Evidence is read-only; work on copies; never alter the original PCAP. Reputation lookups (VirusTotal/AbuseIPDB) are outbound network sends gated under §5 (allowed_hosts). Recovered secrets stay in the case file, never disclosed. In MAOS, any LLM-assisted summarization rides subscription quota (§11), never",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-network-packet-forensics/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
     "tier": "T2"
   },
   {
@@ -8711,6 +9103,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-sqlite-database-forensics",
+    "name": "performing-sqlite-database-forensics",
+    "description": "|",
+    "domain": "planning",
+    "summary": "SQLite forensics for DFIR. SQLite backs nearly every browser/mobile app (Chrome History, Firefox places.sqlite, WhatsApp/Signal/iMessage, Android SMS). Beyond SQL queries, recover deleted data from: freelist trunk/leaf pages (walk header offsets 32/36), WAL frames (un-checkpointed transactions) and rolled-back journals, and in-page unallocated space between the cell-pointer array and cell-content area. Decode Chrome/WebKit, Unix, Mac-absolute, and Mozilla PRTime timestamps. Always work on copies (with -wal/-journal sidecars) read-only; recovered messages/history are PII, case-scoped, never disclosed (§5). No $/€; quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-sqlite-database-forensics/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "performing-ssl-certificate-lifecycle-management",
     "name": "performing-ssl-certificate-lifecycle-management",
     "description": "|",
@@ -8767,6 +9173,20 @@
     "tier": "T2"
   },
   {
+    "id": "performing-steganography-detection",
+    "name": "performing-steganography-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Steganalysis (detection of hidden data) for DFIR — defensive counterpart to steganography. On copies of suspect media (read-only): check metadata anomalies (exiftool), detect data appended after a file's end marker (e.g. bytes after JPEG FFD9) and embedded ZIP/RAR signatures, run binwalk/zsteg/stegoveritas, do LSB analysis per channel with a chi-square randomness test, and attempt steghide extraction with empty/common passwords (or stegseek). Used to uncover exfiltration, covert C2, or insider-threat channels. Detect, never embed; extracted hidden content is PII/case-scoped, never disclosed/exfiltrated (§5); password-cracking attempts only on lawfully-held evidence. No $/€; quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-steganography-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "performing-threat-hunting-with-elastic-siem",
     "name": "performing-threat-hunting-with-elastic-siem",
     "description": "|",
@@ -8809,6 +9229,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-timeline-reconstruction-with-plaso",
+    "name": "performing-timeline-reconstruction-with-plaso",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Super-timeline reconstruction with Plaso. log2timeline.py parses 100+ artifact types (winevtx, prefetch, mft, usnjrnl, lnk, recycle_bin, chrome/firefox history, winreg) from an acquired image into a .plaso storage file; psort.py filters by date/source and exports (l2tcsv, json_line, dynamic). Use --parsers/--filter-file to scope and cut quota; pivot on known timestamps (MACB) to bound the incident window. Import into Timesketch for collaborative tagging, Sigma analyzers, and stories. Read-only on evidence; recovered user-activity is PII, case-scoped, never disclosed (§5). Aggregates other artifacts into one chronology — not a substitute for per-artifact recovery. No $/€; quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-timeline-reconstruction-with-plaso/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
+  },
+  {
     "id": "performing-user-behavior-analytics",
     "name": "performing-user-behavior-analytics",
     "description": "|",
@@ -8849,6 +9283,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
     "tier": "T1"
+  },
+  {
+    "id": "performing-windows-artifact-analysis-with-ez-tools",
+    "name": "performing-windows-artifact-analysis-with-ez-tools",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Umbrella Windows-forensics methodology with Eric Zimmerman's EZ Tools (open-source, the de-facto DFIR standard) + KAPE. KAPE (Targets .tkape collect, Modules .mkape process; !EZParser runs the suite) orchestrates triage from a mounted image read-only. Component tools: MFTECmd ($MFT, $J USN journal, $Boot, $SDS, $LogFile → CSV; $SI vs $FN timestamp comparison for timestomping), PECmd (prefetch, keyword filter), RECmd (registry hives via .reb batch), EvtxECmd (event logs + maps), LECmd/JLECmd (LNK/Jump Lists), SBECmd (ShellBags), AmcacheParser (Amcache), Timeline Explorer (CSV review, filtering, super-timeline). Core moves: collect with KAPE → process with !EZParser → analyze in Timeline Explorer → detect timestomping (Created0x10 < Created0x30) → corroborate across artifacts. Scenarios: mal",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-windows-artifact-analysis-with-ez-tools/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
+    "tier": "T2"
   },
   {
     "id": "performing-wireless-security-assessment-with-kismet",
@@ -9268,6 +9716,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/react-testing/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:eng-lang",
+    "tier": "T2"
+  },
+  {
+    "id": "recovering-deleted-files-with-photorec",
+    "name": "recovering-deleted-files-with-photorec",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Signature-based deleted-file recovery with PhotoRec (TestDisk suite), supporting 300+ formats and bypassing the file system entirely. Run against a forensic image (or write-blocked device, read-only); choose partition + Free (unallocated) vs Whole scan; use /cmd fileopt to target types (doc/pdf/xlsx/jpg/sqlite). Output lands in recup_dir.N with names/structure lost — sort by extension, validate via file signatures, drop zero-byte/corrupt, hash (sha256), and catalog; filter known-good via NSRL/hashdeep. Broader format engine than Foremost's header/footer carving — keep both. Read-only on evidence; recovered PII case-scoped, never disclosed (§5). No $/€; quota units.",
+    "tags": [
+      "cyber:digital-forensics"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/recovering-deleted-files-with-photorec/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:digital-forensics",
     "tier": "T2"
   },
   {
