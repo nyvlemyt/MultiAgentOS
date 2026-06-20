@@ -129,6 +129,10 @@ The 8 Tier B agents wired in MVP and who calls them:
 | `testing-performance-benchmarker`       | Reviewer                   | Perf gates before validation                 |
 | `testing-reality-checker`               | Reviewer, Sec Reviewer     | Default-to-needs-work gate before archive    |
 
+### 6.bis Cold agent library (ECC harvest)
+
+Beyond the wired Tier B slice, the ECC harvest deposited **32 cold Tier B fiches** in `packages/agents/library/<id>.md` (mirror of the cold skills arsenal in `packages/skills/library/`). They are **not auto-registered**; they are scanned into a router-readable `packages/agents/library/index.json` (a **generated, gitignored** build artifact — regen via `pnpm --filter @mas/agents build-library-index`) and loaded on demand via `loadAgentLibraryIndex()` in `packages/agents/src/library.ts`. The dispatcher consults this index the same way `mas-skill-router` consults the cold skills index — discover first, register/delegate on need.
+
 ## 7. Files to create at MVP
 
 ```

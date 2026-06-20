@@ -27,7 +27,7 @@ quality_criteria:
   - Icon-only controls always get an accessible name; no color-only state indicators
   - Diffs apply against the project sandbox only; never write outside projects.path
 common_mistakes:
-  - "Click here" links and empty icon buttons left without accessible names
+  - '"Click here" links and empty icon buttons left without accessible names'
   - Emitting raw code for code's sake instead of the minimal accessible diff
   - Reviewing visual polish instead of perceivable/operable/understandable/robust
 escalate_when:

@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
@@ -70,6 +70,85 @@ export function loadTierBFiche(id: string, dir?: string): LibraryAgentFiche {
   const fiche = loadTierBFiches(dir).find((f) => f.id === id);
   if (!fiche) throw new Error(`Tier B fiche not found: ${id}`);
   return fiche;
+}
+
+// ----------------------------------------------------------------------------
+// Cold agent-library arsenal (ECC harvest) — mirror of the skills library index
+// (packages/skills/src/scanner.ts). The harvested Tier B fiches live in
+// packages/agents/library/<id>.md and are NOT auto-registered; they are scanned
+// into a router-readable index.json and loaded on demand. The index.json is a
+// GENERATED build artifact (regen via `pnpm --filter @mas/agents build-library-index`)
+// and is gitignored (see CLAUDE.md §3).
+// ----------------------------------------------------------------------------
+
+const AGENT_LIBRARY_REL = join('packages', 'agents', 'library');
+const AGENT_LIBRARY_INDEX_REL = join(AGENT_LIBRARY_REL, 'index.json');
+
+export interface AgentLibraryMeta {
+  id: string;
+  name: string;
+  role: string;
+  tier?: string;
+  domains: string[];
+  emoji?: string;
+  path: string;
+}
+
+function strArray(v: unknown): string[] {
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+}
+
+/** Parse one library fiche into L1 metadata (frontmatter only). */
+function parseLibraryFiche(file: string, fullPath: string): AgentLibraryMeta | undefined {
+  let data: Record<string, unknown>;
+  try {
+    data = matter(readFileSync(fullPath, 'utf-8')).data;
+  } catch {
+    // Malformed YAML frontmatter — skip rather than crash the whole scan.
+    return undefined;
+  }
+  const id = str(data.id) ?? file.slice(0, -'.md'.length);
+  const name = str(data.name);
+  const role = str(data.role) ?? str(data.description);
+  if (!name && !role) return undefined;
+  return {
+    id,
+    name: name ?? id,
+    role: role ?? '',
+    tier: str(data.tier),
+    domains: strArray(data.domains),
+    emoji: str(data.emoji),
+    path: fullPath,
+  };
+}
+
+/** Scan every packages/agents/library/<id>.md into L1 AgentLibraryMeta[]. */
+export function scanAgentLibrary(repoRoot: string): AgentLibraryMeta[] {
+  const dir = join(repoRoot, AGENT_LIBRARY_REL);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => parseLibraryFiche(f, join(dir, f)))
+    .filter((m): m is AgentLibraryMeta => m !== undefined)
+    .sort((a, b) => a.id.localeCompare(b.id));
+}
+
+/** Generate packages/agents/library/index.json from the scanned library. */
+export function buildAgentLibraryIndex(repoRoot: string): AgentLibraryMeta[] {
+  const metas = scanAgentLibrary(repoRoot);
+  writeFileSync(
+    join(repoRoot, AGENT_LIBRARY_INDEX_REL),
+    JSON.stringify(metas, null, 2) + '\n',
+    'utf8',
+  );
+  return metas;
+}
+
+/** Cheap runtime path: read the prebuilt agent index.json (no per-file scan). */
+export function loadAgentLibraryIndex(repoRoot: string): AgentLibraryMeta[] {
+  const indexPath = join(repoRoot, AGENT_LIBRARY_INDEX_REL);
+  if (!existsSync(indexPath)) return [];
+  return JSON.parse(readFileSync(indexPath, 'utf8')) as AgentLibraryMeta[];
 }
 
 export interface DelegationEntry {
