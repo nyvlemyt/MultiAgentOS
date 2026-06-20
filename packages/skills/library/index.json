@@ -462,6 +462,20 @@
     "tier": "T2"
   },
   {
+    "id": "assessing-own-aws-privilege-escalation-paths",
+    "name": "assessing-own-aws-privilege-escalation-paths",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive own-account IAM self-assessment doctrine: find and fix the privilege-escalation paths in your own AWS account before an attacker does. Requires written authorization and your own account. Enumerate the test principal's effective permissions (list-policies, simulate-principal-policy); map escalation edges as a graph with PMapper (who can reach admin and how); check the known IAM escalation classes (iam:CreatePolicyVersion, iam:PassRole + lambda/ec2, iam:AttachUserPolicy, iam:CreateLoginProfile, sts:AssumeRole); review cross-account trust policies for wildcard/:root principals lacking external-id or MFA (confused-deputy risk). The deliverable is a findings report with remediation: permission boundaries on all principals, iam:PassRole restricted to specific role ARNs, SCP guardrails",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/assessing-own-aws-privilege-escalation-paths/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "assessing-own-cloud-security-posture",
     "name": "assessing-own-cloud-security-posture",
     "description": "|",
@@ -541,6 +555,20 @@
       "cyber:cloud-security"
     ],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-kubernetes-cluster-rbac/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-own-aws-account-with-scout-suite",
+    "name": "auditing-own-aws-account-with-scout-suite",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive own-account CSPM doctrine with ScoutSuite (NCC Group, agentless, read-only). ScoutSuite is an AUDIT tool: it queries your own AWS account's APIs with read-only IAM (SecurityAudit / ViewOnlyAccess), stores results locally, and produces a severity-ranked report of misconfigurations — public S3 buckets, root account without MFA, security groups open to 0.0.0.0/0 on SSH, unencrypted RDS, CloudTrail not multi-region, public Lambda. Triage danger > warning > good, ticket the danger/warning findings, re-scan to verify, and schedule recurring scans for drift. Same framework audits Azure and GCP. GUARDRAIL: this is authorized own-account posture assessment only — never recon against accounts you do not own; that framing is rejected (KILL). In MAOS this is READ-AND-REPORT: MAOS runs the re",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-own-aws-account-with-scout-suite/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
     "tier": "T1"
@@ -4749,6 +4777,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-secrets-management-with-vault",
+    "name": "implementing-secrets-management-with-vault",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive secrets-management doctrine with HashiCorp Vault: deploy HA (Raft) with TLS + cloud-KMS auto-unseal + audit logging; enable auth backends (OIDC for humans, AppRole for CI/CD, Kubernetes for pods); stand up dynamic secret engines (database/AWS) with short TTLs and root-credential rotation so no static long-lived secret survives; use Transit for encryption-as-a-service and PKI for internal certs without exposing keys to apps; enforce least-privilege ACL policies and comprehensive audit trails. In MAOS this is READ-AND-REPORT: MAOS designs/audits the Vault posture and surfaces credential-hygiene findings; deploying, unsealing, rotating, or writing policy on the live Vault is the owner's action (§5 cross-tenant). Vault tokens/unseal keys/secret_ids are §5 secrets — never logged, pers",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-secrets-management-with-vault/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-secure-email-gateway",
     "name": "implementing-secure-email-gateway",
     "description": "|",
@@ -5096,6 +5138,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-trust-for-saas-applications/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-trust-in-cloud",
+    "name": "implementing-zero-trust-in-cloud",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive zero-trust cloud doctrine (NIST SP 800-207 / BeyondCorp): never trust, always verify — every request authenticated, authorized, encrypted regardless of origin. Put an Identity-Aware Proxy (GCP IAP) / AWS Verified Access / Azure Conditional Access in front of each app to remove direct network reach; require MFA + compliant managed device; run continuous verification scoring identity, device posture, location, behavior, threat intel per request (not just at login); enforce micro-segmentation so a compromised credential can't move laterally; export all access decisions to a SIEM and refine policy from real usage. Maturity is measured across identity/device/network/application pillars. In MAOS this is READ-AND-REPORT: MAOS designs the architecture and audits the maturity, producing p",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-trust-in-cloud/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-zero-trust-network-access",
+    "name": "implementing-zero-trust-network-access",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ZTNA doctrine: replace VPN with identity- and context-aware access to internal apps. Deploy GCP IAP / AWS Verified Access in front of web apps so backends aren't internet-exposed; use Azure Private Link for network isolation + Conditional Access (compliant device + MFA) for identity controls; micro-segment with security groups and Kubernetes NetworkPolicy to stop lateral movement; enforce continuous verification (re-auth on sensitive apps) rather than one-time login; centralize access-decision logs and query denials. ZTNA complements — never replaces — firewalls and network ACLs; legacy thick-clients may need agent-based ZTNA; document break-glass for IdP outages. In MAOS this is READ-AND-REPORT: MAOS designs/audits the ZTNA topology and migration plan; standing up proxies, writi",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-zero-trust-network-access/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -5547,6 +5617,20 @@
     "tier": "T1"
   },
   {
+    "id": "managing-cloud-identity-with-okta",
+    "name": "managing-cloud-identity-with-okta",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive cloud-identity doctrine with Okta as central IdP: federate SSO to AWS (SAML), Azure (OIDC), and GCP (Workforce Identity) so one directory governs console access; deploy phishing-resistant MFA (FastPass / FIDO2) and disable phishable SMS/voice; automate the user lifecycle via SCIM so deprovisioning terminates all cloud sessions within minutes of an HR event; enforce adaptive access policies (managed+compliant device, block anonymizers, bounded session/re-auth, FIDO2-only break-glass); monitor with ThreatInsight + System Log streaming to a SIEM for credential-stuffing and account-takeover. Watch for orphan direct IAM users/service accounts that bypass federation. In MAOS this is READ-AND-REPORT: MAOS designs the IdP topology and audits identity hygiene; configuring SAML/OIDC, MFA p",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/managing-cloud-identity-with-okta/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "market-research",
     "name": "market-research",
     "description": "Use to conduct decision-oriented market research, competitive analysis, investor/fund due diligence, market sizing (TAM/SAM/SOM), or technology/vendor scans with source attribution and an explicit recommendation. Do NOT use for one-off factual lookups, for writing marketing copy, or to make a final business decision on the user's behalf — it informs the decision, it does not take it.",
@@ -5995,6 +6079,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-cloud-asset-inventory-with-cartography",
+    "name": "performing-cloud-asset-inventory-with-cartography",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive asset-inventory doctrine with Cartography: consolidate cloud resources and their relationships into a Neo4j graph to reveal hidden connections — IAM permission chains, network paths, cross-account trust — that flat asset lists miss. Deploy Neo4j, sync AWS/GCP/Azure with read-only credentials, then run security-focused Cypher: public/anonymous S3 buckets, users with AdministratorAccess, EC2 reachable from 0.0.0.0/0 on SSH, cross-account :root trust without external-id, IAM roles unused 90+ days, Lambdas with admin roles, public-instance-to-sensitive-bucket attack paths. Schedule periodic syncs for drift. The graph is an analysis surface: it locates exposure and attack paths but does not remediate. In MAOS this is READ-AND-REPORT: MAOS runs/queries the inventory against the owner's",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-asset-inventory-with-cartography/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-cloud-forensics-with-aws-cloudtrail",
+    "name": "performing-cloud-forensics-with-aws-cloudtrail",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive cloud-forensics doctrine (AWS CloudTrail DFIR): reconstruct attacker activity from API logs after a suspected compromise. Scope the incident (timeframe, accounts, compromised credentials); query management events via boto3 lookup_events (last 90 days) or Athena/CloudTrail Lake for historical SQL analysis; filter on suspicious user agents, source IPs, and event names; build a chronological attacker timeline; analyze data access (S3 GetObject), IAM changes, and resource modifications; identify persistence — new IAM users, access keys, roles, Lambda functions. Track activity by AccessKeyId and geolocate source IPs. Output a forensic report: timeframe, compromised keys, suspicious events, attacker IPs/actions, data accessed, persistence mechanisms. In MAOS this is READ-AND-REPORT: MA",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-forensics-with-aws-cloudtrail/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "performing-cloud-incident-containment-procedures",
     "name": "performing-cloud-incident-containment-procedures",
     "description": "|",
@@ -6006,6 +6118,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-incident-containment-procedures/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-cloud-log-forensics-with-athena",
+    "name": "performing-cloud-log-forensics-with-athena",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud-log forensics doctrine with Athena: create forensic tables (CloudTrail/VPC Flow/S3 access/ALB) using partition projection to avoid ALTER TABLE; run forensic SQL for unauthorized API calls (AccessDenied bursts), privilege escalation (AttachPolicy/CreateAccessKey/AssumeRole), S3 exfiltration (non-RFC1918 GetObject/CopyObject), lateral movement and port scanning over VPC Flow Logs, and ALB-layer injection attempts; correlate suspicious actors across sources into a single timeline. Defensive read-and-report — MAOS queries logs and emits findings; querying the user's live account and acting on results is owner-executed (§5 cross-tenant). ARNs/IPs/identities are sensitive and never leaked. In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash or per-TB Athena doll",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-log-forensics-with-athena/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-cloud-native-forensics-with-falco",
+    "name": "performing-cloud-native-forensics-with-falco",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud-native runtime forensics doctrine with Falco: author YAML detection rules over the syscall stream for shell-in-container, sensitive-file access (/etc/shadow, /etc/passwd), anomalous outbound connections, setuid/setgid privilege escalation, and container escape (mount/ptrace); tune out benign parents (entrypoint/supervisord) to control false positives; parse Falco JSON alerts into triage with priority and MITRE mapping. Runtime detection complements static image scanning (what is in the image) by watching what the container actually does. Defensive read-and-report — MAOS designs and triages rules; deploying/enforcing Falco and responding on a live cluster is owner-executed (§5 cross-tenant). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-native-forensics-with-falco/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-cloud-native-threat-hunting-with-aws-detective",
+    "name": "performing-cloud-native-threat-hunting-with-aws-detective",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Cloud-native threat-hunting doctrine with AWS Detective: read behavior graphs that auto-link CloudTrail, VPC Flow, GuardDuty, and EKS logs; investigate entities (IAM user/role, EC2, IP, S3 bucket, EKS cluster) over a scope-time window; correlate GuardDuty findings into finding groups that map to a campaign; interpret indicators (TTP_OBSERVED, IMPOSSIBLE_TRAVEL, FLAGGED_IP_ADDRESS, NEW_GEOLOCATION/ASO/USER_AGENT) and cross-reference against raw CloudTrail for accuracy. Read-only by design — Detective never mutates resources; MAOS hunts and reports, while responding on the live account is owner-executed (§5 cross-tenant). Requires read scoped IAM (detective:SearchGraph/GetInvestigation/ListIndicators). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-cloud-native-threat-hunting-with-aws-detective/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -6202,6 +6356,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-false-positive-reduction-in-siem/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-gcp-security-assessment-with-forseti",
+    "name": "performing-gcp-security-assessment-with-forseti",
+    "description": "|",
+    "domain": "planning",
+    "summary": "GCP security-assessment doctrine: enable Cloud Asset Inventory + Security Command Center and export resources; audit IAM across the org→folder→project hierarchy (Owner/Editor bindings, allUsers/allAuthenticatedUsers public grants, SA keys >90 days), firewall rules allowing 0.0.0.0/0 / all-protocol / SSH-RDP-open, storage buckets with public access or missing CMEK/uniform-access, and CIS GCP Foundations compliance via SCC findings; run ScoutSuite for a multi-check report. Inheritance flows top-down — audit every hierarchy level, not just project. Defensive read-and-report — MAOS produces prioritized findings; remediation/enforcement on the live org is owner-executed (§5 cross-tenant). Read IAM only (securityReviewer). In MAOS this rides subscription quota (TOKEN_STRATEGY §8), never per-toke",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-gcp-security-assessment-with-forseti/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -6468,6 +6636,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-sca-dependency-scanning-with-snyk/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-serverless-function-security-review",
+    "name": "performing-serverless-function-security-review",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Serverless security-review doctrine: enumerate functions across AWS/Azure/GCP with runtime, memory, timeout, network, and role; audit execution roles for wildcard/admin policies and scope to least privilege; scan environment variables for secrets (passwords, API keys, AKIA…); find unauthenticated function URLs and public resource-based invoke policies; review code for injection/deserialization (os.system, eval, pickle.loads, yaml.load); flag deprecated runtimes; run Prowler/Checkov/Bandit. Defensive read-and-report — MAOS produces findings and a scoped-policy/secrets-migration plan; applying role changes, secret migration, or trigger changes on live functions is owner-executed (§5 cross-tenant). Discovered secrets are §5-critical, masked never persisted. In MAOS this rides subscription quo",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-serverless-function-security-review/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
@@ -7045,6 +7227,20 @@
     "tier": "T1"
   },
   {
+    "id": "remediating-s3-bucket-misconfiguration",
+    "name": "remediating-s3-bucket-misconfiguration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "S3 misconfiguration-remediation doctrine: detect public/misconfigured buckets via S3 Access Analyzer, AWS Config rules, Macie, and policy/ACL inspection (Principal '*'); then design the remediation plan — account+bucket-level Block Public Access (all four settings), BucketOwnerEnforced to disable legacy ACLs, restrictive bucket policies (deny non-TLS, VPC-endpoint-only), default SSE-KMS encryption with deny-unencrypted-upload, server access logging + CloudTrail data events, and preventive SCP/Config auto-remediation. Defensive read-and-report — MAOS identifies exposure and produces the ordered remediation plan; executing it (Block Public Access, policy replace, ACL disable, encryption) on the live account is owner-executed (§5 cross-tenant, risk:high), and analyzing access logs before reme",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/remediating-s3-bucket-misconfiguration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "repo-scan",
     "name": "repo-scan",
     "description": "|",
@@ -7283,6 +7479,76 @@
     "tier": "T1"
   },
   {
+    "id": "securing-api-gateway-with-aws-waf",
+    "name": "securing-api-gateway-with-aws-waf",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive playbook for putting AWS WAF in front of an API Gateway stage. Build a Web ACL with AWS managed rule groups (CommonRuleSet, KnownBadInputs, SQLi, IpReputation), add rate-based rules per IP and per sensitive endpoint (/login), enable Bot Control in COMMON, add custom rules (require API key, geo-restrict, max body size), associate the ACL to the prod stage, ship redacted logs (authorization/cookie) to Firehose, then monitor BlockedRequests + sampled requests and tune false positives starting in Count mode. In MAOS this is library knowledge a security task pulls for cloud-hardening reviews; it never runs against MAOS's own infra and treats every threshold as a posture control, never a billing figure (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-api-gateway-with-aws-waf/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-aws-iam-permissions",
+    "name": "securing-aws-iam-permissions",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive playbook for least-privilege AWS IAM. Inventory users/roles/keys via credential reports; enable IAM Access Analyzer and generate policies from 90 days of CloudTrail activity; replace wildcard ARNs with scoped resources and add conditions (MFA, source IP, time); attach permission boundaries to cap escalation; enforce MFA via SCP and migrate from long-lived access keys to STS AssumeRole; deploy Config rules + EventBridge to alert on root usage and high-risk IAM changes. In MAOS this is library knowledge consulted when reviewing a registered project's AWS identity surface — it complements §5 cross-project gating doctrine but is reference, never run against MAOS infra, and never expressed as cash (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-aws-iam-permissions/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-aws-lambda-execution-roles",
+    "name": "securing-aws-lambda-execution-roles",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive playbook for least-privilege Lambda execution roles. Audit every function's role and attached/inline policies; enable CloudTrail data events and use Access Analyzer to generate per-function policies from actual API usage; build scoped policies (specific ARNs for S3/DynamoDB/Logs) with confused-deputy-safe trust policies (aws:SourceAccount); attach permission boundaries that Deny privilege escalation (iam:Create*, PassRole, sts:AssumeRole); validate with validate-policy and simulate-principal-policy; enforce standards via SCPs requiring boundaries on lambda-* roles. In MAOS this is library knowledge for reviewing a registered project's serverless IAM surface — reference only, never run against MAOS, never cash (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-aws-lambda-execution-roles/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-azure-with-microsoft-defender",
+    "name": "securing-azure-with-microsoft-defender",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive playbook for Microsoft Defender for Cloud as a cloud-native application protection platform. Enable Defender plans per workload (Servers P2, Containers, Storage with malware scan, Databases, Key Vault); connect AWS/GCP via security connectors for unified CSPM; review and prioritize Secure Score recommendations; use the cloud security graph and attack-path analysis to remediate by real exploitability rather than per-finding severity; enable Just-In-Time VM access and adaptive application controls; wire workflow automation (Logic Apps) on High alerts. Carries MITRE ATLAS + NIST AI RMF mappings for AI-workload posture. In MAOS this is library knowledge for reviewing a registered project's Azure/multi-cloud surface — reference only, never run against MAOS, never cash (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-azure-with-microsoft-defender/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-container-registry-images",
+    "name": "securing-container-registry-images",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive playbook for container-registry supply-chain security. Scan images with Trivy (fail CI on CRITICAL) and Grype for broader DB coverage; generate SBOMs (SPDX/CycloneDX) with Syft and attach as OCI artifacts; sign with Cosign (key-based or keyless Sigstore/OIDC) and add scan-result attestations; verify signatures before promotion; enable registry controls (ECR scan-on-push, tag immutability, lifecycle cleanup); build a CI/CD pipeline whose mandatory gates block unscanned/unsigned images and continuously rescan deployed images. Signing keys live in KMS/Vault, never CI env vars. In MAOS this is library knowledge for reviewing a registered project's container supply chain — reference only, never run against MAOS, never cash (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-container-registry-images/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
     "id": "securing-container-registry-with-harbor",
     "name": "securing-container-registry-with-harbor",
     "description": "|",
@@ -7322,6 +7588,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-helm-chart-deployments/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-kubernetes-on-cloud",
+    "name": "securing-kubernetes-on-cloud",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive playbook for hardening managed Kubernetes clusters on EKS/AKS/GKE. Enforce Pod Security Standards (Restricted profile via Pod Security Admission labels, runAsNonRoot, drop ALL caps, readOnlyRootFilesystem, no auto-mounted SA token); bind service accounts to cloud IAM via workload identity (IRSA/GKE WI/AKS MI) to kill static creds in pods; apply default-deny network policies with explicit allow rules; scope RBAC to namespaces and avoid cluster-admin bindings; enforce image admission (Kyverno/OPA require approved registries + digest pinning); add runtime monitoring (Falco) and CIS benchmarking (kube-bench). In MAOS this is library knowledge for reviewing a registered project's k8s surface — reference only, never run against MAOS, never cash (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-kubernetes-on-cloud/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-serverless-functions",
+    "name": "securing-serverless-functions",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive playbook for hardening serverless functions across Lambda/Azure Functions/GCF. Give each function a dedicated least-privilege IAM role (never shared, scoped ARNs); replace hardcoded secrets in env vars with vault lookups (Secrets Manager/Key Vault/Vault) plus KMS encryption at rest; scan dependencies in CI (npm audit, Snyk, pip-audit, Trivy) and run Semgrep SAST; validate every event input with JSON Schema and use parameterized queries to stop injection; authenticate function URLs with IAM/Cognito (never AuthType NONE); enable runtime monitoring (GuardDuty Lambda network activity, structured JSON logging). In MAOS this is library knowledge for reviewing a registered project's serverless surface — reference only, never run against MAOS, never cash (§11).",
+    "tags": [
+      "cyber:cloud-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-serverless-functions/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:cloud-security",
     "tier": "T1"
   },
   {
