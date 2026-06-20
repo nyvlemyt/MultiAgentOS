@@ -168,6 +168,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-campaign-attribution-evidence",
+    "name": "analyzing-campaign-attribution-evidence",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive attribution doctrine: who is behind a campaign, with how much confidence. Collect evidence across six categories (infrastructure overlap, TTP consistency, malware code similarity, operational timing/timezone, language artifacts, victimology), then apply Analysis of Competing Hypotheses — score each evidence item consistent/inconsistent/neutral against each candidate actor and favour the hypothesis with the LEAST inconsistent evidence (inconsistency weighs more than confirmation). Compute infrastructure-overlap and Jaccard TTP-similarity scores, map confidence to High/Moderate/Low, and report alternative hypotheses plus explicit false-flag considerations. Distinct from correlation: this NAMES the actor with confidence; correlation only groups incidents. Read-only analysis; attribu",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-campaign-attribution-evidence/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-cloud-storage-access-patterns",
     "name": "analyzing-cloud-storage-access-patterns",
     "description": "|",
@@ -179,6 +193,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-cloud-storage-access-patterns/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-ct-logs-for-phishing",
+    "name": "analyzing-ct-logs-for-phishing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive phishing early-warning via Certificate Transparency. Query crt.sh for historical certs and stream Certstream for real-time issuance; flag certificates whose CN/SAN contains your domain string, a brand keyword, or is within a typosquat Levenshtein distance of your domain — especially free-CA (Let's Encrypt) issuance, which dominates phishing. Because CT lists certs before the campaign goes live, this is a proactive blocking window: sinkhole/blocklist flagged domains, file takedowns, and harden with CAA + DMARC. Corroborate with DNS before acting. In MAOS this is read/propose; outbound to CT/stream hosts is risk-gated (§5) and blocklist/takedown actions are human-confirmed.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-ct-logs-for-phishing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-cyber-kill-chain",
+    "name": "analyzing-cyber-kill-chain",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive kill-chain doctrine: post-incident analysis of how far an adversary progressed and where to interrupt earlier. Map observed actions to the seven Lockheed Martin phases (Reconnaissance, Weaponization, Delivery, Exploitation, Installation, C2, Actions-on-Objectives), build a phase-completion matrix marking each phase completed/detected/blocked and recording the control gap for every undetected phase, then map phases to ATT&CK tactics (Delivery→Initial-Access, Exploitation→Execution, Installation→Persistence/PrivEsc, C2→Command-and-Control, Objectives→Exfil/Impact) for technique detail. Assign six courses of action per phase (detect/deny/disrupt/degrade/deceive/destroy) and prioritise by cost and earliest interruption. Beware non-linear progression, invisible phases 1-2, and insider",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-cyber-kill-chain/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -235,6 +277,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-malicious-url-with-urlscan/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:phishing-defense",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-malware-family-relationships-with-malpedia",
+    "name": "analyzing-malware-family-relationships-with-malpedia",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Malpedia malware-relationship doctrine: query the Malpedia API (token-authed) to resolve the 'many names' problem via platform.family naming (win.emotet, elf.mirai) and aliases, map family relationships (parent-child code reuse, loader-payload chains like Emotet→TrickBot→Ryuk, shared authorship, infra sharing), link families to threat actors and find shared tooling across actors, and extract community/vendor YARA rules to compile a DEFENSIVE detection ruleset. The output is detection and intelligence — not samples or payloads; never fetch/run live malware. Curated chains are starting hints, corroborate against reports. In MAOS this enriches threat/memory and feeds mas-sec-reviewer + detection engineering; the API key is a secret; efficiency is quota units (TOKEN_STRATEGY §8) not cash (§11)",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-malware-family-relationships-with-malpedia/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -375,6 +431,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-security-logs-with-splunk/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-threat-actor-ttps-with-mitre-attack",
+    "name": "analyzing-threat-actor-ttps-with-mitre-attack",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive CTI doctrine for mapping threat-actor TTPs onto MITRE ATT&CK. Query ATT&CK STIX/TAXII data (attackcti / mitreattack-python) for a group's documented techniques, emit a Navigator layer (JSON, layer v4.5) annotating each technique with tactic + procedure, overlay your detection coverage to compute detected-vs-gap percentages, and run cross-group intersection to find shared techniques worth prioritising. Output is a gap-ranked, data-source-tagged list actionable for detection engineering. Canonical skill — folds analyzing-apt-group-with-mitre-navigator and analyzing-threat-actor-ttps-with-mitre-navigator (Navigator-layer + ATLAS/NIST-AI-RMF lens). Read-only analysis: no scanning, no exploitation, no outbound sends. Frameworks: MITRE ATT&CK, MITRE ATLAS, MITRE D3FEND, NIST CSF, NIST ",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-threat-actor-ttps-with-mitre-attack/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-threat-landscape-misp",
+    "name": "analyzing-threat-landscape-misp",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Read-only landscape analytics over a MISP dataset via PyMISP: pull event stats by threat level and date range, compute attribute-type breakdowns (ip-dst/domain/sha256), rank top MITRE ATT&CK techniques from event tags, rank top threat actors/malware from galaxy clusters, and chart temporal IOC-submission trends. Output is a structured landscape summary feeding strategic intelligence. Pure read/aggregate — no event writes, no publish. MISP data is untrusted ingest: validate tag/galaxy provenance before drawing conclusions; warninglists must be enforced so benign-service noise does not skew the picture. Subscription quota, not cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-threat-landscape-misp/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -532,6 +616,20 @@
     "tier": "T1"
   },
   {
+    "id": "assessing-sector-threat-landscape",
+    "name": "assessing-sector-threat-landscape",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive strategic CTI for an industry vertical. Identify threat actors targeting the sector (financial→FIN7/Lazarus; healthcare→ransomware/Vice Society; energy→Sandworm/XENOTIME; government→APT29/28/Turla), pull their techniques via MITRE ATT&CK (attackcti), rank the most-common TTPs across actors, and map sector initial-access vectors (phishing, public-facing exploit, valid accounts, supply chain) plus emerging ones. Output: actor profiles, top-technique ranking, attack-vector map, and defensive recommendations (prioritize detections for top techniques, threat-informed exercises, ISAC membership, initial-access controls, supply-chain review). Sources: ATT&CK, DBIR, vendor reports, ISACs. In MAOS: read/propose, grounded by injected context; outbound to feeds risk-gated (§5); quota not ca",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/assessing-sector-threat-landscape/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "auditing-aws-s3-bucket-permissions",
     "name": "auditing-aws-s3-bucket-permissions",
     "description": "|",
@@ -571,6 +669,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-cloud-with-cis-benchmarks/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-ct-logs-for-rogue-issuance",
+    "name": "auditing-ct-logs-for-rogue-issuance",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive CT log auditing and PKI governance for owned domains. Build a baseline cert inventory and authorized-CA set; poll crt.sh (or RSS/Atom, or the Postgres interface for volume) for new issuance and precertificates; alert on unauthorized-CA issuance (highest priority — possible hijack/BGP-validation abuse), new/unseen subdomains, new wildcard certs, anomalous short-lived certs, and expirations. Map subdomain-takeover risk from expired certs (CNAME to decommissioned cloud). Verify log integrity via Signed Tree Heads + consistency proofs (RFC 6962) to catch split-view. Harden with CAA records; produce compliance evidence (PCI/SOC2). In MAOS: read/propose; outbound to CT hosts risk-gated (§5); revocation/blocklist actions human-confirmed.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-ct-logs-for-rogue-issuance/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -655,6 +767,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-terraform-infrastructure-for-security/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "automating-osint-collection-with-spiderfoot",
+    "name": "automating-osint-collection-with-spiderfoot",
+    "description": "|",
+    "domain": "planning",
+    "summary": "SpiderFoot automation doctrine for defensive OSINT: connect via REST API/CLI, create a scan with an explicit target and a use-case-scoped module set — prefer the 'passive' use case so no packets hit non-owned targets — then poll scan status, retrieve results by data-element type, and extract subdomains/IPs/emails/leaked-credentials/DNS into a structured JSON profile. SpiderFoot has 200+ modules; choose by use case and authorization, never blanket-enable active modules against targets you do not own. Treat results as leads needing corroboration and provenance, not facts. In MAOS this is a knowledge skill feeding threat/memory context and mas-sec-reviewer; running active modules against non-owned hosts is a §5 gated action, efficiency is quota units (TOKEN_STRATEGY §8) not cash (§11).",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/automating-osint-collection-with-spiderfoot/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -781,6 +907,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/browser-qa/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-eval",
+    "tier": "T1"
+  },
+  {
+    "id": "building-attack-pattern-library-from-cti",
+    "name": "building-attack-pattern-library-from-cti",
+    "description": "|",
+    "domain": "planning",
+    "summary": "CTI attack-pattern library doctrine: parse vendor/government CTI reports for behavioral indicators (action verbs, tool/malware names, technique keywords), map each to a MITRE ATT&CK technique ID with its tactic and required data sources, and create STIX 2.1 Attack-Pattern objects (TLP-marked, with mitre-attack external references and kill-chain phases) indexed by tactic/technique/actor. From confirmed patterns, generate DEFENSIVE detection scaffolds — Sigma/YARA templates with data-source and observed-tool context — never working offensive payloads. Keyword matches are hints needing analyst confirmation, not auto-truth. In MAOS this feeds detection engineering, threat/memory, and mas-sec-reviewer; LLM-assisted extraction routes through packages/core/src/llm.ts (§11); efficiency is quota un",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-attack-pattern-library-from-cti/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -924,6 +1064,20 @@
     "tier": "T1"
   },
   {
+    "id": "building-ioc-enrichment-pipeline-opencti",
+    "name": "building-ioc-enrichment-pipeline-opencti",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Automated IOC enrichment on OpenCTI (STIX 2.1 native, GraphQL + Elasticsearch + RabbitMQ/Redis): deploy platform, attach internal-enrichment connectors that trigger on new observables, query external sources (VirusTotal/Shodan/AbuseIPDB/GreyNoise/SecurityTrails), and return STIX bundles adding notes, labels, relationships and 0-100 confidence scores. Enrichment respects TLP ceilings (max_tlp) so sensitive observables are never sent to third parties. Every enrichment host is an outbound call to an untrusted external service — register it in allowed_hosts (§5) and never exfiltrate above the TLP ceiling. API keys come from the environment, never the repo. Subscription quota, not cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-ioc-enrichment-pipeline-opencti/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "building-malware-incident-communication-template",
     "name": "building-malware-incident-communication-template",
     "description": "|",
@@ -1036,6 +1190,20 @@
     "tier": "T1"
   },
   {
+    "id": "building-threat-actor-profile-from-osint",
+    "name": "building-threat-actor-profile-from-osint",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Threat-actor profiling doctrine from OSINT: collect from ≥3 source types (vendor reports, government advisories, malware repos, paste/forums, CT logs), apply structured analytic techniques (Diamond Model, Analysis of Competing Hypotheses for attribution confidence), and express the profile as STIX 2.1 Threat-Actor + Intrusion-Set + Identity objects with an attributed-to relationship. Map TTPs to MITRE ATT&CK technique IDs, capture aliases/motivation/targeted-sectors/toolset/infrastructure-patterns, and end with a confidence-graded dossier whose recommendations are defensive (detections, blocks, hunts). Attribution overlap is a hypothesis, not proof — false flags exist; record confidence explicitly. In MAOS this enriches threat/memory and feeds mas-sec-reviewer; efficiency is quota units (T",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-threat-actor-profile-from-osint/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "building-threat-intelligence-enrichment-in-splunk",
     "name": "building-threat-intelligence-enrichment-in-splunk",
     "description": "|",
@@ -1061,6 +1229,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-threat-intelligence-feed-integration/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "building-threat-intelligence-platform",
+    "name": "building-threat-intelligence-platform",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Architecture-and-deploy doctrine for an integrated open-source TIP: layered design (collection / storage Elasticsearch / analysis MISP+OpenCTI / enrichment Cortex / response TheHive / sharing TAXII) with integration points MISP<->OpenCTI sync, OpenCTI->TheHive case creation, TheHive<->Cortex enrichment, all->SIEM push. Each external feed, connector, and SIEM endpoint is an outbound/inbound trust boundary: register hosts in allowed_hosts (§5), gate cross-instance sync and outbound sharing behind human approval, source all admin tokens/passwords from the environment. Subscription quota, not cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/building-threat-intelligence-platform/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -1243,6 +1425,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/coding-standards/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-eval",
+    "tier": "T1"
+  },
+  {
+    "id": "collecting-defensive-osint",
+    "name": "collecting-defensive-osint",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive OSINT collection doctrine: state an intelligence requirement (target + Priority Intelligence Requirements + legal authority + TLP handling) before collecting, then gather passively via certificate-transparency (crt.sh), passive DNS, WHOIS history, ASN/Shodan banner data, and dark-web/paste monitoring — never sending packets to unauthorized targets. Pivot one data point (IP, registrant email, cert) into related infrastructure, but verify every pivot independently because infrastructure overlap and false-flag reuse cause attribution errors. Watch data freshness (stale passive DNS misleads) and your own footprint (query via isolated VM/relay so you do not alert the adversary). In MAOS this enriches threat/memory context and feeds mas-sec-reviewer; active recon is a §5 gated action, ",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/collecting-defensive-osint/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -1689,6 +1885,20 @@
     "tier": "T1"
   },
   {
+    "id": "correlating-osint-with-ai-reasoning",
+    "name": "correlating-osint-with-ai-reasoning",
+    "description": "|",
+    "domain": "planning",
+    "summary": "AI-driven OSINT correlation doctrine: normalize multi-source findings into one schema tagged with source/type/timestamp, then use LLM reasoning to link identities across platforms, assign 0.0–1.0 confidence per linkage by evidence strength (exact username match high; similar handle medium; same breached email high; co-occurring infra medium; temporal-only low), detect contradictions and common-name false positives, flag high-risk exposures, and resolve/merge entities into a final profile. Require lawful basis + documented authorization before processing PII, and manual spot-check of a 10–20% sample plus two-source corroboration before any linkage >0.8. In MAOS the LLM call goes through the single injection point packages/core/src/llm.ts (Claude Code engine, subscription) — never a direct o",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/correlating-osint-with-ai-reasoning/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "correlating-security-events-in-qradar",
     "name": "correlating-security-events-in-qradar",
     "description": "|",
@@ -1700,6 +1910,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/correlating-security-events-in-qradar/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "correlating-threat-campaigns",
+    "name": "correlating-threat-campaigns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive campaign-correlation doctrine: group disparate incidents/IOCs into one campaign without forcing false links. Normalise all candidate events to STIX 2.1 (UTC, typed indicators, source + confidence), pivot across four dimensions — infrastructure (IP/24, WHOIS, ASN, SSL fingerprint), capability (malware hash/YARA, C2 config, packer), temporal (operational-hours/timezone, kill-chain sequence, compile timestamps) and victimology (sector/geo/tech) — then weight a confidence score (infra 40 / capability 35 / temporal 15 / victim 10 → HIGH/MEDIUM/LOW). Build a campaign graph (OpenCTI/Maltego/Neo4j) of intrusion-set→uses→malware/infra→targets→identity, and ship a campaign report: name, timeline, target profile, TTP heatmap, shared IOCs (highest-confidence for blocking), Sigma/YARA. Distin",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/correlating-threat-campaigns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -2879,6 +3103,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-typosquat-domains",
+    "name": "detecting-typosquat-domains",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive domain-permutation detection with dnstwist. Generate lookalikes of YOUR domains (addition, bitsquat, homoglyph, hyphenation, insertion, omission, replacement, transposition, vowel-swap, subdomain, dictionary), resolve DNS (A/AAAA/NS/MX), and compare web similarity via ssdeep (HTML) and pHash (screenshots). Score risk: high ssdeep similarity, MX present (email-capable), recent registration, homoglyph fuzzer, IP different from legitimate. Run as a continuous monitor that diffs against a known-set to surface NEW squats. Output firewall/proxy blocklists and evidence-backed takedown reports. In MAOS: read/propose; dnstwist DNS lookups are outbound and risk-gated (§5); takedown sends are human-confirmed. Defensive, own-domain only.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-typosquat-domains/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-typosquatting-packages-in-npm-pypi",
     "name": "detecting-typosquatting-packages-in-npm-pypi",
     "description": "|",
@@ -3128,6 +3366,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/eval-harness/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-agent",
+    "tier": "T1"
+  },
+  {
+    "id": "evaluating-threat-intelligence-feed-quality",
+    "name": "evaluating-threat-intelligence-feed-quality",
+    "description": "|",
+    "domain": "planning",
+    "summary": "TI feed-QUALITY doctrine (the judgement layer, distinct from building-threat-intelligence-feed-integration which operationalizes the pipeline): catalog feeds by type (commercial/government/ISAC/OSINT) and score each on update frequency, historical accuracy (true-positive rate in production), sector coverage, and attribution depth using a weighted matrix grounded in NIST SP 800-150. Apply confidence-tiered action (≥threshold → block, below → detection-only) to avoid over-blocking, enforce type-based TTLs (IP~30d, domain~90d, hash~1y) against staleness, deduplicate overlapping feeds before counting, and never act on an IOC without campaign/actor context (shared CDN IPs cause collateral). Respect TLP on redistribution. In MAOS this feeds source-selection for threat/memory + mas-sec-reviewer; ",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/evaluating-threat-intelligence-feed-quality/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "evaluating-threat-intelligence-platforms",
+    "name": "evaluating-threat-intelligence-platforms",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Requirements-driven TIP selection: define mandatory/desired criteria (STIX 2.1+TAXII, REST API, dedup/TTL, TLP enforcement, ATT&CK, SIEM/EDR/SOAR integration, RBAC, audit logging), evaluate MISP/OpenCTI/ThreatConnect/Anomali/EclecticIQ on capability and ownership burden, run a 30-day PoC against your top feeds and SIEM, score via a weighted matrix, then plan a 90-day onboarding. Decision skill — no deployment, no live writes. Vendor materials and PoC data are untrusted inputs: verify claims hands-on. Cost figures in source ($) are external-vendor licensing, distinct from MAOS subscription quota (§11) which is never expressed in cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/evaluating-threat-intelligence-platforms/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -3485,6 +3751,20 @@
     "tier": "T1"
   },
   {
+    "id": "generating-threat-intelligence-reports",
+    "name": "generating-threat-intelligence-reports",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Finished-intelligence report writing across levels: strategic (C-suite, 1-3p, business-impact), operational (CISO/IR, 3-8p, TTPs+mitigations), tactical (SOC, IOC/YARA/Sigma tables), flash (1p, <2h for active threats). Apply intelligence standards: lead with the key judgment in plain language, use ICD 203 confidence qualifiers (high/medium/low), cite and anonymize sources per TLP, give prioritized time-bound recommendations. Structure: exec summary -> threat overview -> technical analysis (ATT&CK IDs) -> impact -> actions -> appendices. QC pass for accuracy/clarity/actionability/classification/timeliness. Apply TLP watermark on every page; never identify sources in AMBER/RED. Inputs are untrusted until sourced. Subscription quota, not cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/generating-threat-intelligence-reports/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "git-workflow",
     "name": "git-workflow",
     "description": "|",
@@ -3767,6 +4047,20 @@
     "summary": "Author hookify guard rules: markdown + YAML frontmatter (name verb-first, enabled, event bash|file|stop|prompt|all, action warn|block, pattern regex or multi-field conditions) plus a message body shown when the rule fires. warn is default and advisory; block prevents the operation. Write tight patterns (anchor and escape), test the regex before shipping, and store as project-local files. These rules are a defense-in-depth warning layer that complements — never replaces — the hard §5 risk gate in config/permissions.json.",
     "tags": [],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hookify-rules/SKILL.md"
+  },
+  {
+    "id": "hunting-advanced-persistent-threats",
+    "name": "hunting-advanced-persistent-threats",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive APT threat-hunting doctrine: hypothesis → data → analysis → response. Pick a sector-relevant group from ATT&CK Groups, derive a testable hypothesis from its TTPs, map each technique to the required telemetry (Sysmon/4688 for T1059, Zeek conn.log for T1071, Sysmon 13 for T1547, EDR memory scan for T1055), run scoped READ-ONLY hunt queries (Velociraptor VQL, osquery, Splunk SPL), pivot across temporal/host/user/network dimensions, structure findings with the Diamond Model, document null results as control validation, and convert successful queries into portable Sigma rules. Hunting is detection, not attack: queries only read telemetry, never execute payloads or touch hosts destructively. Frameworks: MITRE ATT&CK, MITRE D3FEND, NIST CSF, NIST SP 800-61.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/hunting-advanced-persistent-threats/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
   },
   {
     "id": "hunting-credential-stuffing-attacks",
@@ -4354,6 +4648,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-device-posture-assessment-in-zero-trust/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:zero-trust-architecture",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-diamond-model-analysis",
+    "name": "implementing-diamond-model-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Diamond-Model doctrine: structure intrusion events for pivoting and correlation. Capture each event's four core features (Adversary, Capability, Infrastructure, Victim) and meta-features (timestamp, kill-chain phase, result, direction, methodology, resources), link events chronologically into activity threads, cluster threads sharing an adversary into activity groups, and find pivot points where ≥2 events share infrastructure / capability / adversary — those pivots drive discovery of related activity. Map Capability to ATT&CK techniques and tag IOCs per event. Output is a pivot-ready activity graph and report (event count, unique adversaries/victims/infra, pivots). It is the atomic structuring layer beneath campaign correlation and attribution. Read-only analysis. Frameworks: MIT",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-diamond-model-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -5617,6 +5925,20 @@
     "tier": "T1"
   },
   {
+    "id": "indicator-lifecycle-management",
+    "name": "indicator-lifecycle-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Indicator lifecycle-management doctrine: model each IOC through a 7-state machine (discovered→validated→enriched→deployed→monitoring→under-review→retired) with logged transitions. Apply type-based confidence DECAY (half-life IP 30d, URL 60d, domain 90d, hash 365d) so stale indicators stop over-alerting; track hit_count and false_positive_count (>3 FPs → under-review); enforce aging/retirement policies (retire when past max-age with zero hits). Surface quality metrics — hit rate, false-positive rate, coverage, freshness — to fight analyst fatigue and keep detection efficacy high. Retirement/deployment changes to live detection systems are §5-gated outbound; cost is subscription quota (§8), never per-token cash. In MAOS, prefer literal-union state values over enum at SQLite/Drizzle boundarie",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/indicator-lifecycle-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "inherit-legacy-style",
     "name": "inherit-legacy-style",
     "description": "Use to prevent AI code-style drift when onboarding an agent onto a hand-written legacy project: scan the codebase for implicit conventions across 4 meta-architecture dimensions, resolve conflicts with the user one at a time, and crystallize the consensus into an enforceable .ai-style-rules.md. Language- and framework-agnostic — aligns meta-architecture, not syntax. Use when registering an external project or when the user worries generated code will 'drift' from existing conventions. Do NOT use for pure research, one-off questions, or judging tech-stack quality.",
@@ -5727,6 +6049,48 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:misc",
     "tier": "T2"
+  },
+  {
+    "id": "ioc-analysis-triage",
+    "name": "ioc-analysis-triage",
+    "description": "|",
+    "domain": "planning",
+    "summary": "IOC analysis and triage doctrine: normalize and classify each indicator (IPv4/6 — skip RFC1918; domain/FQDN — defang + registered-domain; URL — split domain/path; hash — prefer SHA-256; email — split domain/local), defang in all documentation (evil[.]com, hxxp) to prevent accidental activation, enrich from ≥3 independent sources (VirusTotal, AbuseIPDB, MalwareBazaar, URLScan, Shodan, MISP) never one, contextualize with campaign attribution, then apply a tiered disposition (block ≥70 conf / monitor 40–69 / whitelist <40 / false-positive) with TTL expiry (IP 30d, domain 90d). Always pair automated scoring with analyst judgment for shared infrastructure (CDN/cloud). High-stakes blocking is §5-gated. Enrichment API hosts must be allowlisted; cost is subscription quota (§8), never per-token cas",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ioc-analysis-triage/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "ioc-defanging-sharing-pipeline",
+    "name": "ioc-defanging-sharing-pipeline",
+    "description": "|",
+    "domain": "planning",
+    "summary": "IOC defanging + sharing pipeline doctrine: extract IOCs from free text (refang first to catch already-defanged), normalize (lowercase, strip slashes/whitespace, extract domains from URLs, dedupe across sources), whitelist known-good domains to suppress false positives, DEFANG for all human-facing output (http→hxxp, .→[.], @→[@]) so reports/email/Slack cannot auto-link to malicious infra, convert to STIX 2.1 Indicators with TLP marking definitions, and distribute via MISP events and TAXII collections. Refang only inside controlled analysis, never in shareable artifacts. Distribution to MISP/TAXII is a §5-gated outbound to allowlisted hosts; never disable TLS verification in production (SKIP_TLS_VERIFY lab-only); cost is subscription quota (§8), never per-token cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ioc-defanging-sharing-pipeline/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "ioc-enrichment-automation",
+    "name": "ioc-enrichment-automation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Automated IOC-enrichment doctrine (SOAR/Python/TIP): extract IOCs from alerts, classify type, fan out in parallel to type-appropriate sources (IP→AbuseIPDB+Shodan+VT+MISP, domain→VT+passiveDNS+MISP, URL→URLScan+VT+SafeBrowsing, hash→VT+MalwareBazaar+MISP), aggregate a weighted composite score, route by tier (≥70 high / 40–69 medium / <40 auto-close). Mandatory: respect provider rate limits (VT free 4/min) with rate-limiting + 429 retry-after backoff, cache results ≥24h to avoid redundant calls, never fail silently (log + fallback, empty≠clean), and NEVER auto-block on score alone — enrichment informs, humans decide (§5). Folds VirusTotal hash enrichment (last_analysis_stats, behaviours, contacted_ips/domains pivots, crowdsourced YARA). Enrichment hosts must be allowlisted; cost is subscrip",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ioc-enrichment-automation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
   },
   {
     "id": "iterative-retrieval",
@@ -6037,6 +6401,20 @@
     "tier": "T1"
   },
   {
+    "id": "malware-ioc-extraction",
+    "name": "malware-ioc-extraction",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive malware-IOC-extraction doctrine (detection, not weaponization): work only in an isolated VM/container, never on a live host. Static analysis — file hashes (MD5/SHA-1/SHA-256), imphash + rich-header for family grouping, section names/entropy (entropy ≥7 = packed), imports, PE metadata (PDB paths, version info, compile timestamp). String extraction — IPv4, domains, URLs, registry paths, mutexes, user-agents, PDB paths, bitcoin addresses (ASCII + UTF-16LE). YARA scanning for family/packer/campaign classification. Output STIX 2.1 Indicator + Malware objects with 'indicates' relationships, filtering private IP ranges and benign strings. Goal is actionable detection/blocking IOCs for defenders — never operational malware. Detonation/enrichment hosts are §5-gated; cost is subscription q",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/malware-ioc-extraction/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "managing-cloud-identity-with-okta",
     "name": "managing-cloud-identity-with-okta",
     "description": "|",
@@ -6048,6 +6426,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/managing-cloud-identity-with-okta/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "mapping-mitre-attack-techniques",
+    "name": "mapping-mitre-attack-techniques",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection-engineering doctrine: map your own controls onto MITRE ATT&CK to quantify coverage. For each SIEM/Sigma rule assign technique IDs and a coverage score (0 blind / 50 logged-only / 100 alerted); cross-reference blind spots against adversary groups targeting your sector; export an ATT&CK Navigator heatmap (layer v4.5) with a red→green gradient; summarise by tactic for executives and ship a ranked blind-spot remediation list naming the data source each fix needs. Distinct from actor-TTP mapping: this is control-coverage measurement (Sigma / D3FEND / coverage-gap), the other is per-actor profiling. Read-only analytical activity; no exploitation, no outbound sends. Frameworks: MITRE ATT&CK, MITRE D3FEND, MITRE ATLAS, NIST CSF, NIST AI RMF.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/mapping-mitre-attack-techniques/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -6118,6 +6510,62 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/mle-workflow/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-eval",
+    "tier": "T1"
+  },
+  {
+    "id": "monitoring-brand-impersonation",
+    "name": "monitoring-brand-impersonation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive multi-channel brand-protection monitoring. Detect domain squatting (typosquat/homoglyph/TLD via dnstwist), phishing clones (Safe Browsing / VirusTotal / CT logs), social-media and app-store impersonation, and dark-web brand mentions for YOUR brand. Prioritize by maliciousness: active login pages, valid TLS, configured MX (email-capable), high visual similarity (ssdeep/pHash), recent registration, crime-associated hosting. Output evidence-backed takedown requests and blocklist entries; harden with CAA records and DMARC. In MAOS this is read/propose; takedown emails and outbound network are risk-gated (§5) — drafts proposed, sends require a human click. Quota, not cash (§11).",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/monitoring-brand-impersonation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "monitoring-dark-web-sources",
+    "name": "monitoring-dark-web-sources",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive dark-web OSINT for early warning. Prefer commercial CTI feeds (Recorded Future / Flashpoint / Intel 471 / SpyCloud / HIBP Enterprise) that crawl forums, markets, and .onion leak sites without analyst exposure; reserve direct access for authorized investigations only, behind Whonix/Tails isolation, a cover identity, JS disabled, and never logging in with real credentials or downloading payloads. Watchlist = own domains, executive names, brands, IP ranges. On a hit: capture timestamped evidence, classify severity (P1 imminent/active exposure, P2 credential leak, P3 mention), verify before escalating (actors fabricate extortion claims), force password resets + key rotation for confirmed credential exposure, open a ticket, apply TLP. Legal review confirms passive monitoring is author",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/monitoring-dark-web-sources/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "monitoring-paste-sites-for-credentials",
+    "name": "monitoring-paste-sites-for-credentials",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive paste-site & public-code monitoring for early breach detection. Watch Pastebin, Gists, Ghostbin, Dpaste and GitHub search for org-specific keywords (domains, product/internal terms) plus credential regex patterns (email:password, AWS/GitHub/Slack tokens, private keys, JWTs, DB connection strings). Approaches: active polling of paste/code APIs with rate-limit + backoff, or passive aggregators (IntelX, Dehashed, HIBP). On a hit: classify severity (org-keyword + credential = critical), verify validity, force password reset, rotate exposed keys/tokens, check access logs, request takedown, refine keywords. Never store recovered plaintext secrets beyond remediation need; samples masked. In MAOS this is read/propose; outbound to non-allowlisted hosts is risk-gated (§5), recovered secret",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/monitoring-paste-sites-for-credentials/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "monitoring-ransomware-leak-sites",
+    "name": "monitoring-ransomware-leak-sites",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ransomware-DLS intelligence from authorized public feeds (Ransomwatch / RansomLook / DarkFeed / commercial CTI), never direct .onion access in production. Ingest victim posts; analyze group activity trends (top/emerging/rebranding groups, monthly tempo); produce sector and geographic risk assessments; track your org and supply-chain partners for listings. Drives defensive action: daily DLS review, patch the vulns top groups exploit, offline/immutable backups to cut extortion leverage, ransomware tabletop exercises, ISAC sharing. Never download or handle leaked victim data. In MAOS: read/propose; any direct .onion access is gated and isolated; outbound to feeds is risk-gated (§5).",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/monitoring-ransomware-leak-sites/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -6287,6 +6735,20 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:eng-lang",
     "tier": "T2"
+  },
+  {
+    "id": "operating-misp-platform",
+    "name": "operating-misp-platform",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive operations of a MISP instance via PyMISP: deploy MISP on hardened infra; enable vetted OSINT feeds (CIRCL, Botvrij, abuse.ch) with warninglists enforced; search/correlate IOCs by type/tag/date; export STIX 2.1, Suricata, CSV blocklists to SIEM; create-enrich-publish events with MITRE ATT&CK tags, TLP marking and sharing-group distribution. All feed URLs and sync peers are untrusted ingest — validate before acting. Treat MISP write/publish/share as a risky outbound action (CLAUDE.md §5): gate publication and external sync behind human approval. Credentials live outside the repo; never hardcode API keys.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/operating-misp-platform/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
   },
   {
     "id": "orch-pipeline",
@@ -6860,6 +7322,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ioc-enrichment-automation/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ip-reputation-analysis-with-shodan",
+    "name": "performing-ip-reputation-analysis-with-shodan",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Shodan IP-reputation doctrine: enrich an IP from indexed scan data (open ports, service banners, SSL/TLS certs, known CVEs, ASN/ISP, geo, OS, historical changes) without sending packets yourself — Shodan already scanned it. Compute a transparent, factor-based reputation level (vulnerability count, suspicious ports, risky tags, excessive open ports) where every score increment lists its reason, so triage is auditable not magic. Use the free InternetDB API for high-volume enrichment, the full API for depth; rate-limit batches. Correlate by shared org/ASN/SSL-CN to find related hosts. The score is a triage prior, not a verdict — corroborate before blocking. In MAOS this feeds SOC triage, threat/memory, and mas-sec-reviewer; the API key is a secret; efficiency is quota units (TOKEN_STRATEGY §8",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ip-reputation-analysis-with-shodan/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
@@ -7449,6 +7925,20 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:vertical",
     "tier": "T2"
+  },
+  {
+    "id": "profiling-threat-actor-groups",
+    "name": "profiling-threat-actor-groups",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive threat-actor profiling doctrine: produce sector-relevant adversary profiles to drive threat modelling and detection tuning. Shortlist groups by sector/geo/tech-stack fit (ATT&CK Groups, vendor reports, CISA KEV), document each across identity (G-code + aliases + suspected sponsor), motivation, targeting, capabilities, campaign history, and TTPs-by-tactic, map TTPs via mitreattack-python, assess detection coverage against the profile to surface critical gaps and compensating controls, then package three tiers — executive 1-pager, SOC analyst brief, technical appendix (Sigma/YARA/STIX) — with confidence-qualified attribution and TLP marking. Profiles are TTP-centric (durable) not IOC-centric (stale); attribution is probabilistic, never binary. Read-only intel synthesis; no offensiv",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/profiling-threat-actor-groups/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
   },
   {
     "id": "project-flow-ops",
@@ -8291,6 +8781,34 @@
     "tier": "T2"
   },
   {
+    "id": "stix-taxii-feed-processing",
+    "name": "stix-taxii-feed-processing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "STIX/TAXII 2.1 feed-consumer and processing doctrine: discover API roots and collections, poll incrementally (added_after, UTC, +5min overlap, paginate via next), parse and validate STIX 2.1 SDOs/SROs (check spec_version 2.0 vs 2.1), enforce TLP marking definitions before routing (never auto-route TLP:RED to broad-access platforms), map object types to destinations (indicator→SIEM/blocklist, malware→EDR, threat-actor/campaign→TIP, course-of-action→SOAR), index parsed objects (not opaque JSON blobs), and optionally publish validated local intel back. Folds STIX/TAXII feed-integration. In MAOS all polling cost is subscription quota (TOKEN_STRATEGY §8), and any outbound publish or network host outside config/permissions.json#allowed_hosts is §5-gated.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/stix-taxii-feed-processing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
+    "id": "stix2-intelligence-authoring",
+    "name": "stix2-intelligence-authoring",
+    "description": "|",
+    "domain": "planning",
+    "summary": "STIX 2.1 intelligence-authoring doctrine with the stix2 Python library: build SDOs (Indicator, Malware, ThreatActor, Campaign, AttackPattern, Identity) with a producer Identity in created_by_ref, link them with SROs (Relationship/Sighting) whose source_ref/target_ref resolve inside the bundle, write valid STIX patterns (pattern_type='stix'), attach TLP marking definitions, assemble and serialize a Bundle, then lint with stix2-validator and round-trip-parse before publishing. Required props (type/id/created/modified) must be present; indicator patterns must parse. Use only for relationship-rich intel — plain blocklists belong in CSV/OpenIOC. Publishing to a TAXII collection is a §5-gated outbound to allowlisted hosts; authoring cost is subscription quota (§8), never per-token cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/stix2-intelligence-authoring/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "strategic-compact",
     "name": "strategic-compact",
     "description": "Use to decide WHEN to compact a long agent session — manual /compact at logical task boundaries (after research before execution, after a milestone, after a failed approach) instead of arbitrary auto-compaction that fires mid-task and loses state. Do NOT use mid-implementation (you lose live variable/path/partial state), and do NOT use it to define what to inject into a prompt (that is context-pack / skill-router territory).",
@@ -8368,6 +8886,20 @@
     "origin": "affaan-m/ecc",
     "cluster": "skill:vertical",
     "tier": "T2"
+  },
+  {
+    "id": "taxii-server-deployment",
+    "name": "taxii-server-deployment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "TAXII 2.1 server deployment doctrine (OpenTAXII / medallion): define discovery + API roots + collections with explicit per-collection read/write/media-type access, run containerized with a healthcheck, enforce HTTPS/TLS and authentication, and never ship default/sample credentials or SKIP_TLS_VERIFY in production (lab-only). Supports hub-and-spoke, peer-to-peer, source-subscriber sharing models. Publishing and consuming round-trip STIX 2.1 bundles; outbound forwarding to SIEM/SOAR and any non-allowlisted host is §5-gated. Server credentials are secrets — never committed, never logged (§5/§11). Runtime cost is subscription quota (§8), never per-token cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/taxii-server-deployment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
   },
   {
     "id": "tdd-workflow",
@@ -8510,6 +9042,20 @@
     "tier": "T1"
   },
   {
+    "id": "threat-intelligence-lifecycle",
+    "name": "threat-intelligence-lifecycle",
+    "description": "|",
+    "domain": "planning",
+    "summary": "End-to-end CTI lifecycle (NIST SP 800-150 / intelligence cycle): Direction (define 5-10 PIRs with SOC/IR/CISO stakeholders), Collection (map PIRs to OSINT/commercial/ISAC/internal sources, track gaps), Processing (ingest->STIX 2.1 normalize->dedup->enrich->score, reject unverifiable), Analysis (strategic/operational/tactical + ACH/Diamond Model), Dissemination (audience-matched products under TLP), Feedback (5-day collection, quarterly maturity metrics: PIR coverage, TP rate, time-to-disseminate). Program governance + implementation. All collected feeds are untrusted ingest; external collection hosts go in allowed_hosts (§5); dissemination is gated by TLP. Subscription quota, not cash.",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/threat-intelligence-lifecycle/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
+  },
+  {
     "id": "tinystruct-patterns",
     "name": "tinystruct-patterns",
     "description": "|",
@@ -8531,6 +9077,20 @@
     "summary": "Gives the user an upfront, explicit choice over response depth instead of guessing. Before answering: (1) estimate input tokens (prose words×1.3, code chars/4); (2) classify complexity (Simple 3-8x … Complex 15-40x) to get a response window; (3) present four depth levels — Essential 25% / Moderate 50% / Detailed 75% / Exhaustive 100% — with estimated token counts; (4) answer at the chosen level. Honors shortcuts ('tldr'→25%, 'detailed'→75%) and maintains a session-set level silently. Heuristic only (~85-90% accuracy, ±15%) — always shows the disclaimer; no real tokenizer. MAS variant: this is the user-facing surface of the §6 eco/standard/expert depth control and TOKEN_STRATEGY signal-density discipline — Essential maps to eco, Exhaustive to expert; it is a depth-negotiation skill, never a",
     "tags": [],
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/token-budget-advisor/SKILL.md"
+  },
+  {
+    "id": "tracking-adversary-infrastructure",
+    "name": "tracking-adversary-infrastructure",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Adversary-infrastructure tracking doctrine (canonical; absorbs the build-a-tracking-system variant): pivot from a known indicator to related assets via passive DNS (historical domain↔IP), certificate transparency, reverse-WHOIS/registrant, shared SSL certs and name servers, and network fingerprints (JARM, JA3S, favicon hash, HTTP banners) — using indexed/passive data, not active scans of non-owned hosts. Build a graph (nodes=domains/IPs, edges=relationships with first/last-seen), find clusters and high-centrality hubs (shared infra), maintain a timeline of infrastructure evolution, and monitor CT logs + newly-registered domains for adversary patterns. Overlap is a graded hypothesis, never proof. Export as STIX 2.1 Infrastructure objects. In MAOS this is knowledge feeding threat/memory + ma",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/tracking-adversary-infrastructure/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
+    "tier": "T1"
   },
   {
     "id": "triaging-security-alerts-in-splunk",
@@ -8628,6 +9188,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/validating-backup-integrity-for-recovery/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "validating-detections-with-atomic-red-team",
+    "name": "validating-detections-with-atomic-red-team",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized, defensive detection-validation with Atomic Red Team (atomic-operator). HARD GATE: requires written authorization, a defined scope, and an isolated lab/test environment — never production, never systems you don't own. Map atomic tests to your detection rules, execute single ATT&CK techniques in the lab, then check SIEM/EDR for the corresponding alert; document detection gaps and tune rules. Purpose is to verify alerts fire and close coverage gaps, not to cause impact — select benign validation atomics, avoid destructive ones, and clean up after. In MAOS, test execution is risk:high/blocking (code-execution simulating adversary behavior) → ALWAYS pauses for human validation (§5), even in autopilot; mas-sec-reviewer PASS precedes any run. Quota not cash (§11).",
+    "tags": [
+      "cyber:threat-intelligence"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/validating-detections-with-atomic-red-team/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:threat-intelligence",
     "tier": "T1"
   },
   {
