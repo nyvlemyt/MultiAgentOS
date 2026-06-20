@@ -98,6 +98,20 @@
     "tier": "T1"
   },
   {
+    "id": "agent-tesla-config-extraction",
+    "name": "agent-tesla-config-extraction",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Agent Tesla config extraction (detection/blocking, not weaponization). Agent Tesla is a .NET RAT/keylogger that exfiltrates via SMTP, FTP, Telegram bot API, or Discord webhook; its config is embedded in the assembly, usually obfuscated (string/resource encryption, in-memory .NET Reflection loaders). Work only in an isolated/sandboxed VM. Deobfuscate with de4dot, decompile with dnSpy/ILSpy or automate with dnlib/pythonnet, identify the config-string decryption routine, and recover the EXFIL ENDPOINTS (SMTP server, FTP URL, Telegram bot endpoint + chat id, Discord webhook), C2 settings, persistence mechanism, and targeted-application list. The deliverable is BLOCKING IOCs (defanged endpoints, webhook hosts, mutexes, file paths) and detection content — never operational credentials ",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/agent-tesla-config-extraction/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "agentic-engineering",
     "name": "agentic-engineering",
     "description": "|",
@@ -140,6 +154,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-android-malware-with-apktool",
+    "name": "analyzing-android-malware-with-apktool",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only static APK analysis centered on apktool (smali + decoded resources) and androguard (programmatic manifest/permission/API analysis), complementary to JADX's Java view. Parse manifest metadata, enumerate requested permissions and flag dangerous combinations, list activities/services/receivers/providers, scan smali/API for reflection + crypto + SMS/telephony + dynamic code loading (DexClassLoader, Runtime.exec), extract hardcoded URLs/IPs/C2 strings, and produce a risk-scored JSON report with MITRE ATT&CK Mobile mappings + IOCs. Run only in an isolated environment. Deliverable is detection: risk report + components + suspicious APIs + IOCs + YARA. Defensive only — never build/repack/sign/run payloads. Sample handling §5-gated, cost in subscription quota (§11).",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-android-malware-with-apktool/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-api-gateway-access-logs",
     "name": "analyzing-api-gateway-access-logs",
     "description": "|",
@@ -166,6 +194,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:security-operations",
     "tier": "T1"
+  },
+  {
+    "id": "analyzing-bootkit-and-rootkit-samples",
+    "name": "analyzing-bootkit-and-rootkit-samples",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only analysis of below-OS persistence: bootkits (MBR/VBR/UEFI) and advanced kernel rootkits. Acquire offline — dd for MBR/VBR/first-track, copy ESP, chipsec/flashrom for SPI firmware (boot from clean live media; never analyze a running compromised OS). Inspect MBR/VBR (ndisasm 16-bit real mode, signature compare vs known-good), extract UEFI DXE modules with UEFITool and diff GUIDs vs vendor baseline (LoJax/BlackLotus/CosmicStrand/MoonBounce/ESPecter patterns), verify Secure Boot/SPI write-protect with chipsec, and use Volatility 3 for SSDT/IDT/callback/driver/DKOM kernel-rootkit artifacts. Deliverable is attribution + persistence map + detection/remediation (reflash, rebuild ESP/MBR). Defensive only — never build/flash/deploy implants. Sample handling §5-gated, firmware writes are bloc",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-bootkit-and-rootkit-samples/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "analyzing-campaign-attribution-evidence",
@@ -238,6 +280,34 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-golang-malware-with-ghidra",
+    "name": "analyzing-golang-malware-with-ghidra",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only Ghidra workflow for Go (Golang) malware, whose static linking + large function counts + non-null-terminated strings defeat generic RE. Recover function names from pclntab (even when stripped; garble-obfuscated names need CFG-similarity tools like GoResolver), parse buildinfo for Go version, extract module paths/deps (HTTP/crypto/C2 libs) to infer capability without full RE, and categorize network/crypto/os-exec/main functions. Deliverable is detection: recovered map + dependency-derived capabilities + suspicious strings + YARA/IOCs. Defensive RE for detection only — never build/obfuscate/run Go payloads. Sample handling is §5-gated, execution lab-only (isolated non-networked VM), cost in subscription quota (§11).",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-golang-malware-with-ghidra/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-heap-spray-exploitation",
+    "name": "analyzing-heap-spray-exploitation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive memory-forensics RE-for-detection of heap-spray (analysis of the exploit technique, not building it): from a memory dump, use Volatility3 malfind/vadinfo/memmap to find processes with injected executable regions, large contiguous RWX allocations, and NOP-sled patterns (0x90 runs, 0x0c0c0c0c), then carve suspect regions and analyze shellcode behavior in the sandbox. Output = memory IOCs + NOP-sled locations + region sizes + shellcode hashes + YARA/behavioral rules. Lab-only: isolated VM, never detonate; strip any working exploit payload to detection signatures. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-heap-spray-exploitation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-kubernetes-audit-logs",
     "name": "analyzing-kubernetes-audit-logs",
     "description": "|",
@@ -266,6 +336,48 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-linux-elf-malware",
+    "name": "analyzing-linux-elf-malware",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only analysis of malicious Linux ELF binaries on servers/containers/cloud. Static: file/readelf headers, sections, symbols, dynamic linking, hashes, entropy (>7.0 = packed); strings for network/shell/mining/credential/persistence IOCs. Dynamic (sandbox only): strace/ltrace for socket/connect/execve/fork, gdb breakpoints, ss for live connections — never ldd on malware outside a sandbox (it can execute code). RE in Ghidra/Radare2 for command dispatch, crypto, scanner/killer modules; check Linux persistence (cron, systemd, rc.local, ld.so.preload, authorized_keys, kernel modules). Deliverable is detection: classification + IOCs + persistence artifacts + YARA. Defensive only — never build/run payloads on real hosts. Sample handling §5-gated, cost in subscription quota (§11).",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-linux-elf-malware/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-macro-malware-in-office-documents",
+    "name": "analyzing-macro-malware-in-office-documents",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive maldoc RE-for-detection: triage an Office document for VBA/XLM macros, DDE, remote-template and embedded-object vectors (olevba/oledump/oleid), extract and deobfuscate the macro (Chr/StrReverse/Replace/concat), identify the auto-exec trigger (Auto_Open, Document_Open, Workbook_Open) and the execution method (Shell, WScript, PowerShell, COM), then output IOCs and a YARA rule. Lab-only: isolated VM without Office, never execute on production; sample handling is §5-gated; output is detection signatures, never a working maldoc.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-macro-malware-in-office-documents/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-malicious-pdf-with-peepdf",
+    "name": "analyzing-malicious-pdf-with-peepdf",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive PDF RE-for-detection with peepdf (deep/interactive companion to pdfid quick triage): open the sample in peepdf interactive mode, walk objects, decode streams, extract embedded JavaScript / shellcode / embedded files, deobfuscate JS for heap-spray/ROP/redirect, and emit defanged IOCs + YARA + CVE attribution. Lab-only: isolated VM with no PDF reader, never detonate on production; sample handling is §5-gated; shellcode/JS are reduced to signatures, never reusable exploits. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-malicious-pdf-with-peepdf/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-malicious-url-with-urlscan",
     "name": "analyzing-malicious-url-with-urlscan",
     "description": "|",
@@ -280,6 +392,20 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-malware-behavior-with-cuckoo-sandbox",
+    "name": "analyzing-malware-behavior-with-cuckoo-sandbox",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive dynamic malware analysis with self-hosted Cuckoo Sandbox on an ISOLATED lab VM (network simulated via InetSim/FakeNet-NG, never live internet). Submit an authorized sample, observe runtime behavior — process tree, API calls (VirtualAllocEx/WriteProcessMemory/CreateRemoteThread, CryptEncrypt, URLDownloadToFileA), file drops, registry Run-key/service persistence, DNS/HTTP/TCP C2 — read Cuckoo's behavioral signatures and threat score, and pull dropped files + memory.dmp for follow-on Volatility analysis. The deliverable is detection content: YARA rules, IOCs, and behavioral signatures, NOT a redistributable payload. Map findings to MITRE ATT&CK (T1497 sandbox-evasion, T1055 injection, T1071 C2, T1027 obfuscation) and NIST-CSF DE.AE/DE.CM/RS.AN/ID.RA. In MAOS this is a lab-only foren",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-malware-behavior-with-cuckoo-sandbox/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "analyzing-malware-family-relationships-with-malpedia",
     "name": "analyzing-malware-family-relationships-with-malpedia",
     "description": "|",
@@ -292,6 +418,34 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:threat-intelligence",
     "tier": "T1"
+  },
+  {
+    "id": "analyzing-malware-persistence-with-autoruns",
+    "name": "analyzing-malware-persistence-with-autoruns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Windows persistence triage with Sysinternals Autoruns (GUI) / Autorunsc (CLI) on an authorized live system or, via -z, an offline forensic disk image. Autoruns enumerates 18+ ASEP (Auto-Start Extensibility Point) categories — Run/RunOnce, services, scheduled tasks, drivers, Winlogon, LSA providers, print monitors, WMI subscriptions, AppInit DLLs — with Authenticode signature verification (hide Microsoft-signed) and VirusTotal hash reputation. Core triage: flag unsigned/(Not verified) binaries, missing Company/Description metadata, suspicious paths (\\\\Temp\\\\, \\\\AppData\\\\Local\\\\Temp, \\\\Users\\\\Public\\\\), and LOLBin launch strings (powershell, cmd /c, wscript, mshta, regsvr32); use the compare/baseline-diff to surface newly added persistence. Map to MITRE ATT&CK (T1547.001 Run-keys, ",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-malware-persistence-with-autoruns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-malware-sandbox-evasion-techniques",
+    "name": "analyzing-malware-sandbox-evasion-techniques",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive analysis of sandbox/VM-evasion (MITRE T1497) in authorized samples by parsing behavioral reports from an ISOLATED Cuckoo/ANY.RUN run. Detect the four evasion families: timing checks (GetTickCount/QueryPerformanceCounter, sleep inflation = requested vs actual sleep delta), VM-artifact detection (registry keys, MAC-prefix lookups, process names like vmtoolsd.exe, WMI hardware queries), user-interaction checks (GetCursorPos/GetAsyncKeyState waiting for mouse/keyboard), and environment fingerprinting (disk size, CPU count, RAM). Score evasion sophistication by technique count + diversity, flag evasive samples for deeper manual analysis, and map to T1497.001/.003, T1480 (execution guardrails), T1027.002 (packing). The lens is purely DEFENSIVE — recognizing evasion to improve detection",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-malware-sandbox-evasion-techniques/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "analyzing-memory-forensics-with-lime-and-volatility",
@@ -376,6 +530,34 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
     "tier": "T1"
+  },
+  {
+    "id": "analyzing-packed-malware-with-upx-unpacker",
+    "name": "analyzing-packed-malware-with-upx-unpacker",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only unpacking to expose packed-malware code for static analysis and detection. Detect packing (entropy >7.0, very few imports, UPX0/UPX1 sections) with Detect It Easy/pefile; try standard upx -d; if magic bytes/section names were tampered to block automated unpacking, repair them and retry; if that fails, manually unpack in x64dbg (PUSHAD → hardware BP on ESP → POPAD → JMP to OEP → Scylla dump + IAT fix); validate the recovered binary (normal entropy, resolved imports). Deliverable is a recovered binary for analysis + YARA/IOCs, run only inside an isolated non-networked VM. Defensive only — never pack/arm a payload or run recovered code on real hosts. Sample handling §5-gated, cost in subscription quota (§11).",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-packed-malware-with-upx-unpacker/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "analyzing-pdf-malware-with-pdfid",
+    "name": "analyzing-pdf-malware-with-pdfid",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive PDF quick-triage with pdfid (the fast counterpart to deep peepdf analysis): scan for high-risk keywords (/JS, /JavaScript, /AA, /OpenAction, /Launch, /EmbeddedFile, /ObjStm) without opening the file, parse flagged objects with pdf-parser, decode streams, carve embedded JS/PE/URLs, then classify exploit vs social-engineering and emit defanged IOCs + escalate-to-peepdf decision. Lab-only: isolated VM with no PDF reader, never detonate; sample handling §5-gated; output is signatures, never a working exploit. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-pdf-malware-with-pdfid/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "analyzing-persistence-mechanisms-in-linux",
@@ -474,6 +656,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
     "tier": "T1"
+  },
+  {
+    "id": "analyzing-supply-chain-malware-artifacts",
+    "name": "analyzing-supply-chain-malware-artifacts",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive supply-chain RE-for-detection (SolarWinds/3CX/npm-PyPI poisoning class): binary-diff a trojanized build against the legitimate version (PE sections, entropy, import deltas, code-signing state via pefile/ssdeep/sigcheck), isolate the injected code, document signing anomalies, reconstruct the infection timeline from build artifacts, and scope downstream impact. Output = IOCs + injected-code analysis + signing-anomaly notes + YARA. Lab-only: isolated VM, never run suspect installers on production; sample handling §5-gated; output is signatures, never a trojanized build. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-supply-chain-malware-artifacts/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "analyzing-threat-actor-ttps-with-mitre-attack",
@@ -1386,6 +1582,20 @@
     "tier": "T1"
   },
   {
+    "id": "c2-communication-analysis",
+    "name": "c2-communication-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive command-and-control protocol analysis (detection, not weaponization). From PCAP captured in a sandbox/lab or from RE of a sample, characterize the C2 channel (HTTP/S blends with web; DNS tunneling = long high-entropy subdomains / TXT volume; ICMP = large payloads; custom TCP/UDP on high ports; WebSocket binary frames; cloud-service abuse Telegram/Discord/GitHub). Measure beaconing (interval, stdev, jitter%) to flag periodic check-ins. Decode message structure (length prefix, type field, Base64/XOR payloads). Fingerprint the framework from default URIs and JA3/JA3S (Cobalt Strike /dpixel /submit.php, Meterpreter staging, Sliver protobuf, Covenant, PoshC2). Map infrastructure (primary/failover/DNS) via passive DNS + scan platforms. Output Suricata rules (HTTP beacon, JA3, DNS-entro",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/c2-communication-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "canary-watch",
     "name": "canary-watch",
     "description": "Use to verify a deployed or locally-running MAS surface after a release, merge, or dependency bump — checks HTTP status, console errors, network/API health, key content, performance regressions, static assets, and SSE streams against a recorded baseline. Do NOT use for interactive UI driving (use webapp-testing), for reviewing a diff (use mas-reviewer), or as the human gate for risky actions (use mas-sec-reviewer).",
@@ -1439,6 +1649,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/clickhouse-io/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:eng-lang",
+    "tier": "T2"
+  },
+  {
+    "id": "cobalt-strike-beacon-config-extraction",
+    "name": "cobalt-strike-beacon-config-extraction",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Cobalt Strike beacon-config extraction (detection, not weaponization). Work only in an isolated/sandboxed VM, never on a production or networked host. The beacon config is a TLV (Type-Length-Value) blob in the PE .data section, single-byte XOR-encoded (0x2e for v4, 0x69 for v3); stageless beacons add a 4-byte code XOR. Use dissect.cobaltstrike / SentinelOne CobaltStrikeParser to parse, or locate-and-XOR manually then walk TLV entries (BeaconType, C2Server, Port, SleepTime, Jitter, UserAgent, PostURI, SpawnTo, Watermark, PipeName, Malleable_C2_Instructions). Extract actionable detection output only: C2 domains/IPs/ports, user-agent, named pipes, spawn-to processes, watermark for operator attribution, and GET/POST URIs. Generate YARA (XOR'd config markers + reflective-loader patter",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/cobalt-strike-beacon-config-extraction/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "cobalt-strike-malleable-c2-profile-analysis",
+    "name": "cobalt-strike-malleable-c2-profile-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Cobalt Strike Malleable C2 profile analysis (detection, not weaponization). Profiles are a DSL that customizes how Beacon talks to the team server — HTTP request/response transforms, URI paths, headers, metadata encoding (Base64/NetBIOS), user agents, sleep/jitter, DNS beacon settings, process-injection (spawn-to, allocation). Threat actors use them to mimic Amazon/Google/Slack traffic. Parse with dissect.cobaltstrike (C2Profile.from_path) or pyMalleableC2 (Lark/AST). Extract for detection: GET/POST URIs + headers + params, user-agent and spoof target, sleep/jitter, DNS settings, spawn-to paths, staging URIs. Output: JSON IOC report + Suricata/Snort signatures, then compare against public threat-actor profile collections for attribution. Lab-only: never deploy a profile or operat",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/cobalt-strike-malleable-c2-profile-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
     "tier": "T2"
   },
   {
@@ -2263,6 +2501,34 @@
     "tier": "T1"
   },
   {
+    "id": "deobfuscating-javascript-malware",
+    "name": "deobfuscating-javascript-malware",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive JS RE-for-detection: extract obfuscated JavaScript without executing it, classify the obfuscation (hex/unicode/base64/charCode, string-array rotation, control-flow, anti-debug), neutralize anti-analysis traps (debugger loops, DevTools/timing checks), decode string layers, and resolve eval/Function/document.write chains in a Node vm sandbox with intercepted APIs (return-not-run) to reveal the payload (credential harvester, Magecart skimmer, redirect, exploit-kit). Emit defanged IOCs + YARA. Lab-only: isolated VM, never run on a connected system; output is signatures, never a working skimmer. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deobfuscating-javascript-malware/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "deobfuscating-powershell-obfuscated-malware",
+    "name": "deobfuscating-powershell-obfuscated-malware",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive PowerShell RE-for-detection: identify and classify layered obfuscation (Base64 EncodedCommand, FromBase64String, string concat, [char] arrays, tick-marks, env-var abuse, ConvertTo-SecureString, -bxor, Deflate/GZip, Replace chains), then unwrap iteratively via AST evaluation and IEX→Write-Output substitution (capture-not-execute), and extract IOCs (URLs/IPs/paths/registry/suspicious cmdlets) from the final stage. Lab-only: isolated VM/sandbox, never run unmodified on production; IEX substitution makes execution safe; output is signatures, never a working dropper. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/deobfuscating-powershell-obfuscated-malware/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "deploying-cloudflare-access-for-zero-trust",
     "name": "deploying-cloudflare-access-for-zero-trust",
     "description": "|",
@@ -2865,6 +3131,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-fileless-malware-techniques",
+    "name": "detecting-fileless-malware-techniques",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of fileless malware that lives in memory / LOLBins without dropping executables. Detect LOLBin abuse (mshta with URL/vbscript:, regsvr32 /i:http 'Squiblydoo', certutil -urlcache/-decode, rundll32 javascript:, wmic /format:http, bitsadmin /transfer, cmstp /ni), WMI-event-subscription persistence (Sysmon EID 19/20/21 = __EventFilter/CommandLine|ActiveScript-EventConsumer/__FilterToConsumerBinding), registry-resident Base64 payloads in Run/Environment keys, and in-memory .NET reflection (Assembly.Load, FromBase64String, Invoke-Expression download cradles). Evidence sources: Sysmon, PowerShell Script Block Logging (EID 4104, post-deobfuscation), Autoruns, and Volatility (malfind, cmdline, vadinfo). Ship Sigma rules for LOLBin+network and WMI-persistence, and map the full ch",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-fileless-malware-techniques/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "detecting-golden-ticket-attacks-in-kerberos-logs",
     "name": "detecting-golden-ticket-attacks-in-kerberos-logs",
     "description": "|",
@@ -3173,6 +3453,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-process-injection-techniques",
+    "name": "detecting-process-injection-techniques",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection + classification of process injection (MITRE T1055.*) on authorized systems. Memory-forensics signal: Volatility malfind (PAGE_EXECUTE_READWRITE non-image VAD with MZ/PE header = injected code), windows.vadinfo for VAD anomalies, windows.hollowfind for image-vs-disk mismatch (hollowing). Sysmon signal: EID 8 CreateRemoteThread (SourceImage != TargetImage into svchost/lsass/explorer/winlogon), EID 10 ProcessAccess with PROCESS_VM_WRITE 0x0020 + CREATE_THREAD 0x0002. Classify the technique from its API artifact chain (classic DLL inj, process hollowing/RunPE, APC, thread hijacking, reflective DLL, doppelganging, AtomBombing) and map to T1055 sub-techniques (.001 DLL/.002 PE/.003 thread-hijack/.004 APC/.012 hollowing/.013 doppelganging). Verify by dumping the injected regi",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-process-injection-techniques/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "detecting-qr-code-phishing-with-email-security",
     "name": "detecting-qr-code-phishing-with-email-security",
     "description": "|",
@@ -3227,6 +3521,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:threat-detection",
     "tier": "T1"
+  },
+  {
+    "id": "detecting-rootkit-activity",
+    "name": "detecting-rootkit-activity",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Live/offline rootkit DETECTION (distinct from RE of a sample). Prefer offline memory forensics (Volatility 3) over trusting a live compromised host. Cross-view detection: diff psscan vs pslist to find DKOM-hidden processes; windows.ssdt/idt/apihooks/driverirp for SSDT/IDT/inline/IRP hooks; modules vs modscan + driverscan + verinfo for hidden/unsigned drivers; filescan/registry/svcscan for hidden files/keys/services; netscan for covert connections; rkhunter/chkrootkit/rpm -Va/debsums on Linux; YARA scan + kernel integrity diff (moddump vs known-good). Deliverable is a detection report: hidden objects, hook map, driver IOCs, remediation (boot clean, remove driver offline, verify boot persistence). Defensive only — never build/install rootkits. Memory acquisition §5-gated, cost in subscriptio",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-rootkit-activity/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "detecting-s3-data-exfiltration-attempts",
@@ -7087,6 +7395,20 @@
     "tier": "T1"
   },
   {
+    "id": "malware-network-traffic-analysis",
+    "name": "malware-network-traffic-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive malware network-traffic analysis (detection, not weaponization). Given a PCAP captured in a sandbox/lab, get an overview (capinfos, tshark protocol hierarchy, top talkers, conversations), triage DNS for DGA (high-entropy domains) and tunneling (large TXT), inspect HTTP/S C2 (requests, POST exfil, payload downloads) and TLS (SNI, JA3, cert details), detect beaconing (interval mean/stdev/jitter%), and extract transferred files/objects with Zeek/NetworkMiner/tshark (then hash them). Generate Suricata/Snort signatures from observed patterns (URI beacon, DNS C2 domain, JA3 hash) and run existing rulesets against the PCAP. Output a structured malware-network report (DNS activity, C2 channel, payload downloads, exfiltration, alerts, generated SIDs). Lab-only: never run the sample on a p",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/malware-network-traffic-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "managing-cloud-identity-with-okta",
     "name": "managing-cloud-identity-with-okta",
     "description": "|",
@@ -7350,6 +7672,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/network-config-validation/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:vertical",
+    "tier": "T2"
+  },
+  {
+    "id": "network-covert-channel-analysis",
+    "name": "network-covert-channel-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive covert-channel detection (detection, not weaponization). Malware hides C2/exfil in legitimate-looking traffic: DNS tunneling (iodine, dnscat2) encodes data in queries/responses; ICMP tunneling (icmpsh, ptunnel) hides data in echo payloads; HTTP covert channels embed data in headers/cookies/steganographic images; protocol abuse slips through allowed ports. Detect DNS tunneling by scoring per-base-domain: long subdomains (avg >30 chars), high uniqueness ratio (>0.9), high Shannon entropy (>4.0), many TXT queries — sum to a suspicion score. Detect ICMP tunneling via large/frequent payloads (avg >64 bytes or >100 packets/flow). Distinguish tunneling from legitimate CDN/cloud traffic; estimate exfil volume. Lab-only analysis on captured PCAP; never build or run a tunnel on a productio",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/network-covert-channel-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
     "tier": "T2"
   },
   {
@@ -7633,6 +7969,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-automated-malware-analysis-with-cape",
+    "name": "performing-automated-malware-analysis-with-cape",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive automated malware analysis with self-hosted CAPEv2 (Config And Payload Extraction, a Cuckoo derivative) on an ISOLATED lab VM with no production connectivity. CAPE hooks the Windows API for behavioral instrumentation, captures dropped/created/deleted files and PCAP network traffic, runs 1000+ behavioral signatures, and applies 70+ family config-extractors (cape-parsers for Emotet/TrickBot/Cobalt Strike/AsyncRAT/Rhadamanthys) plus a debugger for anti-evasion bypass. Submit authorized samples via the apiv2 REST API, poll to 'reported', then pull extracted configs, dropped-file list, and network IOCs. The deliverable is detection content (configs, IOCs, YARA, behavioral signatures), NOT a redistributable payload. Map to MITRE ATT&CK (T1027 obfuscation, T1055 injection, T1140 deobfus",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-automated-malware-analysis-with-cape/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "performing-cloud-asset-inventory-with-cartography",
     "name": "performing-cloud-asset-inventory-with-cartography",
     "description": "|",
@@ -7857,6 +8207,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-dynamic-analysis-with-any-run",
+    "name": "performing-dynamic-analysis-with-any-run",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive interactive dynamic analysis with the ANY.RUN cloud sandbox: detonate an authorized sample in a remote isolated VM and interact live (click 'Enable Content' on macro docs, accept installer/UAC prompts, navigate redirects) to trigger user-dependent payloads that non-interactive sandboxes miss. Capture the process tree (e.g. WINWORD→cmd→powershell -enc→rundll32), network IOCs (DNS, MITM-decrypted HTTPS C2, payload downloads), dropped-file hashes, mutexes, Suricata alerts, and ANY.RUN's auto MITRE ATT&CK mapping; export IOCs (STIX/JSON/CSV) and PCAP. Critical confidentiality gate: ANY.RUN is a cloud service — never upload samples containing sensitive/org data (use an on-prem sandbox instead); free-tier tasks are PUBLIC. Deliverable is detection content, not a payload. Maps to MITRE ",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-dynamic-analysis-with-any-run/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "performing-endpoint-forensics-investigation",
     "name": "performing-endpoint-forensics-investigation",
     "description": "|",
@@ -7911,6 +8275,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
     "tier": "T1"
+  },
+  {
+    "id": "performing-firmware-malware-analysis",
+    "name": "performing-firmware-malware-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive firmware RE-for-detection: extract firmware components with binwalk (bootloader/kernel/rootfs/SquashFS/JFFS2), inspect the filesystem for backdoors (startup scripts, SUID, modified .so, hardcoded creds, rogue SSH keys, cron reverse shells), reverse suspect ARM/MIPS binaries (Ghidra/radare2), diff hashes vs known-good vendor baseline, and analyze UEFI/BIOS for bootkits (UEFITool/chipsec; LoJax/MoonBounce/BlackLotus families). Emulate only inside the lab (QEMU/firmadyne) for behavioral C2 discovery. Output = IOCs + modified-file list + YARA. Lab-only: isolated VM, never flash/run on production hardware. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-firmware-malware-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "performing-gcp-security-assessment-with-forseti",
@@ -8093,6 +8471,34 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:soc-operations",
     "tier": "T1"
+  },
+  {
+    "id": "performing-malware-triage-with-yara",
+    "name": "performing-malware-triage-with-yara",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive YARA triage = APPLYING rules (distinct from authoring): scan files/dirs/memory dumps with existing community and commercial rule sets (signature-base, Malpedia, YARA-Rules), use compiled rules and timeouts for speed, batch-classify large sample sets with yara-python, and route classified samples to deeper RE. Output = classification summary + per-sample matches + defanged IOCs. Lab-only: isolated VM, sample handling §5-gated; a YARA hit is triage not full analysis (it only finds known patterns). For writing new rules see the yara-rule-development skill. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-malware-triage-with-yara/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "performing-memory-forensics-with-volatility3-plugins",
+    "name": "performing-memory-forensics-with-volatility3-plugins",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive memory-forensics AUTOMATION with Volatility 3 (v2.26+, the post-Volatility2 standard): a reusable Python harness (Vol3Analyzer) that drives plugins programmatically in JSON mode for repeatable malware triage of an authorized RAM image. Core moves: windows.malfind (RWX/PAGE_EXECUTE_READWRITE non-file-backed injection), pslist-vs-psscan set-difference to surface rootkit-hidden processes, windows.netscan (C2 endpoints correlated to PIDs), windows.dlllist (loaded modules), windows.handles, and windows.yarascan (in-memory signature matching). Distinct from the manual-CLI memory-forensics playbook: this is the scriptable plugin-automation angle (subprocess + JSON parsing into a results dict) for batch/repeatable DFIR. Cross-cluster near-duplicates exist in library (conducting-memory-fo",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-memory-forensics-with-volatility3-plugins/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "performing-network-traffic-analysis-with-tshark",
@@ -8347,6 +8753,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-static-malware-analysis-with-pe-studio",
+    "name": "performing-static-malware-analysis-with-pe-studio",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive static (no-execution) triage of an authorized Windows PE sample with PEStudio on an isolated workstation, plus pefile/FLOSS/Detect-It-Easy. Compute MD5/SHA-1/SHA-256 and check VirusTotal reputation; inspect PE headers (compile timestamp — forgeable, architecture, subsystem) and the section table (entropy >7.0 in .text/.rsrc = likely packing; high virtual/raw ratio = unpacking stub); categorize the Import Address Table into capabilities (injection: VirtualAllocEx/WriteProcessMemory/CreateRemoteThread; keylogging: GetAsyncKeyState/SetWindowsHookEx; evasion: IsDebuggerPresent; network: InternetOpen/URLDownloadToFile; crypto: CryptEncrypt; persistence: RegSetValueEx); extract ASCII+Unicode strings and FLOSS-deobfuscated strings for URLs/IPs/registry keys/paths; inspect resources for ",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-static-malware-analysis-with-pe-studio/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "performing-threat-hunting-with-elastic-siem",
     "name": "performing-threat-hunting-with-elastic-siem",
     "description": "|",
@@ -8443,6 +8863,20 @@
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:network-security",
     "tier": "T1"
+  },
+  {
+    "id": "performing-yara-rule-development-for-detection",
+    "name": "performing-yara-rule-development-for-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive YARA authoring = WRITING rules (distinct from applying): from analyzed unpacked malware, extract candidate strings/imports/unique byte patterns, then craft rules targeting stable family-unique anchors (hardcoded stack strings, C2 patterns, mutex names, encryption constants, code sequences) — not packer signatures. Combine text/wide/hex (wildcards+jumps)/regex with PE-module + filesize conditions, order conditions for short-circuit performance, use private building-block rules, and validate for zero false negatives on family samples + <0.1% FP on a clean corpus. Lab-only: isolated VM, sample handling §5-gated; rules are detection artifacts, never evasion tooling. For running rules see the triage skill. Subscription quota, never $/€.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-yara-rule-development-for-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
   },
   {
     "id": "perl-patterns",
@@ -8781,6 +9215,20 @@
     "tier": "T1"
   },
   {
+    "id": "ransomware-encryption-analysis",
+    "name": "ransomware-encryption-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ransomware encryption analysis (RE for recovery + detection, not weaponization). FOLD of two source skills (analyzing-ransomware-encryption-mechanisms + reverse-engineering-ransomware-encryption-routine). Work only in an isolated/sandboxed VM. Identify the scheme: inspect crypto-API imports (CryptGenKey/CryptEncrypt, BCrypt*, OpenSSL EVP/RSA) and embedded constants (AES S-box, ChaCha20 'expand 32-byte k', RSA ASN.1/PEM markers) to determine algorithm, key size, and mode. Common hybrid: per-file AES-256-CBC/CTR or ChaCha20 wrapped by RSA-2048/4096 or Curve25519. Map key management strength: STRONG (CSPRNG per-file key + RSA wrap, attacker holds private key = no recovery) vs WEAK/FLAWED (predictable seed from timestamp/PID, single static key, IV reuse, ECB pattern leakage, key left",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ransomware-encryption-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
     "id": "react-patterns",
     "name": "react-patterns",
     "description": "|",
@@ -8946,6 +9394,62 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/returns-reverse-logistics/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:vertical",
+    "tier": "T2"
+  },
+  {
+    "id": "reverse-engineering-android-malware-with-jadx",
+    "name": "reverse-engineering-android-malware-with-jadx",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only JADX workflow for Android malware (banking trojans, spyware, SMS stealers). Extract APK metadata + dangerous permissions (READ/RECEIVE/SEND_SMS, SYSTEM_ALERT_WINDOW overlay, BIND_ACCESSIBILITY/DEVICE_ADMIN) via aapt2/androguard; decompile DEX→Java with JADX (--deobf) to read source; grep for network, SMS, overlay, accessibility-abuse, exfiltration, crypto, dynamic-code-loading and obfuscation patterns; trace C2 URLs/IPs/Base64; inspect native .so libs (hand off to Ghidra). Run only in an isolated emulator without Google services. Deliverable is detection: family, abused permissions, malicious components, C2 infra, IOCs, YARA. Defensive only — never build/repack/sign/run payloads. Sample handling §5-gated, cost in subscription quota (§11).",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/reverse-engineering-android-malware-with-jadx/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "reverse-engineering-dotnet-malware-with-dnspy",
+    "name": "reverse-engineering-dotnet-malware-with-dnspy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only workflow for managed .NET malware: confirm a .NET assembly (COM descriptor / mscoree.dll), detect the obfuscator with Detect It Easy (ConfuserEx/SmartAssembly/Dotfuscator/Reactor/Babel), deobfuscate with de4dot (-p cf/sa/dr/rv/bl), open in dnSpy/dnSpyEx and read decompiled C#/VB.NET, extract hardcoded config (static Config classes, runtime-decrypted strings, resource-embedded blobs) and, when needed, breakpoint decryption methods in the dnSpy debugger to capture decrypted values — strictly inside an isolated non-networked VM (stealers exfiltrate on run). Deliverable is detection: C2 config, capabilities, persistence, IOCs, YARA. Defensive RE only — never build/recompile-for-deployment/run payloads. Sample handling §5-gated, cost in subscription quota (§11).",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/reverse-engineering-dotnet-malware-with-dnspy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "reverse-engineering-malware-with-ghidra",
+    "name": "reverse-engineering-malware-with-ghidra",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only Ghidra workflow to reverse a native malware binary for detection: import + auto-analyze in an isolated VM, locate entry point and suspicious API XREFs (VirtualAlloc, CreateRemoteThread, CryptEncrypt, WinHTTP, RegSetValueEx), read decompiled pseudo-C to recover decryptors and the C2 command dispatcher, identify crypto (XOR/RC4/AES/Base64 constants via FindCrypt), then emit YARA rules + extracted IOCs (C2 URLs, keys, campaign IDs). Defensive RE for signature/IOC production — never to construct or run payloads. In MAOS this is library-tier (T2) cognition; sample acquisition/handling is §5-gated and execution is lab-only; cost is subscription quota (§11), never per-token cash.",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/reverse-engineering-malware-with-ghidra/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
+    "tier": "T2"
+  },
+  {
+    "id": "reverse-engineering-rust-malware",
+    "name": "reverse-engineering-rust-malware",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Lab-only RE workflow for Rust malware (BlackCat/ALPHV, Hive, Buer), whose static linking, monomorphization, fat-pointer strings, and Result/Option chains make decompiled C unhelpful. Identify Rust via panic strings, core::panicking, std::rt::lang_start, .cargo/registry paths and rustc version; extract crate names+versions from cargo/crates.io paths and flag malware-relevant crates (reqwest/hyper/tokio, aes/chacha20/rsa/ring, winapi/winreg, sysinfo/screenshots/clipboard); handle non-null-terminated strings in .rodata. Deliverable is detection: crate-derived capabilities + located crypto/net/persistence + YARA/IOCs. Defensive RE only — never build/obfuscate/run Rust payloads. Sample handling §5-gated, execution lab-only, cost in subscription quota (§11).",
+    "tags": [
+      "cyber:malware-analysis"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/reverse-engineering-rust-malware/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:malware-analysis",
     "tier": "T2"
   },
   {
