@@ -564,7 +564,7 @@ cyber-skill	cyber:blockchain-security	analyzing-ethereum-smart-contract-vulnerab
 cyber-skill	cyber:malware-analysis	analyzing-golang-malware-with-ghidra	integrated	adapt	decisions/cyber-malware-analysis-K.md
 cyber-skill	cyber:malware-analysis	analyzing-heap-spray-exploitation	integrated	adapt	decisions/cyber-malware-analysis-M.md
 cyber-skill	cyber:threat-intelligence	analyzing-indicators-of-compromise	integrated	adapt	decisions/cyber-threat-intelligence-C.md
-cyber-skill	cyber:mobile-security	analyzing-ios-app-security-with-objection	pending		
+cyber-skill	cyber:mobile-security	analyzing-ios-app-security-with-objection	rejected	fold	decisions/cyber-mobile-security-BB.md
 cyber-skill	cyber:container-security	analyzing-kubernetes-audit-logs	integrated	adapt	decisions/cyber-DH.md
 cyber-skill	cyber:incident-response	analyzing-linux-audit-logs-for-intrusion	integrated	adapt	decisions/cyber-DS.md
 cyber-skill	cyber:malware-analysis	analyzing-linux-elf-malware	integrated	adapt	decisions/cyber-malware-analysis-K.md
@@ -769,7 +769,7 @@ cyber-skill	cyber:threat-detection	detecting-living-off-the-land-with-lolbas	rej
 cyber-skill	cyber:threat-hunting	detecting-malicious-scheduled-tasks-with-sysmon	integrated	adapt	decisions/cyber-threat-hunting-H.md
 cyber-skill	cyber:threat-hunting	detecting-mimikatz-execution-patterns	integrated	adapt	decisions/cyber-threat-hunting-F.md
 cyber-skill	cyber:cloud-security	detecting-misconfigured-azure-storage	integrated	adapt	decisions/cyber-EQ.md
-cyber-skill	cyber:mobile-security	detecting-mobile-malware-behavior	pending		
+cyber-skill	cyber:mobile-security	detecting-mobile-malware-behavior	integrated	adapt	decisions/cyber-mobile-security-BB.md
 cyber-skill	cyber:ot-ics-security	detecting-modbus-command-injection-attacks	integrated	adapt	decisions/cyber-ot-ics-security-S.md
 cyber-skill	cyber:ot-ics-security	detecting-modbus-protocol-anomalies	integrated	adapt	decisions/cyber-ot-ics-security-S.md
 cyber-skill	cyber:network-security	detecting-network-anomalies-with-zeek	integrated	adapt	decisions/cyber-EX.md
@@ -817,11 +817,11 @@ cyber-skill	cyber:network-security	exploiting-bgp-hijacking-vulnerabilities	inte
 cyber-skill	cyber:api-security	exploiting-broken-function-level-authorization	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:web-application-security	exploiting-broken-link-hijacking	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:red-teaming	exploiting-constrained-delegation-abuse	integrated	adapt	decisions/cyber-red-teaming-Z.md
-cyber-skill	cyber:mobile-security	exploiting-deeplink-vulnerabilities	pending		
+cyber-skill	cyber:mobile-security	exploiting-deeplink-vulnerabilities	integrated	adapt	decisions/cyber-mobile-security-CC.md
 cyber-skill	cyber:api-security	exploiting-excessive-data-exposure-in-api	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:web-application-security	exploiting-http-request-smuggling	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:web-application-security	exploiting-idor-vulnerabilities	integrated	adapt	decisions/cyber-DD.md
-cyber-skill	cyber:mobile-security	exploiting-insecure-data-storage-in-mobile	pending		
+cyber-skill	cyber:mobile-security	exploiting-insecure-data-storage-in-mobile	integrated	adapt	decisions/cyber-mobile-security-CC.md
 cyber-skill	cyber:web-application-security	exploiting-insecure-deserialization	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:network-security	exploiting-ipv6-vulnerabilities	integrated	adapt	decisions/cyber-FA.md
 cyber-skill	cyber:api-security	exploiting-jwt-algorithm-confusion-attack	integrated	adapt	decisions/cyber-DC.md
@@ -980,7 +980,7 @@ cyber-skill	cyber:endpoint-security	implementing-memory-protection-with-dep-aslr
 cyber-skill	cyber:zero-trust-architecture	implementing-microsegmentation-with-guardicore	integrated	adapt	decisions/cyber-EJ.md
 cyber-skill	cyber:phishing-defense	implementing-mimecast-targeted-attack-protection	rejected	fold	decisions/cyber-EL.md
 cyber-skill	cyber:soc-operations	implementing-mitre-attack-coverage-mapping	integrated	adapt	decisions/cyber-DY.md
-cyber-skill	cyber:mobile-security	implementing-mobile-application-management	pending		
+cyber-skill	cyber:mobile-security	implementing-mobile-application-management	integrated	adapt	decisions/cyber-mobile-security-BB.md
 cyber-skill	cyber:security-operations	implementing-mtls-for-zero-trust-services	integrated	adapt	decisions/cyber-EE.md
 cyber-skill	cyber:ot-ics-security	implementing-nerc-cip-compliance-controls	integrated	adapt	decisions/cyber-ot-ics-security-T.md
 cyber-skill	cyber:network-security	implementing-network-access-control-with-cisco-ise	rejected	fold	decisions/cyber-EY.md
@@ -1056,7 +1056,7 @@ cyber-skill	cyber:zero-trust	implementing-zero-trust-with-beyondcorp	pending
 cyber-skill	cyber:zero-trust-architecture	implementing-zero-trust-with-hashicorp-boundary	integrated	adapt	decisions/cyber-EJ.md
 cyber-skill	cyber:devsecops	integrating-dast-with-owasp-zap-in-pipeline	integrated	adapt	decisions/cyber-DG.md
 cyber-skill	cyber:devsecops	integrating-sast-into-github-actions-pipeline	integrated	adapt	decisions/cyber-DG.md
-cyber-skill	cyber:mobile-security	intercepting-mobile-traffic-with-burpsuite	pending		
+cyber-skill	cyber:mobile-security	intercepting-mobile-traffic-with-burpsuite	integrated	adapt	decisions/cyber-mobile-security-CC.md
 cyber-skill	cyber:soc-operations	investigating-insider-threat-indicators	integrated	adapt	decisions/cyber-DZ.md
 cyber-skill	cyber:soc-operations	investigating-phishing-email-incident	integrated	adapt	decisions/cyber-DZ.md
 cyber-skill	cyber:digital-forensics	investigating-ransomware-attack-artifacts	integrated	adapt	decisions/cyber-digital-forensics-Q.md
@@ -1076,7 +1076,7 @@ cyber-skill	cyber:phishing-defense	performing-adversary-in-the-middle-phishing-d
 cyber-skill	cyber:vulnerability-management	performing-agentless-vulnerability-scanning	integrated	adapt	decisions/cyber-DL.md
 cyber-skill	cyber:threat-intelligence	performing-ai-driven-osint-correlation	integrated	adapt	decisions/cyber-threat-intelligence-D.md
 cyber-skill	cyber:soc-operations	performing-alert-triage-with-elastic-siem	integrated	adapt	decisions/cyber-DZ.md
-cyber-skill	cyber:mobile-security	performing-android-app-static-analysis-with-mobsf	pending		
+cyber-skill	cyber:mobile-security	performing-android-app-static-analysis-with-mobsf	integrated	adapt	decisions/cyber-mobile-security-BB.md
 cyber-skill	cyber:api-security	performing-api-fuzzing-with-restler	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:api-security	performing-api-inventory-and-discovery	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:api-security	performing-api-rate-limiting-bypass	integrated	adapt	decisions/cyber-DC.md
@@ -1119,7 +1119,7 @@ cyber-skill	cyber:phishing-defense	performing-dmarc-policy-enforcement-rollout	i
 cyber-skill	cyber:network-security	performing-dns-enumeration-and-zone-transfer	integrated	adapt	decisions/cyber-FA.md
 cyber-skill	cyber:security-operations	performing-dns-tunneling-detection	integrated	adapt	decisions/cyber-EF.md
 cyber-skill	cyber:container-security	performing-docker-bench-security-assessment	integrated	adapt	decisions/cyber-DJ.md
-cyber-skill	cyber:mobile-security	performing-dynamic-analysis-of-android-app	pending		
+cyber-skill	cyber:mobile-security	performing-dynamic-analysis-of-android-app	integrated	adapt	decisions/cyber-mobile-security-BB.md
 cyber-skill	cyber:malware-analysis	performing-dynamic-analysis-with-any-run	integrated	adapt	decisions/cyber-malware-analysis-L.md
 cyber-skill	cyber:endpoint-security	performing-endpoint-forensics-investigation	integrated	adapt	decisions/cyber-DW.md
 cyber-skill	cyber:endpoint-security	performing-endpoint-vulnerability-remediation	integrated	adapt	decisions/cyber-DW.md
@@ -1143,7 +1143,7 @@ cyber-skill	cyber:threat-intelligence	performing-indicator-lifecycle-management	
 cyber-skill	cyber:red-teaming	performing-initial-access-with-evilginx3	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:incident-response	performing-insider-threat-investigation	integrated	adapt	decisions/cyber-DU.md
 cyber-skill	cyber:soc-operations	performing-ioc-enrichment-automation	integrated	adapt	decisions/cyber-DZ.md
-cyber-skill	cyber:mobile-security	performing-ios-app-security-assessment	pending		
+cyber-skill	cyber:mobile-security	performing-ios-app-security-assessment	integrated	adapt	decisions/cyber-mobile-security-BB.md
 cyber-skill	cyber:penetration-testing	performing-iot-security-assessment	pending		
 cyber-skill	cyber:threat-intelligence	performing-ip-reputation-analysis-with-shodan	integrated	adapt	decisions/cyber-threat-intelligence-D.md
 cyber-skill	cyber:api-security	performing-jwt-none-algorithm-attack	integrated	adapt	decisions/cyber-DC.md
@@ -1162,7 +1162,7 @@ cyber-skill	cyber:digital-forensics	performing-malware-persistence-investigation
 cyber-skill	cyber:malware-analysis	performing-malware-triage-with-yara	integrated	adapt	decisions/cyber-malware-analysis-M.md
 cyber-skill	cyber:malware-analysis	performing-memory-forensics-with-volatility3-plugins	integrated	adapt	decisions/cyber-malware-analysis-L.md
 cyber-skill	cyber:digital-forensics	performing-memory-forensics-with-volatility3	integrated	adapt	decisions/cyber-digital-forensics-Q.md
-cyber-skill	cyber:mobile-security	performing-mobile-app-certificate-pinning-bypass	pending		
+cyber-skill	cyber:mobile-security	performing-mobile-app-certificate-pinning-bypass	integrated	adapt	decisions/cyber-mobile-security-CC.md
 cyber-skill	cyber:digital-forensics	performing-mobile-device-forensics-with-cellebrite	integrated	adapt	decisions/cyber-digital-forensics-R.md
 cyber-skill	cyber:digital-forensics	performing-network-forensics-with-wireshark	rejected	fold	decisions/cyber-digital-forensics-R.md
 cyber-skill	cyber:digital-forensics	performing-network-packet-capture-analysis	integrated	adapt	decisions/cyber-digital-forensics-R.md
@@ -1245,7 +1245,7 @@ cyber-skill	cyber:ransomware-defense	recovering-from-ransomware-attack	integrate
 cyber-skill	cyber:cloud-security	remediating-s3-bucket-misconfiguration	integrated	adapt	decisions/cyber-EU.md
 cyber-skill	cyber:malware-analysis	reverse-engineering-android-malware-with-jadx	integrated	adapt	decisions/cyber-malware-analysis-K.md
 cyber-skill	cyber:malware-analysis	reverse-engineering-dotnet-malware-with-dnspy	integrated	adapt	decisions/cyber-malware-analysis-K.md
-cyber-skill	cyber:mobile-security	reverse-engineering-ios-app-with-frida	pending		
+cyber-skill	cyber:mobile-security	reverse-engineering-ios-app-with-frida	integrated	adapt	decisions/cyber-mobile-security-BB.md
 cyber-skill	cyber:malware-analysis	reverse-engineering-malware-with-ghidra	integrated	adapt	decisions/cyber-malware-analysis-K.md
 cyber-skill	cyber:malware-analysis	reverse-engineering-ransomware-encryption-routine	rejected	fold	decisions/cyber-malware-analysis-N.md
 cyber-skill	cyber:malware-analysis	reverse-engineering-rust-malware	integrated	adapt	decisions/cyber-malware-analysis-K.md
@@ -1267,7 +1267,7 @@ cyber-skill	cyber:ot-ics-security	securing-historian-server-in-ot-environment	in
 cyber-skill	cyber:cloud-security	securing-kubernetes-on-cloud	integrated	adapt	decisions/cyber-EV.md
 cyber-skill	cyber:ot-ics-security	securing-remote-access-to-ot-environment	integrated	adapt	decisions/cyber-ot-ics-security-T.md
 cyber-skill	cyber:cloud-security	securing-serverless-functions	integrated	adapt	decisions/cyber-EV.md
-cyber-skill	cyber:mobile-security	testing-android-intents-for-vulnerabilities	pending		
+cyber-skill	cyber:mobile-security	testing-android-intents-for-vulnerabilities	integrated	adapt	decisions/cyber-mobile-security-CC.md
 cyber-skill	cyber:api-security	testing-api-authentication-weaknesses	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:api-security	testing-api-for-broken-object-level-authorization	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:api-security	testing-api-for-mass-assignment-vulnerability	integrated	adapt	decisions/cyber-DB.md
@@ -1285,7 +1285,7 @@ cyber-skill	cyber:web-application-security	testing-for-xss-vulnerabilities-with-
 cyber-skill	cyber:penetration-testing	testing-for-xss-vulnerabilities	pending		
 cyber-skill	cyber:web-application-security	testing-for-xxe-injection-vulnerabilities	integrated	adapt	decisions/cyber-web-application-security-W.md
 cyber-skill	cyber:web-application-security	testing-jwt-token-security	integrated	adapt	decisions/cyber-web-application-security-X.md
-cyber-skill	cyber:mobile-security	testing-mobile-api-authentication	pending		
+cyber-skill	cyber:mobile-security	testing-mobile-api-authentication	integrated	adapt	decisions/cyber-mobile-security-CC.md
 cyber-skill	cyber:api-security	testing-oauth2-implementation-flaws	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:incident-response	testing-ransomware-recovery-procedures	integrated	adapt	decisions/cyber-DU.md
 cyber-skill	cyber:api-security	testing-websocket-api-security	integrated	adapt	decisions/cyber-DC.md
