@@ -2963,6 +2963,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-anomalies-in-industrial-control-systems",
+    "name": "detecting-anomalies-in-industrial-control-systems",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Behavior-based OT/ICS anomaly detection: build multi-dimensional deterministic baselines (per master-slave timing/interval, function-code allowlist, topology of authorized comm pairs) from 2-4 weeks of passive SPAN/TAP capture, then detect new comm pairs, polling-interval z-score deviations, unauthorized function codes, and physics-model violations. Uses Isolation Forest on low-anomaly-rate OT traffic plus rule-based topology/timing/function checks; correlate with historian process data to catch sensor-spoofing. Passive-first (read-only on mirrored traffic); any active query is a §5-gated maintenance-window action. Frameworks: IEC 62443, MITRE ATT&CK for ICS, NIST CSF, NIST AI RMF. In MAOS this is library reference only — no live OT actuation, costs in subscription quota not cash (§11).",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-anomalies-in-industrial-control-systems/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-anomalous-authentication-patterns",
     "name": "detecting-anomalous-authentication-patterns",
     "description": "|",
@@ -3002,6 +3016,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-arp-poisoning-in-network-traffic/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-attacks-on-historian-servers",
+    "name": "detecting-attacks-on-historian-servers",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detect attacks on OT historians (OSIsoft PI, Ignition, Wonderware, GE Proficy) sitting at the IT/OT pivot boundary. Three angles: (1) unauthorized-client detection by comparing live historian connections against a baseline of authorized client IPs; (2) data-integrity checks via read-only API — flatline/constant-value (replay/spoof), data gaps (deletion), out-of-range values; (3) lateral-movement indicators — historian initiating outbound connections to PLC ports (502/102/44818), unexpected process creation, anomalous auth (Win 4624). All via read-only historian API queries + passive log review; credentials use a least-privilege read-only account, never embedded secrets. Map findings to MITRE ATT&CK for ICS (T0811/T0882/T0846/T0859/T0832). Frameworks: MITRE ATT&CK for ICS, NIST CSF, IEC 624",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-attacks-on-historian-servers/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-attacks-on-scada-systems",
+    "name": "detecting-attacks-on-scada-systems",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Signature/IOC-driven SCADA attack detection across Modbus/DNP3/S7comm/IEC-104/OPC. Four moves: (1) establish deterministic comm baselines (function codes, polling intervals, register ranges) from passive captures; (2) deploy OT-aware IDS rules (Suricata/Zeek) for unauthorized writes, broadcast writes, S7 CPU-STOP, DNP3 cold restart, port scans, new devices; (3) physics/historian process-anomaly detection (out-of-range, rate-of-change, flatline, z-score) to catch Stuxnet-style sensor spoofing; (4) known-ICS-malware IOC matching (TRITON/TRISIS, Industroyer/CrashOverride, PIPEDREAM/INCONTROLLER). Passive SPAN/TAP monitoring is the default; SIS-related alerts are safety-critical and go to process safety immediately. Frameworks: IEC 62443, MITRE ATT&CK for ICS, NIST CSF, NIST AI RMF. MAOS: libr",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-attacks-on-scada-systems/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {
@@ -3285,6 +3327,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-dnp3-protocol-anomalies",
+    "name": "detecting-dnp3-protocol-anomalies",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detect DNP3 protocol anomalies in energy-sector SCADA (master/outstation over TCP 20000 or serial). Passive deep-packet inspection parses the DNP3 data-link + application headers and flags: unauthorized DNP3 master (src not in authorized-master baseline), cold/warm restart commands (FC 0x0D/0x0E — DoS), file operations (FC 0x19-0x1E — firmware update / PIPEDREAM indicator), unexpected Select/Operate control commands (FC 0x03-0x06) not in the per-pair baseline, and anomalous function codes. Requires authorized master→outstation topology, expected function-code sets, and Suricata/Zeek DNP3 parser. Recommends DNP3 Secure Authentication (SA v5) as remediation. Passive TAP/SPAN only — never transmit DNP3 to a live outstation. Map to MITRE ATT&CK for ICS (T0816 Device Restart, T0839 Module Firmw",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-dnp3-protocol-anomalies/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-dns-exfiltration-with-dns-query-analysis",
     "name": "detecting-dns-exfiltration-with-dns-query-analysis",
     "description": "|",
@@ -3534,6 +3590,34 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-misconfigured-azure-storage/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-modbus-command-injection-attacks",
+    "name": "detecting-modbus-command-injection-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detect Modbus TCP/RTU command-injection attacks (the FrostyGoop class — first malware using Modbus TCP for real-world operational impact). Passive MBAP/PDU parsing on port-502 traffic with six detection rules: unauthorized master (src not in baseline), unauthorized write (write FC 5/6/15/16 from a non-write-authorized source), write flood (>20 writes/60s = automated attack), broadcast write (unit ID 0 affecting all slaves), out-of-range register access (outside baseline ranges), and diagnostic/restart commands (FC 8/17/43 — DoS/recon). Requires baseline of authorized masters, write sources, per-pair function codes, and register ranges; Suricata Modbus rules supplement. Source IP is the only identifier (Modbus has no auth) — verify against change-management before escalating. Passive SPAN/T",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-modbus-command-injection-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-modbus-protocol-anomalies",
+    "name": "detecting-modbus-protocol-anomalies",
+    "description": "|",
+    "domain": "planning",
+    "summary": "General Modbus/TCP & RTU protocol-anomaly detection (broader than the injection-specific skill). Passive MBAP parsing on port 502 with six rule families: unauthorized client (src not in allowlist), unauthorized function code (per-session FC allowlist, write FCs = critical), write-operation tracking with register extraction, polling-timing anomalies (z-score vs baseline interval mean/std), protocol violations (non-zero protocol ID = possible MITM/malformed frame), and broadcast write (unit ID 0). Uses Zeek/Suricata Modbus parsers + custom Python with Markov-chain models of normal transaction sequences. Requires authorized-client list, per-session function-code allowlist, and a 1-2 week passive baseline. Distinct from injection detection: this is the wide anomaly net (timing/protocol/sequenc",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-modbus-protocol-anomalies/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {
@@ -3856,6 +3940,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-sql-injection-via-waf-logs/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:security-operations",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-stuxnet-style-attacks",
+    "name": "detecting-stuxnet-style-attacks",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Detect Stuxnet-class cyber-physical attacks that modify PLC logic while spoofing sensor readings. Three defensive layers: (1) map the 5-stage attack chain (USB initial access → lateral movement → engineering-workstation compromise → PLC logic modification → process manipulation) to detection points and MITRE ATT&CK for ICS; (2) PLC logic-integrity monitoring — periodically read program block info and diff against a known-good baseline to detect new/removed/modified/count-changed blocks (T0833/T0839); (3) physics-based process anomaly detection — cross-validate independent measurements (motor frequency↔reported RPM via RPM=120f/poles, power↔RPM^3 for centrifugal loads, vibration↔speed) to expose spoofed sensors. Read-only block reads + passive monitoring; never download or modify PLC logic.",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-stuxnet-style-attacks/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {
@@ -5309,6 +5407,34 @@
     "tier": "T1"
   },
   {
+    "id": "ics-firewall-tofino",
+    "name": "ics-firewall-tofino",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Tofino (Belden/Hirschmann) industrial firewall at the zone/controller level for an authorized OT network: deploy in transparent inline-bridge mode (no IP changes) with fail-open so a device failure does not stop the process; apply deep packet inspection per OT protocol — Modbus function-code allowlists (reads only from upper levels, writes dropped), S7comm operation filtering (block cpu_stop / program download for non-engineering sources), EtherNet/IP CIP service filtering (block firmware flash / program download); derive every allow rule from a communication baseline; end with a default-deny logged rule; manage via the Central Management Platform. Ideal compensating control for unpatchable legacy PLCs. Complements (does not replace) the DMZ perimeter firewall and architecture-level segmen",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ics-firewall-tofino/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "iec-62443-security-zones",
+    "name": "iec-62443-security-zones",
+    "description": "|",
+    "domain": "planning",
+    "summary": "IEC 62443-3-2 zone-and-conduit design for an authorized IACS: partition assets into security zones by function, criticality and consequence of compromise; assign each zone a Security Level Target (SL-T 1=casual, 4=state-sponsored); define conduits as the only sanctioned communication paths between zones with explicit allowed protocols, direction, DPI and Modbus function-code filtering; place SIS in its own SL-3 air-gapped zone; route OT→IT through a DMZ with a data diode; configure industrial firewalls at every conduit; and validate that prohibited cross-zone paths are blocked and write operations are denied where only reads are permitted. This is the policy/model layer; the concrete VLAN+firewall implementation lives in ot-network-segmentation. Any change to a live IACS is §5-gated (human",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/iec-62443-security-zones/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-aes-encryption-for-data-at-rest",
     "name": "implementing-aes-encryption-for-data-at-rest",
     "description": "|",
@@ -5939,6 +6065,20 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-dragos-platform-for-ot-monitoring",
+    "name": "implementing-dragos-platform-for-ot-monitoring",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deploy and operate the Dragos Platform for OT network detection and response (NDR). Passive Dragos sensors on TAP/SPAN per segment, outbound-only encrypted comms to SiteStore; validate sensor health, asset visibility (PLCs/HMIs/protocols), and threat-group relevance via read-only API. Tune Knowledge Packs and detection categories (network baseline, threat detection, vulnerability correlation) against tracked ICS threat groups (VOLTZITE energy-sector recon, CHERNOVITE/PIPEDREAM, ELECTRUM/Industroyer, KAMACITE). Per-protocol monitoring (Modbus writes, DNP3 control/firmware, S7 CPU-STOP/program-download, OPC UA methods, EtherNet/IP CIP). Forward alerts to SIEM (Splunk CEF / Sentinel) with MITRE ATT&CK for ICS mapping; severity-based alert routing to OT-SOC + process safety. Read-only API; API",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-dragos-platform-for-ot-monitoring/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-ebpf-security-monitoring",
     "name": "implementing-ebpf-security-monitoring",
     "description": "|",
@@ -6496,6 +6636,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-opa-gatekeeper-for-policy-enforcement/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-ot-network-traffic-analysis-with-nozomi",
+    "name": "implementing-ot-network-traffic-analysis-with-nozomi",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deploy Nozomi Networks Guardian for passive OT network traffic analysis. Guardian sensors on TAP/SPAN provide asset visibility (nodes by type/vendor/protocol), behavioral anomaly detection (BAD), and vulnerability assessment without generating traffic; centralized via Vantage/CMC. Read-only API validates deployment (system status, node discovery, alerts, vulnerabilities) and analyzes communication links — flagging cross-zone flows that violate IEC 62443 segmentation. Nozomi Smart Polling (active native-protocol queries) is the one active feature and must be treated as a §5-gated, maintenance-window action, never default-on against sensitive segments. Integrate with Fortinet/Splunk/ServiceNow. API token is an external secret, never committed. Frameworks: IEC 62443, MITRE ATT&CK for ICS, NIS",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-ot-network-traffic-analysis-with-nozomi/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {
@@ -7885,6 +8039,20 @@
     "tier": "T2"
   },
   {
+    "id": "nerc-cip-compliance-controls",
+    "name": "nerc-cip-compliance-controls",
+    "description": "|",
+    "domain": "planning",
+    "summary": "NERC CIP compliance for authorized Bulk Electric System (BES) cyber systems: categorize systems as high/medium/low impact via CIP-002-5.1a Attachment 1 criteria (control-center RC/BA/TOP, generation ≥3000/1500 MW, transmission ≥500 kV, blackstart/cranking/SPS-RAS); enforce Electronic Security Perimeters with Electronic Access Points and CIP-005-7 R2 MFA remote access through an Intermediate System; apply CIP-007-6 system security management (disable unneeded ports/services, evaluate patches within 35 days, anti-malware/app-allowlisting, 90-day log retention with 15-day review, least-privilege access); maintain CIP-010 config baselines and CIP-013 supply-chain controls; collect audit evidence throughout. Telemetry is in quota units, never $/€ (§11). Changes to live BES assets are §5-gated (",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/nerc-cip-compliance-controls/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "nestjs-patterns",
     "name": "nestjs-patterns",
     "description": "|",
@@ -8036,6 +8204,62 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/orch-pipeline/SKILL.md",
     "origin": "affaan-m/ecc",
     "cluster": "skill:core-agent",
+    "tier": "T1"
+  },
+  {
+    "id": "ot-incident-response-playbook",
+    "name": "ot-incident-response-playbook",
+    "description": "|",
+    "domain": "planning",
+    "summary": "OT/ICS incident response for an authorized environment, structured on the SANS PICERL lifecycle (Preparation, Identification, Containment, Eradication, Recovery, Lessons-Learned) with ICS specifics: keep offline known-good backups of PLC programs/HMI configs; correlate OT IDS alerts with historian process anomalies; NEVER shut down OT without plant-operations approval — isolate at the industrial firewall and switch PLCs to LOCAL/MANUAL instead; sever the IT/OT conduit at the DMZ while preserving intra-OT and safety operation; recover in safety-first order (SIS → critical controllers → HMIs → historian → engineering WS → IT/OT connectivity last); verify SIS integrity against vendor baseline. Category playbooks for OT ransomware and SIS compromise. Reporting: CISA 72h (CIRCIA), ISAC 24h, NER",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ot-incident-response-playbook/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "ot-network-segmentation",
+    "name": "ot-network-segmentation",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive OT/ICS network segmentation on the Purdue Model (PERA): classify assets into levels 0-5 + a Level 3.5 IT/OT DMZ, derive VLANs and OT-aware firewall rules from a 2-4 week passive traffic baseline (never from guesses), enforce a hard IT/OT DMZ where all cross-boundary connections terminate (no end-to-end pass-through), use a data diode for unidirectional historian replication, isolate SIS from BPCS, harden switch ports, deploy firewalls in monitor-then-enforce mode during maintenance windows with a rollback plan, and validate that prohibited cross-zone paths are blocked while legitimate flows pass. OT is safety-critical: any network change to a live plant is a §5-gated action requiring human approval and a maintenance window.",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ot-network-segmentation/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "ot-patch-management",
+    "name": "ot-patch-management",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Patch management for an authorized OT/ICS environment where availability and safety outrank immediate remediation: track patches against an asset inventory with firmware/OS versions; prioritize risk-based (CVSS plus CISA-KEV exploited, network exposure, Purdue level — never CVSS alone); ALWAYS validate in a staging lab mirroring production (functional, performance scan-time, compatibility, rollback) before any production deployment; evaluate patches within 35 days (NERC CIP-007-6 R2); deploy only in coordinated maintenance windows with a tested rollback; and when a patch cannot be applied (vendor restriction, no window), DEFER with documented compensating controls (virtual patching via IDS/IPS, network isolation, firewall rules). Cost discipline in quota units, never $/€ (§11). Patch deplo",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ot-patch-management/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "ot-remote-access",
+    "name": "ot-remote-access",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Secure remote access to an authorized OT/ICS environment via the IEC 62443 conduit model: every external session terminates on a hardened jump server / PAM broker in the Level 3.5 DMZ that opens a separate inward connection — no end-to-end pass-through to OT. Enforce MFA (CIP-005-7 R2.4), role-based access policy (allowed targets/protocols/duration per role), approval-based workflows with plant-manager authorization, vendor co-attendance and real-time monitoring, session recording (screen + keystroke), time-limited one-time credentials auto-revoked at window close, clipboard/file-transfer restrictions, idle timeout, and prohibited targets (SIS/SAFETY-*). Aligns IEC 62443 conduits with NERC CIP-005. Granting OT remote access and any privileged-session action are §5-gated (human approval); n",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/ot-remote-access/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {
@@ -8655,6 +8879,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-ics-asset-discovery-with-claroty",
+    "name": "performing-ics-asset-discovery-with-claroty",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Perform ICS/OT asset discovery with Claroty xDome. Passive SPAN/TAP monitoring is the default and runs 2-4 weeks before any active step; read-only API extracts assets, builds Purdue-level (0-5) inventory, exports CSV for compliance, and pulls per-asset firmware/CVEs. Cross-reference discovered assets against CMDB to find shadow OT devices (undocumented) and missing devices. Claroty Edge active discovery uses NATIVE industrial protocols (S7 SZL, CIP identity, Modbus FC43, BACnet who-is) — strictly maintenance-window, rate-limited, with SIS subnets EXCLUDED and abort-on-device-error; never IT vulnerability scanners (Nessus/Qualys) against PLCs/RTUs, which can crash legacy controllers. Active Edge queries are §5-gated maintenance actions. API token is an external secret, never committed. Fram",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ics-asset-discovery-with-claroty/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "performing-insider-threat-investigation",
     "name": "performing-insider-threat-investigation",
     "description": "|",
@@ -8935,6 +9173,76 @@
     "tier": "T1"
   },
   {
+    "id": "performing-oil-gas-cybersecurity-assessment",
+    "name": "performing-oil-gas-cybersecurity-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive oil & gas OT assessment doctrine. Scope by segment (upstream/midstream/downstream); inventory pipeline SCADA, refinery DCS, SIS, and remote RTUs by passive observation. Evaluate IT/OT segmentation, RTU comms encryption (DNP3/IEC 60870-5-104 over radio/satellite per IEC 62351), custody-transfer flow-computer authentication, remote-site physical-cyber convergence. Map findings to API 1164, TSA SD-01/SD-02, IEC 62443, NIST CSF. SAFETY-FIRST: passive/read-only first; active queries only in authorized maintenance windows, and active OT actions are §5-gated requiring human validation. Frameworks: IEC 62443, API 1164, TSA SD-01/SD-02, NIST CSF, IEC 62351, MITRE ATT&CK-ICS (T0816/T0836). No working exploit; report compliance gaps and prioritized remediation only.",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-oil-gas-cybersecurity-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ot-network-security-assessment",
+    "name": "performing-ot-network-security-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Broad defensive OT/ICS network assessment doctrine organized on the Purdue Reference Model. Scope and safety boundaries first (Level 0/1 passive-only, SIS/ESD excluded). Build asset inventory and comms map by passive SPAN-port capture (no packets to OT devices). Analyze cross-zone flows for IT/OT convergence risk; evaluate Purdue-zone firewall rules against IEC 62443 zone/conduit policy (deny-default, no prohibited L4→L1/L2 conduits, no any/any). Assess industrial protocol security (unauthenticated Modbus writes, OPC UA security mode). SAFETY-FIRST: passive first; targeted active scans of Level 2-4 only in authorized maintenance windows and §5-gated; never active-scan PLCs/RTUs/SIS. Frameworks: IEC 62443-3-2/3-3, NIST SP 800-82r3, MITRE ATT&CK-ICS. No exploit; deliver findings, asset inven",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ot-network-security-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ot-vulnerability-assessment-with-claroty",
+    "name": "performing-ot-vulnerability-assessment-with-claroty",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Claroty xDome OT vulnerability assessment doctrine. Build a complete asset inventory (vendor/model/firmware) via passive discovery + active-safe native-protocol queries; correlate against CVE data and CISA ICS-CERT advisories. Compute an OT risk score = CVSS base × asset-criticality × Purdue-level proximity × compensating-control reduction, then prioritize remediation into maintenance windows or virtual patching (IPS/firewall DPI) when firmware patches cannot be applied. SAFETY-FIRST: passive discovery is zero-risk; active-safe queries run at safe rates; never active-scan SIS. Outbound advisory fetch (CISA KEV) is a §5-gated network call to an allowlisted host. Frameworks: IEC 62443, NERC CIP-010-4, NIST CSF, MITRE ATT&CK-ICS, CVSS, CISA ICS-CERT. No exploit; deliver risk-prioritized findi",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ot-vulnerability-assessment-with-claroty/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ot-vulnerability-scanning-safely",
+    "name": "performing-ot-vulnerability-scanning-safely",
+    "description": "|",
+    "domain": "planning",
+    "summary": "OT-safe vulnerability scanning methodology. Three safety tiers: passive (zero packets, no risk), native-protocol query (minimal risk, window required), controlled-active (OT-safe lab-tested profiles, low-moderate risk). Each tier above passive is gated by prerequisites: lab validation against each device type, vendor-warranty verification, change-management approval, confirmed maintenance window, documented rollback plan, and SIS always excluded. Start passive; escalate tiers only when prerequisites pass. SAFETY-FIRST: standard IT scan profiles crash legacy controllers — never use them; every escalation beyond passive is §5-gated and window-bound. Frameworks: IEC 62443, NERC CIP, NIST SP 800-82, MITRE ATT&CK-ICS, CVSS-in-OT-context. No exploit; deliver risk-prioritized findings + compensat",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ot-vulnerability-scanning-safely/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-plc-firmware-security-analysis",
+    "name": "performing-plc-firmware-security-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive PLC firmware security analysis doctrine (lab/offline only). Acquire firmware via authorized means (vendor download, lab device, project backup); verify integrity by cryptographic hash comparison against a known-good baseline to detect tampering/supply-chain modification. Static-analyze (binwalk unpack, entropy, Ghidra disasm) for hardcoded credentials, backdoors, debug interfaces, weak crypto. Review the protocol stack (Modbus/S7) for missing authentication, broadcast handling, and malformed-packet resilience — as defensive findings for detection and hardening. LAB/OFFLINE ONLY: never run against live production PLCs; never upload firmware to public services; live testing is §5-gated and out of scope here. Frameworks: IEC 62443-4-2, NIST CSF, MITRE ATT&CK-ICS, CWE. No working exp",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-plc-firmware-security-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "performing-post-quantum-cryptography-migration",
     "name": "performing-post-quantum-cryptography-migration",
     "description": "|",
@@ -8946,6 +9254,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-post-quantum-cryptography-migration/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cryptography",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-power-grid-cybersecurity-assessment",
+    "name": "performing-power-grid-cybersecurity-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive power-grid OT assessment doctrine. Map grid cyber architecture (EMS/SCADA, ICCP/TASE.2, substation automation, synchrophasor/PMU). Assess IEC 61850 substation security: GOOSE message authentication and MMS access control (IEC 62351-4/-6), station-bus segmentation, vendor remote-access MFA. Verify NERC CIP (CIP-002 categorization, CIP-005 ESP/remote access, CIP-007 system access controls). Account for grid-targeting threat groups (Industroyer/CrashOverride, ELECTRUM). SAFETY-FIRST: passive substation traffic analysis first; never inject GOOSE/MMS on live buses; active OT actions §5-gated and window-bound. Frameworks: NERC CIP, IEC 61850, IEC 62351, IEC 60870-5-104, MITRE ATT&CK-ICS, NIST CSF. No exploit; deliver findings + NERC CIP compliance status + remediation.",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-power-grid-cybersecurity-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {
@@ -9019,6 +9341,20 @@
     "tier": "T1"
   },
   {
+    "id": "performing-s7comm-protocol-security-analysis",
+    "name": "performing-s7comm-protocol-security-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive S7comm/S7CommPlus protocol security analysis doctrine. Parse captured TCP/102 traffic (TPKT/COTP/S7 header, ROSCTR, function codes) to identify security-relevant operations: critical functions (0x05 write, 0x1A-0x1C program download, 0x28/0x29 CPU start/stop) and program upload (0x1D-0x1F = logic exfil). Flag operations from unauthorized engineering stations, CPU-STOP (MITRE T0881), and program download (T0843) for detection. Assess known Siemens CVEs (CVE-2019-13945 replay, S7CommPlus integrity bypass, CVE-2022-38773 boot bypass, CVE-2019-10929 DoS) and recommend segmentation + know-how/access protection. PASSIVE: analyze captured pcaps; never scan production PLCs (can crash them); active testing is §5-gated/out of scope. Frameworks: MITRE ATT&CK-ICS (T0881/T0843), IEC 62443, NI",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-s7comm-protocol-security-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
+    "tier": "T1"
+  },
+  {
     "id": "performing-sca-dependency-scanning-with-snyk",
     "name": "performing-sca-dependency-scanning-with-snyk",
     "description": "|",
@@ -9030,6 +9366,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-sca-dependency-scanning-with-snyk/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:devsecops",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-scada-hmi-security-assessment",
+    "name": "performing-scada-hmi-security-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SCADA HMI security assessment doctrine across four categories. Authentication: password complexity, lockout, default-credential change, RBAC role separation, session timeout, MFA for remote (IEC 62443-3-3 SR 1.x/2.1). Communication: encrypted HMI-PLC (OPC UA/TLS), write-command authentication, HTTPS for web HMI, no cleartext protocols. Web HMI: XSS/CSRF/IDOR, security headers, vendor CVEs (e.g. Ignition CVE-2025-0921). Hardening: OS patch SLA, disabled services, USB restriction, app whitelisting, audit logging. SAFETY-FIRST: prefer a lab mirror; production active web testing of state-changing functions (setpoints) needs a maintenance window, rollback, and §5 gating. Frameworks: IEC 62443-3-3, NIST SP 800-82, OWASP, MITRE ATT&CK-ICS. No exploit; deliver findings by category + IEC ",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-scada-hmi-security-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {
@@ -10234,6 +10584,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-helm-chart-deployments/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "securing-historian-server-in-ot-environment",
+    "name": "securing-historian-server-in-ot-environment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive OT historian hardening doctrine (OSIsoft/AVEVA PI, Honeywell PHD, GE Proficy). Audit network exposure (flag HTTP/RDP/SMB/RPC, direct DB ports); migrate legacy IP-based PI Trust auth to Windows Integrated Security; disable default piadmin; enforce per-tag access control and data-modification audit trails for integrity (used in safety analysis and regulatory reporting). Place the historian at Purdue Level 3; replicate to enterprise ONLY via a unidirectional DMZ path (data diode / PI-to-PI) so Level 4 users never connect directly to the OT historian. SAFETY-FIRST: audit is read-only; firewall/auth/account changes on a live server are §5-gated changes requiring human validation and a window. Frameworks: IEC 62443, NERC CIP-007, NIST CSF, Purdue Model, MITRE ATT&CK-ICS. No exploit; de",
+    "tags": [
+      "cyber:ot-ics-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/securing-historian-server-in-ot-environment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:ot-ics-security",
     "tier": "T1"
   },
   {

@@ -53,7 +53,8 @@ multiAgentOS/
 ├── PRODUCT_SPEC.md
 ├── ROADMAP.md
 ├── SKILLS_REGISTRY.md
-└── TOKEN_STRATEGY.md
+├── TOKEN_STRATEGY.md
+└── sonar-project.properties   # SonarCloud Automatic-Analysis config (excludes generated library indexes)
 ```
 
 ## 4. Autonomy levels (enforce in code)
