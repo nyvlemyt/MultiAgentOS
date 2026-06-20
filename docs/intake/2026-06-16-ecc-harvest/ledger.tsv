@@ -665,26 +665,26 @@ cyber-skill	cyber:incident-response	collecting-indicators-of-compromise	integrat
 cyber-skill	cyber:threat-intelligence	collecting-open-source-intelligence	integrated	adapt	decisions/cyber-threat-intelligence-D.md
 cyber-skill	cyber:threat-intelligence	collecting-threat-intelligence-with-misp	integrated	adapt	decisions/cyber-threat-intelligence-B.md
 cyber-skill	cyber:incident-response	collecting-volatile-evidence-from-compromised-host	integrated	adapt	decisions/cyber-DS.md
-cyber-skill	cyber:penetration-testing	conducting-api-security-testing	pending		
+cyber-skill	cyber:penetration-testing	conducting-api-security-testing	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:incident-response	conducting-cloud-incident-response	integrated	adapt	decisions/cyber-DS.md
 cyber-skill	cyber:cloud-security	conducting-cloud-penetration-testing	integrated	adapt	decisions/cyber-EP.md
 cyber-skill	cyber:red-teaming	conducting-domain-persistence-with-dcsync	rejected	reject	decisions/cyber-red-teaming-Z.md
-cyber-skill	cyber:penetration-testing	conducting-external-reconnaissance-with-osint	pending		
+cyber-skill	cyber:penetration-testing	conducting-external-reconnaissance-with-osint	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:red-teaming	conducting-full-scope-red-team-engagement	rejected	fold	decisions/cyber-red-teaming-YAA.md
-cyber-skill	cyber:penetration-testing	conducting-internal-network-penetration-test	pending		
+cyber-skill	cyber:penetration-testing	conducting-internal-network-penetration-test	rejected	fold	decisions/cyber-pentest-final.md
 cyber-skill	cyber:red-teaming	conducting-internal-reconnaissance-with-bloodhound-ce	rejected	fold	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:incident-response	conducting-malware-incident-response	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:network-security	conducting-man-in-the-middle-attack-simulation	integrated	adapt	decisions/cyber-FA.md
 cyber-skill	cyber:incident-response	conducting-memory-forensics-with-volatility	integrated	adapt	decisions/cyber-DT.md
-cyber-skill	cyber:penetration-testing	conducting-mobile-app-penetration-test	pending		
-cyber-skill	cyber:penetration-testing	conducting-network-penetration-test	pending		
+cyber-skill	cyber:penetration-testing	conducting-mobile-app-penetration-test	rejected	reject	decisions/cyber-pentest-final.md
+cyber-skill	cyber:penetration-testing	conducting-network-penetration-test	integrated	adapt	decisions/cyber-pentest-final.md
 cyber-skill	cyber:red-teaming	conducting-pass-the-ticket-attack	rejected	reject	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:incident-response	conducting-phishing-incident-response	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:incident-response	conducting-post-incident-lessons-learned	integrated	adapt	decisions/cyber-DT.md
-cyber-skill	cyber:penetration-testing	conducting-social-engineering-penetration-test	pending		
+cyber-skill	cyber:penetration-testing	conducting-social-engineering-penetration-test	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:red-teaming	conducting-social-engineering-pretext-call	integrated	adapt	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:red-teaming	conducting-spearphishing-simulation-campaign	rejected	reject	decisions/cyber-red-teaming-YAA.md
-cyber-skill	cyber:penetration-testing	conducting-wireless-network-penetration-test	pending		
+cyber-skill	cyber:penetration-testing	conducting-wireless-network-penetration-test	integrated	adapt	decisions/cyber-pentest-final.md
 cyber-skill	cyber:identity-access-management	configuring-active-directory-tiered-model	integrated	adapt	decisions/cyber-DO.md
 cyber-skill	cyber:zero-trust-architecture	configuring-aws-verified-access-for-ztna	rejected	fold	decisions/cyber-EI.md
 cyber-skill	cyber:cryptography	configuring-certificate-authority-with-openssl	integrated	adapt	decisions/cyber-EM.md
@@ -806,10 +806,10 @@ cyber-skill	cyber:supply-chain-security	detecting-typosquatting-packages-in-npm-
 cyber-skill	cyber:threat-hunting	detecting-wmi-persistence	rejected	fold	decisions/cyber-threat-hunting-H.md
 cyber-skill	cyber:incident-response	eradicating-malware-from-infected-systems	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:threat-intelligence	evaluating-threat-intelligence-platforms	integrated	adapt	decisions/cyber-threat-intelligence-B.md
-cyber-skill	cyber:penetration-testing	executing-active-directory-attack-simulation	pending		
-cyber-skill	cyber:penetration-testing	executing-phishing-simulation-campaign	pending		
+cyber-skill	cyber:penetration-testing	executing-active-directory-attack-simulation	rejected	reject	decisions/cyber-pentest-final.md
+cyber-skill	cyber:penetration-testing	executing-phishing-simulation-campaign	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:red-teaming	executing-red-team-engagement-planning	integrated	adapt	decisions/cyber-red-teaming-YAA.md
-cyber-skill	cyber:penetration-testing	executing-red-team-exercise	pending		
+cyber-skill	cyber:penetration-testing	executing-red-team-exercise	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:red-teaming	exploiting-active-directory-certificate-services-esc1	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:red-teaming	exploiting-active-directory-with-bloodhound	rejected	fold	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:api-security	exploiting-api-injection-vulnerabilities	integrated	adapt	decisions/cyber-DC.md
@@ -835,7 +835,7 @@ cyber-skill	cyber:web-application-security	exploiting-prototype-pollution-in-jav
 cyber-skill	cyber:web-application-security	exploiting-race-condition-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:web-application-security	exploiting-server-side-request-forgery	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:network-security	exploiting-smb-vulnerabilities-with-metasploit	rejected	reject	decisions/cyber-FA.md
-cyber-skill	cyber:penetration-testing	exploiting-sql-injection-vulnerabilities	pending		
+cyber-skill	cyber:penetration-testing	exploiting-sql-injection-vulnerabilities	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:web-application-security	exploiting-sql-injection-with-sqlmap	rejected	reject	decisions/cyber-DE.md
 cyber-skill	cyber:web-application-security	exploiting-template-injection-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:web-application-security	exploiting-type-juggling-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
@@ -1069,8 +1069,8 @@ cyber-skill	cyber:identity-access-management	performing-access-recertification-w
 cyber-skill	cyber:identity-access-management	performing-access-review-and-certification	integrated	adapt	decisions/cyber-DR.md
 cyber-skill	cyber:red-teaming	performing-active-directory-bloodhound-analysis	integrated	adapt	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:incident-response	performing-active-directory-compromise-investigation	integrated	adapt	decisions/cyber-DT.md
-cyber-skill	cyber:red-team	performing-active-directory-forest-trust-attack	pending		
-cyber-skill	cyber:penetration-testing	performing-active-directory-penetration-test	pending		
+cyber-skill	cyber:red-team	performing-active-directory-forest-trust-attack	rejected	reject	decisions/cyber-pentest-final.md
+cyber-skill	cyber:penetration-testing	performing-active-directory-penetration-test	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:vulnerability-management	performing-active-directory-vulnerability-assessment	integrated	adapt	decisions/cyber-DL.md
 cyber-skill	cyber:phishing-defense	performing-adversary-in-the-middle-phishing-detection	integrated	adapt	decisions/cyber-EL.md
 cyber-skill	cyber:vulnerability-management	performing-agentless-vulnerability-scanning	integrated	adapt	decisions/cyber-DL.md
@@ -1089,7 +1089,7 @@ cyber-skill	cyber:malware-analysis	performing-automated-malware-analysis-with-ca
 cyber-skill	cyber:cloud-security	performing-aws-account-enumeration-with-scout-suite	integrated	adapt	decisions/cyber-ET.md
 cyber-skill	cyber:cloud-security	performing-aws-privilege-escalation-assessment	integrated	adapt	decisions/cyber-ET.md
 cyber-skill	cyber:network-security	performing-bandwidth-throttling-attack-simulation	rejected	reject	decisions/cyber-FA.md
-cyber-skill	cyber:offensive-security	performing-binary-exploitation-analysis	pending		
+cyber-skill	cyber:offensive-security	performing-binary-exploitation-analysis	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:web-application-security	performing-blind-ssrf-exploitation	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:wireless-security	performing-bluetooth-security-assessment	integrated	adapt	decisions/cyber-smalls-FF.md
 cyber-skill	cyber:threat-intelligence	performing-brand-monitoring-for-impersonation	integrated	adapt	decisions/cyber-threat-intelligence-E.md
@@ -1124,7 +1124,7 @@ cyber-skill	cyber:malware-analysis	performing-dynamic-analysis-with-any-run	inte
 cyber-skill	cyber:endpoint-security	performing-endpoint-forensics-investigation	integrated	adapt	decisions/cyber-DW.md
 cyber-skill	cyber:endpoint-security	performing-endpoint-vulnerability-remediation	integrated	adapt	decisions/cyber-DW.md
 cyber-skill	cyber:identity-access-management	performing-entitlement-review-with-sailpoint-iiq	integrated	adapt	decisions/cyber-DR.md
-cyber-skill	cyber:penetration-testing	performing-external-network-penetration-test	pending		
+cyber-skill	cyber:penetration-testing	performing-external-network-penetration-test	rejected	fold	decisions/cyber-pentest-final.md
 cyber-skill	cyber:soc-operations	performing-false-positive-reduction-in-siem	integrated	adapt	decisions/cyber-DZ.md
 cyber-skill	cyber:digital-forensics	performing-file-carving-with-foremost	integrated	adapt	decisions/cyber-digital-forensics-P.md
 cyber-skill	cyber:firmware-analysis	performing-firmware-extraction-with-binwalk	integrated	adapt	decisions/cyber-smalls-FF.md
@@ -1184,7 +1184,7 @@ cyber-skill	cyber:ot-ics-security	performing-plc-firmware-security-analysis	inte
 cyber-skill	cyber:cryptography	performing-post-quantum-cryptography-migration	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:ot-ics-security	performing-power-grid-cybersecurity-assessment	integrated	adapt	decisions/cyber-ot-ics-security-U.md
 cyber-skill	cyber:privacy-compliance	performing-privacy-impact-assessment	integrated	adapt	decisions/cyber-smalls-DD.md
-cyber-skill	cyber:penetration-testing	performing-privilege-escalation-assessment	pending		
+cyber-skill	cyber:penetration-testing	performing-privilege-escalation-assessment	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:red-teaming	performing-privilege-escalation-on-linux	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:identity-access-management	performing-privileged-account-access-review	integrated	adapt	decisions/cyber-DR.md
 cyber-skill	cyber:identity-access-management	performing-privileged-account-discovery	integrated	adapt	decisions/cyber-DR.md
@@ -1193,7 +1193,7 @@ cyber-skill	cyber:soc-operations	performing-purple-team-exercise	integrated	adap
 cyber-skill	cyber:incident-response	performing-ransomware-response	integrated	adapt	decisions/cyber-DU.md
 cyber-skill	cyber:ransomware-defense	performing-ransomware-tabletop-exercise	integrated	adapt	decisions/cyber-EH.md
 cyber-skill	cyber:security-operations	performing-red-team-phishing-with-gophish	integrated	adapt	decisions/cyber-EF.md
-cyber-skill	cyber:red-team	performing-red-team-with-covenant	pending		
+cyber-skill	cyber:red-team	performing-red-team-with-covenant	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:ot-ics-security	performing-s7comm-protocol-security-analysis	integrated	adapt	decisions/cyber-ot-ics-security-U.md
 cyber-skill	cyber:devsecops	performing-sca-dependency-scanning-with-snyk	integrated	adapt	decisions/cyber-DG.md
 cyber-skill	cyber:ot-ics-security	performing-scada-hmi-security-assessment	integrated	adapt	decisions/cyber-ot-ics-security-U.md
@@ -1214,8 +1214,8 @@ cyber-skill	cyber:security-operations	performing-ssrf-vulnerability-exploitation
 cyber-skill	cyber:malware-analysis	performing-static-malware-analysis-with-pe-studio	integrated	adapt	decisions/cyber-malware-analysis-L.md
 cyber-skill	cyber:digital-forensics	performing-steganography-detection	integrated	adapt	decisions/cyber-digital-forensics-P.md
 cyber-skill	cyber:web-application-security	performing-subdomain-enumeration-with-subfinder	integrated	adapt	decisions/cyber-web-application-security-W.md
-cyber-skill	cyber:application-security	performing-supply-chain-attack-simulation	pending		
-cyber-skill	cyber:penetration-testing	performing-thick-client-application-penetration-test	pending		
+cyber-skill	cyber:application-security	performing-supply-chain-attack-simulation	rejected	reject	decisions/cyber-pentest-final.md
+cyber-skill	cyber:penetration-testing	performing-thick-client-application-penetration-test	integrated	adapt	decisions/cyber-pentest-final.md
 cyber-skill	cyber:threat-intelligence	performing-threat-emulation-with-atomic-red-team	integrated	adapt	decisions/cyber-threat-intelligence-E.md
 cyber-skill	cyber:soc-operations	performing-threat-hunting-with-elastic-siem	integrated	adapt	decisions/cyber-EA.md
 cyber-skill	cyber:threat-hunting	performing-threat-hunting-with-yara-rules	integrated	adapt	decisions/cyber-threat-hunting-J.md
@@ -1225,16 +1225,16 @@ cyber-skill	cyber:devsecops	performing-threat-modeling-with-owasp-threat-dragon	
 cyber-skill	cyber:digital-forensics	performing-timeline-reconstruction-with-plaso	integrated	adapt	decisions/cyber-digital-forensics-P.md
 cyber-skill	cyber:soc-operations	performing-user-behavior-analytics	integrated	adapt	decisions/cyber-EA.md
 cyber-skill	cyber:network-security	performing-vlan-hopping-attack	integrated	adapt	decisions/cyber-FA.md
-cyber-skill	cyber:penetration-testing	performing-vulnerability-scanning-with-nessus	pending		
+cyber-skill	cyber:penetration-testing	performing-vulnerability-scanning-with-nessus	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:web-application-security	performing-web-application-firewall-bypass	integrated	adapt	decisions/cyber-web-application-security-V.md
-cyber-skill	cyber:penetration-testing	performing-web-application-penetration-test	pending		
+cyber-skill	cyber:penetration-testing	performing-web-application-penetration-test	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:vulnerability-management	performing-web-application-scanning-with-nikto	integrated	adapt	decisions/cyber-DM.md
 cyber-skill	cyber:vulnerability-management	performing-web-application-vulnerability-triage	integrated	adapt	decisions/cyber-DM.md
 cyber-skill	cyber:web-application-security	performing-web-cache-deception-attack	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:web-application-security	performing-web-cache-poisoning-attack	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:network-security	performing-wifi-password-cracking-with-aircrack	rejected	reject	decisions/cyber-FA.md
 cyber-skill	cyber:digital-forensics	performing-windows-artifact-analysis-with-eric-zimmerman-tools	integrated	adapt	decisions/cyber-digital-forensics-O.md
-cyber-skill	cyber:penetration-testing	performing-wireless-network-penetration-test	pending		
+cyber-skill	cyber:penetration-testing	performing-wireless-network-penetration-test	rejected	fold	decisions/cyber-pentest-final.md
 cyber-skill	cyber:network-security	performing-wireless-security-assessment-with-kismet	integrated	adapt	decisions/cyber-EZ.md
 cyber-skill	cyber:malware-analysis	performing-yara-rule-development-for-detection	integrated	adapt	decisions/cyber-malware-analysis-M.md
 cyber-skill	cyber:vulnerability-management	prioritizing-vulnerabilities-with-cvss-scoring	integrated	adapt	decisions/cyber-DM.md
@@ -1282,7 +1282,7 @@ cyber-skill	cyber:web-application-security	testing-for-open-redirect-vulnerabili
 cyber-skill	cyber:web-application-security	testing-for-sensitive-data-exposure	integrated	adapt	decisions/cyber-web-application-security-X.md
 cyber-skill	cyber:web-application-security	testing-for-xml-injection-vulnerabilities	integrated	adapt	decisions/cyber-web-application-security-W.md
 cyber-skill	cyber:web-application-security	testing-for-xss-vulnerabilities-with-burpsuite	integrated	adapt	decisions/cyber-web-application-security-X.md
-cyber-skill	cyber:penetration-testing	testing-for-xss-vulnerabilities	pending		
+cyber-skill	cyber:penetration-testing	testing-for-xss-vulnerabilities	rejected	reject	decisions/cyber-pentest-final.md
 cyber-skill	cyber:web-application-security	testing-for-xxe-injection-vulnerabilities	integrated	adapt	decisions/cyber-web-application-security-W.md
 cyber-skill	cyber:web-application-security	testing-jwt-token-security	integrated	adapt	decisions/cyber-web-application-security-X.md
 cyber-skill	cyber:mobile-security	testing-mobile-api-authentication	integrated	adapt	decisions/cyber-mobile-security-CC.md
