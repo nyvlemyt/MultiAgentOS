@@ -252,6 +252,34 @@
     "tier": "T1"
   },
   {
+    "id": "analyzing-network-flow-data-with-netflow",
+    "name": "analyzing-network-flow-data-with-netflow",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive NetFlow/IPFIX flow analysis: decode v9/IPFIX records with the Python netflow library, build a per-host traffic baseline, then statistically flag the four core anomaly classes — port scan (one src → many dst, same port), exfiltration (high outbound byte-count to unusual dst), C2 beaconing (periodic fixed-interval connections), and volumetric spikes beyond baseline. Output is a prioritized findings report feeding mas-sec-reviewer + CLAUDE.md §5 network guardrails (allowed_hosts). Owner-scoped only: collect flows from routers you control, never tap third-party networks. In MAOS all cost is subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-network-flow-data-with-netflow/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-network-packets-with-scapy",
+    "name": "analyzing-network-packets-with-scapy",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Scapy packet analysis: read pcap/pcapng offline with rdpcap(), extract IP/TCP/UDP/DNS/HTTP layers and fields, compute top-talkers / protocol distribution / port frequency, and detect anomalies — SYN-flood via TCP-flag ratios, DNS exfiltration via query-length + entropy, malformed/over-fragmented packets. Output is a structured JSON report feeding mas-sec-reviewer + CLAUDE.md §5. Scapy can also craft and send packets; in MAOS that capability is RISKY-GATED §5 (active probing = outbound network send) and owner-scoped only — default posture is read-only offline pcap analysis. Cost is subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-network-packets-with-scapy/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "analyzing-network-traffic-for-incidents",
     "name": "analyzing-network-traffic-for-incidents",
     "description": "|",
@@ -263,6 +291,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-network-traffic-for-incidents/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:incident-response",
+    "tier": "T1"
+  },
+  {
+    "id": "analyzing-network-traffic-with-wireshark",
+    "name": "analyzing-network-traffic-with-wireshark",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Wireshark/tshark traffic analysis: scope captures with BPF capture filters + ring buffers, apply display filters for suspicious HTTP/DNS/SMB/TLS, follow TCP streams, export HTTP/SMB objects and IOCs, run statistics (protocol hierarchy, conversations, endpoints, IO graphs) to surface beaconing/scanning/exfil, and preserve evidence with SHA-256 chain-of-custody. Feeds mas-sec-reviewer + CLAUDE.md §5. Capture is authorized-segment / owner-scoped only — live capture needs the §5 gate; never tap third-party or private comms. Cost is subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/analyzing-network-traffic-with-wireshark/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -571,6 +613,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-own-aws-account-with-scout-suite/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "auditing-own-dns-exposure",
+    "name": "auditing-own-dns-exposure",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive DNS self-audit for domains you control: confirm AXFR/IXFR zone transfers are restricted to authorized secondaries, hunt stale/dangling/wildcard records and information-leaking entries, and verify DNSSEC signing plus SPF/DKIM/DMARC are correctly published. Process is audit-and-reduce only on your OWN authoritative zones: list what an outsider could learn, close zone-transfer misconfigurations, prune dangling records (subdomain-takeover risk), and validate email-auth + DNSSEC. No third-party enumeration; no weaponized recon. In MAOS this feeds mas-sec-reviewer and the §5 allowed_hosts surface, measured in subscription quota units, never cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/auditing-own-dns-exposure/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -1437,6 +1493,20 @@
     "tier": "T1"
   },
   {
+    "id": "configuring-network-segmentation-with-vlans",
+    "name": "configuring-network-segmentation-with-vlans",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive VLAN segmentation on managed switches: design zones (corp/servers/DMZ/guest/IoT/mgmt/quarantine) with a traffic-flow matrix, configure access/trunk ports, harden against VLAN hopping (disable DTP/nonegotiate, native-VLAN to an unused VLAN, DHCP snooping, Dynamic ARP Inspection, IP Source Guard, port security, BPDU guard, storm control), enforce inter-VLAN ACLs (default-deny), and verify isolation by testing. Feeds mas-sec-reviewer + CLAUDE.md §5 (blast-radius reduction, lateral-movement limits). Owner-scoped only; switch reconfig that can cut access is a §5-gated change, staged not autonomous. Cost is subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-network-segmentation-with-vlans/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "configuring-oauth2-authorization-flow",
     "name": "configuring-oauth2-authorization-flow",
     "description": "|",
@@ -1448,6 +1518,48 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-oauth2-authorization-flow/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:identity-access-management",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-pfsense-firewall-rules",
+    "name": "configuring-pfsense-firewall-rules",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive pfSense configuration: define interfaces/VLANs, build firewall rules with aliases and a default-deny posture per zone (LAN/DMZ/GUEST/IoT), scope NAT port-forwards to required services only, set up IPsec/OpenVPN, enable pfBlockerNG IP/DNS blocklists, and forward all firewall logs to a SIEM. Rule order matters (first match wins; specific BLOCK above broad PASS). Feeds mas-sec-reviewer + CLAUDE.md §5. Owner-scoped; any rule/NAT change that opens inbound exposure or cuts access is a §5-gated change, not autonomous. Cost is subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-pfsense-firewall-rules/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-snort-ids-for-intrusion-detection",
+    "name": "configuring-snort-ids-for-intrusion-detection",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Snort 3 IDS deployment and tuning: install Snort 3 + DAQ, configure the capture interface (promiscuous, offloading disabled) on a span port/tap you own, write the Lua config (HOME_NET, preprocessors, port_scan, alert_json), load Snort Community rules via PulledPork, author local detection rules (reverse-shell, Mimikatz-over-SMB, DNS tunneling, cleartext-creds, SYN-scan), validate, then tune with thresholds/suppression against a baseline. Alerts feed mas-sec-reviewer + CLAUDE.md §5. Default posture is detection (IDS); inline IPS blocking is a §5-gated change. Owner-scoped only. Paid Subscriber rulesets are a third-party prerequisite, never MAOS billing (§11); cost is subscription quota (TOKEN_STRATEGY §8).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-snort-ids-for-intrusion-detection/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "configuring-suricata-for-network-monitoring",
+    "name": "configuring-suricata-for-network-monitoring",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive Suricata IDS/NSM deployment: install Suricata 7+, tune AF_PACKET (threads, ring/buffer, offloading disabled) on a span/tap you own, configure suricata.yaml (HOME_NET, EVE JSON with alert/http/dns/tls/files/flow/anomaly, app-layer parsers, JA3/HASSH fingerprinting), manage rules with suricata-update (ET Open) + a disable.conf, write custom rules (reverse-shell, DNS tunneling, bad-JA3 C2, SSH brute-force, large-POST exfil), validate, then tune against a baseline. EVE JSON ships to SIEM. Feeds mas-sec-reviewer + CLAUDE.md §5. Default IDS; inline IPS (NFQUEUE drop) is a §5-gated change. Owner-scoped. Paid ET Pro rules are a third-party prerequisite, not MAOS billing (§11); cost is subscription quota (TOKEN_STRATEGY §8).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/configuring-suricata-for-network-monitoring/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -1997,6 +2109,90 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-and-preventing-arp-spoofing",
+    "name": "detecting-and-preventing-arp-spoofing",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ARP-spoofing posture for a switched network you control: confirm Dynamic ARP Inspection backed by DHCP snooping is enabled on every access VLAN, validate port security / 802.1X / VLAN segmentation, and verify IDS/SIEM detection of ARP cache-poisoning indicators (unsolicited ARP replies, opcode-2 floods, MAC-to-IP rebindings). Process is detect-and-mitigate only: inventory DAI coverage, close gaps on un-protected VLANs, confirm the binding table is populated, and prove the alert fires. No poisoning is performed; no weaponized commands. In MAOS this feeds mas-sec-reviewer and the §5 network guardrail, measured in subscription quota units, never cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-and-preventing-arp-spoofing/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-and-preventing-bgp-hijacking",
+    "name": "detecting-and-preventing-bgp-hijacking",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive BGP-hijacking posture for prefixes you originate: publish ROAs and drop RPKI-Invalid routes at ingress (route-origin validation), apply strict prefix filters and AS-path checks, set sane max-prefix limits, and deploy real-time monitoring (BGPalerter / looking-glass / RIPEstat) that alerts on unauthorized announcements and RPKI-status changes. Process is validate-and-monitor only on routers/prefixes you control: confirm ROA coverage, confirm ingress filtering rejects Invalid, and confirm hijack alerts fire. No false announcement is made; no weaponized commands. In MAOS this feeds mas-sec-reviewer routing posture, in subscription quota units, never cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-and-preventing-bgp-hijacking/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-and-preventing-ipv6-rogue-ra",
+    "name": "detecting-and-preventing-ipv6-rogue-ra",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive posture against rogue IPv6 Router Advertisements and DHCPv6 abuse (mitm6 / SLAAC spoofing) on networks you own: deploy RA Guard on access-layer switches, block unauthorized DHCPv6 at the firewall, disable the DHCPv6 client / IPv6 where unused, and deploy NDP monitoring (ndpmon) to detect rogue RAs and Neighbor-Discovery spoofing. Process is harden-and-detect only: inventory IPv6 reachability, confirm RA Guard coverage, close the DHCPv6 vector, and prove rogue-RA alerts fire. No rogue RA / NA is sent; no weaponized commands. In MAOS this feeds mas-sec-reviewer first-hop posture, in subscription quota units, never cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-and-preventing-ipv6-rogue-ra/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-and-preventing-mitm",
+    "name": "detecting-and-preventing-mitm",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive MITM posture for a network you control: enforce encrypted transport and strict TLS validation, confirm HSTS + certificate pinning + Dynamic ARP Inspection are correctly deployed, and verify IDS/SIEM detection of ARP/DHCP/DNS spoofing indicators. Process is detect-and-mitigate only: inventory cleartext protocols, harden the anti-downgrade controls, validate that thick clients (not just browsers) reject rogue CA certs, and confirm alerting fires. No interception is performed; no weaponized commands are included. In MAOS this feeds mas-sec-reviewer and the §5 network guardrail (allowed_hosts), measured in subscription quota units, never cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-and-preventing-mitm/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-and-preventing-ssl-stripping",
+    "name": "detecting-and-preventing-ssl-stripping",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive SSL-stripping posture for web properties you own: enforce HSTS (adequate max-age + includeSubDomains + preload registration), close the first-visit gap via preload, eliminate cleartext-HTTP redirects and mixed content, add Upgrade-Insecure-Requests, and verify IDS/SIEM flags downgrade indicators. Process is harden-and-detect only: confirm headers, confirm preload-list inclusion, confirm there is no HTTP entry an attacker can pin a victim to, and prove the alert fires. No stripping is performed; no weaponized commands. In MAOS this feeds mas-sec-reviewer, measured in subscription quota units, never cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-and-preventing-ssl-stripping/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-and-preventing-vlan-hopping",
+    "name": "detecting-and-preventing-vlan-hopping",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive VLAN-hopping posture for switches you own: disable DTP on every access port (switchport nonegotiate), set access ports to a fixed access mode, move the native VLAN off VLAN 1 and tag it, prune unused VLANs from trunks, and confirm segmentation blocks unauthorized cross-VLAN reach. Process is harden-and-verify only: audit DTP/trunk/native-VLAN config, close switch-spoofing and double-tagging vectors, and confirm monitoring flags rogue trunk negotiation. No trunk forging or double-tagging is performed; no weaponized commands. In MAOS this feeds mas-sec-reviewer and the §5 segmentation guardrail, in subscription quota units, never cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-and-preventing-vlan-hopping/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-anomalous-authentication-patterns",
     "name": "detecting-anomalous-authentication-patterns",
     "description": "|",
@@ -2022,6 +2218,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-api-enumeration-attacks/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:api-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-arp-poisoning-in-network-traffic",
+    "name": "detecting-arp-poisoning-in-network-traffic",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive ARP-poisoning detection + prevention: spot Layer-2 MitM (T1557.002) via its tells — IP-to-MAC change, gateway-MAC spoof, MAC flip-flop, gratuitous-ARP flood, duplicate-IP. Detection layers: ARPWatch (new station / changed-ethernet / flip-flop), Wireshark display filters, and a passive Python monitor (gateway-spoof, mac-change, flip-flop, ARP-rate). Prevention: Dynamic ARP Inspection (needs DHCP snooping first), port security, static ARP for gateways, smaller broadcast domains via VLANs, 802.1X, encrypted protocols. Feeds mas-sec-reviewer + CLAUDE.md §5. Passive/read-only by construction; switch DAI changes are owner-scoped + §5-gated. Cost is subscription quota (TOKEN_STRATEGY §8), never per-token cash.",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-arp-poisoning-in-network-traffic/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -2179,6 +2389,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-command-and-control-over-dns",
+    "name": "detecting-command-and-control-over-dns",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of DNS-based C2 and DGA. Five correlated detectors: (1) Shannon-entropy of subdomain labels (legit <3.5, tunnel >3.8-4.5) + encoding-pattern flags (hex/base32/base64); (2) DNS beaconing via inter-query interval regularity (low coefficient-of-variation = beacon) and known C2 intervals; (3) DGA classification from character-level features (entropy, length, digit/consonant ratios, English bigram deviation) — deterministic scoring first, ML only on need; (4) TXT-record payload analysis (base64/PE/ELF/PowerShell-stager detection, with SPF/DKIM/DMARC allowlist to cut false positives); (5) tool signatures (Iodine/dnscat2/dns2tcp/Cobalt Strike). Inputs: Zeek dns.log, Suricata EVE, passive DNS. Frameworks: NIST CSF, MITRE ATT&CK (T1071/T1572/T1568). In MAOS this is detect-and-pr",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-command-and-control-over-dns/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-compromised-cloud-credentials",
     "name": "detecting-compromised-cloud-credentials",
     "description": "|",
@@ -2260,6 +2484,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-cryptomining-in-cloud/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:cloud-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-dns-exfiltration-with-dns-query-analysis",
+    "name": "detecting-dns-exfiltration-with-dns-query-analysis",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of DNS data exfiltration. Per registered-domain statistics flag tunnels: avg subdomain length (normal 5-20 vs tunnel 40-253), Shannon entropy (normal 2.5-3.5 vs tunnel 4.0-5.5), unique-subdomain ratio, TXT/NULL query ratio, sustained per-domain volume, and base64/hex encoding of subdomain labels — composited into a 0-100 risk score (alert ≥ threshold). Inputs: passive DNS, Zeek dns.log (TSV), Suricata EVE JSON, PCAP. Outputs Suricata rules + Splunk SPL for deployment. Frameworks: NIST CSF, MITRE ATT&CK (T1048/T1071). FOLD: absorbs detecting-exfiltration-over-dns-with-zeek (same entropy+length+volume method, Zeek dns.log already covered here). In MAOS this is detect-and-propose only — block-tunnel-domain / isolate-host are risk:high|blocking actions gated by CLAUDE.md §5",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-dns-exfiltration-with-dns-query-analysis/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -2347,6 +2585,20 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-lateral-movement-in-network",
+    "name": "detecting-lateral-movement-in-network",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of lateral movement (MITRE TA0008). Correlates Windows Security events (4624 Type 3 NTLM = pass-the-hash, Type 10 = RDP, 7045 = PsExec service, 4648 = explicit-cred, 4769 = Kerberoast) with Zeek network logs (conn.log port 445/135/5985 east-west, smb_mapping.log admin-share C$/ADMIN$/IPC$ access, dce_rpc.log svcctl/atsvc remote exec, ntlm.log account-spray = one user to many hosts in a window, kerberos.log ticket anomalies) and Sigma rules portable across SIEMs. Detection = a single account/host fanning out to many internal hosts in a short window; trace the full chain, not the single alert. Frameworks: NIST CSF, MITRE ATT&CK (T1021/T1550.002/T1569.002), D3FEND. FOLD: absorbs detecting-lateral-movement-with-zeek (its NTLM-spray Zeek script + network-only path are kept h",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-lateral-movement-in-network/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-living-off-the-land-attacks",
     "name": "detecting-living-off-the-land-attacks",
     "description": "|",
@@ -2375,6 +2627,34 @@
     "tier": "T1"
   },
   {
+    "id": "detecting-network-anomalies-with-zeek",
+    "name": "detecting-network-anomalies-with-zeek",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive deployment + scripting of Zeek as a passive NSM. Install/configure on a SPAN/tap (node.cfg, networks.cfg, disable NIC offload), navigate the structured logs (conn/dns/http/ssl/files/notice/weird/x509/ssh), and author custom event-driven detection scripts using the Notice + SumStats frameworks: DNS-tunneling (long query / high per-source query volume), beaconing (connection-count thresholds over a window), SSH brute-force, self-signed/expired certs, rare user-agents, large transfers, long-duration C2 connections. JSON output + Filebeat to SIEM; RITA for beacon/tunnel analytics; Intel framework for IOC matching. Frameworks: NIST CSF, MITRE ATT&CK (T1046/T1040/T1557/T1071). Tuning + CDN/update-service exclusion is mandatory to avoid false positives. In MAOS this is monitor-and-detec",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-network-anomalies-with-zeek/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-network-scanning-with-ids-signatures",
+    "name": "detecting-network-scanning-with-ids-signatures",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Defensive detection of recon/port-scanning via Suricata/Snort signatures. Threshold-based rules per scan type: SYN (flags:S, count/seconds), FIN/Xmas/NULL (anomalous flag combos), ACK (firewall probing), UDP, Nmap OS-fingerprint (ECN SYN, window probes) + NSE user-agent, Masscan (window:1024 high-rate), and HOME_NET→HOME_NET internal scans (CRITICAL = likely compromise). threshold.config suppresses authorized scanners and rate-limits to stop log floods. A Python correlator groups EVE alerts into per-source campaigns (target/port breadth, scan types, duration, severity). Frameworks: NIST CSF, MITRE ATT&CK (T1595 Active Scanning, T1046). Internal scans rank above external; threshold tuning per network size is mandatory. In MAOS this is detect-and-propose only — block/firewall actions are ris",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-network-scanning-with-ids-signatures/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "detecting-oauth-token-theft",
     "name": "detecting-oauth-token-theft",
     "description": "|",
@@ -2400,6 +2680,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-pass-the-ticket-attacks/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:threat-detection",
+    "tier": "T1"
+  },
+  {
+    "id": "detecting-port-scanning-with-fail2ban",
+    "name": "detecting-port-scanning-with-fail2ban",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Host-based detection + automated response to port scanning and brute force via Fail2ban. Jails bind a filter (regex over a log) to an action (iptables/nftables ban) with thresholds (maxretry, findtime, bantime): portscan (iptables `recent` module logs SYN-to-closed-port → PORTSCAN filter), nmap-scan, http-scan (404/403 to /wp-admin,/phpmyadmin,/.env probes), sshd, and a recidive meta-jail escalating repeat offenders. ignoreip whitelists trusted/monitoring nets; fail2ban-regex validates filters before deploy. CRITICAL governance note: Fail2ban *executes* iptables DROP automatically — in MAOS the ban is an active outbound/destructive response, so it is a risk:high action gated by CLAUDE.md §5 + mas-sec-reviewer (never silent autopilot), and ignoreip must protect operational hosts. Frameworks",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/detecting-port-scanning-with-fail2ban/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -3811,6 +4105,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-bgp-security-with-rpki",
+    "name": "implementing-bgp-security-with-rpki",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team BGP origin hardening with RPKI/ROV: create ROAs (prefix + origin AS + max-length = prefix-length to block sub-prefix hijack) at the RIR, deploy a validating cache (Routinator/FORT/OctoRPKI) serving VRPs over RTR (TCP 8323), and enforce ROV on your own routers — Valid→prefer, Invalid→reject, NotFound→accept-lower-pref. Roll out soft (log-invalid) before drop, run dual validators, alert on ROA expiry. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071). Configuration runs only on infrastructure you own; rejecting routes / cutting reachability is a §5 gated risky action. In MAOS this is a knowledge input feeding mas-sec-reviewer and the §5 network lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-bgp-security-with-rpki/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-browser-isolation-for-zero-trust",
+    "name": "implementing-browser-isolation-for-zero-trust",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team remote browser isolation for Zero Trust: a URL risk-classification engine maps category + reputation to an isolation action (allow-direct / read-only / full-isolation / CDR-passthrough); CDR strips macros, OLE objects, scripts and active content from downloads and reconstructs safe files; per-session DLP controls clipboard/download/upload/print/keystroke/watermark; integrate with Secure Web Gateway, ZTNA, IdP device-posture and conditional-access so unmanaged or high-risk users get isolated. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071/T1003). Policy enforcement applies only to the owner's user population; routing/blocking is a §5 gated change. In MAOS this feeds mas-sec-reviewer and the §5 network/risk lens; cost is quota un",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-browser-isolation-for-zero-trust/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-canary-tokens-for-network-intrusion",
     "name": "implementing-canary-tokens-for-network-intrusion",
     "description": "|",
@@ -3990,6 +4312,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-continuous-security-validation-with-bas/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-ddos-mitigation-with-cloudflare",
+    "name": "implementing-ddos-mitigation-with-cloudflare",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Cloudflare DDoS hardening for owner zones: proxy all DNS records, tune the HTTP (ddos_l7) and network (ddos_l4) managed rulesets by sensitivity, add rate-limiting on login/API/global, author WAF custom rules (bad-ASN, missing UA, admin-path geo, oversized body), enable Bot Management, and protect the origin by allowing only Cloudflare IP ranges + Authenticated Origin Pulls (mTLS) so attackers can't bypass to origin. Start rules in Log mode before Block; alert on dos_attack_l7. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071/T1078.004). Applies only to zones/origins you control; blocking and 'Under Attack' mode are §5 gated changes. In MAOS this feeds mas-sec-reviewer and the §5 network lens; cost is quota units (§8), never PAYG ",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-ddos-mitigation-with-cloudflare/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -4511,6 +4847,34 @@
     "tier": "T1"
   },
   {
+    "id": "implementing-network-access-control",
+    "name": "implementing-network-access-control",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team 802.1X NAC, vendor-neutral with Cisco-ISE variant folded in: RADIUS auth (FreeRADIUS/NPS/ISE) with EAP-TLS or PEAP-MSCHAPv2, MAB fallback for printers/phones, dynamic VLAN by AD-group, PacketFence/ISE posture (patch/AV/encryption) with quarantine VLAN, and mandatory critical-VLAN fail-open so a dead RADIUS doesn't black out the floor. ISE delta: policy sets, authorization profiles, downloadable ACLs, SGT/TrustSec segmentation, Change-of-Authorization, endpoint profiling. Deploy monitor/open mode before closed enforcement. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071, +T1027). Applies only to owner-controlled switches/RADIUS; closed-mode enforcement is a §5 gated change. In MAOS this feeds mas-sec-reviewer and the §5 IAM/netwo",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-network-access-control/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-network-intrusion-prevention-with-suricata",
+    "name": "implementing-network-intrusion-prevention-with-suricata",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Suricata IDS/IPS on owner networks: deploy inline (NFQUEUE or AF_PACKET copy-mode ips) or passive (AF_PACKET TAP/SPAN), set HOME_NET/EXTERNAL_NET, manage rulesets with suricata-update (ET Open / ET Pro / trafficid), write custom detection and drop rules (reverse-shell, C2 user-agent, DGA/DNS-TXT, SMB lateral movement, ICMP tunneling), tune false positives with threshold/suppress/rate_filter before enabling drop, run fail-open, and ship EVE-JSON to the SIEM. Start IDS-only, tune weeks, then IPS. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071). Runs only on networks you own; inline drop is a §5 gated change. In MAOS this feeds mas-sec-reviewer and the §5 network lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-network-intrusion-prevention-with-suricata/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "implementing-network-policies-for-kubernetes",
     "name": "implementing-network-policies-for-kubernetes",
     "description": "|",
@@ -4522,6 +4886,62 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-network-policies-for-kubernetes/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-network-segmentation-with-firewall-zones",
+    "name": "implementing-network-segmentation-with-firewall-zones",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team network segmentation to contain breaches and stop lateral movement: baseline flows from NetFlow, define trust-tiered zones (Internet/DMZ/Guest/Corporate/Servers/PCI-CDE/Management/OT), configure VLANs (native-VLAN hygiene, anti-VLAN-hopping) and zone-based firewall rules with default-deny + explicit allows + intra-zone deny, layer inter-VLAN ACLs and workload microsegmentation/SGT, restrict the management plane to a jump-box zone, and validate with connectivity tests that should-block actually blocks. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071/T1021). Applies only to owner-controlled networks; deny rules that cut access are §5 gated changes. In MAOS this feeds mas-sec-reviewer and the §5 network lens; cost is quota units (§",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-network-segmentation-with-firewall-zones/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-network-traffic-analysis-with-arkime",
+    "name": "implementing-network-traffic-analysis-with-arkime",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team full-packet-capture analysis with Arkime: query sessions by IP/port/protocol/expression through the Arkime viewer API, pull PCAPs for forensic review, detect C2 beaconing from regular connection intervals + low jitter, find DNS tunneling via query-length statistics, and flag connections to known-bad TLS certificate issuers and anomalous HTTP/DNS flows. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071/T1095). Read-only investigation of authorized capture data only — never capture on a network you don't own; remediation is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 network lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-network-traffic-analysis-with-arkime/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-network-traffic-baselining",
+    "name": "implementing-network-traffic-baselining",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team network baselining from authorized NetFlow/IPFIX: ingest v5/v9/IPFIX flow records, compute hourly/daily volume distributions (bytes/packets/flows), per-source-IP mean/median/stddev profiles, and protocol/port distribution baselines, then flag statistical outliers via z-score thresholds and IQR — surfacing data-exfiltration spikes, beaconing, and anomalous port usage as ranked top-talker deviations. Needs ~7+ days of history for a stable baseline. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071). Read-only statistical analysis of authorized flow data; remediation is owner guidance, not a MAOS action. In MAOS this feeds mas-sec-reviewer and the §5 network lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-network-traffic-baselining/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "implementing-next-generation-firewall-with-palo-alto",
+    "name": "implementing-next-generation-firewall-with-palo-alto",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Blue-team Palo Alto NGFW deployment for owner networks: zone-based architecture (Trust/Untrust/DMZ/Guest/DataCenter), App-ID application-aware policy and User-ID identity enforcement with default-deny + explicit allows, zone-protection profiles (SYN-cookies, flood, scan), threat-prevention profile groups (anti-spyware botnet-sinkhole, vulnerability block-critical, URL block-C2/malware/phishing, file-blocking, WildFire), SSL forward-proxy decryption with financial/health no-decrypt exclusions, and SIEM syslog forwarding. Validate with Policy Optimizer, EICAR test, shadowed-rule audit. Maps to NIST-CSF (PR.IR-01, DE.CM-01, ID.AM-03, PR.DS-02) and MITRE ATT&CK (T1046/T1040/T1557/T1071/T1553). Applies only to owner-controlled firewalls; deny rules and decryption are §5 gated/privacy-sensitive ",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/implementing-next-generation-firewall-with-palo-alto/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -6527,6 +6947,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-network-traffic-analysis-with-tshark",
+    "name": "performing-network-traffic-analysis-with-tshark",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Offline PCAP triage with tshark/pyshark on authorized capture files: extract protocol-hierarchy and conversation statistics, rank top talkers by volume/connection-count, flag suspicious flows (port scans, beaconing, exfiltration), pull network IOCs (IPs, DNS-query domains, HTTP URLs), and detect DNS tunneling via high-entropy subdomains and excessive TXT records. Output is a structured JSON report with severity-rated detections. Read-only analysis of owned PCAPs — never live capture of third-party systems. Map indicators to MITRE ATT&CK (T1046/T1040/T1557/T1071/T1005) and NIST-CSF DE.CM/PR.DS/ID.AM. In MAOS this feeds mas-sec-reviewer and the §5 network/allowed_hosts lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-network-traffic-analysis-with-tshark/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-network-traffic-analysis-with-zeek",
+    "name": "performing-network-traffic-analysis-with-zeek",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Deploy and operate Zeek as a passive NSM on an authorized TAP/SPAN segment: install/configure node layout, understand the protocol-log architecture (conn/dns/http/ssl/files/notice/weird/x509/smtp/ssh), run live or offline-on-PCAP, write custom detection scripts in the Zeek scripting language for behavioral analysis, and ship structured logs (TSV/JSON, JA3/JA3S, file hashes) into a SIEM (Splunk/ELK/QRadar). Distinct from offline tshark IOC extraction and from narrow conn.log beacon-hunting — this is the standing-monitor + scripting + SIEM-integration lens. Passive: generates high-fidelity metadata, transmits nothing. Map to MITRE ATT&CK (T1046/T1040/T1557/T1071/T1685.002) and NIST-CSF DE.CM/PR.DS/ID.AM. In MAOS this feeds mas-sec-reviewer and the §5 network lens; cost is quota units (§8), n",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-network-traffic-analysis-with-zeek/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "performing-oauth-scope-minimization-review",
     "name": "performing-oauth-scope-minimization-review",
     "description": "|",
@@ -6723,6 +7171,34 @@
     "tier": "T1"
   },
   {
+    "id": "performing-ssl-tls-inspection-configuration",
+    "name": "performing-ssl-tls-inspection-configuration",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Configure authorized SSL/TLS break-and-inspect on a NGFW/secure-web-gateway: deploy an internal inspection CA, understand forward-proxy/inbound/SSH modes and the certificate trust chain, generate proxy certs signed by the internal CA, manage exemptions for certificate-pinned and privacy-sensitive categories (banking/health), and align scope with privacy/legal review. Inspection is performed only within an organization that owns the endpoints and traffic — never against third-party or pinned services you do not control. Map to MITRE ATT&CK (T1046/T1040/T1557/T1071/T1573) and NIST-CSF DE.CM/PR.DS/PR.IR. In MAOS this is library knowledge for a network/secure-coding review feeding mas-sec-reviewer and the §5 secrets/network lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ssl-tls-inspection-configuration/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-ssl-tls-security-assessment",
+    "name": "performing-ssl-tls-security-assessment",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized TLS posture assessment with sslyze: scan a target HTTPS server (ServerScanRequest/ServerNetworkLocation), enumerate supported protocol versions (SSLv2/3, TLS 1.0–1.3), grade cipher-suite strength, validate the certificate chain, check HSTS enforcement and OCSP stapling, and test for known weaknesses (Heartbleed, ROBOT, insecure renegotiation). Output is a JSON report with compliance findings and remediation recommendations. Run only against servers you own or are explicitly authorized to test — assessment is read-level posture evaluation, never exploitation. Map to MITRE ATT&CK (T1046/T1040/T1557/T1071/T1553) and NIST-CSF DE.CM/PR.DS/ID.AM. In MAOS this feeds mas-sec-reviewer and the §5 network/allowed_hosts lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-ssl-tls-security-assessment/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
+    "tier": "T1"
+  },
+  {
     "id": "performing-threat-hunting-with-elastic-siem",
     "name": "performing-threat-hunting-with-elastic-siem",
     "description": "|",
@@ -6790,6 +7266,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-web-application-vulnerability-triage/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:vulnerability-management",
+    "tier": "T1"
+  },
+  {
+    "id": "performing-wireless-security-assessment-with-kismet",
+    "name": "performing-wireless-security-assessment-with-kismet",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Passive 802.11 wireless assessment with Kismet on an authorized environment: put a monitor-mode adapter into passive capture (no packets transmitted, undetectable to the target), then enumerate access points, clients, and probe requests; identify rogue APs, hidden SSIDs (via probe responses), weak/legacy encryption (Open/WEP/WPA-TKIP), and unauthorized clients; optionally map with GPS. Strictly passive WIDS-style monitoring — never deauth, injection, or active attack. Requires written authorization (legal requirement noted in source). Map to MITRE ATT&CK (T1046/T1040/T1557/T1071/T1573) and NIST-CSF DE.CM/PR.DS/ID.AM. In MAOS this feeds mas-sec-reviewer and the §5 network lens as defensive library knowledge; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/performing-wireless-security-assessment-with-kismet/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
@@ -7434,6 +7924,20 @@
     "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-kubernetes-manifests-with-kubesec/SKILL.md",
     "origin": "mukul975/Anthropic-Cybersecurity-Skills",
     "cluster": "cyber:container-security",
+    "tier": "T1"
+  },
+  {
+    "id": "scanning-own-network-with-nmap",
+    "name": "scanning-own-network-with-nmap",
+    "description": "|",
+    "domain": "planning",
+    "summary": "Authorized-own-network discovery and inventory with Nmap: layered host discovery (ARP/ICMP/TCP/UDP probes, list scan for DNS-only resolution), bounded SYN/UDP port scanning, service-version detection and OS fingerprinting, and selective NSE checks — producing structured output (-oA/gnmap) for an asset-inventory and vulnerability-management pipeline. Scoped to networks you own or hold explicit written authorization for; non-disruptive timing only. Firewall/IDS-evasion and DoS-grade aggressive scanning are deliberately excluded as out-of-scope (weaponization KILL). Map to MITRE ATT&CK (T1046/T1040/T1557/T1071/T1595) and NIST-CSF DE.CM/ID.AM/PR.IR. In MAOS this feeds mas-sec-reviewer and the §5 network/allowed_hosts lens; cost is quota units (§8), never PAYG (§11).",
+    "tags": [
+      "cyber:network-security"
+    ],
+    "path": "/Users/melvyn/Documents/02_PROJETS/maos-ecc/packages/skills/library/scanning-own-network-with-nmap/SKILL.md",
+    "origin": "mukul975/Anthropic-Cybersecurity-Skills",
+    "cluster": "cyber:network-security",
     "tier": "T1"
   },
   {
