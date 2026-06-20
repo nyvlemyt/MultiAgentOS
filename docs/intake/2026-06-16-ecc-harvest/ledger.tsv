@@ -629,7 +629,7 @@ cyber-skill	cyber:threat-intelligence	automating-ioc-enrichment	integrated	adapt
 cyber-skill	cyber:threat-intelligence	building-adversary-infrastructure-tracking-system	rejected	fold	decisions/cyber-threat-intelligence-D.md
 cyber-skill	cyber:threat-intelligence	building-attack-pattern-library-from-cti-reports	integrated	adapt	decisions/cyber-threat-intelligence-D.md
 cyber-skill	cyber:soc-operations	building-automated-malware-submission-pipeline	integrated	adapt	decisions/cyber-DX.md
-cyber-skill	cyber:red-teaming	building-c2-infrastructure-with-sliver-framework	pending		
+cyber-skill	cyber:red-teaming	building-c2-infrastructure-with-sliver-framework	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:cloud-security	building-cloud-siem-with-sentinel	integrated	adapt	decisions/cyber-EP.md
 cyber-skill	cyber:soc-operations	building-detection-rule-with-splunk-spl	integrated	adapt	decisions/cyber-DX.md
 cyber-skill	cyber:soc-operations	building-detection-rules-with-sigma	integrated	adapt	decisions/cyber-DX.md
@@ -645,7 +645,7 @@ cyber-skill	cyber:incident-response	building-malware-incident-communication-temp
 cyber-skill	cyber:vulnerability-management	building-patch-tuesday-response-process	integrated	adapt	decisions/cyber-DK.md
 cyber-skill	cyber:phishing-defense	building-phishing-reporting-button-workflow	integrated	adapt	decisions/cyber-EK.md
 cyber-skill	cyber:ransomware-defense	building-ransomware-playbook-with-cisa-framework	integrated	adapt	decisions/cyber-EG.md
-cyber-skill	cyber:red-teaming	building-red-team-c2-infrastructure-with-havoc	pending		
+cyber-skill	cyber:red-teaming	building-red-team-c2-infrastructure-with-havoc	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:identity-access-management	building-role-mining-for-rbac-optimization	integrated	adapt	decisions/cyber-DO.md
 cyber-skill	cyber:soc-operations	building-soc-escalation-matrix	integrated	adapt	decisions/cyber-DX.md
 cyber-skill	cyber:soc-operations	building-soc-metrics-and-kpi-tracking	integrated	adapt	decisions/cyber-DX.md
@@ -668,22 +668,22 @@ cyber-skill	cyber:incident-response	collecting-volatile-evidence-from-compromise
 cyber-skill	cyber:penetration-testing	conducting-api-security-testing	pending		
 cyber-skill	cyber:incident-response	conducting-cloud-incident-response	integrated	adapt	decisions/cyber-DS.md
 cyber-skill	cyber:cloud-security	conducting-cloud-penetration-testing	integrated	adapt	decisions/cyber-EP.md
-cyber-skill	cyber:red-teaming	conducting-domain-persistence-with-dcsync	pending		
+cyber-skill	cyber:red-teaming	conducting-domain-persistence-with-dcsync	rejected	reject	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:penetration-testing	conducting-external-reconnaissance-with-osint	pending		
-cyber-skill	cyber:red-teaming	conducting-full-scope-red-team-engagement	pending		
+cyber-skill	cyber:red-teaming	conducting-full-scope-red-team-engagement	rejected	fold	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:penetration-testing	conducting-internal-network-penetration-test	pending		
-cyber-skill	cyber:red-teaming	conducting-internal-reconnaissance-with-bloodhound-ce	pending		
+cyber-skill	cyber:red-teaming	conducting-internal-reconnaissance-with-bloodhound-ce	rejected	fold	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:incident-response	conducting-malware-incident-response	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:network-security	conducting-man-in-the-middle-attack-simulation	integrated	adapt	decisions/cyber-FA.md
 cyber-skill	cyber:incident-response	conducting-memory-forensics-with-volatility	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:penetration-testing	conducting-mobile-app-penetration-test	pending		
 cyber-skill	cyber:penetration-testing	conducting-network-penetration-test	pending		
-cyber-skill	cyber:red-teaming	conducting-pass-the-ticket-attack	pending		
+cyber-skill	cyber:red-teaming	conducting-pass-the-ticket-attack	rejected	reject	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:incident-response	conducting-phishing-incident-response	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:incident-response	conducting-post-incident-lessons-learned	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:penetration-testing	conducting-social-engineering-penetration-test	pending		
-cyber-skill	cyber:red-teaming	conducting-social-engineering-pretext-call	pending		
-cyber-skill	cyber:red-teaming	conducting-spearphishing-simulation-campaign	pending		
+cyber-skill	cyber:red-teaming	conducting-social-engineering-pretext-call	integrated	adapt	decisions/cyber-red-teaming-YAA.md
+cyber-skill	cyber:red-teaming	conducting-spearphishing-simulation-campaign	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:penetration-testing	conducting-wireless-network-penetration-test	pending		
 cyber-skill	cyber:identity-access-management	configuring-active-directory-tiered-model	integrated	adapt	decisions/cyber-DO.md
 cyber-skill	cyber:zero-trust-architecture	configuring-aws-verified-access-for-ztna	rejected	fold	decisions/cyber-EI.md
@@ -808,15 +808,15 @@ cyber-skill	cyber:incident-response	eradicating-malware-from-infected-systems	in
 cyber-skill	cyber:threat-intelligence	evaluating-threat-intelligence-platforms	integrated	adapt	decisions/cyber-threat-intelligence-B.md
 cyber-skill	cyber:penetration-testing	executing-active-directory-attack-simulation	pending		
 cyber-skill	cyber:penetration-testing	executing-phishing-simulation-campaign	pending		
-cyber-skill	cyber:red-teaming	executing-red-team-engagement-planning	pending		
+cyber-skill	cyber:red-teaming	executing-red-team-engagement-planning	integrated	adapt	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:penetration-testing	executing-red-team-exercise	pending		
-cyber-skill	cyber:red-teaming	exploiting-active-directory-certificate-services-esc1	pending		
-cyber-skill	cyber:red-teaming	exploiting-active-directory-with-bloodhound	pending		
+cyber-skill	cyber:red-teaming	exploiting-active-directory-certificate-services-esc1	rejected	reject	decisions/cyber-red-teaming-YAA.md
+cyber-skill	cyber:red-teaming	exploiting-active-directory-with-bloodhound	rejected	fold	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:api-security	exploiting-api-injection-vulnerabilities	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:network-security	exploiting-bgp-hijacking-vulnerabilities	integrated	adapt	decisions/cyber-FA.md
 cyber-skill	cyber:api-security	exploiting-broken-function-level-authorization	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:web-application-security	exploiting-broken-link-hijacking	integrated	adapt	decisions/cyber-DD.md
-cyber-skill	cyber:red-teaming	exploiting-constrained-delegation-abuse	pending		
+cyber-skill	cyber:red-teaming	exploiting-constrained-delegation-abuse	integrated	adapt	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:mobile-security	exploiting-deeplink-vulnerabilities	pending		
 cyber-skill	cyber:api-security	exploiting-excessive-data-exposure-in-api	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:web-application-security	exploiting-http-request-smuggling	integrated	adapt	decisions/cyber-DD.md
@@ -825,10 +825,10 @@ cyber-skill	cyber:mobile-security	exploiting-insecure-data-storage-in-mobile	pen
 cyber-skill	cyber:web-application-security	exploiting-insecure-deserialization	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:network-security	exploiting-ipv6-vulnerabilities	integrated	adapt	decisions/cyber-FA.md
 cyber-skill	cyber:api-security	exploiting-jwt-algorithm-confusion-attack	integrated	adapt	decisions/cyber-DC.md
-cyber-skill	cyber:red-teaming	exploiting-kerberoasting-with-impacket	pending		
+cyber-skill	cyber:red-teaming	exploiting-kerberoasting-with-impacket	rejected	reject	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:web-application-security	exploiting-mass-assignment-in-rest-apis	integrated	adapt	decisions/cyber-DD.md
-cyber-skill	cyber:red-teaming	exploiting-ms17-010-eternalblue-vulnerability	pending		
-cyber-skill	cyber:red-teaming	exploiting-nopac-cve-2021-42278-42287	pending		
+cyber-skill	cyber:red-teaming	exploiting-ms17-010-eternalblue-vulnerability	rejected	reject	decisions/cyber-red-teaming-YAA.md
+cyber-skill	cyber:red-teaming	exploiting-nopac-cve-2021-42278-42287	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:web-application-security	exploiting-nosql-injection-vulnerabilities	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:web-application-security	exploiting-oauth-misconfiguration	integrated	adapt	decisions/cyber-DD.md
 cyber-skill	cyber:web-application-security	exploiting-prototype-pollution-in-javascript	integrated	adapt	decisions/cyber-DE.md
@@ -841,7 +841,7 @@ cyber-skill	cyber:web-application-security	exploiting-template-injection-vulnera
 cyber-skill	cyber:web-application-security	exploiting-type-juggling-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
 cyber-skill	cyber:vulnerability-management	exploiting-vulnerabilities-with-metasploit-framework	rejected	reject	decisions/cyber-DK.md
 cyber-skill	cyber:web-application-security	exploiting-websocket-vulnerabilities	integrated	adapt	decisions/cyber-DE.md
-cyber-skill	cyber:red-teaming	exploiting-zerologon-vulnerability-cve-2020-1472	pending		
+cyber-skill	cyber:red-teaming	exploiting-zerologon-vulnerability-cve-2020-1472	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:digital-forensics	extracting-browser-history-artifacts	integrated	adapt	decisions/cyber-digital-forensics-R.md
 cyber-skill	cyber:malware-analysis	extracting-config-from-agent-tesla-rat	integrated	adapt	decisions/cyber-malware-analysis-N.md
 cyber-skill	cyber:digital-forensics	extracting-credentials-from-memory-dump	integrated	adapt	decisions/cyber-digital-forensics-Q.md
@@ -1067,7 +1067,7 @@ cyber-skill	cyber:threat-intelligence	monitoring-darkweb-sources	integrated	adop
 cyber-skill	cyber:ot-security	monitoring-scada-modbus-traffic-anomalies	pending		
 cyber-skill	cyber:identity-access-management	performing-access-recertification-with-saviynt	integrated	adapt	decisions/cyber-DR.md
 cyber-skill	cyber:identity-access-management	performing-access-review-and-certification	integrated	adapt	decisions/cyber-DR.md
-cyber-skill	cyber:red-teaming	performing-active-directory-bloodhound-analysis	pending		
+cyber-skill	cyber:red-teaming	performing-active-directory-bloodhound-analysis	integrated	adapt	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:incident-response	performing-active-directory-compromise-investigation	integrated	adapt	decisions/cyber-DT.md
 cyber-skill	cyber:red-team	performing-active-directory-forest-trust-attack	pending		
 cyber-skill	cyber:penetration-testing	performing-active-directory-penetration-test	pending		
@@ -1107,7 +1107,7 @@ cyber-skill	cyber:container-security	performing-container-escape-detection	integ
 cyber-skill	cyber:devsecops	performing-container-image-hardening	integrated	adapt	decisions/cyber-DG.md
 cyber-skill	cyber:container-security	performing-container-security-scanning-with-trivy	integrated	adapt	decisions/cyber-DI.md
 cyber-skill	cyber:web-application-security	performing-content-security-policy-bypass	integrated	adapt	decisions/cyber-web-application-security-W.md
-cyber-skill	cyber:red-teaming	performing-credential-access-with-lazagne	pending		
+cyber-skill	cyber:red-teaming	performing-credential-access-with-lazagne	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:cryptography	performing-cryptographic-audit-of-application	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:web-application-security	performing-csrf-attack-simulation	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:vulnerability-management	performing-cve-prioritization-with-kev-catalog	integrated	adapt	decisions/cyber-DM.md
@@ -1140,19 +1140,19 @@ cyber-skill	cyber:cryptography	performing-hash-cracking-with-hashcat	integrated	
 cyber-skill	cyber:web-application-security	performing-http-parameter-pollution-attack	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:ot-ics-security	performing-ics-asset-discovery-with-claroty	integrated	adapt	decisions/cyber-ot-ics-security-S.md
 cyber-skill	cyber:threat-intelligence	performing-indicator-lifecycle-management	integrated	adapt	decisions/cyber-threat-intelligence-C.md
-cyber-skill	cyber:red-teaming	performing-initial-access-with-evilginx3	pending		
+cyber-skill	cyber:red-teaming	performing-initial-access-with-evilginx3	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:incident-response	performing-insider-threat-investigation	integrated	adapt	decisions/cyber-DU.md
 cyber-skill	cyber:soc-operations	performing-ioc-enrichment-automation	integrated	adapt	decisions/cyber-DZ.md
 cyber-skill	cyber:mobile-security	performing-ios-app-security-assessment	pending		
 cyber-skill	cyber:penetration-testing	performing-iot-security-assessment	pending		
 cyber-skill	cyber:threat-intelligence	performing-ip-reputation-analysis-with-shodan	integrated	adapt	decisions/cyber-threat-intelligence-D.md
 cyber-skill	cyber:api-security	performing-jwt-none-algorithm-attack	integrated	adapt	decisions/cyber-DC.md
-cyber-skill	cyber:red-teaming	performing-kerberoasting-attack	pending		
+cyber-skill	cyber:red-teaming	performing-kerberoasting-attack	rejected	reject	decisions/cyber-red-teaming-Z.md
 cyber-skill	cyber:container-security	performing-kubernetes-cis-benchmark-with-kube-bench	integrated	adapt	decisions/cyber-DJ.md
 cyber-skill	cyber:container-security	performing-kubernetes-etcd-security-assessment	integrated	adapt	decisions/cyber-DJ.md
 cyber-skill	cyber:container-security	performing-kubernetes-penetration-testing	integrated	adapt	decisions/cyber-DJ.md
 cyber-skill	cyber:soc-operations	performing-lateral-movement-detection	integrated	adapt	decisions/cyber-EA.md
-cyber-skill	cyber:red-teaming	performing-lateral-movement-with-wmiexec	pending		
+cyber-skill	cyber:red-teaming	performing-lateral-movement-with-wmiexec	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:digital-forensics	performing-linux-log-forensics-investigation	integrated	adapt	decisions/cyber-digital-forensics-Q.md
 cyber-skill	cyber:digital-forensics	performing-log-analysis-for-forensic-investigation	integrated	adapt	decisions/cyber-digital-forensics-Q.md
 cyber-skill	cyber:soc-operations	performing-log-source-onboarding-in-siem	integrated	adapt	decisions/cyber-EA.md
@@ -1171,7 +1171,7 @@ cyber-skill	cyber:network-security	performing-network-traffic-analysis-with-zeek
 cyber-skill	cyber:compliance-governance	performing-nist-csf-maturity-assessment	pending		
 cyber-skill	cyber:identity-access-management	performing-oauth-scope-minimization-review	integrated	adapt	decisions/cyber-DR.md
 cyber-skill	cyber:ot-ics-security	performing-oil-gas-cybersecurity-assessment	integrated	adapt	decisions/cyber-ot-ics-security-U.md
-cyber-skill	cyber:red-teaming	performing-open-source-intelligence-gathering	pending		
+cyber-skill	cyber:red-teaming	performing-open-source-intelligence-gathering	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:threat-intelligence	performing-osint-with-spiderfoot	integrated	adapt	decisions/cyber-threat-intelligence-D.md
 cyber-skill	cyber:ot-ics-security	performing-ot-network-security-assessment	integrated	adapt	decisions/cyber-ot-ics-security-U.md
 cyber-skill	cyber:ot-ics-security	performing-ot-vulnerability-assessment-with-claroty	integrated	adapt	decisions/cyber-ot-ics-security-U.md
@@ -1179,13 +1179,13 @@ cyber-skill	cyber:ot-ics-security	performing-ot-vulnerability-scanning-safely	in
 cyber-skill	cyber:network-security	performing-packet-injection-attack	rejected	reject	decisions/cyber-FA.md
 cyber-skill	cyber:threat-intelligence	performing-paste-site-monitoring-for-credentials	integrated	adapt	decisions/cyber-threat-intelligence-E.md
 cyber-skill	cyber:phishing-defense	performing-phishing-simulation-with-gophish	rejected	reject	decisions/cyber-EL.md
-cyber-skill	cyber:red-teaming	performing-physical-intrusion-assessment	pending		
+cyber-skill	cyber:red-teaming	performing-physical-intrusion-assessment	integrated	adapt	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:ot-ics-security	performing-plc-firmware-security-analysis	integrated	adapt	decisions/cyber-ot-ics-security-U.md
 cyber-skill	cyber:cryptography	performing-post-quantum-cryptography-migration	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:ot-ics-security	performing-power-grid-cybersecurity-assessment	integrated	adapt	decisions/cyber-ot-ics-security-U.md
 cyber-skill	cyber:privacy-compliance	performing-privacy-impact-assessment	pending		
 cyber-skill	cyber:penetration-testing	performing-privilege-escalation-assessment	pending		
-cyber-skill	cyber:red-teaming	performing-privilege-escalation-on-linux	pending		
+cyber-skill	cyber:red-teaming	performing-privilege-escalation-on-linux	rejected	reject	decisions/cyber-red-teaming-YAA.md
 cyber-skill	cyber:identity-access-management	performing-privileged-account-access-review	integrated	adapt	decisions/cyber-DR.md
 cyber-skill	cyber:identity-access-management	performing-privileged-account-discovery	integrated	adapt	decisions/cyber-DR.md
 cyber-skill	cyber:purple-team	performing-purple-team-atomic-testing	pending		
