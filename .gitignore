@@ -79,3 +79,9 @@ docs/ressources/.DS_Store
 # Curated, cited distillation goes to docs/knowledge/ — don't commit raw third-party content.
 docs/ressources/md/
 .mcp.json
+
+# Generated skill/agent library indexes (regen via `pnpm --filter @mas/skills build-library-index`).
+# Not committed: their summary prose trips Sonar S7164 secret false positives, and
+# they are build artifacts. See docs/intake/2026-06-16-ecc-harvest.
+packages/skills/library/index.json
+packages/agents/library/index.json

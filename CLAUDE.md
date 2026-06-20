@@ -53,9 +53,10 @@ multiAgentOS/
 ├── PRODUCT_SPEC.md
 ├── ROADMAP.md
 ├── SKILLS_REGISTRY.md
-├── TOKEN_STRATEGY.md
-└── sonar-project.properties   # SonarCloud Automatic-Analysis config (excludes generated library indexes)
+└── TOKEN_STRATEGY.md
 ```
+
+> `packages/{skills,agents}/library/index.json` are **generated** (regen via `pnpm --filter @mas/skills build-library-index`) and **gitignored** — not committed, since their summary prose trips SonarCloud S7164 secret false positives and they are build artifacts.
 
 ## 4. Autonomy levels (enforce in code)
 

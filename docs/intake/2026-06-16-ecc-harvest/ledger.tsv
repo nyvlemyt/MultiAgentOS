@@ -1090,10 +1090,10 @@ cyber-skill	cyber:cloud-security	performing-aws-account-enumeration-with-scout-s
 cyber-skill	cyber:cloud-security	performing-aws-privilege-escalation-assessment	integrated	adapt	decisions/cyber-ET.md
 cyber-skill	cyber:network-security	performing-bandwidth-throttling-attack-simulation	rejected	reject	decisions/cyber-FA.md
 cyber-skill	cyber:offensive-security	performing-binary-exploitation-analysis	pending		
-cyber-skill	cyber:web-application-security	performing-blind-ssrf-exploitation	pending		
+cyber-skill	cyber:web-application-security	performing-blind-ssrf-exploitation	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:wireless-security	performing-bluetooth-security-assessment	pending		
 cyber-skill	cyber:threat-intelligence	performing-brand-monitoring-for-impersonation	integrated	adapt	decisions/cyber-threat-intelligence-E.md
-cyber-skill	cyber:web-application-security	performing-clickjacking-attack-test	pending		
+cyber-skill	cyber:web-application-security	performing-clickjacking-attack-test	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:cloud-security	performing-cloud-asset-inventory-with-cartography	integrated	adapt	decisions/cyber-ET.md
 cyber-skill	cyber:digital-forensics	performing-cloud-forensics-investigation	integrated	adapt	decisions/cyber-digital-forensics-R.md
 cyber-skill	cyber:cloud-security	performing-cloud-forensics-with-aws-cloudtrail	integrated	adapt	decisions/cyber-ET.md
@@ -1106,14 +1106,14 @@ cyber-skill	cyber:digital-forensics	performing-cloud-storage-forensic-acquisitio
 cyber-skill	cyber:container-security	performing-container-escape-detection	integrated	adapt	decisions/cyber-DI.md
 cyber-skill	cyber:devsecops	performing-container-image-hardening	integrated	adapt	decisions/cyber-DG.md
 cyber-skill	cyber:container-security	performing-container-security-scanning-with-trivy	integrated	adapt	decisions/cyber-DI.md
-cyber-skill	cyber:web-application-security	performing-content-security-policy-bypass	pending		
+cyber-skill	cyber:web-application-security	performing-content-security-policy-bypass	integrated	adapt	decisions/cyber-web-application-security-W.md
 cyber-skill	cyber:red-teaming	performing-credential-access-with-lazagne	pending		
 cyber-skill	cyber:cryptography	performing-cryptographic-audit-of-application	integrated	adapt	decisions/cyber-EN.md
-cyber-skill	cyber:web-application-security	performing-csrf-attack-simulation	pending		
+cyber-skill	cyber:web-application-security	performing-csrf-attack-simulation	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:vulnerability-management	performing-cve-prioritization-with-kev-catalog	integrated	adapt	decisions/cyber-DM.md
 cyber-skill	cyber:threat-intelligence	performing-dark-web-monitoring-for-threats	rejected	fold	decisions/cyber-threat-intelligence-E.md
 cyber-skill	cyber:soc-operations	performing-deception-technology-deployment	integrated	adapt	decisions/cyber-DZ.md
-cyber-skill	cyber:web-application-security	performing-directory-traversal-testing	pending		
+cyber-skill	cyber:web-application-security	performing-directory-traversal-testing	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:incident-response	performing-disk-forensics-investigation	integrated	adapt	decisions/cyber-DU.md
 cyber-skill	cyber:phishing-defense	performing-dmarc-policy-enforcement-rollout	integrated	adapt	decisions/cyber-EL.md
 cyber-skill	cyber:network-security	performing-dns-enumeration-and-zone-transfer	integrated	adapt	decisions/cyber-FA.md
@@ -1134,10 +1134,10 @@ cyber-skill	cyber:cloud-security	performing-gcp-penetration-testing-with-gcpbuck
 cyber-skill	cyber:cloud-security	performing-gcp-security-assessment-with-forseti	integrated	adapt	decisions/cyber-EU.md
 cyber-skill	cyber:api-security	performing-graphql-depth-limit-attack	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:api-security	performing-graphql-introspection-attack	integrated	adapt	decisions/cyber-DC.md
-cyber-skill	cyber:web-application-security	performing-graphql-security-assessment	pending		
+cyber-skill	cyber:web-application-security	performing-graphql-security-assessment	integrated	adapt	decisions/cyber-web-application-security-X.md
 cyber-skill	cyber:cryptography	performing-hardware-security-module-integration	integrated	adapt	decisions/cyber-EN.md
 cyber-skill	cyber:cryptography	performing-hash-cracking-with-hashcat	integrated	adapt	decisions/cyber-EN.md
-cyber-skill	cyber:web-application-security	performing-http-parameter-pollution-attack	pending		
+cyber-skill	cyber:web-application-security	performing-http-parameter-pollution-attack	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:ot-ics-security	performing-ics-asset-discovery-with-claroty	integrated	adapt	decisions/cyber-ot-ics-security-S.md
 cyber-skill	cyber:threat-intelligence	performing-indicator-lifecycle-management	integrated	adapt	decisions/cyber-threat-intelligence-C.md
 cyber-skill	cyber:red-teaming	performing-initial-access-with-evilginx3	pending		
@@ -1197,8 +1197,8 @@ cyber-skill	cyber:red-team	performing-red-team-with-covenant	pending
 cyber-skill	cyber:ot-ics-security	performing-s7comm-protocol-security-analysis	integrated	adapt	decisions/cyber-ot-ics-security-U.md
 cyber-skill	cyber:devsecops	performing-sca-dependency-scanning-with-snyk	integrated	adapt	decisions/cyber-DG.md
 cyber-skill	cyber:ot-ics-security	performing-scada-hmi-security-assessment	integrated	adapt	decisions/cyber-ot-ics-security-U.md
-cyber-skill	cyber:web-application-security	performing-second-order-sql-injection	pending		
-cyber-skill	cyber:web-application-security	performing-security-headers-audit	pending		
+cyber-skill	cyber:web-application-security	performing-second-order-sql-injection	integrated	adapt	decisions/cyber-web-application-security-V.md
+cyber-skill	cyber:web-application-security	performing-security-headers-audit	integrated	adapt	decisions/cyber-web-application-security-W.md
 cyber-skill	cyber:cloud-security	performing-serverless-function-security-review	integrated	adapt	decisions/cyber-EU.md
 cyber-skill	cyber:identity-access-management	performing-service-account-audit	integrated	adapt	decisions/cyber-DR.md
 cyber-skill	cyber:identity-access-management	performing-service-account-credential-rotation	integrated	adapt	decisions/cyber-DR.md
@@ -1213,7 +1213,7 @@ cyber-skill	cyber:network-security	performing-ssl-tls-security-assessment	integr
 cyber-skill	cyber:security-operations	performing-ssrf-vulnerability-exploitation	rejected	reject	decisions/cyber-EF.md
 cyber-skill	cyber:malware-analysis	performing-static-malware-analysis-with-pe-studio	integrated	adapt	decisions/cyber-malware-analysis-L.md
 cyber-skill	cyber:digital-forensics	performing-steganography-detection	integrated	adapt	decisions/cyber-digital-forensics-P.md
-cyber-skill	cyber:web-application-security	performing-subdomain-enumeration-with-subfinder	pending		
+cyber-skill	cyber:web-application-security	performing-subdomain-enumeration-with-subfinder	integrated	adapt	decisions/cyber-web-application-security-W.md
 cyber-skill	cyber:application-security	performing-supply-chain-attack-simulation	pending		
 cyber-skill	cyber:penetration-testing	performing-thick-client-application-penetration-test	pending		
 cyber-skill	cyber:threat-intelligence	performing-threat-emulation-with-atomic-red-team	integrated	adapt	decisions/cyber-threat-intelligence-E.md
@@ -1226,12 +1226,12 @@ cyber-skill	cyber:digital-forensics	performing-timeline-reconstruction-with-plas
 cyber-skill	cyber:soc-operations	performing-user-behavior-analytics	integrated	adapt	decisions/cyber-EA.md
 cyber-skill	cyber:network-security	performing-vlan-hopping-attack	integrated	adapt	decisions/cyber-FA.md
 cyber-skill	cyber:penetration-testing	performing-vulnerability-scanning-with-nessus	pending		
-cyber-skill	cyber:web-application-security	performing-web-application-firewall-bypass	pending		
+cyber-skill	cyber:web-application-security	performing-web-application-firewall-bypass	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:penetration-testing	performing-web-application-penetration-test	pending		
 cyber-skill	cyber:vulnerability-management	performing-web-application-scanning-with-nikto	integrated	adapt	decisions/cyber-DM.md
 cyber-skill	cyber:vulnerability-management	performing-web-application-vulnerability-triage	integrated	adapt	decisions/cyber-DM.md
-cyber-skill	cyber:web-application-security	performing-web-cache-deception-attack	pending		
-cyber-skill	cyber:web-application-security	performing-web-cache-poisoning-attack	pending		
+cyber-skill	cyber:web-application-security	performing-web-cache-deception-attack	integrated	adapt	decisions/cyber-web-application-security-V.md
+cyber-skill	cyber:web-application-security	performing-web-cache-poisoning-attack	integrated	adapt	decisions/cyber-web-application-security-V.md
 cyber-skill	cyber:network-security	performing-wifi-password-cracking-with-aircrack	rejected	reject	decisions/cyber-FA.md
 cyber-skill	cyber:digital-forensics	performing-windows-artifact-analysis-with-eric-zimmerman-tools	integrated	adapt	decisions/cyber-digital-forensics-O.md
 cyber-skill	cyber:penetration-testing	performing-wireless-network-penetration-test	pending		
@@ -1271,20 +1271,20 @@ cyber-skill	cyber:mobile-security	testing-android-intents-for-vulnerabilities	pe
 cyber-skill	cyber:api-security	testing-api-authentication-weaknesses	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:api-security	testing-api-for-broken-object-level-authorization	integrated	adapt	decisions/cyber-DB.md
 cyber-skill	cyber:api-security	testing-api-for-mass-assignment-vulnerability	integrated	adapt	decisions/cyber-DB.md
-cyber-skill	cyber:web-application-security	testing-api-security-with-owasp-top-10	pending		
-cyber-skill	cyber:web-application-security	testing-cors-misconfiguration	pending		
-cyber-skill	cyber:web-application-security	testing-for-broken-access-control	pending		
-cyber-skill	cyber:web-application-security	testing-for-business-logic-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	testing-for-email-header-injection	pending		
-cyber-skill	cyber:web-application-security	testing-for-host-header-injection	pending		
-cyber-skill	cyber:web-application-security	testing-for-json-web-token-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	testing-for-open-redirect-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	testing-for-sensitive-data-exposure	pending		
-cyber-skill	cyber:web-application-security	testing-for-xml-injection-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	testing-for-xss-vulnerabilities-with-burpsuite	pending		
+cyber-skill	cyber:web-application-security	testing-api-security-with-owasp-top-10	integrated	adapt	decisions/cyber-web-application-security-X.md
+cyber-skill	cyber:web-application-security	testing-cors-misconfiguration	integrated	adapt	decisions/cyber-web-application-security-W.md
+cyber-skill	cyber:web-application-security	testing-for-broken-access-control	integrated	adapt	decisions/cyber-web-application-security-X.md
+cyber-skill	cyber:web-application-security	testing-for-business-logic-vulnerabilities	integrated	adapt	decisions/cyber-web-application-security-X.md
+cyber-skill	cyber:web-application-security	testing-for-email-header-injection	integrated	adapt	decisions/cyber-web-application-security-W.md
+cyber-skill	cyber:web-application-security	testing-for-host-header-injection	integrated	adapt	decisions/cyber-web-application-security-W.md
+cyber-skill	cyber:web-application-security	testing-for-json-web-token-vulnerabilities	rejected	fold	decisions/cyber-web-application-security-X.md
+cyber-skill	cyber:web-application-security	testing-for-open-redirect-vulnerabilities	integrated	adapt	decisions/cyber-web-application-security-W.md
+cyber-skill	cyber:web-application-security	testing-for-sensitive-data-exposure	integrated	adapt	decisions/cyber-web-application-security-X.md
+cyber-skill	cyber:web-application-security	testing-for-xml-injection-vulnerabilities	integrated	adapt	decisions/cyber-web-application-security-W.md
+cyber-skill	cyber:web-application-security	testing-for-xss-vulnerabilities-with-burpsuite	integrated	adapt	decisions/cyber-web-application-security-X.md
 cyber-skill	cyber:penetration-testing	testing-for-xss-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	testing-for-xxe-injection-vulnerabilities	pending		
-cyber-skill	cyber:web-application-security	testing-jwt-token-security	pending		
+cyber-skill	cyber:web-application-security	testing-for-xxe-injection-vulnerabilities	integrated	adapt	decisions/cyber-web-application-security-W.md
+cyber-skill	cyber:web-application-security	testing-jwt-token-security	integrated	adapt	decisions/cyber-web-application-security-X.md
 cyber-skill	cyber:mobile-security	testing-mobile-api-authentication	pending		
 cyber-skill	cyber:api-security	testing-oauth2-implementation-flaws	integrated	adapt	decisions/cyber-DC.md
 cyber-skill	cyber:incident-response	testing-ransomware-recovery-procedures	integrated	adapt	decisions/cyber-DU.md
