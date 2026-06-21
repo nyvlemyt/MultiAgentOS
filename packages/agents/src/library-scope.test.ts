@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { selectLibrarySkills, type SkillMeta } from '@mas/skills';
-import { SkillRouter, mergeSkillMetas, scanOrchestratorSkills, loadLibraryIndex } from '@mas/skills';
+import {
+  selectLibrarySkills,
+  SkillRouter,
+  mergeSkillMetas,
+  scanOrchestratorSkills,
+  loadLibraryIndex,
+  type SkillMeta,
+} from '@mas/skills';
 import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -10,6 +16,7 @@ const REPO_ROOT = resolve(__dirname, '../../..');
 
 const PILOT = 'security-defensive-specialist';
 const CYBER_PREFIX = 'cyber:';
+const SECURITY_DOMAIN = 'security';
 
 function libraryRouter(): SkillRouter {
   return new SkillRouter(
@@ -18,12 +25,12 @@ function libraryRouter(): SkillRouter {
 }
 
 function inScope(skill: SkillMeta): boolean {
-  return skill.domain === 'security' || (skill.cluster?.startsWith(CYBER_PREFIX) ?? false);
+  return skill.domain === SECURITY_DOMAIN || (skill.cluster?.startsWith(CYBER_PREFIX) ?? false);
 }
 
 describe('domainScopeFor', () => {
   it('test 7: pilot scope deep-equals the security/cyber union', () => {
-    expect(domainScopeFor(PILOT)).toEqual({ domain: 'security', clusterPrefix: CYBER_PREFIX });
+    expect(domainScopeFor(PILOT)).toEqual({ domain: SECURITY_DOMAIN, clusterPrefix: CYBER_PREFIX });
   });
 
   it('returns an empty scope for an unknown agent', () => {
@@ -42,7 +49,7 @@ describe('domainScopeFor', () => {
   it('registers the pilot row in the delegation map', () => {
     expect(TIER_B_DELEGATION_MAP[PILOT]).toMatchObject({
       fiche: PILOT,
-      scope: { domain: 'security', clusterPrefix: CYBER_PREFIX },
+      scope: { domain: SECURITY_DOMAIN, clusterPrefix: CYBER_PREFIX },
     });
   });
 });

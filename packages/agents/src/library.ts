@@ -163,7 +163,8 @@ export interface DelegationEntry {
   readonly scope?: DomainScope;
 }
 
-// The 8 MVP Tier B agents wired in this slice — the rows of AGENTS.md §6.
+// The MVP Tier B agents (rows of AGENTS.md §6) + the security-defensive-specialist
+// pilot wired by the arsenal runtime-wiring slice.
 export const TIER_B_DELEGATION_MAP: Readonly<Record<string, DelegationEntry>> = {
   'engineering-software-architect': {
     fiche: 'engineering-software-architect',

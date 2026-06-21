@@ -116,7 +116,7 @@ Each one preselects: relevant Tier B agents, project-scoped skills, memory scope
 
 ## 6. Tier B delegation map — MVP slice
 
-The 8 Tier B agents wired in MVP and who calls them:
+The Tier B agents wired in MVP and who calls them (8 MVP rows + the scoped pilot):
 
 | Tier B fiche (`.claude/agents/`)        | Called by                  | Use case                                     |
 |-----------------------------------------|----------------------------|----------------------------------------------|
@@ -128,6 +128,9 @@ The 8 Tier B agents wired in MVP and who calls them:
 | `engineering-technical-writer`          | Docs Writer                | README, ADRs, user-facing docs               |
 | `testing-performance-benchmarker`       | Reviewer                   | Perf gates before validation                 |
 | `testing-reality-checker`               | Reviewer, Sec Reviewer     | Default-to-needs-work gate before archive    |
+| `security-defensive-specialist` *(pilot)* | Mission Planner, Sec Reviewer | Defensive cyber tasks: detection, mitigation, hardening, analysis |
+
+> **Domain-scoped pilot.** `security-defensive-specialist` is the first *light* agent of the arsenal-runtime-wiring slice: it carries no fixed skill bag. Its delegation entry holds a `scope` (`{ domain: 'security', clusterPrefix: 'cyber:' }`); at plan-time `domainScopeFor(agentHint)` feeds that scope to `selectLibrarySkills` (`@mas/skills`), which picks the best cold-library skills **within that scope** and injects their L1 summaries. Posture is **defensive-only** (detect/mitigate/analyze, never offensive — CLAUDE.md §5). Generalising scoped selection to the other domain agents is the next cycle.
 
 ### 6.bis Cold agent library (ECC harvest)
 
