@@ -135,6 +135,23 @@ export function mockMissionPlanner(input: PlannerInput): PlannerOutput {
       risk: 'low',
     },
   ];
+  // Security/cyber missions get an EXTRA defensive task routed to the Tier B
+  // pilot (Wave 2 arsenal wiring). Keep the default 6-task plan intact for
+  // non-security missions so existing suites are unaffected.
+  const signal = `${input.title} ${input.objective}`.toLowerCase();
+  if (/security|cyber|threat|vuln/.test(signal)) {
+    tasks.push({
+      id: `${m}_tsec`,
+      title: 'Defensive cyber hardening sweep',
+      description: 'Detect threats, analyze findings, and propose mitigations + hardening diffs.',
+      agentHint: 'security-defensive-specialist',
+      skillsHint: [],
+      dependsOn: [`${m}_t1`],
+      budgetTokens: 1500,
+      risk: 'medium',
+    });
+  }
+
   const total = tasks.reduce((s, t) => s + t.budgetTokens, 0);
   return {
     clarifyingQuestions: [],

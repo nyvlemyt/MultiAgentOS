@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
+import type { DomainScope } from '@mas/skills';
 
 export interface LibraryAgentFiche {
   id: string;
@@ -155,6 +156,11 @@ export interface DelegationEntry {
   readonly fiche: string;
   readonly calledBy: readonly string[];
   readonly useCase: string;
+  /**
+   * Which slice of the cold arsenal this agent draws from (Wave 2). Absent ⇒
+   * empty scope ⇒ the whole arsenal is eligible. Passed to selectLibrarySkills.
+   */
+  readonly scope?: DomainScope;
 }
 
 // The 8 MVP Tier B agents wired in this slice — the rows of AGENTS.md §6.
@@ -199,4 +205,22 @@ export const TIER_B_DELEGATION_MAP: Readonly<Record<string, DelegationEntry>> = 
     calledBy: ['Reviewer', 'Sec Reviewer'],
     useCase: 'Default-to-needs-work gate before archive',
   },
+  // Wave 2 pilot — proves the cold arsenal is live. Scope is the UNION of the
+  // 10 domain:'security' skills (cluster skill:core-security) and the 657
+  // cyber:* skills (domain:'planning'), per selectLibrarySkills' scope semantics.
+  'security-defensive-specialist': {
+    fiche: 'security-defensive-specialist',
+    calledBy: ['Mission Planner', 'Sec Reviewer'],
+    useCase: 'Defensive cyber tasks: detection, mitigation, hardening, analysis',
+    scope: { domain: 'security', clusterPrefix: 'cyber:' },
+  },
 };
+
+/**
+ * Resolve an agent's arsenal scope. Pure + deterministic: unknown agent or an
+ * agent with no declared scope ⇒ empty scope (whole arsenal eligible).
+ */
+export function domainScopeFor(agentId: string | undefined | null): DomainScope {
+  if (!agentId) return {};
+  return TIER_B_DELEGATION_MAP[agentId]?.scope ?? {};
+}

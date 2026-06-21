@@ -15,7 +15,6 @@ import {
 } from '@mas/db';
 import {
   mockMissionPlanner,
-  mockSkillRouter,
   mockReviewer,
   mockSecReviewer,
   mockQualityController,
@@ -33,11 +32,17 @@ import {
   type Risk,
   type RouterEvent,
 } from '@mas/core';
-import { scanOrchestratorSkills, loadLibraryIndex, mergeSkillMetas, SkillRouter } from '@mas/skills';
+import {
+  scanOrchestratorSkills,
+  loadLibraryIndex,
+  mergeSkillMetas,
+  selectLibrarySkills,
+  SkillRouter,
+} from '@mas/skills';
 import { MemoryStore, buildMemoryContext, runCloseOutRitual, type MemoryContext } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
-import { TIER_B_DELEGATION_MAP } from './library';
+import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
 
 export type Db = ReturnType<typeof getDb>;
 
@@ -216,8 +221,18 @@ export async function planMission(missionId: string) {
   // Wipe and rewrite task list for an idempotent plan.
   await db.delete(tasks).where(eq(tasks.missionId, m.id));
 
+  // Cache the cold-arsenal router once — don't rebuild the 877-entry index per task.
+  const skillRouter = getSkillRouter();
+
   for (const t of plan.tasks) {
-    const router = mockSkillRouter(t.id, t.skillsHint);
+    // Real engine (Wave 2): scope by the task's agent, select over the cold
+    // arsenal. llm omitted ⇒ deterministic degrade (zero quota spent).
+    const scope = domainScopeFor(t.agentHint);
+    const sel = await selectLibrarySkills({
+      task: { id: t.id, title: t.title, description: t.description, skillsHint: t.skillsHint },
+      scope,
+      router: skillRouter,
+    });
 
     // §5 risk classifier: persist the STRICTER of classified vs planner risk.
     // When the classifier is unsure (shell-ish but no concrete rule) we consult
@@ -237,7 +252,7 @@ export async function planMission(missionId: string) {
       status: 'todo',
       risk: finalRisk,
       agentId: t.agentHint,
-      skillsJson: JSON.stringify(router.favoriteSkills.concat(router.requiredSkills)),
+      skillsJson: JSON.stringify(sel.skillIds),
       dependsOnJson: JSON.stringify(t.dependsOn),
       budgetTokens: t.budgetTokens,
       spentTokens: 0,
@@ -249,7 +264,7 @@ export async function planMission(missionId: string) {
       taskId: t.id,
       agentId: 'skill-router',
       type: 'skill_router_decision',
-      payload: { rationale: router.rationale, skills: router.favoriteSkills, agents: router.tierBAgents },
+      payload: { rationale: sel.rationale, degraded: sel.degraded, skills: sel.skillIds },
     });
     await logEvent(db, {
       missionId: m.id,
