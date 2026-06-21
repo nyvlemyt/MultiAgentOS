@@ -50,6 +50,8 @@ export interface TokenSnapshot {
   window5h: { messagesUsed: number };
   day: BudgetMeterWindow;
   week: BudgetMeterWindow;
+  /** Monthly Agent-SDK quota window (cap may be plan-derived; CLAUDE.md §11). */
+  month: BudgetMeterWindow;
   cacheHitRatio: number;
   /** Today's LLM-call spend grouped by source (Phase 3.5 router breakdown). */
   byProvider: ProviderSpendRow[];
@@ -171,10 +173,12 @@ export async function getTokenSnapshot(): Promise<TokenSnapshot> {
     .map((r) => ({ ...r, plan: planLabels.get(r.provider) ?? planLabels.get(r.provider.split(':')[0]!) }))
     .sort((a, b) => b.tokensIn + b.tokensOut - (a.tokensIn + a.tokensOut));
 
+  // Month cap is resolved by the gate (plan quota overrides the budgets row).
   return {
     window5h: { messagesUsed: messagesUsedInWindow },
     day: meterWindow(budget.day, dayCap),
     week: meterWindow(budget.week, weekCap),
+    month: meterWindow(budget.month, budget.month.cap),
     cacheHitRatio,
     byProvider,
   };

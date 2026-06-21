@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
+import { eq } from 'drizzle-orm';
+import { getDb, budgets, events } from '@mas/db';
 import { selectForTick, runDispatchTick, type DispatchTickConfig } from './dispatch-tick';
 import { seedDispatchableMission as seedMission } from './fixtures';
 import { useTestDb } from './testing';
@@ -74,5 +77,30 @@ describe('runDispatchTick — integration (mock LLM)', () => {
     expect(result.advanced.length).toBe(1);
     expect(result.skipped.length).toBe(2);
     expect(result.skipped.every((s) => s.reason === 'project_cap')).toBe(true);
+  });
+
+  it('halts every mission and emits budget_exceeded when the month cap is reached', async () => {
+    // No plan override (config absent) → cap comes from the month budgets row.
+    process.env.MAS_ROUTING_CONFIG = '/nonexistent/model-routing.json';
+    const db = getDb();
+    await db.insert(budgets).values({
+      id: 'b_month', scope: 'global', period: 'month', tokensCap: 1000,
+    });
+    await db.insert(events).values({
+      id: `evt_${randomUUID()}`, type: 'llm_call',
+      tokensIn: 800, tokensOut: 400, cacheRead: 0, cacheCreation: 0, quotaUnits: 0,
+      risk: 'low', createdAt: new Date(),
+    });
+    await seedMission('m1', 'p1');
+
+    const result = await runDispatchTick({ maxConcurrentPerProject: 1, maxGlobalConcurrent: 4 });
+    expect(result.advanced).toEqual([]);
+    expect(result.skipped).toEqual([{ missionId: 'm1', projectId: 'p1', reason: 'budget_exceeded' }]);
+
+    const emitted = await db.select().from(events).where(eq(events.type, 'budget_exceeded'));
+    expect(emitted).toHaveLength(1);
+    expect(JSON.parse(emitted[0]!.payloadJson ?? '{}').window).toBe('month');
+
+    delete process.env.MAS_ROUTING_CONFIG;
   });
 });

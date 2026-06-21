@@ -52,4 +52,34 @@ describe('evaluateBudget — concurrency-aware window decision', () => {
     const s = evaluateBudget(w(120, 40, 100), w(0, 0, 500));
     expect(s.day.remaining).toBe(0);
   });
+
+  it('blocks on month when only the month estimate is exhausted', () => {
+    const s = evaluateBudget(w(10, 0, 100), w(50, 0, 500), w(990, 20, 1000));
+    expect(s.blocked).toBe(true);
+    expect(s.window).toBe('month');
+    expect(s.month.estimate).toBe(1010);
+  });
+
+  it('reports day before week before month when all over cap', () => {
+    const s = evaluateBudget(w(200, 0, 100), w(999, 0, 500), w(9999, 0, 1000));
+    expect(s.window).toBe('day');
+  });
+
+  it('reports week before month when both over cap (day clear)', () => {
+    const s = evaluateBudget(w(10, 0, 100), w(600, 0, 500), w(9999, 0, 1000));
+    expect(s.window).toBe('week');
+  });
+
+  it('defaults month to an unlimited, non-blocking window when omitted', () => {
+    const s = evaluateBudget(w(10, 0, 100), w(50, 0, 500));
+    expect(s.month.cap).toBe(0);
+    expect(s.month.remaining).toBeNull();
+    expect(s.blocked).toBe(false);
+  });
+
+  it('treats a month cap of 0 as unlimited (never blocks)', () => {
+    const s = evaluateBudget(w(1, 0, 100), w(1, 0, 500), w(9_999_999, 0, 0));
+    expect(s.blocked).toBe(false);
+    expect(s.month.remaining).toBeNull();
+  });
 });

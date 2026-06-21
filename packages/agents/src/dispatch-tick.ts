@@ -84,7 +84,7 @@ async function logBudgetExceeded(status: BudgetStatus): Promise<void> {
   await getDb().insert(events).values({
     id: `evt_${randomUUID()}`,
     type: 'budget_exceeded',
-    payloadJson: JSON.stringify({ window: status.window, day: status.day, week: status.week }),
+    payloadJson: JSON.stringify({ window: status.window, day: status.day, week: status.week, month: status.month }),
     tokensIn: 0, tokensOut: 0, cacheRead: 0, cacheCreation: 0, quotaUnits: 0,
     risk: 'low',
     createdAt: new Date(),

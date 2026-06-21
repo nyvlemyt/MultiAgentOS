@@ -48,6 +48,17 @@ export default async function TokenManager() {
           <BudgetBar spent={data.week.tokensSpent + data.week.reserved} cap={data.week.tokensCap} />
         </Card>
         <Card
+          title="Tokens ce mois (Agent-SDK)"
+          value={fmtTokens(data.month.tokensSpent)}
+          hint={
+            data.month.tokensCap > 0
+              ? `reste ~${fmtTokens(data.month.remaining)} · réservé ${fmtTokens(data.month.reserved)} · plafond ${fmtTokens(data.month.tokensCap)}`
+              : 'plafond non déclaré (illimité)'
+          }
+        >
+          <BudgetBar spent={data.month.tokensSpent + data.month.reserved} cap={data.month.tokensCap} />
+        </Card>
+        <Card
           title="Taux de cache"
           value={`${data.cacheHitRatio}%`}
           hint="cible ≥30%"

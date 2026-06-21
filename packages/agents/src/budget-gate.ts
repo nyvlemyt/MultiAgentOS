@@ -1,5 +1,10 @@
+import { existsSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { and, eq, gte, inArray, sum } from 'drizzle-orm';
 import { getDb, budgets, events, tasks } from '@mas/db';
+import { loadRoutingConfig, resolveProviderPlans } from '@mas/core';
+
+const CLAUDE_POOL = 'claude';
 
 /**
  * One budget window's accounting. `spent` = tokens already logged to the events
@@ -20,12 +25,15 @@ export interface BudgetWindow extends BudgetWindowInput {
   readonly remaining: number | null;
 }
 
+export type BudgetWindowName = 'day' | 'week' | 'month';
+
 /** Outcome of the pre-dispatch budget check (CLAUDE.md §6, §11). */
 export interface BudgetStatus {
   readonly blocked: boolean;
-  readonly window: 'day' | 'week' | null;
+  readonly window: BudgetWindowName | null;
   readonly day: BudgetWindow;
   readonly week: BudgetWindow;
+  readonly month: BudgetWindow;
 }
 
 // Event types that carry real token counts for one LLM call. Mirrors
@@ -46,16 +54,24 @@ function exhausted(w: BudgetWindow): boolean {
 
 /**
  * Pure decision: block dispatch when ANY window's estimate (logged + in-flight
- * reserved) is exhausted. Day is reported first so the operator sees the
- * tightest window. No DB, no clock — fully unit-testable.
+ * reserved) is exhausted. Precedence day → week → month: the tightest window is
+ * reported first (day) so the operator sees the nearest cap. The month window
+ * carries the monthly Agent-SDK quota (CLAUDE.md §11). No DB, no clock — fully
+ * unit-testable.
  */
-export function evaluateBudget(day: BudgetWindowInput, week: BudgetWindowInput): BudgetStatus {
+export function evaluateBudget(
+  day: BudgetWindowInput,
+  week: BudgetWindowInput,
+  month: BudgetWindowInput = { spent: 0, reserved: 0, cap: 0 },
+): BudgetStatus {
   const d = resolveWindow(day);
   const w = resolveWindow(week);
-  let window: 'day' | 'week' | null = null;
+  const m = resolveWindow(month);
+  let window: BudgetWindowName | null = null;
   if (exhausted(d)) window = 'day';
   else if (exhausted(w)) window = 'week';
-  return { blocked: window !== null, window, day: d, week: w };
+  else if (exhausted(m)) window = 'month';
+  return { blocked: window !== null, window, day: d, week: w, month: m };
 }
 
 type DbHandle = ReturnType<typeof getDb>;
@@ -66,6 +82,33 @@ function startOfDay(now: Date): Date {
 
 function sevenDaysAgo(now: Date): Date {
   return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+}
+
+function startOfMonth(now: Date): Date {
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
+
+function findRepoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(resolve(dir, 'pnpm-workspace.yaml'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
+
+/**
+ * The plan is the source of truth for the monthly Agent-SDK quota (CLAUDE.md
+ * §11): if config/model-routing.json declares `claude_plan.monthlyTokenQuota`,
+ * it overrides the month `budgets` row. Undeclared ⇒ 0 ⇒ caller falls back to
+ * the budgets row (which itself treats 0 as unlimited).
+ */
+function planMonthlyQuota(): number {
+  const path = process.env.MAS_ROUTING_CONFIG ?? resolve(findRepoRoot(), 'config/model-routing.json');
+  const quota = resolveProviderPlans(loadRoutingConfig(path)).get(CLAUDE_POOL)?.monthlyTokenQuota;
+  return quota ?? 0;
 }
 
 async function spentSince(db: DbHandle, since: Date): Promise<number> {
@@ -90,7 +133,7 @@ async function reservedInFlight(db: DbHandle): Promise<number> {
   return Number(rows[0]?.reserved ?? 0);
 }
 
-async function capFor(db: DbHandle, period: 'day' | 'week'): Promise<number> {
+async function capFor(db: DbHandle, period: BudgetWindowName): Promise<number> {
   const row = (
     await db
       .select({ cap: budgets.tokensCap })
@@ -112,15 +155,22 @@ export async function checkDispatchBudget(
   db = getDb(),
   now = new Date(),
 ): Promise<BudgetStatus> {
-  const [dayCap, weekCap, daySpent, weekSpent, reserved] = await Promise.all([
-    capFor(db, 'day'),
-    capFor(db, 'week'),
-    spentSince(db, startOfDay(now)),
-    spentSince(db, sevenDaysAgo(now)),
-    reservedInFlight(db),
-  ]);
+  const [dayCap, weekCap, monthRowCap, daySpent, weekSpent, monthSpent, reserved] =
+    await Promise.all([
+      capFor(db, 'day'),
+      capFor(db, 'week'),
+      capFor(db, 'month'),
+      spentSince(db, startOfDay(now)),
+      spentSince(db, sevenDaysAgo(now)),
+      spentSince(db, startOfMonth(now)),
+      reservedInFlight(db),
+    ]);
+  // Plan quota overrides the budgets row when declared (plan = source of truth).
+  const planQuota = planMonthlyQuota();
+  const monthCap = planQuota > 0 ? planQuota : monthRowCap;
   return evaluateBudget(
     { spent: daySpent, reserved, cap: dayCap },
     { spent: weekSpent, reserved, cap: weekCap },
+    { spent: monthSpent, reserved, cap: monthCap },
   );
 }
