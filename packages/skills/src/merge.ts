@@ -3,7 +3,7 @@ import type { SkillMeta } from './types.js';
 /**
  * Merge orchestrator skills with the cold-library arsenal, deduped by `id`.
  * On collision the orchestrator entry wins (it's the curated, active version).
- * Order: orchestrator first, then library entries not already present.
+ * Iteration order is not contractual — the only consumer re-keys by `id`.
  */
 export function mergeSkillMetas(
   orchestrator: SkillMeta[],

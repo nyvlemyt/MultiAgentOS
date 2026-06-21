@@ -45,8 +45,6 @@ const W_HINT = 10;
 const W_TAG = 3;
 const W_CLUSTER = 1;
 
-const DEGRADED_REASON = 'no llm ranker — deterministic shortlist';
-
 /** Lowercase word tokens from free text (title+description), deduped. */
 function tokenize(text: string): Set<string> {
   const out = new Set<string>();
@@ -80,10 +78,8 @@ function scoreSkill(
     skill.tags.some((t) => hints.has(t.toLowerCase()));
 
   // Cluster affinity: any task token appearing in the skill's cluster slug.
-  const clusterAffinity =
-    skill.cluster && [...taskTokens].some((t) => skill.cluster!.toLowerCase().includes(t))
-      ? 1
-      : 0;
+  const cluster = skill.cluster?.toLowerCase();
+  const clusterAffinity = cluster && [...taskTokens].some((t) => cluster.includes(t)) ? 1 : 0;
 
   return (hinted ? W_HINT : 0) + tagOverlap * W_TAG + clusterAffinity * W_CLUSTER;
 }
@@ -122,7 +118,7 @@ async function rankWithLlm(
     }
     return valid;
   } catch {
-    // Any ranker failure (incl. an Error whose message includes BUDGET_MARKER)
+    // Any ranker failure (incl. an Error whose message includes "budget_exceeded")
     // degrades to the deterministic shortlist rather than spending more tokens.
     return undefined;
   }
@@ -152,7 +148,7 @@ export async function selectLibrarySkills(p: SelectParams): Promise<SelectResult
   const deterministicTopN = shortlist.slice(0, n).map((s) => s.id);
 
   if (!p.llm) {
-    return { skillIds: deterministicTopN, rationale: `${buildRationale(p.scope, true)} (${DEGRADED_REASON})`, degraded: true };
+    return { skillIds: deterministicTopN, rationale: buildRationale(p.scope, true), degraded: true };
   }
 
   const llmIds = await rankWithLlm(p.llm, p.task, shortlist, n);
