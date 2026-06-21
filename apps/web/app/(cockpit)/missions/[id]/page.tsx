@@ -14,8 +14,22 @@ import { isDeadlineSoon } from '@/lib/prioritize';
 import { listMissionReports } from '@/lib/reports';
 import { allAgents } from '@/lib/fixtures';
 import { FileText } from 'lucide-react';
+import { ConversationPanel } from '@/components/manager/ConversationPanel';
+import { ConversationThreads } from '@/components/manager/ConversationThreads';
+import { ensureConversation, listConversations, getConversation, listMessages } from '@/lib/conversations';
+import { newMissionConversation } from '@/app/(cockpit)/conversation-actions';
+import { missionProgress } from '@/lib/mission-progress';
+import { GenerateReportButton } from '@/components/GenerateReportButton';
 
 export const dynamic = 'force-dynamic';
+
+const STEP_STATUS_FR: Record<string, string> = {
+  todo: 'à faire',
+  running: 'en cours',
+  done: 'terminée',
+  blocked: 'bloquée',
+  needs_validation: 'à valider',
+};
 
 const fsm = ['draft', 'clarified', 'planned', 'dispatched', 'executing', 'review', 'validated', 'archived'] as const;
 
@@ -46,15 +60,36 @@ function taskStatusColor(status: string): string {
   }
 }
 
-export default async function MissionDetail({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
+export default async function MissionDetail({
+  params,
+  searchParams,
+}: Readonly<{ params: Promise<{ id: string }>; searchParams: Promise<{ c?: string }> }>) {
   const { id } = await params;
+  const { c } = await searchParams;
   const db = getDb();
   const [m] = await db.select().from(missionsTable).where(eq(missionsTable.id, id));
   if (!m) return notFound();
   const [proj] = await db.select().from(projectsTable).where(eq(projectsTable.id, m.projectId));
+  const slug = proj?.slug ?? '';
   const missionReports = await listMissionReports(db, id);
 
   const ts = await db.select().from(tasksTable).where(eq(tasksTable.missionId, id)).orderBy(asc(tasksTable.createdAt));
+
+  // Mission chat (scope='mission', per projectId+missionId) — multi-thread like manager/agent.
+  await ensureConversation(db, 'mission', m.projectId, null, new Date(), id);
+  const threads = await listConversations(db, 'mission', m.projectId, null, id);
+  const selectedRaw = (c ? await getConversation(db, c) : undefined) ?? threads[0]!;
+  const conv = selectedRaw.scope === 'mission' && selectedRaw.missionId === id ? selectedRaw : threads[0]!;
+  const chatMessages = (await listMessages(db, conv.id)).map((msg) => ({ role: msg.role, text: msg.text }));
+  const newThread = newMissionConversation.bind(null, id, m.projectId);
+
+  // Progress index (pure) + agents involved (unique tasks.agentId).
+  const progress = missionProgress(
+    ts.map((t) => ({ id: t.id, title: t.title, agentId: t.agentId, status: t.status })),
+    missionReports.map((r) => ({ id: r.id, taskId: r.taskId, kind: r.kind })),
+  );
+  const involvedAgentIds = [...new Set(ts.map((t) => t.agentId).filter((a): a is string => Boolean(a)))];
+  const involvedAgents = involvedAgentIds.map((aid) => ({ id: aid, name: allAgents.find((a) => a.id === aid)?.name ?? aid }));
   const evs = await db.select().from(eventsTable).where(eq(eventsTable.missionId, id)).orderBy(desc(eventsTable.createdAt)).limit(25);
   const pendingRows = await db
     .select({
@@ -141,11 +176,82 @@ export default async function MissionDetail({ params }: Readonly<{ params: Promi
         <BudgetBar spent={m.spentTokens} cap={m.budgetTokens} label={`${m.spentTokens}/${m.budgetTokens} tokens`} />
       </header>
 
+      <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
+        <div className="flex gap-4">
+          <ConversationThreads
+            threads={threads.map((t) => ({ id: t.id, title: t.title }))}
+            activeId={conv.id}
+            basePath={`/missions/${id}`}
+            onNew={newThread}
+          />
+          <div className="min-w-0 flex-1">
+            <ConversationPanel
+              kind="mission"
+              conversationId={conv.id}
+              initialMessages={chatMessages}
+              presenceName="Pilote de mission"
+              presenceRole="manager"
+              subtitle={`Mission ${m.id} · ${STEP_STATUS_FR[m.status] ?? m.status}`}
+              mission={m.title}
+              greeting={`Je pilote « ${m.title} ». Demande-moi l'avancement, d'ajuster les tâches, ou de générer le rapport final.`}
+            />
+          </div>
+        </div>
+
+        <aside className="flex flex-col gap-5">
+          <section className="surface p-4" data-testid="progress-index">
+            <h2 className="mb-1 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Avancement</h2>
+            <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>{progress.done}/{progress.total} tâches terminées</p>
+            {progress.steps.length === 0 ? (
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucune tâche encore.</p>
+            ) : (
+              <ol className="flex flex-col gap-2">
+                {progress.steps.map((s) => (
+                  <li key={s.taskId} className="flex items-center justify-between gap-2 text-[11px]">
+                    <span className="min-w-0 flex-1 truncate" style={{ color: 'var(--text-primary)' }}>{s.title}</span>
+                    <span className="mono shrink-0" style={{ color: 'var(--text-muted)' }}>{s.agentId ?? '—'}</span>
+                    <span className="mono shrink-0 uppercase" style={{ color: 'var(--text-secondary)' }} data-step-status={s.status}>{STEP_STATUS_FR[s.status] ?? s.status}</span>
+                    {s.reportId ? (
+                      <Link href={`/projects/${slug}/reports/${s.reportId}`} className="mono shrink-0" style={{ color: 'var(--accent)' }}>rapport →</Link>
+                    ) : (
+                      <span className="mono shrink-0" style={{ color: 'var(--text-muted)' }}>—</span>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+
+          <section className="surface p-4">
+            <h2 className="mb-3 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Agents impliqués</h2>
+            {involvedAgents.length === 0 ? (
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucun agent assigné encore.</p>
+            ) : (
+              <ul className="flex flex-wrap gap-2">
+                {involvedAgents.map((a) => (
+                  <li key={a.id}>
+                    <Link href={`/projects/${slug}/agents/${a.id}`} className="surface inline-flex items-center gap-2 px-2.5 py-1.5 text-[11px] transition-colors hover:bg-[color:var(--bg-hover)]" style={{ color: 'var(--text-secondary)' }}>
+                      {a.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="surface p-4">
+            <h2 className="mb-1 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Rapport final</h2>
+            <p className="mb-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>agrège les rapports de tâche en un rapport de mission</p>
+            <GenerateReportButton missionId={m.id} />
+          </section>
+        </aside>
+      </section>
+
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <article className="surface lg:col-span-2 p-4">
           <h2 className="mb-3 text-sm font-semibold">Graphe des tâches</h2>
           {ts.length === 0 ? (
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No tasks yet. Click <strong>Plan mission</strong> to generate the DAG.</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Aucune tâche pour l'instant. Clique sur <strong>Plan mission</strong> pour générer le DAG.</p>
           ) : (
             <ol className="flex flex-col gap-2">
               {ts.map((t) => (

@@ -4,25 +4,30 @@ import { getDb, conversations, messages, type Conversation, type Message } from 
 
 type Db = ReturnType<typeof getDb>;
 type Role = 'user' | 'agent';
-type Scope = 'manager' | 'agent';
+type Scope = 'manager' | 'agent' | 'mission';
 
-function scopeWhere(scope: Scope, projectId: string | null, agentId: string | null) {
+// missionId added as a trailing param so existing (scope, projectId, agentId, now)
+// call sites stay source-compatible.
+function scopeWhere(scope: Scope, projectId: string | null, agentId: string | null, missionId: string | null) {
   if (scope === 'agent') {
     return and(eq(conversations.scope, 'agent'), eq(conversations.projectId, projectId!), eq(conversations.agentId, agentId!));
+  }
+  if (scope === 'mission') {
+    return and(eq(conversations.scope, 'mission'), eq(conversations.projectId, projectId!), eq(conversations.missionId, missionId!));
   }
   return eq(conversations.scope, 'manager');
 }
 
-export async function createConversation(db: Db, scope: Scope, projectId: string | null = null, agentId: string | null = null, now: Date = new Date()): Promise<Conversation> {
+export async function createConversation(db: Db, scope: Scope, projectId: string | null = null, agentId: string | null = null, now: Date = new Date(), missionId: string | null = null): Promise<Conversation> {
   const [row] = await db
     .insert(conversations)
-    .values({ id: `conv_${randomUUID()}`, scope, projectId, agentId, title: '', createdAt: now, updatedAt: now })
+    .values({ id: `conv_${randomUUID()}`, scope, projectId, agentId, missionId, title: '', createdAt: now, updatedAt: now })
     .returning();
   return row!;
 }
 
-export async function listConversations(db: Db, scope: Scope, projectId: string | null = null, agentId: string | null = null): Promise<Conversation[]> {
-  return db.select().from(conversations).where(scopeWhere(scope, projectId, agentId)).orderBy(desc(conversations.updatedAt));
+export async function listConversations(db: Db, scope: Scope, projectId: string | null = null, agentId: string | null = null, missionId: string | null = null): Promise<Conversation[]> {
+  return db.select().from(conversations).where(scopeWhere(scope, projectId, agentId, missionId)).orderBy(desc(conversations.updatedAt));
 }
 
 export async function getConversation(db: Db, id: string): Promise<Conversation | undefined> {
@@ -31,10 +36,10 @@ export async function getConversation(db: Db, id: string): Promise<Conversation 
 }
 
 // Ensure at least one conversation exists for the scope; return the most recent.
-export async function ensureConversation(db: Db, scope: Scope, projectId: string | null = null, agentId: string | null = null, now: Date = new Date()): Promise<Conversation> {
-  const [latest] = await db.select().from(conversations).where(scopeWhere(scope, projectId, agentId)).orderBy(desc(conversations.updatedAt)).limit(1);
+export async function ensureConversation(db: Db, scope: Scope, projectId: string | null = null, agentId: string | null = null, now: Date = new Date(), missionId: string | null = null): Promise<Conversation> {
+  const [latest] = await db.select().from(conversations).where(scopeWhere(scope, projectId, agentId, missionId)).orderBy(desc(conversations.updatedAt)).limit(1);
   if (latest) return latest;
-  return createConversation(db, scope, projectId, agentId, now);
+  return createConversation(db, scope, projectId, agentId, now, missionId);
 }
 
 export async function listMessages(db: Db, conversationId: string): Promise<Message[]> {

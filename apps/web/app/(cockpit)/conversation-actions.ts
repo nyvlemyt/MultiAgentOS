@@ -4,6 +4,7 @@ import { getDb } from '@mas/db';
 import { appendExchange, createConversation } from '@/lib/conversations';
 import { managerReply } from '@/lib/manager-script';
 import { agentReply } from '@/lib/agent-script';
+import { missionReply } from '@/lib/mission-script';
 
 // Persist a conversation exchange (scripted reply — single seam for a real LLM later).
 export async function sendManagerMessage(conversationId: string, text: string, project: string): Promise<void> {
@@ -12,6 +13,10 @@ export async function sendManagerMessage(conversationId: string, text: string, p
 
 export async function sendAgentMessage(conversationId: string, text: string, agentId: string): Promise<void> {
   await appendExchange(getDb(), conversationId, text, agentReply(agentId, text));
+}
+
+export async function sendMissionMessage(conversationId: string, text: string, mission: string): Promise<void> {
+  await appendExchange(getDb(), conversationId, text, missionReply(text, mission).text);
 }
 
 // Start a fresh thread (like a new Claude Code session) and open it.
@@ -23,4 +28,9 @@ export async function newManagerConversation(): Promise<void> {
 export async function newAgentConversation(slug: string, projectId: string, agentId: string): Promise<void> {
   const c = await createConversation(getDb(), 'agent', projectId, agentId);
   redirect(`/projects/${slug}/agents/${agentId}?c=${c.id}`);
+}
+
+export async function newMissionConversation(missionId: string, projectId: string): Promise<void> {
+  const c = await createConversation(getDb(), 'mission', projectId, null, new Date(), missionId);
+  redirect(`/missions/${missionId}?c=${c.id}`);
 }

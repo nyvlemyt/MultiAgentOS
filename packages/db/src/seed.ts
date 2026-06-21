@@ -22,6 +22,7 @@ import {
   ideas,
   decisions,
   reports,
+  conversations,
 } from './schema';
 
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000);
@@ -68,6 +69,7 @@ async function main() {
   // idempotent regardless of prior mutations from the lifecycle tests.
   await db.delete(decisions);
   await db.delete(ideas);
+  await db.delete(conversations); // messages cascade; FK to missions is RESTRICT, wipe before missions
   await db.delete(events);
   await db.delete(validations);
   await db.delete(memoryCandidates);

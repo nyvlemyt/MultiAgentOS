@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, primaryKey, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, primaryKey, index, unique } from 'drizzle-orm/sqlite-core';
 
 const epoch = () => integer({ mode: 'timestamp' }).$defaultFn(() => new Date());
 
@@ -284,19 +284,24 @@ export const schedules = sqliteTable(
 // UI redesign: persistent conversations. A 'manager' conversation is global
 // (projectId/agentId null). An 'agent' conversation is one running instance of a
 // base agent scoped to a project (the "Docker container" model): unique per
-// (projectId, agentId). Messages survive navigation and are revisitable.
+// (projectId, agentId). A 'mission' conversation is the chat that drives a single
+// mission, scoped per (projectId, missionId). Messages survive navigation.
 export const conversations = sqliteTable(
   'conversations',
   {
     id: text('id').primaryKey(),
-    scope: text('scope', { enum: ['manager', 'agent'] }).notNull(),
+    scope: text('scope', { enum: ['manager', 'agent', 'mission'] }).notNull(),
     projectId: text('project_id').references(() => projects.id, { onDelete: 'cascade' }),
     agentId: text('agent_id').references(() => agents.id),
+    missionId: text('mission_id').references(() => missions.id, { onDelete: 'cascade' }),
     title: text('title').notNull().default(''),
     createdAt: epoch().notNull(),
     updatedAt: epoch().notNull(),
   },
-  (t) => ({ byScope: index('conversations_scope_idx').on(t.scope, t.projectId, t.agentId) }),
+  (t) => ({
+    byScope: index('conversations_scope_idx').on(t.scope, t.projectId, t.agentId),
+    byMission: index('conversations_mission_idx').on(t.scope, t.projectId, t.missionId),
+  }),
 );
 
 export const messages = sqliteTable(
@@ -344,6 +349,46 @@ export const reports = sqliteTable(
   (t) => ({ byProject: index('reports_project_idx').on(t.projectId, t.createdAt), byMission: index('reports_mission_idx').on(t.missionId) }),
 );
 
+// Agent Control Panel: project-scoped editable override layer for a base agent.
+// The fiche on disk is never touched here; the same agent on another project
+// keeps its fixture defaults. getAgentConfig merges defaults <- override row
+// (override wins field-by-field). Unique on (agentId, projectId) → upsert target.
+export const agentOverrides = sqliteTable(
+  'agent_overrides',
+  {
+    id: text('id').primaryKey(),
+    agentId: text('agent_id').notNull(),
+    projectId: text('project_id').notNull(),
+    model: text('model'),
+    autonomy: text('autonomy', { enum: ['manual', 'assisted', 'autonomous', 'autopilot'] }),
+    budgetCap: integer('budget_cap'),
+    effortMode: text('effort_mode', { enum: ['eco', 'standard', 'expert'] }),
+    enabledSkills: text('enabled_skills'),
+    updatedAt: epoch().notNull(),
+  },
+  (t) => ({ byAgentProject: unique('agent_overrides_agent_project_unq').on(t.agentId, t.projectId) }),
+);
+
+// Agent Control Panel: base-agent rollback trail. Snapshots the FULL prior fiche
+// content before each writeFiche, plus a short human summary computed at save time
+// so the history list reads at a glance. Retention is applied on every write
+// (pruneFicheRevisions): keep last 10 AND drop > 30 days.
+export const ficheRevisions = sqliteTable(
+  'fiche_revisions',
+  {
+    id: text('id').primaryKey(),
+    agentId: text('agent_id').notNull(),
+    content: text('content').notNull(),
+    summary: text('summary').notNull(),
+    savedAt: epoch().notNull(),
+  },
+  (t) => ({ byAgent: index('fiche_revisions_agent_idx').on(t.agentId, t.savedAt) }),
+);
+
+export type AgentOverride = typeof agentOverrides.$inferSelect;
+export type NewAgentOverride = typeof agentOverrides.$inferInsert;
+export type FicheRevision = typeof ficheRevisions.$inferSelect;
+export type NewFicheRevision = typeof ficheRevisions.$inferInsert;
 export type Report = typeof reports.$inferSelect;
 export type NewReport = typeof reports.$inferInsert;
 export type Project = typeof projects.$inferSelect;
