@@ -52,7 +52,9 @@ function exhausted(w: BudgetWindow): boolean {
 export function evaluateBudget(day: BudgetWindowInput, week: BudgetWindowInput): BudgetStatus {
   const d = resolveWindow(day);
   const w = resolveWindow(week);
-  const window = exhausted(d) ? 'day' : exhausted(w) ? 'week' : null;
+  let window: 'day' | 'week' | null = null;
+  if (exhausted(d)) window = 'day';
+  else if (exhausted(w)) window = 'week';
   return { blocked: window !== null, window, day: d, week: w };
 }
 
