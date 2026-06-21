@@ -1,7 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadRoutingConfig, buildSourceStatuses, DOMAINS } from './config.js';
+import {
+  loadRoutingConfig,
+  buildSourceStatuses,
+  resolveProviderPlans,
+  planWarnings,
+  DOMAINS,
+} from './config.js';
 
 const repoRoot = resolve(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
 const configPath = resolve(repoRoot, 'config/model-routing.json');
@@ -23,6 +29,47 @@ describe('loadRoutingConfig', () => {
     expect(cfg.paid_apis_enabled).toBe(false);
     expect(cfg.providers).toEqual({});
     expect(cfg.domains).toEqual({});
+  });
+});
+
+describe('resolveProviderPlans', () => {
+  it('reads the Claude Max plan + each provider plan from the repo config', () => {
+    const plans = resolveProviderPlans(loadRoutingConfig(configPath));
+    expect(plans.get('claude')).toMatchObject({ tier: 'max', billing: 'subscription', monthlyCostEur: 100 });
+    expect(plans.get('gemini-free')).toMatchObject({ tier: 'free', billing: 'free' });
+    expect(plans.get('openai')).toMatchObject({ billing: 'payg' });
+  });
+
+  it('omits sources whose plan is undeclared', () => {
+    const plans = resolveProviderPlans({
+      claude_accounts: [], paid_apis_enabled: false, providers: {}, domains: {},
+    });
+    expect(plans.size).toBe(0);
+  });
+});
+
+describe('planWarnings', () => {
+  it('repo config is fully declared ⇒ no warnings for enabled sources', () => {
+    const cfg = loadRoutingConfig(configPath);
+    // only the claude pool is enabled by default; it has a declared plan.
+    expect(planWarnings(cfg, {})).toEqual([]);
+  });
+
+  it('warns when the Claude pool plan is missing', () => {
+    const cfg = { claude_accounts: [], paid_apis_enabled: false, providers: {}, domains: {} };
+    expect(planWarnings(cfg, {})).toContainEqual(expect.stringContaining('Claude pool'));
+  });
+
+  it('warns when an enabled provider has no plan', () => {
+    const cfg = {
+      claude_accounts: [], paid_apis_enabled: false,
+      claude_plan: { tier: 'max', billing: 'subscription' as const },
+      providers: { 'gemini-free': { id: 'gemini-free', kind: 'gemini' as const, apiKeyEnv: 'GEMINI_API_KEY' } },
+      domains: {},
+    };
+    expect(planWarnings(cfg, { GEMINI_API_KEY: 'k' })).toContainEqual(
+      expect.stringContaining('gemini-free'),
+    );
   });
 });
 

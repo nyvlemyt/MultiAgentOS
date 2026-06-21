@@ -36,16 +36,16 @@ export default async function TokenManager() {
         <Card
           title="Tokens aujourd'hui"
           value={fmtTokens(data.day.tokensSpent)}
-          hint={`plafond ${fmtTokens(data.day.tokensCap)}`}
+          hint={`reste ~${fmtTokens(data.day.remaining)} · réservé ${fmtTokens(data.day.reserved)} · plafond ${fmtTokens(data.day.tokensCap)}`}
         >
-          <BudgetBar spent={data.day.tokensSpent} cap={data.day.tokensCap} />
+          <BudgetBar spent={data.day.tokensSpent + data.day.reserved} cap={data.day.tokensCap} />
         </Card>
         <Card
           title="Tokens cette semaine"
           value={fmtTokens(data.week.tokensSpent)}
-          hint={`plafond ${fmtTokens(data.week.tokensCap)}`}
+          hint={`reste ~${fmtTokens(data.week.remaining)} · réservé ${fmtTokens(data.week.reserved)} · plafond ${fmtTokens(data.week.tokensCap)}`}
         >
-          <BudgetBar spent={data.week.tokensSpent} cap={data.week.tokensCap} />
+          <BudgetBar spent={data.week.tokensSpent + data.week.reserved} cap={data.week.tokensCap} />
         </Card>
         <Card
           title="Taux de cache"
@@ -77,6 +77,7 @@ export default async function TokenManager() {
             <thead>
               <tr className="text-left" style={{ color: 'var(--text-muted)' }}>
                 <th className="py-1 font-medium">Source</th>
+                <th className="py-1 font-medium">Abonnement</th>
                 <th className="py-1 text-right font-medium">Appels</th>
                 <th className="py-1 text-right font-medium">Tokens entrée</th>
                 <th className="py-1 text-right font-medium">Tokens sortie</th>
@@ -86,6 +87,7 @@ export default async function TokenManager() {
               {data.byProvider.map((row) => (
                 <tr key={row.provider} className="border-t" style={{ borderColor: 'var(--border)' }}>
                   <td className="py-1 mono">{row.provider}</td>
+                  <td className="py-1 mono" style={{ color: 'var(--text-muted)' }}>{row.plan ?? '—'}</td>
                   <td className="py-1 text-right tabular-nums">{row.calls}</td>
                   <td className="py-1 text-right tabular-nums">{fmtTokens(row.tokensIn)}</td>
                   <td className="py-1 text-right tabular-nums">{fmtTokens(row.tokensOut)}</td>

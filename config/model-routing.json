@@ -2,26 +2,34 @@
   "$comment": "Phase 3.5 routing (ADR 0002, CLAUDE.md §11.bis). 'claude' = pooled Claude accounts (claude_accounts; empty = the single claude-login profile). Paid APIs ship OFF; domains resolve against ENABLED sources only, walking the fallback chain.",
   "claude_accounts": [],
   "paid_apis_enabled": false,
+  "claude_plan": {
+    "tier": "max",
+    "billing": "subscription",
+    "monthlyCostEur": 100
+  },
   "providers": {
     "gemini-free": {
       "id": "gemini-free",
       "kind": "gemini",
       "apiKeyEnv": "GEMINI_API_KEY",
-      "model": "gemini-2.0-flash"
+      "model": "gemini-2.0-flash",
+      "plan": { "tier": "free", "billing": "free" }
     },
     "openai": {
       "id": "openai",
       "kind": "openai",
       "apiKeyEnv": "OPENAI_API_KEY",
       "model": "gpt-4o",
-      "paid": true
+      "paid": true,
+      "plan": { "tier": "payg", "billing": "payg" }
     },
     "perplexity": {
       "id": "perplexity",
       "kind": "perplexity",
       "apiKeyEnv": "PERPLEXITY_API_KEY",
       "model": "sonar",
-      "paid": true
+      "paid": true,
+      "plan": { "tier": "payg", "billing": "payg" }
     }
   },
   "domains": {

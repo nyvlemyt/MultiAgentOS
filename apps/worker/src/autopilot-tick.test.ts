@@ -104,6 +104,25 @@ describe('worker tick — multi-project dispatch (Phase 8a)', () => {
     expect(evs.length).toBe(1);
   });
 
+  it('counts a concurrent running task as reserved spend and halts dispatch', async () => {
+    const db = getDb();
+    await db.insert(budgets).values({
+      id: 'bud_day2', scope: 'global', period: 'day', tokensCap: 1000, tokensSpent: 0,
+    });
+    // A sibling agent already running elsewhere reserves 2000 tokens > cap.
+    await seedDispatchableMission('busy', 'pbusy');
+    await db.update(tasks).set({ status: 'running', budgetTokens: 2000 }).where(eq(tasks.id, 'busy_t1'));
+    // A fresh dispatchable mission: zero logged spend, but the reservation blocks it.
+    await seedDispatchableMission('fresh', 'pfresh');
+
+    await tick(getDb(), new Date(2026, 5, 15, 3, 0));
+
+    const [t] = await getDb().select().from(tasks).where(eq(tasks.id, 'fresh_t1'));
+    expect(t?.status).toBe('todo');
+    const evs = await getDb().select().from(events).where(eq(events.type, 'budget_exceeded'));
+    expect(evs.length).toBe(1);
+  });
+
   it('honors the global concurrency cap in a single tick', async () => {
     process.env.MAS_MAX_GLOBAL_CONCURRENT = '1';
     try {

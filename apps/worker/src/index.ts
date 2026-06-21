@@ -1,5 +1,6 @@
 import { argv } from 'node:process';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import {
   runDispatchTick,
   runAutopilotTick,
@@ -8,6 +9,7 @@ import {
   hasDailyReportFor,
   type DispatchTickConfig,
 } from '@mas/agents';
+import { loadRoutingConfig, planWarnings } from '@mas/core';
 import { getDb } from '@mas/db';
 
 const TICK_MS = 1500;
@@ -84,6 +86,13 @@ async function main() {
     process.exit(1);
   }
   console.log('[worker] alive');
+  // Surface any IA whose subscription/plan is undeclared — the app must always
+  // know which plan it bills against to budget correctly (user req 2026-06-21).
+  const repoRoot = resolve(fileURLToPath(new URL('.', import.meta.url)), '../../..');
+  const routingPath = process.env.MAS_ROUTING_CONFIG ?? resolve(repoRoot, 'config/model-routing.json');
+  for (const w of planWarnings(loadRoutingConfig(routingPath), process.env as Record<string, string>)) {
+    console.warn(`[worker:plan] ${w}`);
+  }
   // touch the DB once to surface init errors early
   getDb();
   setInterval(() => {

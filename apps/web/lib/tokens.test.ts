@@ -5,7 +5,7 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { getDb, closeDb, events } from '@mas/db';
+import { getDb, closeDb, events, budgets, projects, missions, tasks } from '@mas/db';
 import { getTokenSnapshot } from './tokens';
 
 const MIGRATIONS = resolve(dirname(fileURLToPath(import.meta.url)), '../../../packages/db/migrations');
@@ -55,5 +55,32 @@ describe('getTokenSnapshot — per-provider breakdown (Phase 3.5 step 6)', () =>
   it('empty events ⇒ empty breakdown', async () => {
     const snap = await getTokenSnapshot();
     expect(snap.byProvider).toEqual([]);
+  });
+});
+
+describe('getTokenSnapshot — concurrency-aware day meter', () => {
+  it('counts logged spend AND in-flight reserved against the cap', async () => {
+    const db = getDb();
+    await db.insert(budgets).values({
+      id: 'b_day', scope: 'global', period: 'day', tokensCap: 1000, tokensSpent: 0,
+    });
+    await seedEvent('task_done', 'claude', 200, 100); // 300 logged
+    await db.insert(projects).values({
+      id: 'p', name: 'p', slug: 'p', path: '/tmp/p', type: 'other',
+      autonomy: 'autonomous', createdAt: new Date(), lastActiveAt: new Date(),
+    });
+    await db.insert(missions).values({
+      id: 'm', projectId: 'p', title: 'm', objective: 'o', status: 'executing',
+      risk: 'low', budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+    });
+    await db.insert(tasks).values({
+      id: 't', missionId: 'm', title: 't', description: 'd', status: 'running',
+      risk: 'low', budgetTokens: 250, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+    });
+
+    const snap = await getTokenSnapshot();
+    expect(snap.day.tokensSpent).toBe(300);
+    expect(snap.day.reserved).toBe(250);
+    expect(snap.day.remaining).toBe(450); // 1000 − 300 − 250
   });
 });

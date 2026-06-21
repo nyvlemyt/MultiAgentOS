@@ -10,6 +10,21 @@ export interface ClaudeAccount {
   plan?: string;
 }
 
+/**
+ * What subscription/plan a source runs on. The app must always know this to
+ * route and budget correctly (user requirement 2026-06-21). For Claude the
+ * Agent-SDK quota is SEPARATE from interactive Claude.ai usage (CLAUDE.md §11
+ * billing change 2026-06-15).
+ */
+export interface PlanInfo {
+  /** Human tier: 'max' | 'pro' | 'free' | 'payg' | 'team' | … */
+  tier: string;
+  billing: 'subscription' | 'payg' | 'free';
+  monthlyCostEur?: number;
+  /** Monthly Agent-SDK token quota the plan grants, if known/declared. */
+  monthlyTokenQuota?: number;
+}
+
 export interface ProviderDef {
   id: string;
   kind: ProviderKind;
@@ -19,6 +34,8 @@ export interface ProviderDef {
   baseUrl?: string;
   /** Paid per-token API — gated behind paid_apis_enabled (§11.bis rule 2). */
   paid?: boolean;
+  /** Which subscription/plan this provider bills against. */
+  plan?: PlanInfo;
 }
 
 export interface DomainRoute {
@@ -29,6 +46,8 @@ export interface DomainRoute {
 export interface RoutingConfig {
   claude_accounts: ClaudeAccount[];
   paid_apis_enabled: boolean;
+  /** The pooled Claude subscription plan (e.g. Max, 100 €/month). */
+  claude_plan?: PlanInfo;
   providers: Record<string, ProviderDef>;
   domains: Record<string, DomainRoute>;
 }
