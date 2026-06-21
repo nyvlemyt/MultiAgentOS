@@ -59,10 +59,13 @@ function exhausted(w: BudgetWindow): boolean {
  * carries the monthly Agent-SDK quota (CLAUDE.md §11). No DB, no clock — fully
  * unit-testable.
  */
+/** An uncapped, idle window — the default when no month budget applies. */
+const UNLIMITED_WINDOW: BudgetWindowInput = { spent: 0, reserved: 0, cap: 0 };
+
 export function evaluateBudget(
   day: BudgetWindowInput,
   week: BudgetWindowInput,
-  month: BudgetWindowInput = { spent: 0, reserved: 0, cap: 0 },
+  month: BudgetWindowInput = UNLIMITED_WINDOW,
 ): BudgetStatus {
   const d = resolveWindow(day);
   const w = resolveWindow(week);
