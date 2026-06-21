@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq, gte } from 'drizzle-orm';
 import { getDb, validations, tasks, missions, events } from '@mas/db';
 
 // Phase 6 autopilot read helpers. Server-side DB reads (mirror lib/health.ts).
@@ -40,6 +40,51 @@ export interface DailyReportView {
   tasksDone: number;
   validationsPending: number;
   quotaUnits: number;
+}
+
+export type BudgetWindow = 'day' | 'week' | 'month';
+
+export interface BudgetPause {
+  window: BudgetWindow;
+  at: Date;
+  remaining?: number;
+}
+
+interface BudgetExceededPayload {
+  window?: BudgetWindow;
+  day?: { remaining?: number };
+  week?: { remaining?: number };
+  month?: { remaining?: number };
+}
+
+function startOfToday(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+/**
+ * Most recent `budget_exceeded` event logged today, surfaced so the cockpit can
+ * show that dispatch is paused (CLAUDE.md §6 pause+ask). Read-only, no LLM, no
+ * auto-resume: the user must raise the cap to continue.
+ */
+export async function getBudgetPause(db: Db): Promise<BudgetPause | null> {
+  const [row] = await db
+    .select({ payloadJson: events.payloadJson, createdAt: events.createdAt })
+    .from(events)
+    .where(and(eq(events.type, 'budget_exceeded'), gte(events.createdAt, startOfToday())))
+    .orderBy(desc(events.createdAt))
+    .limit(1);
+  if (!row) return null;
+
+  let window: BudgetWindow = 'day';
+  let remaining: number | undefined;
+  try {
+    const p = JSON.parse(row.payloadJson) as BudgetExceededPayload;
+    if (p.window) window = p.window;
+    remaining = p[window]?.remaining;
+  } catch { /* malformed payload → default day window */ }
+
+  return { window, at: row.createdAt, remaining };
 }
 
 export async function latestDailyReport(db: Db): Promise<DailyReportView | null> {

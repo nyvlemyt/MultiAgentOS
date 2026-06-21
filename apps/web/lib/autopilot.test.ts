@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb, projects, missions, tasks, validations, events } from '@mas/db';
-import { listPendingValidations, latestDailyReport } from './autopilot';
+import { listPendingValidations, latestDailyReport, getBudgetPause } from './autopilot';
 
 const MIGRATIONS = resolve(dirname(fileURLToPath(import.meta.url)), '../../../packages/db/migrations');
 
@@ -68,5 +68,46 @@ describe('latestDailyReport', () => {
     const r = await latestDailyReport(getDb());
     expect(r?.quotaUnits).toBe(42);
     expect(r?.tasksDone).toBe(9);
+  });
+});
+
+describe('getBudgetPause', () => {
+  it('returns null when no budget_exceeded event exists today', async () => {
+    expect(await getBudgetPause(getDb())).toBeNull();
+  });
+
+  it('ignores a budget_exceeded event from a previous day', async () => {
+    await getDb().insert(events).values({
+      id: 'e_old_pause', type: 'budget_exceeded', payloadJson: JSON.stringify({ window: 'day' }),
+      risk: 'low', createdAt: new Date(2020, 0, 1),
+    });
+    expect(await getBudgetPause(getDb())).toBeNull();
+  });
+
+  it('returns the newest pause today with window + remaining', async () => {
+    const now = new Date();
+    await getDb().insert(events).values({
+      id: 'e_pause_old', type: 'budget_exceeded',
+      payloadJson: JSON.stringify({ window: 'day', day: { remaining: 0 } }),
+      risk: 'low', createdAt: new Date(now.getTime() - 60_000),
+    });
+    await getDb().insert(events).values({
+      id: 'e_pause_new', type: 'budget_exceeded',
+      payloadJson: JSON.stringify({ window: 'month', month: { remaining: 1234 } }),
+      risk: 'low', createdAt: now,
+    });
+    const pause = await getBudgetPause(getDb());
+    expect(pause?.window).toBe('month');
+    expect(pause?.remaining).toBe(1234);
+  });
+
+  it('defaults to the day window on a malformed payload', async () => {
+    await getDb().insert(events).values({
+      id: 'e_pause_bad', type: 'budget_exceeded', payloadJson: 'not-json',
+      risk: 'low', createdAt: new Date(),
+    });
+    const pause = await getBudgetPause(getDb());
+    expect(pause?.window).toBe('day');
+    expect(pause?.remaining).toBeUndefined();
   });
 });

@@ -5,7 +5,8 @@ import { ConversationPanel } from '@/components/manager/ConversationPanel';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { allAgents } from '@/lib/fixtures';
 import { isDeadlineSoon } from '@/lib/prioritize';
-import { listPendingValidations, latestDailyReport } from '@/lib/autopilot';
+import { listPendingValidations, latestDailyReport, getBudgetPause } from '@/lib/autopilot';
+import { BudgetPauseBanner } from '@/components/BudgetPauseBanner';
 import { ensureConversation, listConversations, getConversation, listMessages } from '@/lib/conversations';
 import { newManagerConversation } from '@/app/(cockpit)/conversation-actions';
 import { ConversationThreads } from '@/components/manager/ConversationThreads';
@@ -23,6 +24,7 @@ export default async function CommandCenter({ searchParams }: Readonly<{ searchP
     .filter((m) => isDeadlineSoon(m.deadline));
   const pendingValidations = await listPendingValidations(db);
   const dailyReport = await latestDailyReport(db);
+  const budgetPause = await getBudgetPause(db);
   const busy = allAgents.filter((a) => a.status === 'running');
 
   await ensureConversation(db, 'manager');
@@ -33,6 +35,7 @@ export default async function CommandCenter({ searchParams }: Readonly<{ searchP
 
   return (
     <div className="flex flex-col gap-5">
+      <BudgetPauseBanner pause={budgetPause} />
       <header>
         <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Command Center</h1>
         <p className="mono text-xs" style={{ color: 'var(--text-muted)' }}>

@@ -93,6 +93,16 @@ test('Command Center shows the autopilot daily-report card and pending-validatio
   await expect(page.getByTestId('pending-validations')).toBeVisible({ timeout: 15_000 });
 });
 
+test('budget-pause banner is absent in the default no-pause state (Step D)', async ({ page }) => {
+  // No seeded budget_exceeded event → dispatch is not paused, so neither the
+  // home nor the tokens page should render the pause banner.
+  await page.goto('/');
+  await expect(page.getByTestId('budget-pause-banner')).toHaveCount(0);
+  await page.goto('/tokens');
+  await expect(page.getByRole('heading', { name: 'Quota & Cache' })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId('budget-pause-banner')).toHaveCount(0);
+});
+
 test('new-project wizard shows template cards and creates a project (Phase 7)', async ({ page }) => {
   await page.goto('/projects/new');
 
