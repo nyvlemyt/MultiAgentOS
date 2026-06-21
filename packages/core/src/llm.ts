@@ -135,6 +135,23 @@ export function mockMissionPlanner(input: PlannerInput): PlannerOutput {
       risk: 'low',
     },
   ];
+  // Security/cyber missions get an EXTRA defensive task routed to the Tier B
+  // pilot (Wave 2 arsenal wiring). Keep the default 6-task plan intact for
+  // non-security missions so existing suites are unaffected.
+  const signal = `${input.title} ${input.objective}`.toLowerCase();
+  if (/security|cyber|threat|vuln/.test(signal)) {
+    tasks.push({
+      id: `${m}_tsec`,
+      title: 'Defensive cyber hardening sweep',
+      description: 'Detect threats, analyze findings, and propose mitigations + hardening diffs.',
+      agentHint: 'security-defensive-specialist',
+      skillsHint: [],
+      dependsOn: [`${m}_t1`],
+      budgetTokens: 1500,
+      risk: 'medium',
+    });
+  }
+
   const total = tasks.reduce((s, t) => s + t.budgetTokens, 0);
   return {
     clarifyingQuestions: [],
@@ -143,59 +160,6 @@ export function mockMissionPlanner(input: PlannerInput): PlannerOutput {
     estimatedTokens: total,
     estimatedQuotaUnits: Math.ceil((total / 1_000_000) * 25),
   };
-}
-
-export interface SkillRouterDecision {
-  taskId: string;
-  requiredSkills: string[];
-  favoriteSkills: string[];
-  tierBAgents: string[];
-  budgetEstimate: { tokens: number; model: string };
-  rationale: string;
-  requires_validation: boolean;
-}
-
-const SKILL_MATRIX: Record<string, Omit<SkillRouterDecision, 'taskId'>> = {
-  'ui-ux-pro-max': {
-    requiredSkills: ['superpowers:using-superpowers'],
-    favoriteSkills: ['ui-ux-pro-max'],
-    tierBAgents: ['design-ux-architect'],
-    budgetEstimate: { tokens: 1500, model: 'claude-haiku-4-5' },
-    rationale: 'UX task signal → ui-ux-pro-max + UX Architect',
-    requires_validation: false,
-  },
-  'frontend-design': {
-    requiredSkills: ['superpowers:using-superpowers'],
-    favoriteSkills: ['frontend-design'],
-    tierBAgents: ['engineering-frontend-developer'],
-    budgetEstimate: { tokens: 2500, model: 'claude-haiku-4-5' },
-    rationale: 'Frontend component task → frontend-design + Frontend Developer',
-    requires_validation: false,
-  },
-  'security-review': {
-    requiredSkills: ['superpowers:using-superpowers', 'security-review'],
-    favoriteSkills: [],
-    tierBAgents: ['testing-reality-checker'],
-    budgetEstimate: { tokens: 800, model: 'claude-haiku-4-5' },
-    rationale: 'Security gate → security-review + Reality Checker',
-    requires_validation: true,
-  },
-  default: {
-    requiredSkills: ['superpowers:using-superpowers'],
-    favoriteSkills: [],
-    tierBAgents: [],
-    budgetEstimate: { tokens: 800, model: 'claude-haiku-4-5' },
-    rationale: 'No specific skill signal — falling back to defaults.',
-    requires_validation: false,
-  },
-};
-
-export function mockSkillRouter(taskId: string, skillsHint: string[]): SkillRouterDecision {
-  for (const hint of skillsHint) {
-    const match = SKILL_MATRIX[hint];
-    if (match) return { taskId, ...match };
-  }
-  return { taskId, ...SKILL_MATRIX.default! };
 }
 
 export interface ReviewerVerdict {

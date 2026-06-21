@@ -9,7 +9,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "build-library-index": "tsx src/build-library-index.ts"
   },
   "dependencies": {
     "@mas/core": "workspace:*",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "better-sqlite3": "12.10.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.5.4",
     "vitest": "^2.0.0"
   }

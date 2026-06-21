@@ -33,6 +33,9 @@ vi.mock('@mas/core', async (importOriginal) => {
 // Deterministic skill registry: every skill resolves to the 'search' domain.
 vi.mock('@mas/skills', () => ({
   scanOrchestratorSkills: vi.fn(() => []),
+  loadLibraryIndex: vi.fn(() => []),
+  mergeSkillMetas: vi.fn((a: unknown[], b: unknown[]) => [...a, ...b]),
+  selectLibrarySkills: vi.fn(async () => ({ skillIds: [], rationale: 'mock', degraded: true })),
   SkillRouter: class {
     buildPromptContext(): string {
       return '';

@@ -62,8 +62,8 @@ describe('loadTierBFiche', () => {
 });
 
 describe('TIER_B_DELEGATION_MAP', () => {
-  it('has exactly 8 entries', () => {
-    expect(Object.keys(TIER_B_DELEGATION_MAP)).toHaveLength(8);
+  it('has exactly 9 entries', () => {
+    expect(Object.keys(TIER_B_DELEGATION_MAP)).toHaveLength(9);
   });
 
   it('every fiche id resolves to a real fiche on disk', () => {

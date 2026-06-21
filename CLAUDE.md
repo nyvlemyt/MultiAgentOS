@@ -38,14 +38,15 @@ multiAgentOS/
 ├── packages/
 │   ├── core/                # Mission/Agent/Skill domain logic + LLM wrapper
 │   ├── db/                  # Drizzle schema + migrations
-│   ├── agents/              # Tier A fiches + dispatcher
-│   ├── skills/              # Skill router + summaries
+│   ├── agents/              # Tier A fiches + dispatcher; agents/library/ = cold Tier B arsenal (ECC, ADR 0005)
+│   ├── skills/              # Skill router + summaries; skills/library/ + index.json = cold skill arsenal (ECC, ADR 0005)
 │   ├── memory/              # Memory store + summarizer
 │   └── tokens/              # Budget + cost meter
 ├── .claude/                 # Existing — see AGENTS.md, SKILLS_REGISTRY.md
 ├── data/                    # SQLite + caches (gitignored)
 ├── docs/
 │   ├── decisions/           # ADRs
+│   ├── rules/               # Per-language coding-standard arsenal (ECC harvest) — see §7
 │   └── workflows/           # Operational runbooks
 ├── CLAUDE.md
 ├── AGENTS.md
@@ -54,6 +55,8 @@ multiAgentOS/
 ├── SKILLS_REGISTRY.md
 └── TOKEN_STRATEGY.md
 ```
+
+> `packages/{skills,agents}/library/index.json` are **generated** (regen via `pnpm --filter @mas/skills build-library-index`) and **gitignored** — not committed, since their summary prose trips SonarCloud S7164 secret false positives and they are build artifacts.
 
 ## 4. Autonomy levels (enforce in code)
 
@@ -97,6 +100,17 @@ See `TOKEN_STRATEGY.md` for the full policy. Summary:
 - **Comments**: write none unless the WHY is non-obvious.
 - **No new top-level files** without updating §3.
 - **No silent destructive ops** — see §5.
+- **Coding standards arsenal**: per-language standards live in `docs/rules/<lang>/<concern>.md` (ECC harvest). For our active stack (TS/React/Next/web) these are **active rules**, not just reference — the non-obvious ones:
+  - `unknown` (never `any`) for untrusted input (LLM output, SSE frames, request bodies); narrow at trust boundaries with Zod `safeParse`, derive the type via `z.infer` (schema = single source).
+  - Prefer literal unions over `enum` (clean SQLite/Drizzle column + SSE round-trip).
+  - No bare `console.log` in committed code — use the project logger.
+  - Server Component by default; `"use client"` only for state/effects/handlers; mark sensitive modules `import 'server-only'`; never re-export server-only through a client module (the bundler ships it silently).
+  - Provider/`ANTHROPIC_API_KEY` keys never `NEXT_PUBLIC_*` or client-side (reinforces §11).
+  - `useEffect` = external synchronization only (not derived state); do **not** memoize by default (profile first).
+  - **Research-&-Reuse FIRST** — before writing new code, check existing repos/registries/our library (generalizes §9.bis Voie 2 to all code).
+  - **Anti-template = UI done-criteria**: a delivered frontend surface must show ≥4 intentional qualities (hierarchy, rhythm, depth, designed hover/focus states), never raw Tailwind/shadcn default.
+  - Binary review thresholds: fn < 50 lines · file < 800 · nesting ≤ 4 · coverage ≥ 80 %.
+  - Do **not** adopt ECC's "attribution disabled" git rule — it contradicts our mandatory `Co-Authored-By` (§ commit footer).
 - **Verification = 5 checks, not 4.** A phase/PR is done only when `pnpm -r test` · `pnpm lint` · `pnpm build` · `pnpm --filter @mas/web smoke` **and** SonarCloud are all clean. Sonar clean means `scripts/sonar-pr-issues.sh <pr>` exits 0 — **zero open issues and zero to-review hotspots**, not merely a green gate (the gate ignores MINOR/MAJOR smells). After `git push`, poll until the analysis of your HEAD sha lands, run the script, and fix everything it lists. Recurring rules + canonical fixes: `docs/knowledge/sonar-recurring-rules.md` — read it before writing UI/test code to avoid the round-trips.
 
 ## 8. Memory

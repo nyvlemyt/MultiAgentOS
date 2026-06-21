@@ -81,6 +81,16 @@ Avant toute décision d'architecture sur MAS :
 
 **Une décision tenue par 1 seule source = à vérifier. Tenue par ≥2 familles = solide.**
 
+## Distillations ECC résiduel (2026-06-21)
+
+Au-delà des skills/agents/rules/commands déjà récoltés, l'audit des dirs restants de `affaan-m/ecc` (dossier `docs/intake/2026-06-21-ecc-residual/PLAN.md`) a distillé 3 fichiers :
+
+| Fichier | Sujet | Alimente |
+|---------|-------|----------|
+| `mcp-connector-policy-and-catalog.md` | Règle « Universal + MCP-beats-CLI » + catalogue ~30 serveurs MCP (mémoire: omega-memory/squish/longhand) | P4 linked-memory, §11.bis |
+| `risk-scoring-and-session-orchestration.md` | Scoring risque 4-axes + patterns session (state machine, ring buffer, DbWriter, métriques) | §5, Phase 6 risk classifier, worker |
+| `continuous-learning-and-memory-lifecycle.md` | Cycle hooks mémoire (SessionStart/PreCompact/SessionEnd) + spirale apprentissage continu | §13 bridge, Phase 4 |
+
 ## Audit (2026-06-03)
 
 Voir `docs/workflows/phase3-audit-report-2026-06-03.md` pour l'audit complet des ressources et le backlog d'implémentation par phase.

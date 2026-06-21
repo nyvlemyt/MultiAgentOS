@@ -108,6 +108,14 @@ These task descriptions trigger automatic escalation regardless of routing confi
 - [ ] `requires_validation: true` if any escalation signal detected
 - [ ] Output is valid JSON
 
+## Cold Library Arsenal (ECC harvest — ADR 0005)
+
+Beyond the auto-injected `.claude/skills/`, MultiAgentOS keeps a large **cold library** of boosted skills at `packages/skills/library/<slug>/SKILL.md`. They are NOT injected into every session (TOKEN_STRATEGY §6). Consult them at routing time via the index, never by reading bodies:
+
+- **Index**: `packages/skills/library/index.json` — one L1 entry per skill (`id`, `name`, `summary`, `domain`, `cluster`, `origin`, `tier`). Regenerate with `pnpm --filter @mas/skills build-library-index`.
+- **Programmatic**: `loadLibraryIndex(repoRoot)` → `SkillMeta[]`; feed into `new SkillRouter([...orchestrator, ...library])`, then `findByDomain` / `findByTags` (tag = cluster) / `buildPromptContext` (L1 summaries only).
+- **Promotion**: when a task genuinely needs a library skill, `promoteSkill(repoRoot, slug)` copies it into `.claude/skills/<slug>/` so Claude Code loads it. Promote on demand; never bulk-promote (defeats the cold-library token saving).
+
 ## Related Skills
 
 - `mas-mission-planner` — provides the task DAG to route
