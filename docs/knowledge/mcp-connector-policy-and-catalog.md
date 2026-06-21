@@ -44,6 +44,31 @@ Grouped from ECC's `mcp-servers.json`. **Discovery only — never auto-install**
 ### Infra / platform (project-dependent, opt-in)
 github · jira · confluence · supabase · clickhouse · vercel · railway · cloudflare-* · firecrawl · playwright · browserbase · browser-use · filesystem · magic (UI) · fal-ai · laraplugins.
 
+## Catalog additions — awesomeclaude.ai `/top-mcp-servers` (2026-06-21)
+
+*Source: awesomeclaude.ai `/top-mcp-servers` (MIT). New candidates not already listed above, each pre-classified by the two-prong rule. **Discovery only — never auto-install.***
+
+### Memory / second-brain (P4 candidates — compare against omega-memory/squish/longhand)
+- **MarkusPfundstein/mcp-obsidian** — Obsidian via REST API. **Direct answer to the open P4 question** (link MAOS memory ⇄ Obsidian, [[project_linked_memory]] / `reference_links_registry` "Obsidian connector"). Stateful (held REST session) + arguably universal-for-Obsidian-users → could earn an opt-in slot. **Intake-audit before adopting in P4.**
+- **topoteretes/cognee** — memory manager: graph + vector stores, ingestion from 30+ sources. Heavier than omega-memory; evaluate for KG-backed second brain.
+- **mediar-ai/screenpipe** — local-first capture of screen/audio, timestamped, SQL/embedding + semantic search. Local-first fits our constraints; privacy-sensitive, opt-in only.
+- **Shashankss1205/codegraphcontext** — indexes local code into a graph DB for AI context + visualization. Candidate for per-project context packs (mas-context-manager).
+
+### Coding agents / orchestration (siblings of our own runtime)
+- **oraios/serena** — coding agent using symbolic ops via language servers. Stateful (LSP session) → legit MCP case; opt-in per-project.
+- **dagger/container-use** — containerized isolated envs, multiple agents in fresh containers + git branches. Conceptual sibling of our dispatcher + **Phase 8a multi-mission**; relevant when we sandbox child-project execution.
+- **eyaltoledano/claude-task-master** — PRD parsing → task expansion → DAG, multi-provider. Overlaps `mas-mission-planner` — study the PRD→DAG parsing, don't adopt (would duplicate our planner; multi-provider incl. PAYG anyway).
+
+### Security / reverse-engineering (defensive cyber arsenal, opt-in)
+- **LaurieWired/GhidraMCP** + **mrexodia/ida-pro-mcp** — decompile/disassemble for binary analysis. Relevant to our defensive **malware-analysis / digital-forensics** cold clusters. Opt-in, never default; pairs with the §5 sandbox (binaries never auto-run).
+
+### Already covered (no action)
+- **upstash/context7** — live docs lookup (already catalogued above).
+- **microsoft/markitdown** — file→Markdown for LLMs; **already our PDF-read tool** ([[feedback_pdf-to-md-reads]]).
+- **microsoft/playwright-mcp**, **github/github-mcp-server**, **supabase-mcp**, cloud servers — match the "drop-for-skill / infra opt-in" buckets already documented.
+
+**Verdict:** none earns a *default* slot (rule: <10 defaults, stateful+universal). All opt-in/per-project. The single high-priority follow-up is **mcp-obsidian → intake-audit at P4 kickoff**.
+
 ## Why this matters for MAOS
 - The **memory MCPs** (omega-memory / squish / longhand) are concrete candidates for the Phase-4 linked second-brain — evaluate each against our local-first + subscription-only constraints before adopting. longhand's *verbatim pre-rotation capture* is the most novel (nothing in MAOS does this yet).
 - The **connector rule** gives us a crisp gate so the cockpit's MCP surface never bloats the context window.

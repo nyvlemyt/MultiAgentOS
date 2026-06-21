@@ -30,7 +30,29 @@ ecc2 scores every tool call on **four axes**, combined into a composite **0.0–
 - **Single-agent lock-in** — `agent_program()` hardcoded `"claude"` while the CLI advertised `--agent`. Don't advertise an extension point the code can't honor (cf. our §11.bis multi-provider router — keep the seam real).
 - **Config file-only** — no env/flag overrides. MAOS already uses env (`CLAUDE_CONFIG_DIR`, budgets) — keep it.
 
+## 4. Autonomy completion-loops — the "Ralph Wiggum" pattern (bound it before adopting)
+
+*Source: awesomeclaude.ai `/ralph-wiggum` (MIT, webfuse-com/awesome-claude) — technique by Geoffrey Huntley, 2025. Distilled 2026-06-21. Feeds CLAUDE.md §4 autopilot + Phase 6 scheduler.*
+
+The pattern in one line: **re-feed the same prompt to the agent in a loop until a completion signal appears.** Naive form:
+
+```bash
+while :; do cat PROMPT.md | claude ; done
+```
+
+- **Principle:** iteration > perfection; predictable failures are *data*; the loop owns retry logic so the human doesn't babysit. Suited to **unattended, well-defined tasks with verifiable success** (tests green, lint clean, greenfield). Unsuited to judgment work, prod debugging, fuzzy success.
+- **The page names its own KILL:** unbounded loops *waste tokens on impossible tasks* and need **safety mechanisms (max-iterations)**. This is exactly the failure mode CLAUDE.md §6 (hard token budget) and §5 (gates) exist to prevent.
+- **Native supported equivalents** (prefer these over a raw `while`): `/goal <condition>` (work until a condition verifies), `/loop [interval] [prompt]`, `/batch` (parallel worktrees), Dynamic Workflows.
+
+**MAOS application — the pattern is welcome only fully bounded.** Our **autopilot mode (§4)** + **autopilot scheduler (Phase 6)** are MAOS's completion-loop. Mandatory rails when running any Ralph-style loop:
+1. **Verifiable completion signal** — a deterministic check (tests/lint/DoD), never "looks done". Mirrors our 5-check gate.
+2. **`max-iterations` cap** — hard stop independent of the signal (the page's own safeguard).
+3. **Budget cap** — the `budgets` table / §6 window cap returns `budget_exceeded` and halts the loop before runaway spend.
+4. **Risk gate still fires** — §5 `risk:high|blocking` actions pause for a human *inside* the loop; autopilot never bypasses them.
+
+This is precisely how the ECC harvest itself was run (autopilot, commit-per-wave as resume points, halt on red check / risk / budget) — the campaign is a worked example of a *bounded* Ralph loop.
+
 ## Verification posture observed (good signs to emulate)
 Zero `unsafe`, 3 `unwrap()`s total, `anyhow::Result` propagation, no hardcoded secrets, `Stdio::piped()` (no shell-injection), risk scoring as a first-class feature. One open item: task strings passed to `claude --print` are not shell-interpreted today but should be audited if quoting ever changes — same care our headless `claude --print` fallback needs.
 
-Relates to CLAUDE.md §5 · Phase 6 autonomy · [[production-patterns]] · `config/project-stack-mappings.json` (per-stack permission lists).
+Relates to CLAUDE.md §5 · §4 autopilot · Phase 6 autonomy · [[production-patterns]] · `config/project-stack-mappings.json` (per-stack permission lists).

@@ -97,6 +97,8 @@ spec-kit, taste-skill, impeccable, superpowers, build-your-own-x, awesome-design
 - [`design-stack-phase7.md`](design-stack-phase7.md) — workflow design cockpit Phase 7.
 - [`self-audit-lean-claude-md.md`](self-audit-lean-claude-md.md) — **self-audit Batch 1** : CLAUDE.md > 200 lignes (RES-022/012) + retourner les audits RES-024/008/023/015 sur MAS lui-même au gate Phase 3.5. **Dette réflexive, décision humaine.**
 - [`self-audit-memoire-reaudit-debt.md`](self-audit-memoire-reaudit-debt.md) — **dette du cycle mémoire (2026-06-06)** : re-vérifier les stats ère-MCP de 044/034/045 (friction « n°9/10 », risque « 40 % Gartner ») + harmoniser les modèles de registres RES-013↔029 (nommage BDR). **Au pré-vol Phase 4, pas de sous-cycle dédié.**
+- [`continuous-learning-hooks.md`](continuous-learning-hooks.md) — **pont §13 ⇄ P4 (2026-06-21)** : cycle d'apprentissage continu (SessionStart inject borné / PreCompact+SessionEnd → MemoryProposal / observer → score → promote mémoire puis skill froid). Versant runtime du pont de persistance. Candidats MCP : longhand/squish/omega-memory. **Candidat ADR P4.**
+- [`cockpit-mcp-surface.md`](cockpit-mcp-surface.md) — **surface MCP du cockpit (2026-06-21)** : MCP opt-in par projet + règle connecteur 2-branches (universel+stateful) + défauts <10 ; découverte ≠ install ; onglet MCP de l'Arsenal console. Doctrine pour §11.bis. **Distillé, application P4/produit.**
 
 ## Principe (rappel)
 
