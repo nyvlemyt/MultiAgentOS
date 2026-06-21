@@ -28,7 +28,7 @@ describe('mergeSkillMetas (router library merge)', () => {
     ];
 
     const merged = mergeSkillMetas(orchestrator, library);
-    const ids = merged.map((m) => m.id).sort();
+    const ids = merged.map((m) => m.id).sort((a, b) => a.localeCompare(b));
     expect(ids).toEqual(['accessibility', 'mas-mission-planner', 'shared']);
 
     const sharedEntry = merged.find((m) => m.id === 'shared');

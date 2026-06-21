@@ -59,8 +59,7 @@ function scopePasses(skill: SkillMeta, scope: DomainScope): boolean {
   const byDomain = scope.domain !== undefined && skill.domain === scope.domain;
   const byCluster =
     scope.clusterPrefix !== undefined &&
-    skill.cluster !== undefined &&
-    skill.cluster.startsWith(scope.clusterPrefix);
+    (skill.cluster?.startsWith(scope.clusterPrefix) ?? false);
   return byDomain || byCluster;
 }
 
