@@ -1,6 +1,7 @@
 export * from './registry';
 export * from './dispatch';
 export * from './dispatch-tick';
+export * from './budget-gate';
 export * from './intake-gate';
 export * from './library';
 export * from './delegate';

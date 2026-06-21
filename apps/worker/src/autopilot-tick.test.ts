@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { eq, inArray } from 'drizzle-orm';
-import { getDb, closeDb, projects, missions, tasks, schedules, events } from '@mas/db';
+import { getDb, closeDb, projects, missions, tasks, schedules, events, budgets } from '@mas/db';
 import { seedDispatchableMission } from '@mas/agents';
 import { tick, maybeEmitDailyReport } from './index';
 
@@ -82,6 +82,26 @@ describe('worker tick — multi-project dispatch (Phase 8a)', () => {
     const rows = await getDb().select().from(tasks).where(inArray(tasks.id, ['m1_t1', 'm2_t1']));
     expect(rows.length).toBe(2);
     expect(rows.every((t) => t.status === 'done')).toBe(true);
+  });
+
+  it('halts dispatch and emits budget_exceeded when the day cap is reached', async () => {
+    const db = getDb();
+    await db.insert(budgets).values({
+      id: 'bud_day', scope: 'global', period: 'day', tokensCap: 100, tokensSpent: 0,
+    });
+    // Prior LLM spend today already at the cap.
+    await db.insert(events).values({
+      id: 'evt_spend', type: 'task_done', tokensIn: 60, tokensOut: 40,
+      cacheRead: 0, cacheCreation: 0, quotaUnits: 0, risk: 'low', createdAt: new Date(),
+    });
+    await seedDispatchableMission('b1', 'pb');
+
+    await tick(getDb(), new Date(2026, 5, 15, 3, 0));
+
+    const [t] = await getDb().select().from(tasks).where(eq(tasks.id, 'b1_t1'));
+    expect(t?.status).not.toBe('done');
+    const evs = await getDb().select().from(events).where(eq(events.type, 'budget_exceeded'));
+    expect(evs.length).toBe(1);
   });
 
   it('honors the global concurrency cap in a single tick', async () => {
