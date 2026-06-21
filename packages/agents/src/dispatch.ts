@@ -33,7 +33,7 @@ import {
   type Risk,
   type RouterEvent,
 } from '@mas/core';
-import { scanOrchestratorSkills, SkillRouter } from '@mas/skills';
+import { scanOrchestratorSkills, loadLibraryIndex, mergeSkillMetas, SkillRouter } from '@mas/skills';
 import { MemoryStore, buildMemoryContext, runCloseOutRitual, type MemoryContext } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
@@ -88,7 +88,11 @@ function getSkillRouter(): SkillRouter {
     try {
       const __dirname = fileURLToPath(new URL('.', import.meta.url));
       const repoRoot = resolve(__dirname, '../../..');
-      _skillRouterInstance = new SkillRouter(scanOrchestratorSkills(repoRoot));
+      const merged = mergeSkillMetas(
+        scanOrchestratorSkills(repoRoot),
+        loadLibraryIndex(repoRoot),
+      );
+      _skillRouterInstance = new SkillRouter(merged);
     } catch {
       // Under a bundler (Next webpack RSC) import.meta.url is not a file: URL,
       // so fileURLToPath rejects it (TypeError: ... Received an instance of URL).
