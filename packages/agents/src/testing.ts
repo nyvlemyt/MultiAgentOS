@@ -69,14 +69,18 @@ export const TIER_A_ROSTER = [
   'reviewer',
 ] as const;
 
-export async function seedAgentsRoster(): Promise<void> {
+export async function seedAgents(ids: readonly string[]): Promise<void> {
   const db = getDb();
-  for (const id of TIER_A_ROSTER) {
+  for (const id of ids) {
     await db.insert(agents).values({
       id, tier: 'A', fichePath: `f/${id}.md`, name: id, model: 'claude-haiku-4-5',
       enabled: true, totalRuns: 0, totalTokens: 0, successRate: 1,
     });
   }
+}
+
+export async function seedAgentsRoster(): Promise<void> {
+  await seedAgents(TIER_A_ROSTER);
 }
 
 export async function seedProject(id: string, name = id): Promise<void> {
@@ -87,11 +91,17 @@ export async function seedProject(id: string, name = id): Promise<void> {
   });
 }
 
-export async function seedMission(missionId: string, projectId: string): Promise<void> {
+export async function seedMission(
+  missionId: string,
+  projectId: string,
+  opts: { title?: string; objective?: string } = {},
+): Promise<void> {
   const db = getDb();
   await db.insert(missions).values({
-    id: missionId, projectId, title: 'Build settings page',
-    objective: 'Add a settings page', status: 'draft', risk: 'low',
+    id: missionId, projectId,
+    title: opts.title ?? 'Build settings page',
+    objective: opts.objective ?? 'Add a settings page',
+    status: 'draft', risk: 'low',
     budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
   });
 }
