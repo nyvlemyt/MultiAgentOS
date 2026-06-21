@@ -66,7 +66,7 @@ describe('getTokenSnapshot — concurrency-aware day meter', () => {
     });
     await seedEvent('task_done', 'claude', 200, 100); // 300 logged
     await db.insert(projects).values({
-      id: 'p', name: 'p', slug: 'p', path: '/tmp/p', type: 'other',
+      id: 'p', name: 'p', slug: 'p', path: join(tmpdir(), 'mas-tok-p'), type: 'other',
       autonomy: 'autonomous', createdAt: new Date(), lastActiveAt: new Date(),
     });
     await db.insert(missions).values({
