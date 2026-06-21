@@ -3,6 +3,9 @@ import { BudgetBar } from '@/components/BudgetBar';
 import { ModePill } from '@/components/ModePill';
 import { dailyTokens, monthlySpend } from '@/lib/fixtures';
 import { getTokenSnapshot, getRemainingCapacity } from '@/lib/tokens';
+import { getBudgetPause } from '@/lib/autopilot';
+import { BudgetPauseBanner } from '@/components/BudgetPauseBanner';
+import { getDb } from '@mas/db';
 
 // Reads the DB directly (server component) — no HTTP self-fetch, which would be
 // port/origin-fragile and silently fall back to zeros (see PR review).
@@ -17,9 +20,11 @@ function fmtTokens(n: number): string {
 export default async function TokenManager() {
   const data = await getTokenSnapshot();
   const capacity = await getRemainingCapacity();
+  const budgetPause = await getBudgetPause(getDb());
 
   return (
     <div className="flex flex-col gap-6">
+      <BudgetPauseBanner pause={budgetPause} />
       <header className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Quota & Cache</h1>
@@ -36,16 +41,27 @@ export default async function TokenManager() {
         <Card
           title="Tokens aujourd'hui"
           value={fmtTokens(data.day.tokensSpent)}
-          hint={`plafond ${fmtTokens(data.day.tokensCap)}`}
+          hint={`reste ~${fmtTokens(data.day.remaining)} · réservé ${fmtTokens(data.day.reserved)} · plafond ${fmtTokens(data.day.tokensCap)}`}
         >
-          <BudgetBar spent={data.day.tokensSpent} cap={data.day.tokensCap} />
+          <BudgetBar spent={data.day.tokensSpent + data.day.reserved} cap={data.day.tokensCap} />
         </Card>
         <Card
           title="Tokens cette semaine"
           value={fmtTokens(data.week.tokensSpent)}
-          hint={`plafond ${fmtTokens(data.week.tokensCap)}`}
+          hint={`reste ~${fmtTokens(data.week.remaining)} · réservé ${fmtTokens(data.week.reserved)} · plafond ${fmtTokens(data.week.tokensCap)}`}
         >
-          <BudgetBar spent={data.week.tokensSpent} cap={data.week.tokensCap} />
+          <BudgetBar spent={data.week.tokensSpent + data.week.reserved} cap={data.week.tokensCap} />
+        </Card>
+        <Card
+          title="Tokens ce mois (Agent-SDK)"
+          value={fmtTokens(data.month.tokensSpent)}
+          hint={
+            data.month.tokensCap > 0
+              ? `reste ~${fmtTokens(data.month.remaining)} · réservé ${fmtTokens(data.month.reserved)} · plafond ${fmtTokens(data.month.tokensCap)}`
+              : 'plafond non déclaré (illimité)'
+          }
+        >
+          <BudgetBar spent={data.month.tokensSpent + data.month.reserved} cap={data.month.tokensCap} />
         </Card>
         <Card
           title="Taux de cache"
@@ -77,6 +93,7 @@ export default async function TokenManager() {
             <thead>
               <tr className="text-left" style={{ color: 'var(--text-muted)' }}>
                 <th className="py-1 font-medium">Source</th>
+                <th className="py-1 font-medium">Abonnement</th>
                 <th className="py-1 text-right font-medium">Appels</th>
                 <th className="py-1 text-right font-medium">Tokens entrée</th>
                 <th className="py-1 text-right font-medium">Tokens sortie</th>
@@ -86,6 +103,7 @@ export default async function TokenManager() {
               {data.byProvider.map((row) => (
                 <tr key={row.provider} className="border-t" style={{ borderColor: 'var(--border)' }}>
                   <td className="py-1 mono">{row.provider}</td>
+                  <td className="py-1 mono" style={{ color: 'var(--text-muted)' }}>{row.plan ?? '—'}</td>
                   <td className="py-1 text-right tabular-nums">{row.calls}</td>
                   <td className="py-1 text-right tabular-nums">{fmtTokens(row.tokensIn)}</td>
                   <td className="py-1 text-right tabular-nums">{fmtTokens(row.tokensOut)}</td>

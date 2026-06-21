@@ -1,4 +1,7 @@
+import { randomUUID } from 'node:crypto';
+import { getDb, events } from '@mas/db';
 import { executeNextTask, listDispatchableMissions } from './dispatch';
+import { checkDispatchBudget, type BudgetStatus } from './budget-gate';
 
 export interface DispatchTickConfig {
   readonly maxConcurrentPerProject: number;
@@ -14,7 +17,7 @@ export interface DispatchAdvance {
 export interface DispatchSkip {
   readonly missionId: string;
   readonly projectId: string;
-  readonly reason: 'project_cap' | 'global_cap';
+  readonly reason: 'project_cap' | 'global_cap' | 'budget_exceeded';
 }
 
 export interface DispatchTickResult {
@@ -77,10 +80,38 @@ export function selectForTick<M extends SelectableMission>(
  * Mission/task DB access is self-resolved via getDb() inside the dispatch
  * helpers, so no Db handle is threaded here.
  */
+async function logBudgetExceeded(status: BudgetStatus): Promise<void> {
+  await getDb().insert(events).values({
+    id: `evt_${randomUUID()}`,
+    type: 'budget_exceeded',
+    payloadJson: JSON.stringify({ window: status.window, day: status.day, week: status.week, month: status.month }),
+    tokensIn: 0, tokensOut: 0, cacheRead: 0, cacheCreation: 0, quotaUnits: 0,
+    risk: 'low',
+    createdAt: new Date(),
+  });
+}
+
 export async function runDispatchTick(
   config: DispatchTickConfig,
 ): Promise<DispatchTickResult> {
   const dispatchable = await listDispatchableMissions();
+
+  // Pre-flight token-budget gate (CLAUDE.md §6, §11): once a day/week window is
+  // exhausted, advance nothing and pause until the operator raises the cap or
+  // the window rolls over. Emitted once per blocked tick for the meter/feed.
+  const budget = await checkDispatchBudget();
+  if (budget.blocked) {
+    await logBudgetExceeded(budget);
+    return {
+      advanced: [],
+      skipped: dispatchable.map((m) => ({
+        missionId: m.id,
+        projectId: m.projectId,
+        reason: 'budget_exceeded' as const,
+      })),
+    };
+  }
+
   const { selected, skipped } = selectForTick(dispatchable, config);
 
   const advanced = await Promise.all(
