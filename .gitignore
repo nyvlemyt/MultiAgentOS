@@ -85,3 +85,4 @@ docs/ressources/md/
 # they are build artifacts. See docs/intake/2026-06-16-ecc-harvest.
 packages/skills/library/index.json
 packages/agents/library/index.json
+.qmd/

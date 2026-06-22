@@ -1,8 +1,17 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, chmodSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { FtsRetriever, ensureIndexed, type MemoryDoc } from './retriever';
+import {
+  FtsRetriever,
+  QmdRetriever,
+  UnifiedRetriever,
+  createRetriever,
+  ensureIndexed,
+  type MemoryDoc,
+  type MemoryHit,
+  type MemoryRetriever,
+} from './retriever';
 
 const docs: MemoryDoc[] = [
   {
@@ -138,5 +147,147 @@ describe('FtsRetriever — persistent index (Phase 9 · 0a)', () => {
     expect(ensureIndexed(r, corpus)).toBe(true);
     expect(r.indexedHash()).toBe('hash-fresh');
     r.close();
+  });
+});
+
+describe('FtsRetriever — projectId filter (Phase 9 · 0a renforcée)', () => {
+  const pdocs: MemoryDoc[] = [
+    { id: 'otakugo/BDR-001', scope: 'project', source: 'data/memory/otakugo/decisions.md', title: 'dark mode toggle', body: 'chose a dark mode toggle for the settings page' },
+    { id: 'webapp/BDR-001', scope: 'project', source: 'data/memory/webapp/decisions.md', title: 'webapp dark mode', body: 'webapp also gets a dark mode toggle decision' },
+  ];
+
+  it('restricts project hits to one project', () => {
+    const r = new FtsRetriever();
+    r.index(pdocs);
+    const hits = r.query('dark mode toggle', { scope: 'project', projectId: 'otakugo' });
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits.every((h) => h.id.startsWith('otakugo/'))).toBe(true);
+  });
+
+  it('does not leak another project', () => {
+    const r = new FtsRetriever();
+    r.index(pdocs);
+    const hits = r.query('dark mode toggle', { scope: 'project', projectId: 'webapp' });
+    expect(hits.every((h) => h.id.startsWith('webapp/'))).toBe(true);
+  });
+});
+
+// A fake `qmd` binary that prints a fixed --json result and exits 0 on `status`.
+const QMD_FIXTURE = JSON.stringify([
+  { docid: '#1', score: 0.9, file: 'qmd://mas-memory/otakugo/decisions.md', line: 1, title: 'dark mode', snippet: 'chose dark mode' },
+  { docid: '#2', score: 0.8, file: 'qmd://mas-knowledge/memory-patterns.md', line: 1, title: 'memory-patterns', snippet: 'three levels of memory' },
+  { docid: '#3', score: 0.7, file: 'qmd://mas-memory/webapp/decisions.md', line: 1, title: 'auth', snippet: 'auth flow decision' },
+  { docid: '#4', score: 0.6, file: 'qmd://mas-arsenal/skill/agent-eval.md', line: 1, title: 'agent-eval', snippet: 'eval skill' },
+]);
+
+function writeFakeQmd(dir: string, body: string, withIndex = true): string {
+  const bin = join(dir, 'qmd-fake');
+  // Banner line before JSON exercises the defensive parser (parseQmdJson).
+  writeFileSync(bin, `#!/bin/sh\nif [ "$1" = "status" ]; then exit 0; fi\necho "Gathering information"\ncat <<'EOF'\n${body}\nEOF\n`, 'utf8');
+  chmodSync(bin, 0o755);
+  if (withIndex) mkdirSync(join(dir, '.qmd'), { recursive: true });
+  return bin;
+}
+
+describe('QmdRetriever (Phase 9 · 0a renforcée)', () => {
+  let dir: string;
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'mas-qmd-'));
+  });
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('available() is true with a .qmd index and a working binary', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    expect(QmdRetriever.available(dir, bin)).toBe(true);
+  });
+
+  it('available() is false without a .qmd index', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE, false);
+    expect(QmdRetriever.available(dir, bin)).toBe(false);
+  });
+
+  it('maps qmd:// paths to scope/project and parses through a banner line', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    const r = new QmdRetriever({ cwd: dir, bin });
+    const hits = r.query('memory', { limit: 10 });
+    expect(hits.length).toBe(4);
+    const memHit = hits.find((h) => h.id === 'mas-memory/otakugo/decisions.md')!;
+    expect(memHit.scope).toBe('project');
+    expect(memHit.source).toBe('data/memory/otakugo/decisions.md');
+    const knHit = hits.find((h) => h.id.startsWith('mas-knowledge/'))!;
+    expect(knHit.scope).toBe('global');
+  });
+
+  it('filters by scope=global', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    const r = new QmdRetriever({ cwd: dir, bin });
+    const hits = r.query('memory', { scope: 'global', limit: 10 });
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits.every((h) => h.scope === 'global')).toBe(true);
+  });
+
+  it('filters by projectId', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    const r = new QmdRetriever({ cwd: dir, bin });
+    const hits = r.query('memory', { scope: 'project', projectId: 'otakugo', limit: 10 });
+    expect(hits.map((h) => h.id)).toEqual(['mas-memory/otakugo/decisions.md']);
+  });
+
+  it('restricts to allow-listed collections', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    const r = new QmdRetriever({ cwd: dir, bin, collections: ['mas-arsenal'] });
+    const hits = r.query('eval', { limit: 10 });
+    expect(hits.map((h) => h.id)).toEqual(['mas-arsenal/skill/agent-eval.md']);
+  });
+});
+
+describe('UnifiedRetriever (QMD primary, FTS fallback)', () => {
+  const throwing: MemoryRetriever = {
+    query() {
+      throw new Error('qmd down');
+    },
+  };
+  const empty: MemoryRetriever = { query: () => [] };
+
+  it('falls back to FTS when the primary throws', () => {
+    const fts = new FtsRetriever();
+    fts.index(docs);
+    let fellBack = false;
+    const u = new UnifiedRetriever(throwing, fts, () => {
+      fellBack = true;
+    });
+    const hits = u.query('Mem0 cloud');
+    expect(hits.length).toBeGreaterThan(0);
+    expect(fellBack).toBe(true);
+  });
+
+  it('does NOT fall back on an empty (but valid) primary result', () => {
+    const fts = new FtsRetriever();
+    fts.index(docs);
+    let fellBack = false;
+    const u = new UnifiedRetriever(empty, fts, () => {
+      fellBack = true;
+    });
+    const hits: MemoryHit[] = u.query('Mem0 cloud');
+    expect(hits).toHaveLength(0);
+    expect(fellBack).toBe(false);
+  });
+});
+
+describe('createRetriever (backend selection, ADR 0003 amendment)', () => {
+  const corpus = { corpusHash: () => 'h', allDocs: () => docs };
+
+  it('returns an FTS retriever when backend=fts', () => {
+    const r = createRetriever({ cwd: '/nonexistent', corpus, backend: 'fts' });
+    expect(r.query('Mem0 cloud').length).toBeGreaterThan(0);
+  });
+
+  it('degrades to FTS when QMD is unavailable (auto)', () => {
+    let warned = false;
+    const r = createRetriever({ cwd: '/nonexistent', corpus, backend: 'qmd', onFallback: () => { warned = true; } });
+    expect(r.query('Mem0 cloud').length).toBeGreaterThan(0);
+    expect(warned).toBe(true);
   });
 });

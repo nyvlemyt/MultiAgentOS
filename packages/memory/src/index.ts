@@ -1,5 +1,8 @@
 export {
   FtsRetriever,
+  QmdRetriever,
+  UnifiedRetriever,
+  createRetriever,
   toMatchExpr,
   ensureIndexed,
   type MemoryRetriever,
@@ -8,7 +11,27 @@ export {
   type MemoryScope,
   type MemoryQueryOpts,
   type IndexableCorpus,
+  type QmdMode,
+  type QmdRetrieverOpts,
+  type RetrievalBackend,
+  type CreateRetrieverOpts,
 } from './retriever';
+export {
+  buildArsenalStubs,
+  serializeStub,
+  parseFrontmatter as parseArsenalFrontmatter,
+  type ArsenalKind,
+  type ArsenalStub,
+  type ArsenalBuildResult,
+} from './arsenal';
+export {
+  runRetrievalEval,
+  formatEvalReport,
+  type GoldenQuery,
+  type EvalBackend,
+  type EvalCase,
+  type EvalReport,
+} from './eval';
 export {
   MemoryStore,
   MemoryWriteForbiddenError,
@@ -48,6 +71,7 @@ export { seedGlobalKnowledge, runSeed, type SeedResult, type RunSeedOpts } from 
 export {
   buildMemoryContext,
   MAX_GLOBAL_ITEMS,
+  MAX_PROJECT_ITEMS,
   type MemoryContext,
   type MemoryContextOpts,
 } from './context';

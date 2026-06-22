@@ -1,3 +1,6 @@
+import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import type BetterSqlite3 from 'better-sqlite3';
 
@@ -23,6 +26,12 @@ export interface MemoryHit extends MemoryDoc {
 export interface MemoryQueryOpts {
   limit?: number;
   scope?: MemoryScope | 'all';
+  /**
+   * Restrict project-scoped hits to one project (id prefix `<projectId>/`). Honoured
+   * by both backends so buildMemoryContext can pull THIS project's memory by relevance
+   * without leaking other projects' entries.
+   */
+  projectId?: string;
 }
 
 /**
@@ -44,6 +53,11 @@ export function toMatchExpr(q: string): string {
     .split(/[^\p{L}\p{N}]+/u)
     .filter((t) => t.length > 0);
   return tokens.map((t) => `"${t}"`).join(' OR ');
+}
+
+/** Escape SQL LIKE wildcards in a literal prefix (used with `ESCAPE '\'`). */
+function escapeLike(s: string): string {
+  return s.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
 
 export class FtsRetriever implements MemoryRetriever {
@@ -99,15 +113,21 @@ export class FtsRetriever implements MemoryRetriever {
     const scope = opts.scope ?? 'all';
 
     const scopeClause = scope === 'all' ? '' : 'AND scope = @scope';
+    // toDocs() ids are `<projectId>/<entryId>` — a prefix LIKE keeps the filter to
+    // one project. The `/` separator is added literally so it can't be a wildcard.
+    const projectClause = opts.projectId ? "AND id LIKE @projectLike ESCAPE '\\'" : '';
+    const params: Record<string, unknown> = { expr, scope, limit };
+    if (opts.projectId) params['projectLike'] = `${escapeLike(opts.projectId)}/%`;
+
     const rows = this.db
       .prepare(
         `SELECT id, scope, source, title, body, bm25(mem_fts) AS rank
          FROM mem_fts
-         WHERE mem_fts MATCH @expr ${scopeClause}
+         WHERE mem_fts MATCH @expr ${scopeClause} ${projectClause}
          ORDER BY rank ASC
          LIMIT @limit`,
       )
-      .all({ expr, scope, limit }) as Array<MemoryDoc & { rank: number }>;
+      .all(params) as Array<MemoryDoc & { rank: number }>;
 
     return rows.map(({ rank, ...d }) => ({ ...d, score: -rank }));
   }
@@ -137,4 +157,216 @@ export function ensureIndexed(r: FtsRetriever, corpus: IndexableCorpus): boolean
   if (r.indexedHash() === want) return false;
   r.index(corpus.allDocs(), want);
   return true;
+}
+
+// ----------------------------------------------------------------------------
+// QMD retriever (Phase 9 · 0a renforcée, ADR 0003 amendment).
+// QMD (github.com/tobi/qmd) is an external local CLI/MCP doing BM25 + vector +
+// rerank over a project-local `.qmd/` index. It only READS the Markdown truth —
+// the index is derived & rebuildable (principle 1). We shell out synchronously
+// (execFileSync) so the MemoryRetriever interface stays sync: the swap is
+// transparent to every caller (ADR 0003 reversibility). buildMemoryContext is
+// only called from the worker dispatch path (not a web request), so a ~4 s
+// model-warm `qmd query` is acceptable for mission-level on-demand retrieval.
+// ----------------------------------------------------------------------------
+
+/** A raw row of `qmd <mode> --json`. */
+interface QmdRawHit {
+  docid: string;
+  score: number;
+  file: string;
+  line: number;
+  title: string;
+  snippet: string;
+}
+
+export type QmdMode = 'query' | 'search' | 'vsearch';
+
+export interface QmdRetrieverOpts {
+  /** Repo root containing the project-local `.qmd/` index. */
+  cwd: string;
+  /** qmd binary (default 'qmd'); override for tests/stubs. */
+  bin?: string;
+  /** 'query' = hybrid+rerank (default), 'search' = BM25 (no models), 'vsearch' = vectors. */
+  mode?: QmdMode;
+  /** Only keep hits from these qmd collection names (default: all). */
+  collections?: string[];
+  /** Hard timeout per query; on timeout the call throws → UnifiedRetriever falls back. */
+  timeoutMs?: number;
+}
+
+const QMD_KNOWLEDGE = 'mas-knowledge';
+const QMD_MEMORY = 'mas-memory';
+
+/** Map one `qmd://<collection>/<rest>` hit to a MemoryDoc scope/source/project. */
+function mapQmdHit(raw: QmdRawHit): (MemoryHit & { collection: string; projectId?: string }) | null {
+  const m = /^qmd:\/\/([^/]+)\/(.+)$/.exec(raw.file);
+  if (!m) return null;
+  const collection = m[1]!;
+  const rest = m[2]!;
+  let scope: MemoryScope = 'global';
+  let projectId: string | undefined;
+  let source = rest;
+  if (collection === QMD_MEMORY) {
+    const seg0 = rest.split('/')[0]!;
+    if (seg0 === '_global') {
+      scope = 'global';
+    } else {
+      scope = 'project';
+      projectId = seg0;
+    }
+    source = `data/memory/${rest}`;
+  } else if (collection === QMD_KNOWLEDGE) {
+    source = rest;
+  }
+  return {
+    id: `${collection}/${rest}`,
+    scope,
+    source,
+    title: raw.title,
+    body: raw.snippet,
+    score: raw.score,
+    collection,
+    projectId,
+  };
+}
+
+/** Extract the JSON array from qmd stdout (defensive against any banner lines). */
+function parseQmdJson(stdout: string): QmdRawHit[] {
+  const start = stdout.indexOf('[');
+  const end = stdout.lastIndexOf(']');
+  if (start === -1 || end === -1 || end < start) return [];
+  const parsed: unknown = JSON.parse(stdout.slice(start, end + 1));
+  return Array.isArray(parsed) ? (parsed as QmdRawHit[]) : [];
+}
+
+export class QmdRetriever implements MemoryRetriever {
+  private readonly bin: string;
+  private readonly mode: QmdMode;
+  private readonly timeoutMs: number;
+
+  constructor(private readonly opts: QmdRetrieverOpts) {
+    this.bin = opts.bin ?? 'qmd';
+    this.mode = opts.mode ?? 'query';
+    this.timeoutMs = opts.timeoutMs ?? 30_000;
+  }
+
+  /** True when the qmd binary runs and a `.qmd` index exists in cwd. */
+  static available(cwd: string, bin = 'qmd'): boolean {
+    if (!existsSync(join(cwd, '.qmd'))) return false;
+    try {
+      execFileSync(bin, ['status'], { cwd, stdio: 'ignore', timeout: 10_000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  query(q: string, opts: MemoryQueryOpts = {}): MemoryHit[] {
+    if (!q.trim()) return [];
+    const limit = opts.limit ?? 5;
+    // qmd ranks then we post-filter by scope/project/collection, so over-fetch.
+    const fetch = Math.max(limit * 4, 20);
+    const stdout = execFileSync(this.bin, [this.mode, q, '--json', '-n', String(fetch)], {
+      cwd: this.opts.cwd,
+      encoding: 'utf8',
+      timeout: this.timeoutMs,
+      maxBuffer: 16 * 1024 * 1024,
+    });
+    const allow = this.opts.collections;
+    const scope = opts.scope ?? 'all';
+    const hits: MemoryHit[] = [];
+    for (const raw of parseQmdJson(stdout)) {
+      const mapped = mapQmdHit(raw);
+      if (!mapped) continue;
+      if (allow && !allow.includes(mapped.collection)) continue;
+      if (scope !== 'all' && mapped.scope !== scope) continue;
+      if (opts.projectId && mapped.projectId !== opts.projectId) continue;
+      hits.push({
+        id: mapped.id,
+        scope: mapped.scope,
+        source: mapped.source,
+        title: mapped.title,
+        body: mapped.body,
+        score: mapped.score,
+      });
+      if (hits.length >= limit) break;
+    }
+    return hits;
+  }
+}
+
+/**
+ * QMD primary, FTS fallback. A QMD *error* (binary missing, timeout, bad JSON)
+ * falls through to FTS for that query; an empty QMD result is a valid answer and
+ * does NOT trigger fallback. This is the "FTS fallback if QMD is cut" guarantee
+ * (Phase 9 · 0a exit criterion) — retrieval never breaks when QMD is unavailable.
+ */
+export class UnifiedRetriever implements MemoryRetriever {
+  constructor(
+    private readonly primary: MemoryRetriever,
+    private readonly fallback: MemoryRetriever,
+    private readonly onFallback?: (err: unknown) => void,
+  ) {}
+
+  query(q: string, opts?: MemoryQueryOpts): MemoryHit[] {
+    try {
+      return this.primary.query(q, opts);
+    } catch (err) {
+      this.onFallback?.(err);
+      return this.fallback.query(q, opts);
+    }
+  }
+}
+
+export type RetrievalBackend = 'qmd' | 'fts' | 'auto';
+
+export interface CreateRetrieverOpts {
+  /** Repo root for QMD (.qmd index). */
+  cwd: string;
+  /** Corpus to build the FTS index/fallback from. */
+  corpus: IndexableCorpus;
+  /** 'auto' (default) = QMD when available else FTS. Env MAS_RETRIEVAL_BACKEND overrides. */
+  backend?: RetrievalBackend;
+  /** Persistent FTS index path (ADR 0003); omit for in-memory. */
+  indexPath?: string;
+  /** Restrict QMD hits to these collections (memory search: mas-memory + mas-knowledge). */
+  collections?: string[];
+  qmdMode?: QmdMode;
+  bin?: string;
+  onFallback?: (err: unknown) => void;
+}
+
+/** Build (and index) an FtsRetriever from a corpus. */
+function buildFts(corpus: IndexableCorpus, indexPath?: string): FtsRetriever {
+  const fts = indexPath ? new FtsRetriever({ indexPath }) : new FtsRetriever();
+  if (indexPath) ensureIndexed(fts, corpus);
+  else fts.index(corpus.allDocs());
+  return fts;
+}
+
+/**
+ * Pick the retrieval backend (ADR 0003 amendment): QMD behind the MemoryRetriever
+ * seam with an FTS fallback. `MAS_RETRIEVAL_BACKEND=fts` forces FTS (used in CI,
+ * where the ~4.4 GB QMD models are absent).
+ */
+export function createRetriever(opts: CreateRetrieverOpts): MemoryRetriever {
+  const envBackend = process.env['MAS_RETRIEVAL_BACKEND'] as RetrievalBackend | undefined;
+  const backend = envBackend ?? opts.backend ?? 'auto';
+  const fts = buildFts(opts.corpus, opts.indexPath);
+  if (backend === 'fts') return fts;
+  if (QmdRetriever.available(opts.cwd, opts.bin)) {
+    const qmd = new QmdRetriever({
+      cwd: opts.cwd,
+      bin: opts.bin,
+      mode: opts.qmdMode,
+      collections: opts.collections ?? [QMD_MEMORY, QMD_KNOWLEDGE],
+    });
+    return new UnifiedRetriever(qmd, fts, opts.onFallback);
+  }
+  if (backend === 'qmd') {
+    // Explicitly asked for QMD but it is unavailable — degrade to FTS, never crash.
+    opts.onFallback?.(new Error('QMD requested but unavailable; using FTS'));
+  }
+  return fts;
 }
