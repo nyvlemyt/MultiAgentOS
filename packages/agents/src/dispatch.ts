@@ -74,13 +74,16 @@ function memoryContextFor(projectId: string | undefined, query: string): MemoryC
   if (!projectId) return empty;
   try {
     const envRoot = process.env.MAS_MEMORY_ROOT;
-    if (envRoot) return buildMemoryContext(new MemoryStore({ root: envRoot }), projectId, query);
+    if (envRoot) {
+      const envStore = new MemoryStore({ root: envRoot });
+      return buildMemoryContext(envStore, projectId, query, { indexPath: envStore.indexPath() });
+    }
     if (!_memoryStore) {
       const __dirname = fileURLToPath(new URL('.', import.meta.url));
       const repoRoot = resolve(__dirname, '../../..');
       _memoryStore = new MemoryStore({ root: resolve(repoRoot, 'data/memory') });
     }
-    return buildMemoryContext(_memoryStore, projectId, query);
+    return buildMemoryContext(_memoryStore, projectId, query, { indexPath: _memoryStore.indexPath() });
   } catch {
     return empty;
   }

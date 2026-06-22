@@ -44,4 +44,9 @@ export {
   type LlmFallbackInfo,
 } from './classifier';
 export { seedGlobalKnowledge, type SeedResult } from './seed';
-export { buildMemoryContext, MAX_GLOBAL_ITEMS, type MemoryContext } from './context';
+export {
+  buildMemoryContext,
+  MAX_GLOBAL_ITEMS,
+  type MemoryContext,
+  type MemoryContextOpts,
+} from './context';
