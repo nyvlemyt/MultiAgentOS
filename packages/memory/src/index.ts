@@ -1,11 +1,13 @@
 export {
   FtsRetriever,
   toMatchExpr,
+  ensureIndexed,
   type MemoryRetriever,
   type MemoryDoc,
   type MemoryHit,
   type MemoryScope,
   type MemoryQueryOpts,
+  type IndexableCorpus,
 } from './retriever';
 export {
   MemoryStore,
