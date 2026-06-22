@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MemoryStore, MEMORY_KEEPER_AGENT } from './registers';
-import { seedGlobalKnowledge } from './seed';
+import { seedGlobalKnowledge, runSeed } from './seed';
 import { FtsRetriever } from './retriever';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -53,5 +53,18 @@ describe('seedGlobalKnowledge (persistence bridge)', () => {
   it('the write path is Keeper-locked (seed via a non-Keeper store throws)', () => {
     const intruder = new MemoryStore({ root, writerAgent: 'mission-planner' });
     expect(() => seedGlobalKnowledge(intruder, KNOWLEDGE_DIR)).toThrow();
+  });
+});
+
+describe('runSeed (bridge runner — builds the Keeper store internally)', () => {
+  it('seeds knowledge into memoryRoot and is idempotent', () => {
+    const res = runSeed({ memoryRoot: root, knowledgeDir: KNOWLEDGE_DIR });
+    expect(res.imported.length).toBeGreaterThanOrEqual(17);
+    const count = keeperStore().knowledgeDocs().length;
+
+    const res2 = runSeed({ memoryRoot: root, knowledgeDir: KNOWLEDGE_DIR });
+    expect(res2.imported).toHaveLength(0);
+    expect(res2.skipped.length).toBeGreaterThan(0);
+    expect(keeperStore().knowledgeDocs().length).toBe(count);
   });
 });

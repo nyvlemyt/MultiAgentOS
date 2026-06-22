@@ -10,6 +10,7 @@ import {
   type DispatchTickConfig,
 } from '@mas/agents';
 import { loadRoutingConfig, planWarnings } from '@mas/core';
+import { runSeed } from '@mas/memory';
 import { getDb } from '@mas/db';
 
 const TICK_MS = 1500;
@@ -65,6 +66,23 @@ export async function maybeEmitDailyReport(db: Db, now: Date): Promise<void> {
   console.log(`[worker] daily report emitted for ${date}`);
 }
 
+/**
+ * Run the knowledge→memory bridge once at boot (CLAUDE.md §13 anti-oubli). It is
+ * idempotent (seedGlobalKnowledge skips already-present files) and non-fatal: a
+ * seed failure logs and is swallowed so the worker still starts. The Keeper
+ * identity is built inside runSeed, so the §8 write-lock is honored.
+ */
+function bootstrapMemorySeed(repoRoot: string): void {
+  try {
+    const memoryRoot = process.env.MAS_MEMORY_ROOT ?? resolve(repoRoot, 'data/memory');
+    const knowledgeDir = resolve(repoRoot, 'docs/knowledge');
+    const res = runSeed({ memoryRoot, knowledgeDir });
+    console.log(`[worker] memory seed imported=${res.imported.length} skipped=${res.skipped.length}`);
+  } catch (e) {
+    console.error('[worker] memory seed failed (non-fatal)', e);
+  }
+}
+
 async function safeTick(): Promise<void> {
   if (busy) return;
   busy = true;
@@ -95,6 +113,8 @@ async function main() {
   }
   // touch the DB once to surface init errors early
   getDb();
+  // Seed build-time knowledge into runtime memory (idempotent, non-fatal).
+  bootstrapMemorySeed(repoRoot);
   setInterval(() => {
     safeTick().then(undefined, (e) => console.error('[worker:interval]', e));
   }, TICK_MS);

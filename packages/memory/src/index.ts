@@ -44,7 +44,7 @@ export {
   type ClassifierOpts,
   type LlmFallbackInfo,
 } from './classifier';
-export { seedGlobalKnowledge, type SeedResult } from './seed';
+export { seedGlobalKnowledge, runSeed, type SeedResult, type RunSeedOpts } from './seed';
 export {
   buildMemoryContext,
   MAX_GLOBAL_ITEMS,

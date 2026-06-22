@@ -12,6 +12,7 @@
     "@mas/agents": "workspace:*",
     "@mas/core": "workspace:*",
     "@mas/db": "workspace:*",
+    "@mas/memory": "workspace:*",
     "drizzle-orm": "^0.36.0"
   },
   "devDependencies": {
