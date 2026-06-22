@@ -15,6 +15,7 @@ export {
   MEMORY_KEEPER_AGENT,
   GLOBAL_PROJECT,
   promoteCandidate,
+  linkifyIds,
   type RegisterKind,
   type RegisterEntry,
   type NewEntry,
