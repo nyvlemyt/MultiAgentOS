@@ -220,7 +220,12 @@ export class MemoryStore {
     return [...this.projectIds().flatMap((p) => this.toDocs(p)), ...this.knowledgeDocs()];
   }
 
-  /** SHA-256 over all register files — the index is derived & rebuilt when this changes (ADR 0003). */
+  /** Absolute path of the derived, persistent search index (ADR 0003). */
+  indexPath(): string {
+    return join(this.opts.root, 'index.db');
+  }
+
+  /** SHA-256 over all register files + seeded knowledge — the index is derived & rebuilt when this changes (ADR 0003). */
   corpusHash(): string {
     const h = createHash('sha256');
     const kinds: RegisterKind[] = ['decisions', 'learnings', 'blockers', 'journal', 'evals'];
@@ -228,6 +233,16 @@ export class MemoryStore {
       for (const kind of kinds) {
         const f = this.file(p, kind);
         if (existsSync(f)) h.update(`${p}/${kind}\n${readFileSync(f, 'utf8')}`);
+      }
+    }
+    // Fold seeded knowledge too — otherwise the hash wouldn't change after a seed
+    // and a persistent index would silently go stale (Phase 9 · 0a finding).
+    const kdir = this.knowledgeDir();
+    if (existsSync(kdir)) {
+      for (const f of readdirSync(kdir)
+        .filter((n) => n.endsWith('.md'))
+        .sort((a, b) => a.localeCompare(b))) {
+        h.update(`knowledge/${f}\n${readFileSync(join(kdir, f), 'utf8')}`);
       }
     }
     return h.digest('hex');

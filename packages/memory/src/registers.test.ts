@@ -96,6 +96,17 @@ describe('MemoryStore registers', () => {
     s.append('proj', 'decisions', { title: 'X', body: 'y' });
     expect(s.corpusHash()).not.toBe(h0);
   });
+
+  it('corpusHash also folds seeded _global/knowledge (so a persistent index re-builds after a seed)', () => {
+    const s = keeperStore();
+    const h0 = s.corpusHash();
+    s.writeKnowledge('docs/knowledge/x.md', 'a build-time fact about BDR registers');
+    expect(s.corpusHash()).not.toBe(h0);
+  });
+
+  it('indexPath() points at index.db under the store root', () => {
+    expect(keeperStore().indexPath()).toBe(join(root, 'index.db'));
+  });
 });
 
 async function seedCandidate(id: string) {
