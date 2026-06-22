@@ -50,3 +50,11 @@ This sequences (does not contradict) `memory-patterns.md`, whose "Phase 4 target
 - **Naming**: project-level decisions use **BDR-XXX** (project-doctrine, retained). Build-time architecture decisions use **ADR-000X** in `docs/decisions/`. Same shape, different registers — do not conflate.
 - Cap discipline holds: ≤5 global-memory items injected per mission call (§12), regardless of store size.
 - QMD adoption later requires: models pinned/hashed (supply-chain), MCP wired into the worker, interface unchanged.
+
+## Decision note (2026-06-22) — `memory_items` fate = reserved (Phase 9 · 0a)
+
+The live N3 store is the Markdown registers under `data/memory/` (this ADR §1). The `memory_items` table is a **structured mirror**: it is only demo-seeded (`packages/db/src/seed.ts`) and is **never read at runtime**. During Phase 9 · 0a (memory activation) its fate was settled: **keep it as RESERVED, do not drop it.**
+
+- **Why not remove**: reversibility is a first-class cost (intake-audit §3 / CLAUDE.md §5). Dropping it would mean a destructive migration with no functional gain; keeping it preserves the option of a future structured-promotion target (candidate → `memory_items` mirror) without re-litigating schema.
+- **Why not wire in**: the Markdown source-of-truth + FTS index already satisfies the Phase 4 retrievability gate; a second read path would create two stores to keep in sync (memory-patterns anti-pattern).
+- **Action taken**: a `RESERVED` comment block above the table in `packages/db/src/schema.ts`. **No migration**, **no schema change**. Wiring it into runtime reads later requires its own ADR.

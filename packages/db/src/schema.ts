@@ -202,6 +202,13 @@ export const events = sqliteTable(
   }),
 );
 
+// RESERVED — not the live memory store. The runtime N3 second brain lives as
+// Markdown registers under data/memory/ (ADR 0003 §1: Markdown = source of truth,
+// SQLite FTS = derived index). `memory_items` is a structured mirror that is only
+// demo-seeded (packages/db/src/seed.ts) and never read at runtime. Kept, not
+// dropped, for reversibility (CLAUDE.md §5) and as a future structured-promotion
+// target. Decision recorded 2026-06-22 in ADR 0003. Do not wire into runtime
+// reads without an ADR.
 export const memoryItems = sqliteTable('memory_items', {
   id: text('id').primaryKey(),
   scope: text('scope', { enum: ['global', 'project'] }).notNull(),
