@@ -118,6 +118,25 @@ export default async function MemoryCenter({
         )}
       </section>
 
+      <section className="surface p-4">
+        <header className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold">Nouvelle note</h2>
+          <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>écrite par le Memory Keeper</span>
+        </header>
+        <form method="POST" action="/api/memory/note" className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-1">
+            <select name="kind" defaultValue="learnings" className="mono rounded px-1.5 py-1 text-[11px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }}>
+              {KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
+            </select>
+            <input name="projectId" defaultValue="_global" placeholder="projectId" className="mono w-32 rounded px-2 py-1 text-[11px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }} />
+            <input name="title" required placeholder="Titre" className="flex-1 rounded px-2 py-1 text-[11px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }} />
+          </div>
+          <textarea name="body" required rows={3} placeholder="Contenu de la note (mentionnez BDR-001 pour créer une arête Obsidian)" className="mono w-full rounded px-2 py-1 text-[11px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }} />
+          <input name="links" placeholder="Liens optionnels (ex. BDR-001, LRN-002)" className="mono w-full rounded px-2 py-1 text-[11px]" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }} />
+          <button type="submit" className="self-start rounded-md px-3 py-1 text-[11px] text-white" style={{ background: 'var(--accent)' }}>Ajouter la note</button>
+        </form>
+      </section>
+
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Column title="Global memory" items={global} />
         <Column title="Project memory" items={project} />
