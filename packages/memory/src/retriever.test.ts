@@ -69,8 +69,8 @@ describe('FtsRetriever', () => {
     const r = new FtsRetriever();
     r.index(docs);
     r.index([docs[0]!]);
-    expect(r.query('memory levels').length).toBe(0);
-    expect(r.query('Mem0 cloud').length).toBe(1);
+    expect(r.query('memory levels')).toHaveLength(0);
+    expect(r.query('Mem0 cloud')).toHaveLength(1);
   });
 });
 

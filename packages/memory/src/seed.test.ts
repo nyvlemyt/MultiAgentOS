@@ -36,7 +36,7 @@ describe('seedGlobalKnowledge (persistence bridge)', () => {
     const after1 = keeperStore().knowledgeDocs().length;
     const res2 = seedGlobalKnowledge(keeperStore(), KNOWLEDGE_DIR);
     expect(res2.skipped.length).toBeGreaterThan(0);
-    expect(keeperStore().knowledgeDocs().length).toBe(after1);
+    expect(keeperStore().knowledgeDocs()).toHaveLength(after1);
   });
 
   it('BRIDGE GATE: every build-time fact is retrievable from runtime memory', () => {
@@ -65,6 +65,6 @@ describe('runSeed (bridge runner — builds the Keeper store internally)', () =>
     const res2 = runSeed({ memoryRoot: root, knowledgeDir: KNOWLEDGE_DIR });
     expect(res2.imported).toHaveLength(0);
     expect(res2.skipped.length).toBeGreaterThan(0);
-    expect(keeperStore().knowledgeDocs().length).toBe(count);
+    expect(keeperStore().knowledgeDocs()).toHaveLength(count);
   });
 });

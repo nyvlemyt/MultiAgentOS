@@ -27,7 +27,7 @@ export function seedGlobalKnowledge(store: MemoryStore, knowledgeDir: string): S
   const imported: string[] = [];
   const skipped: string[] = [];
   for (const file of walkMd(knowledgeDir).sort((a, b) => a.localeCompare(b))) {
-    const rel = relative(knowledgeDir, file).split(/[/\\]/).join('/');
+    const rel = relative(knowledgeDir, file).replaceAll(/[/\\]/g, '/');
     const source = `docs/knowledge/${rel}`;
     if (store.hasKnowledge(source)) {
       skipped.push(source);
