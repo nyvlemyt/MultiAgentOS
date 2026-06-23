@@ -94,11 +94,18 @@ export function runRetrievalEval(
   return { backend, total: queries.length, passed, failed, skipped, cases, ok: failed === 0 };
 }
 
+/** Marker glyph per eval status (extracted — no nested ternary, typescript:S3358). */
+function statusMark(status: EvalCase['status']): string {
+  if (status === 'pass') return '✓';
+  if (status === 'skip') return '·';
+  return '✗';
+}
+
 /** One-line-per-case report for CLI/CI logs. */
 export function formatEvalReport(r: EvalReport): string {
   const lines = [`Retrieval eval [${r.backend}]: ${r.passed} pass, ${r.failed} fail, ${r.skipped} skip`];
   for (const c of r.cases) {
-    const mark = c.status === 'pass' ? '✓' : c.status === 'skip' ? '·' : '✗';
+    const mark = statusMark(c.status);
     lines.push(`  ${mark} ${c.id}: "${c.query}"`);
     if (c.status === 'fail') lines.push(`      top: ${c.topHits.join(' | ') || '(none)'}`);
   }

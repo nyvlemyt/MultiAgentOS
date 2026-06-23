@@ -1,12 +1,29 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { delimiter, isAbsolute, join } from 'node:path';
 import { createRequire } from 'node:module';
 import type BetterSqlite3 from 'better-sqlite3';
 
 const require_ = createRequire(import.meta.url);
 type DatabaseCtor = new (filename: string, options?: BetterSqlite3.Options) => BetterSqlite3.Database;
 const Database: DatabaseCtor = require_('better-sqlite3');
+
+/**
+ * Resolve a command to an ABSOLUTE path by scanning PATH ourselves, so the later
+ * `execFileSync` does not search PATH at spawn time (typescript:S4036 — a bare
+ * command name relies on PATH, which may hold writable dirs). Returns the input
+ * unchanged when already absolute or not found (caller's exec then surfaces the
+ * real ENOENT). Pure lookup; never spawns.
+ */
+function resolveExecutable(cmd: string): string {
+  if (isAbsolute(cmd)) return cmd;
+  for (const dir of (process.env['PATH'] ?? '').split(delimiter)) {
+    if (!dir) continue;
+    const candidate = join(dir, cmd);
+    if (existsSync(candidate)) return candidate;
+  }
+  return cmd;
+}
 
 export type MemoryScope = 'global' | 'project';
 
@@ -121,7 +138,7 @@ export class FtsRetriever implements MemoryRetriever {
     const scopeClause = scope === 'all' ? '' : 'AND scope = @scope';
     // toDocs() ids are `<projectId>/<entryId>` — a prefix LIKE keeps the filter to
     // one project. The `/` separator is added literally so it can't be a wildcard.
-    const projectClause = opts.projectId ? "AND id LIKE @projectLike ESCAPE '\\'" : '';
+    const projectClause = opts.projectId ? String.raw`AND id LIKE @projectLike ESCAPE '\'` : '';
     const params: Record<string, unknown> = { expr, scope, limit };
     if (opts.projectId) params['projectLike'] = `${escapeLike(opts.projectId)}/%`;
 
@@ -265,7 +282,7 @@ export class QmdRetriever implements MemoryRetriever {
   private readonly timeoutMs: number;
 
   constructor(private readonly opts: QmdRetrieverOpts) {
-    this.bin = opts.bin ?? 'qmd';
+    this.bin = resolveExecutable(opts.bin ?? 'qmd');
     this.mode = opts.mode ?? 'query';
     this.timeoutMs = opts.timeoutMs ?? 30_000;
   }
@@ -274,7 +291,7 @@ export class QmdRetriever implements MemoryRetriever {
   static available(cwd: string, bin = 'qmd'): boolean {
     if (!existsSync(join(cwd, '.qmd'))) return false;
     try {
-      execFileSync(bin, ['status'], { cwd, stdio: 'ignore', timeout: 10_000 });
+      execFileSync(resolveExecutable(bin), ['status'], { cwd, stdio: 'ignore', timeout: 10_000 });
       return true;
     } catch {
       return false;
@@ -289,34 +306,55 @@ export class QmdRetriever implements MemoryRetriever {
     // Per-query collections (opts) override the constructor allowlist. Passed to qmd
     // as `-c <name>` so the engine narrows BEFORE rerank, and re-checked below.
     const allow = opts.collections ?? this.opts.collections;
-    const args = [this.mode, q, '--json', '-n', String(fetch)];
-    if (allow) for (const c of allow) args.push('-c', c);
-    const stdout = execFileSync(this.bin, args, {
+    const stdout = execFileSync(this.bin, qmdQueryArgs(this.mode, q, fetch, allow), {
       cwd: this.opts.cwd,
       encoding: 'utf8',
       timeout: this.timeoutMs,
       maxBuffer: 16 * 1024 * 1024,
     });
-    const scope = opts.scope ?? 'all';
-    const hits: MemoryHit[] = [];
-    for (const raw of parseQmdJson(stdout)) {
-      const mapped = mapQmdHit(raw);
-      if (!mapped) continue;
-      if (allow && !allow.includes(mapped.collection)) continue;
-      if (scope !== 'all' && mapped.scope !== scope) continue;
-      if (opts.projectId && mapped.projectId !== opts.projectId) continue;
-      hits.push({
-        id: mapped.id,
-        scope: mapped.scope,
-        source: mapped.source,
-        title: mapped.title,
-        body: mapped.body,
-        score: mapped.score,
-      });
-      if (hits.length >= limit) break;
-    }
-    return hits;
+    return collectQmdHits(parseQmdJson(stdout), {
+      allow,
+      scope: opts.scope ?? 'all',
+      projectId: opts.projectId,
+      limit,
+    });
   }
+}
+
+/** CLI argv for one qmd query: `<mode> <q> --json -n <fetch> [-c <collection>]…`. */
+function qmdQueryArgs(mode: QmdMode, q: string, fetch: number, allow?: string[]): string[] {
+  const args = [mode, q, '--json', '-n', String(fetch)];
+  if (allow) for (const c of allow) args.push('-c', c);
+  return args;
+}
+
+interface QmdHitFilter {
+  allow?: string[];
+  scope: MemoryScope | 'all';
+  projectId?: string;
+  limit: number;
+}
+
+/** Map → post-filter (collection/scope/project) → cap qmd raw hits to MemoryHits. */
+function collectQmdHits(raws: QmdRawHit[], f: QmdHitFilter): MemoryHit[] {
+  const hits: MemoryHit[] = [];
+  for (const raw of raws) {
+    const mapped = mapQmdHit(raw);
+    if (!mapped) continue;
+    if (f.allow && !f.allow.includes(mapped.collection)) continue;
+    if (f.scope !== 'all' && mapped.scope !== f.scope) continue;
+    if (f.projectId && mapped.projectId !== f.projectId) continue;
+    hits.push({
+      id: mapped.id,
+      scope: mapped.scope,
+      source: mapped.source,
+      title: mapped.title,
+      body: mapped.body,
+      score: mapped.score,
+    });
+    if (hits.length >= f.limit) break;
+  }
+  return hits;
 }
 
 /**
@@ -419,7 +457,7 @@ export function retrievalDoctor(cwd: string, bin = 'qmd'): RetrievalDoctorResult
   const indexFound = existsSync(join(cwd, '.qmd'));
   let binFound = false;
   try {
-    execFileSync(bin, ['--version'], { cwd, stdio: 'ignore', timeout: 10_000 });
+    execFileSync(resolveExecutable(bin), ['--version'], { cwd, stdio: 'ignore', timeout: 10_000 });
     binFound = true;
   } catch {
     binFound = false;

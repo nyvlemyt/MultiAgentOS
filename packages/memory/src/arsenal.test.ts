@@ -103,7 +103,7 @@ describe('buildArsenalStubs', () => {
   it('derives a rule stub title from its path', () => {
     buildArsenalStubs(root, outDir);
     const ruleFiles = readdirSync(join(outDir, 'rule'));
-    expect(ruleFiles.length).toBe(1);
+    expect(ruleFiles).toHaveLength(1);
     const stub = readFileSync(join(outDir, 'rule', ruleFiles[0]!), 'utf8');
     expect(stub).toContain('typescript: security');
   });

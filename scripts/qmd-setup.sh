@@ -38,7 +38,7 @@ echo "[qmd-setup] qmd $(qmd --version 2>/dev/null || echo '?')  node $(node --ve
 
 # 1. Project-local index (.qmd/index.yaml) so the index lives in the repo, not the
 #    global ~/.cache. `qmd init` is a no-op when the local config already exists.
-if [ -f "$ROOT/.qmd/index.yaml" ] || [ -f "$ROOT/.qmd/index.yml" ]; then
+if [[ -f "$ROOT/.qmd/index.yaml" ]] || [[ -f "$ROOT/.qmd/index.yml" ]]; then
   echo "[qmd-setup] local .qmd index already present — skipping init"
 else
   echo "[qmd-setup] qmd init (creating project-local .qmd/)"
@@ -56,7 +56,7 @@ fi
 # 3. Register collections (one path each — see multi-path note above). Idempotent.
 add_collection() {
   local name="$1" path="$2"
-  if [ ! -d "$path" ]; then
+  if [[ ! -d "$path" ]]; then
     echo "[qmd-setup] WARN: $path missing — skipping collection $name" >&2
     return 0
   fi

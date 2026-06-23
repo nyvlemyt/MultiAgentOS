@@ -13,14 +13,25 @@
 //
 // Newline-delimited JSON-RPC is the MCP stdio framing (one message per line).
 import { spawn } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
+import { existsSync } from 'node:fs';
+import { delimiter, dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const QUERY = process.argv[2] ?? 'how do I avoid forgetting things between work sessions';
 const TIMEOUT_MS = 120_000; // first call warms the ~4.4 GB models
 
-const child = spawn('qmd', ['mcp'], { cwd: ROOT, stdio: ['pipe', 'pipe', 'inherit'] });
+// Resolve qmd to an absolute path so spawn doesn't search PATH at exec time
+// (javascript:S4036 — PATH may hold writable dirs). Falls back to the bare name.
+function resolveExecutable(cmd) {
+  if (isAbsolute(cmd)) return cmd;
+  for (const dir of (process.env.PATH ?? '').split(delimiter)) {
+    if (dir && existsSync(join(dir, cmd))) return join(dir, cmd);
+  }
+  return cmd;
+}
+
+const child = spawn(resolveExecutable('qmd'), ['mcp'], { cwd: ROOT, stdio: ['pipe', 'pipe', 'inherit'] });
 
 const pending = new Map();
 let buf = '';

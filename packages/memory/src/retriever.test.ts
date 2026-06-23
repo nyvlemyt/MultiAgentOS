@@ -213,7 +213,7 @@ describe('QmdRetriever (Phase 9 · 0a renforcée)', () => {
     const bin = writeFakeQmd(dir, QMD_FIXTURE);
     const r = new QmdRetriever({ cwd: dir, bin });
     const hits = r.query('memory', { limit: 10 });
-    expect(hits.length).toBe(4);
+    expect(hits).toHaveLength(4);
     const memHit = hits.find((h) => h.id === 'mas-memory/otakugo/decisions.md')!;
     expect(memHit.scope).toBe('project');
     expect(memHit.source).toBe('data/memory/otakugo/decisions.md');

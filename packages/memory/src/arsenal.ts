@@ -94,7 +94,9 @@ function bodyAfterFrontmatter(raw: string): string {
 }
 
 function slugify(s: string): string {
-  return s.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  // split→filter→join (not an anchored trim regex) avoids super-linear backtracking
+  // (typescript:S8786) and drops leading/trailing separators for free.
+  return s.split(/[^a-zA-Z0-9._-]+/).filter(Boolean).join('-').toLowerCase();
 }
 
 /** Map one source file to a stub, or null when it is not an arsenal item. */
