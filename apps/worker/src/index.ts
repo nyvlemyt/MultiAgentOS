@@ -10,7 +10,7 @@ import {
   type DispatchTickConfig,
 } from '@mas/agents';
 import { loadRoutingConfig, planWarnings } from '@mas/core';
-import { runSeed } from '@mas/memory';
+import { runSeed, retrievalDoctor } from '@mas/memory';
 import { getDb } from '@mas/db';
 
 const TICK_MS = 1500;
@@ -67,6 +67,17 @@ export async function maybeEmitDailyReport(db: Db, now: Date): Promise<void> {
 }
 
 /**
+ * Announce the retrieval backend at boot — explicit, never silent (Phase 9 · 0a
+ * renforcée). When QMD is absent the worker still runs on FTS, but logs HOW to
+ * upgrade so a fresh clone is never left guessing why search is keyword-only.
+ */
+function reportRetrievalBackend(repoRoot: string): void {
+  const d = retrievalDoctor(repoRoot);
+  if (d.qmdActive) console.log(`[worker:retrieval] ${d.message}`);
+  else console.warn(`[worker:retrieval] ${d.message}`);
+}
+
+/**
  * Run the knowledge→memory bridge once at boot (CLAUDE.md §13 anti-oubli). It is
  * idempotent (seedGlobalKnowledge skips already-present files) and non-fatal: a
  * seed failure logs and is swallowed so the worker still starts. The Keeper
@@ -113,6 +124,8 @@ async function main() {
   }
   // touch the DB once to surface init errors early
   getDb();
+  // Announce QMD vs FTS so an un-provisioned clone is told to run pnpm qmd:setup.
+  reportRetrievalBackend(repoRoot);
   // Seed build-time knowledge into runtime memory (idempotent, non-fatal).
   bootstrapMemorySeed(repoRoot);
   setInterval(() => {

@@ -1,6 +1,6 @@
 # ADR 0003 — Memory storage & retrieval format (Phase 4)
 
-- **Status**: Proposed (awaiting Phase 4 build green-light)
+- **Status**: Accepted — amended 2026-06-22 (Phase 9 · 0a renforcée: QMD now live, see amendment below)
 - **Date**: 2026-06-08
 - **Deciders**: Melvyn + Claude (pre-flight Phase 4)
 - **Sources**: `docs/knowledge/memory-patterns.md`, `docs/knowledge/project-doctrine.md`, `docs/backlog/second-brain-cross-project.md`, `docs/workflows/knowledge-bootstrap.md`
@@ -58,3 +58,62 @@ The live N3 store is the Markdown registers under `data/memory/` (this ADR §1).
 - **Why not remove**: reversibility is a first-class cost (intake-audit §3 / CLAUDE.md §5). Dropping it would mean a destructive migration with no functional gain; keeping it preserves the option of a future structured-promotion target (candidate → `memory_items` mirror) without re-litigating schema.
 - **Why not wire in**: the Markdown source-of-truth + FTS index already satisfies the Phase 4 retrievability gate; a second read path would create two stores to keep in sync (memory-patterns anti-pattern).
 - **Action taken**: a `RESERVED` comment block above the table in `packages/db/src/schema.ts`. **No migration**, **no schema change**. Wiring it into runtime reads later requires its own ADR.
+
+## Amendment (2026-06-22) — QMD is now live (Phase 9 · 0a renforcée)
+
+Decision §2 said "FTS5 now, QMD later (Phase 4.x)". The fast-follow is done: **QMD
+is live as the primary retriever, with FTS as the fallback** — same
+`MemoryRetriever` seam, exactly as §2's reversibility argument promised. The
+sequencing in this ADR is fulfilled, not reversed.
+
+**What changed**
+
+1. **QMD now, not deferred.** `QmdRetriever` (BM25 + vector + rerank, via
+   `@tobilu/qmd`) is wired into the dispatch memory-context path through
+   `createRetriever` / `UnifiedRetriever`. The 4-MVP FtsRetriever is unchanged and
+   now serves as the documented fallback.
+
+2. **Retrieval is unified across three corpora — knowledge + memory + arsenal.**
+   QMD indexes one path per collection: `mas-knowledge` (`docs/knowledge`),
+   `mas-workflows` (`docs/workflows`), `mas-memory` (`data/memory`), and
+   `mas-arsenal` (`data/arsenal-index`, derived L1-summary stubs). The
+   mission-memory context queries `[mas-memory, mas-knowledge, mas-workflows]`
+   (`QMD_MEMORY_COLLECTIONS`); `mas-arsenal` is the Skill Router's candidate
+   corpus, queried separately. One engine, one ranking, three registers — "what
+   the system knows" and "what the system remembers" share a retriever.
+
+3. **FTS is the fallback, and the degradation is never silent.**
+   `UnifiedRetriever` runs QMD primary and catches into FTS over the same corpus.
+   `createRetriever` selects FTS when QMD is unavailable (no `.qmd` index / no
+   binary) and **never crashes**. `MAS_RETRIEVAL_BACKEND=fts` forces FTS (CI
+   default for agent tests). At worker boot `retrievalDoctor` logs the active
+   backend and, when QMD is absent, tells the user to run `pnpm qmd:setup`; the
+   same is exposed as `pnpm mem:doctor`. A fresh clone is informed, not silently
+   degraded.
+
+4. **Store / search / decide boundary holds.** QMD only **reads** the Markdown
+   source-of-truth (and the derived arsenal stubs); it **never writes** to
+   `data/memory/` — the Memory Keeper remains the sole writer (§8). The `.qmd`
+   index and `data/arsenal-index/` are **derived, rebuildable, gitignored** (the
+   §1 "derived & rebuildable" principle, generalized). QMD *searches*; the Keeper
+   *stores*; the agents *decide*. Three roles, no overlap.
+
+5. **QMD = optional external runtime dependency, not an npm dependency.** The
+   first `qmd embed` downloads **~4.4 GB** of GGUF models; vendoring that into
+   `pnpm install` would tax every clone for an optional capability. So QMD is
+   installed out-of-band via `pnpm qmd:setup` (pins `@tobilu/qmd@2.5.3`,
+   supply-chain §5), requires **Node ≥ 22**, and its absence degrades to the FTS
+   fallback documented above. Runbook:
+   [`docs/workflows/qmd-retrieval-setup.md`](../workflows/qmd-retrieval-setup.md).
+
+**Billing isolation (§11) re-confirmed.** QMD is a 100 %-local shell binary behind
+the `MemoryRetriever` seam: no API key, no network at query time, no provider SDK
+import. It does not touch the subscription quota. Compliant.
+
+**Consequence update.** The §52 "QMD adoption later requires" checklist is
+discharged: CLI pinned (`@tobilu/qmd@2.5.3`), interface unchanged
+(`MemoryRetriever`), and — per the user-validated decision this session — QMD is
+queried **out of the worker process** via the same CLI rather than wiring a
+long-lived MCP server into the worker; the MCP server remains available for
+interactive use (`.mcp.json`). Semantic + arsenal recall is proven by the golden
+eval harness (`pnpm mem:eval`, backend=qmd).

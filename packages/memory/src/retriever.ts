@@ -32,6 +32,12 @@ export interface MemoryQueryOpts {
    * without leaking other projects' entries.
    */
   projectId?: string;
+  /**
+   * Restrict this query to specific QMD collections (e.g. `['mas-knowledge']` to test
+   * semantic KNOWLEDGE recall without arsenal noise). QMD-only — the FTS fallback has
+   * no collections and ignores it. Overrides the retriever's constructor allowlist.
+   */
+  collections?: string[];
 }
 
 /**
@@ -195,8 +201,27 @@ export interface QmdRetrieverOpts {
   timeoutMs?: number;
 }
 
-const QMD_KNOWLEDGE = 'mas-knowledge';
-const QMD_MEMORY = 'mas-memory';
+export const QMD_KNOWLEDGE = 'mas-knowledge';
+export const QMD_WORKFLOWS = 'mas-workflows';
+export const QMD_MEMORY = 'mas-memory';
+export const QMD_ARSENAL = 'mas-arsenal';
+
+/**
+ * Default collections for the MISSION-MEMORY context path (dispatch). Memory +
+ * the two knowledge-family collections — QMD indexes one path per collection, so
+ * docs/knowledge and docs/workflows are two collections, both queried as "what the
+ * system knows" (PHASE9-0a §3). mas-arsenal is deliberately EXCLUDED here: it is
+ * the Skill Router's candidate corpus, not mission-memory context.
+ */
+export const QMD_MEMORY_COLLECTIONS = [QMD_MEMORY, QMD_KNOWLEDGE, QMD_WORKFLOWS];
+
+/** Repo-relative folder each collection indexes — used to rebuild hit provenance. */
+const COLLECTION_ROOT: Record<string, string> = {
+  [QMD_KNOWLEDGE]: 'docs/knowledge',
+  [QMD_WORKFLOWS]: 'docs/workflows',
+  [QMD_MEMORY]: 'data/memory',
+  [QMD_ARSENAL]: 'data/arsenal-index',
+};
 
 /** Map one `qmd://<collection>/<rest>` hit to a MemoryDoc scope/source/project. */
 function mapQmdHit(raw: QmdRawHit): (MemoryHit & { collection: string; projectId?: string }) | null {
@@ -206,19 +231,13 @@ function mapQmdHit(raw: QmdRawHit): (MemoryHit & { collection: string; projectId
   const rest = m[2]!;
   let scope: MemoryScope = 'global';
   let projectId: string | undefined;
-  let source = rest;
-  if (collection === QMD_MEMORY) {
-    const seg0 = rest.split('/')[0]!;
-    if (seg0 === '_global') {
-      scope = 'global';
-    } else {
-      scope = 'project';
-      projectId = seg0;
-    }
-    source = `data/memory/${rest}`;
-  } else if (collection === QMD_KNOWLEDGE) {
-    source = rest;
+  // mas-memory ids are `<projectId|_global>/<register>` — derive scope from seg0.
+  if (collection === QMD_MEMORY && rest.split('/')[0] !== '_global') {
+    scope = 'project';
+    projectId = rest.split('/')[0];
   }
+  const root = COLLECTION_ROOT[collection];
+  const source = root ? `${root}/${rest}` : rest;
   return {
     id: `${collection}/${rest}`,
     scope,
@@ -267,13 +286,17 @@ export class QmdRetriever implements MemoryRetriever {
     const limit = opts.limit ?? 5;
     // qmd ranks then we post-filter by scope/project/collection, so over-fetch.
     const fetch = Math.max(limit * 4, 20);
-    const stdout = execFileSync(this.bin, [this.mode, q, '--json', '-n', String(fetch)], {
+    // Per-query collections (opts) override the constructor allowlist. Passed to qmd
+    // as `-c <name>` so the engine narrows BEFORE rerank, and re-checked below.
+    const allow = opts.collections ?? this.opts.collections;
+    const args = [this.mode, q, '--json', '-n', String(fetch)];
+    if (allow) for (const c of allow) args.push('-c', c);
+    const stdout = execFileSync(this.bin, args, {
       cwd: this.opts.cwd,
       encoding: 'utf8',
       timeout: this.timeoutMs,
       maxBuffer: 16 * 1024 * 1024,
     });
-    const allow = this.opts.collections;
     const scope = opts.scope ?? 'all';
     const hits: MemoryHit[] = [];
     for (const raw of parseQmdJson(stdout)) {
@@ -360,7 +383,7 @@ export function createRetriever(opts: CreateRetrieverOpts): MemoryRetriever {
       cwd: opts.cwd,
       bin: opts.bin,
       mode: opts.qmdMode,
-      collections: opts.collections ?? [QMD_MEMORY, QMD_KNOWLEDGE],
+      collections: opts.collections ?? QMD_MEMORY_COLLECTIONS,
     });
     return new UnifiedRetriever(qmd, fts, opts.onFallback);
   }
@@ -369,4 +392,52 @@ export function createRetriever(opts: CreateRetrieverOpts): MemoryRetriever {
     opts.onFallback?.(new Error('QMD requested but unavailable; using FTS'));
   }
   return fts;
+}
+
+export interface RetrievalDoctorResult {
+  /** Will runtime retrieval use QMD (semantic)? False → FTS keyword fallback. */
+  qmdActive: boolean;
+  /** `.qmd` index directory present in cwd. */
+  indexFound: boolean;
+  /** `qmd` binary resolves and runs. */
+  binFound: boolean;
+  /** MAS_RETRIEVAL_BACKEND=fts forces FTS regardless of QMD presence. */
+  forcedFts: boolean;
+  /** Human-facing one-liner — logged at boot and by `pnpm mem:doctor`. */
+  message: string;
+}
+
+/**
+ * Diagnose the retrieval backend so the worker boot (and `pnpm mem:doctor`) can
+ * warn EXPLICITLY when QMD is absent instead of degrading silently to FTS — a
+ * fresh clone / re-fetch elsewhere must be told it needs `pnpm qmd:setup`
+ * (Phase 9 · 0a renforcée exit criterion; CLAUDE.md "jamais de dégradation
+ * silencieuse"). Pure diagnostic: never throws, never mutates.
+ */
+export function retrievalDoctor(cwd: string, bin = 'qmd'): RetrievalDoctorResult {
+  const forcedFts = process.env['MAS_RETRIEVAL_BACKEND'] === 'fts';
+  const indexFound = existsSync(join(cwd, '.qmd'));
+  let binFound = false;
+  try {
+    execFileSync(bin, ['--version'], { cwd, stdio: 'ignore', timeout: 10_000 });
+    binFound = true;
+  } catch {
+    binFound = false;
+  }
+  const qmdActive = !forcedFts && QmdRetriever.available(cwd, bin);
+  let message: string;
+  if (forcedFts) {
+    message = 'Recherche en FTS (mots-clés) — forcée par MAS_RETRIEVAL_BACKEND=fts.';
+  } else if (qmdActive) {
+    message = 'QMD détecté → recherche sémantique active (BM25 + vecteurs + rerank).';
+  } else if (binFound && !indexFound) {
+    message =
+      'QMD installé mais index absent → recherche en FTS (mots-clés). ' +
+      'Lance pnpm qmd:setup pour construire l’index sémantique (~4,4 Go, Node ≥22).';
+  } else {
+    message =
+      'QMD non détecté → recherche en FTS (mots-clés). ' +
+      'Lance pnpm qmd:setup pour le sémantique (~4,4 Go, Node ≥22).';
+  }
+  return { qmdActive, indexFound, binFound, forcedFts, message };
 }

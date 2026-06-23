@@ -39,7 +39,16 @@ import {
   selectLibrarySkills,
   SkillRouter,
 } from '@mas/skills';
-import { MemoryStore, buildMemoryContext, runCloseOutRitual, type MemoryContext } from '@mas/memory';
+import {
+  MemoryStore,
+  buildMemoryContext,
+  runCloseOutRitual,
+  createRetriever,
+  QMD_MEMORY_COLLECTIONS,
+  type MemoryContext,
+  type MemoryRetriever,
+  type RetrievalBackend,
+} from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
 import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
@@ -69,21 +78,39 @@ function stricterRisk(a: Risk, b: Risk): Risk {
 // §8 keeps the Memory Keeper as the sole writer). Resolves data/memory at the repo
 // root; degrades to an empty context under a bundler, like the skill router above.
 let _memoryStore: MemoryStore | undefined;
+let _memRetriever: MemoryRetriever | undefined;
+
+// UnifiedRetriever (QMD primary, FTS fallback) over a store. createRetriever degrades
+// to FTS when QMD isn't configured (no .qmd / no binary) — retrieval never crashes
+// (Phase 9 · 0a exit criterion). `backend` lets the injected-store path force FTS.
+function buildRetriever(store: MemoryStore, repoRoot: string, backend: RetrievalBackend): MemoryRetriever {
+  return createRetriever({
+    cwd: repoRoot,
+    corpus: store,
+    indexPath: store.indexPath(),
+    collections: QMD_MEMORY_COLLECTIONS,
+    backend,
+  });
+}
+
 function memoryContextFor(projectId: string | undefined, query: string): MemoryContext {
-  const empty: MemoryContext = { text: '', projectEntryCount: 0, globalItems: [] };
+  const empty: MemoryContext = { text: '', projectEntryCount: 0, globalItems: [], projectItems: [] };
   if (!projectId) return empty;
   try {
+    const __dirname = fileURLToPath(new URL('.', import.meta.url));
+    const repoRoot = resolve(__dirname, '../../..');
     const envRoot = process.env.MAS_MEMORY_ROOT;
     if (envRoot) {
+      // Injected custom store (tests/dev) has no QMD index → force FTS over it.
       const envStore = new MemoryStore({ root: envRoot });
-      return buildMemoryContext(envStore, projectId, query, { indexPath: envStore.indexPath() });
+      return buildMemoryContext(envStore, projectId, query, { retriever: buildRetriever(envStore, repoRoot, 'fts') });
     }
     if (!_memoryStore) {
-      const __dirname = fileURLToPath(new URL('.', import.meta.url));
-      const repoRoot = resolve(__dirname, '../../..');
       _memoryStore = new MemoryStore({ root: resolve(repoRoot, 'data/memory') });
     }
-    return buildMemoryContext(_memoryStore, projectId, query, { indexPath: _memoryStore.indexPath() });
+    // Worker default: QMD when the local .qmd index is present, else FTS (auto).
+    _memRetriever ??= buildRetriever(_memoryStore, repoRoot, 'auto');
+    return buildMemoryContext(_memoryStore, projectId, query, { retriever: _memRetriever });
   } catch {
     return empty;
   }

@@ -3,8 +3,14 @@ export {
   QmdRetriever,
   UnifiedRetriever,
   createRetriever,
+  retrievalDoctor,
   toMatchExpr,
   ensureIndexed,
+  QMD_KNOWLEDGE,
+  QMD_WORKFLOWS,
+  QMD_MEMORY,
+  QMD_ARSENAL,
+  QMD_MEMORY_COLLECTIONS,
   type MemoryRetriever,
   type MemoryDoc,
   type MemoryHit,
@@ -15,6 +21,7 @@ export {
   type QmdRetrieverOpts,
   type RetrievalBackend,
   type CreateRetrieverOpts,
+  type RetrievalDoctorResult,
 } from './retriever';
 export {
   buildArsenalStubs,

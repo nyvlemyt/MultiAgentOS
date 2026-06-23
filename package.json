@@ -15,6 +15,10 @@
     "db:migrate": "pnpm --filter @mas/db migrate",
     "db:seed": "pnpm --filter @mas/db seed",
     "mem:seed": "pnpm --filter @mas/memory seed",
+    "arsenal:build": "pnpm --filter @mas/memory arsenal:build",
+    "mem:eval": "pnpm --filter @mas/memory mem:eval",
+    "mem:doctor": "pnpm --filter @mas/memory mem:doctor",
+    "qmd:setup": "bash scripts/qmd-setup.sh",
     "smoke": "pnpm --filter @mas/web smoke",
     "skills:reindex": "pnpm --filter @mas/skills reindex"
   },

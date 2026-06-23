@@ -7,6 +7,7 @@ import {
   QmdRetriever,
   UnifiedRetriever,
   createRetriever,
+  retrievalDoctor,
   ensureIndexed,
   type MemoryDoc,
   type MemoryHit,
@@ -289,5 +290,51 @@ describe('createRetriever (backend selection, ADR 0003 amendment)', () => {
     const r = createRetriever({ cwd: '/nonexistent', corpus, backend: 'qmd', onFallback: () => { warned = true; } });
     expect(r.query('Mem0 cloud').length).toBeGreaterThan(0);
     expect(warned).toBe(true);
+  });
+});
+
+describe('retrievalDoctor (boot diagnostic, never silent)', () => {
+  let dir: string;
+  let savedEnv: string | undefined;
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'mas-doctor-'));
+    savedEnv = process.env['MAS_RETRIEVAL_BACKEND'];
+    delete process.env['MAS_RETRIEVAL_BACKEND'];
+  });
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+    if (savedEnv === undefined) delete process.env['MAS_RETRIEVAL_BACKEND'];
+    else process.env['MAS_RETRIEVAL_BACKEND'] = savedEnv;
+  });
+
+  it('reports qmd active with a binary and a .qmd index', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    const d = retrievalDoctor(dir, bin);
+    expect(d.qmdActive).toBe(true);
+    expect(d.message).toContain('QMD détecté');
+  });
+
+  it('tells the user to run pnpm qmd:setup when QMD is absent', () => {
+    const d = retrievalDoctor(dir, join(dir, 'no-such-bin'));
+    expect(d.qmdActive).toBe(false);
+    expect(d.binFound).toBe(false);
+    expect(d.message).toContain('pnpm qmd:setup');
+  });
+
+  it('distinguishes installed-but-unindexed (binary present, no .qmd)', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE, false);
+    const d = retrievalDoctor(dir, bin);
+    expect(d.qmdActive).toBe(false);
+    expect(d.binFound).toBe(true);
+    expect(d.indexFound).toBe(false);
+    expect(d.message).toContain('index absent');
+  });
+
+  it('honors MAS_RETRIEVAL_BACKEND=fts as a forced fallback', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    process.env['MAS_RETRIEVAL_BACKEND'] = 'fts';
+    const d = retrievalDoctor(dir, bin);
+    expect(d.qmdActive).toBe(false);
+    expect(d.forcedFts).toBe(true);
   });
 });

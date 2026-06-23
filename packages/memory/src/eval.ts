@@ -21,6 +21,12 @@ export interface GoldenQuery {
   qmdOnly?: boolean;
   scope?: MemoryScope | 'all';
   projectId?: string;
+  /**
+   * Restrict to specific QMD collections — semantic KNOWLEDGE queries scope to
+   * `['mas-knowledge']` so they prove paraphrase→knowledge-doc recall in isolation
+   * (the exit criterion), not arsenal noise. Arsenal queries stay unscoped (harder).
+   */
+  collections?: string[];
   /** Top-k window (default 5). */
   k?: number;
 }
@@ -66,7 +72,12 @@ export function runRetrievalEval(
       continue;
     }
     const k = g.k ?? 5;
-    const opts: MemoryQueryOpts = { limit: k, scope: g.scope ?? 'all', projectId: g.projectId };
+    const opts: MemoryQueryOpts = {
+      limit: k,
+      scope: g.scope ?? 'all',
+      projectId: g.projectId,
+      collections: g.collections,
+    };
     const hits = retriever.query(g.query, opts);
     const keys = hits.map((h) => `${h.id} ${h.source} ${h.title}`);
     const pass = hits.some((h) => hitMatches([h.id, h.source, h.title], g.expect));

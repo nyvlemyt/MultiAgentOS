@@ -2,23 +2,26 @@
   {
     "id": "sem-forgetting",
     "query": "how do I avoid forgetting things between work sessions",
-    "expect": ["memory-patterns", "continuous-learning", "memory"],
+    "expect": ["memory-patterns", "continuous-learning", "memoire", "memory"],
     "semantic": true,
-    "scope": "global"
+    "scope": "global",
+    "collections": ["mas-knowledge"]
   },
   {
     "id": "sem-token-cost",
-    "query": "how do I keep the model from spending too much money per request",
-    "expect": ["token", "prompt-caching", "production-patterns", "anthropic-ecosystem"],
+    "query": "techniques to reduce how much I pay the provider for each model call",
+    "expect": ["anthropic-ecosystem", "production-patterns", "token", "prompt-caching"],
     "semantic": true,
-    "scope": "global"
+    "scope": "global",
+    "collections": ["mas-knowledge"]
   },
   {
     "id": "sem-prompt-quality",
     "query": "how should I structure instructions so the model follows them reliably",
     "expect": ["prompting-anthropic", "prompting", "agent-patterns"],
     "semantic": true,
-    "scope": "global"
+    "scope": "global",
+    "collections": ["mas-knowledge"]
   },
   {
     "id": "arsenal-audit-pr",
