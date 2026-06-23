@@ -398,6 +398,8 @@ Trois sous-étapes. Aucune ne touche l'app finale : on rend exploitable ce qui e
 
 **0a · Mémoire vivante → retrieval unifié** *(renforcée 2026-06-22 — détail + 8 principes : `docs/learning/2026-06-22/PHASE9-0a-UNIFIED-RETRIEVAL.md`)*
 
+> **✅ Étape 0a (base #35 + renforcée #36) mergée dans `main` le 2026-06-23.** Ordre #35 (`phase/9a-memory`) puis #36 (`phase/9a2-qmd-arsenal`, rebasé sur `main`). 5 checks verts + Sonar PR exit 0 (0 issue / 0 hotspot sur le code nouveau) sur les deux ; CI `main` verte sur les deux merges (`96b98a4`, `ce04cf9`). Dette pré-existante hors-périmètre : 27 smells MINOR `S5906` (« prefer specific assertion ») dans des fichiers de test, antérieurs à #35 (aucun introduit par 0a) — à traiter dans une passe dédiée, non couverte par l'autorisation des deux merges.
+
 La **mémoire de base** est livrée (PR #35, `phase/9a-memory` : pont savoir→mémoire, index persistant, wikilinks, note manuelle, `memory_items` réservée). On **étend** maintenant en **moteur de recherche unique** sur savoir + mémoire + **arsenal**, exploitable par l'humain (Obsidian) et par les agents (QMD via MCP). Rappel base (déjà fait) :
 - Exécuter/brancher le pont : `seedGlobalKnowledge` (`packages/memory/src/seed.ts`) sur `docs/knowledge/**` (+ `vibeflow/INDEX.md`) → peupler le store ; ajouter un script `mem:seed` dans `package.json` et l'invoquer au bootstrap worker. (Aujourd'hui : codé+testé mais jamais exécuté → mémoire vide.)
 - Persister l'index de recherche : passer un `indexPath` (`data/memory/index.db`) à `FtsRetriever` (`packages/memory/src/retriever.ts`), reconstruire seulement quand `corpusHash()` change (aujourd'hui : ré-indexation RAM à chaque requête, `corpusHash` mort).
