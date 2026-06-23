@@ -1,11 +1,13 @@
 export {
   FtsRetriever,
   toMatchExpr,
+  ensureIndexed,
   type MemoryRetriever,
   type MemoryDoc,
   type MemoryHit,
   type MemoryScope,
   type MemoryQueryOpts,
+  type IndexableCorpus,
 } from './retriever';
 export {
   MemoryStore,
@@ -13,6 +15,7 @@ export {
   MEMORY_KEEPER_AGENT,
   GLOBAL_PROJECT,
   promoteCandidate,
+  linkifyIds,
   type RegisterKind,
   type RegisterEntry,
   type NewEntry,
@@ -41,5 +44,10 @@ export {
   type ClassifierOpts,
   type LlmFallbackInfo,
 } from './classifier';
-export { seedGlobalKnowledge, type SeedResult } from './seed';
-export { buildMemoryContext, MAX_GLOBAL_ITEMS, type MemoryContext } from './context';
+export { seedGlobalKnowledge, runSeed, type SeedResult, type RunSeedOpts } from './seed';
+export {
+  buildMemoryContext,
+  MAX_GLOBAL_ITEMS,
+  type MemoryContext,
+  type MemoryContextOpts,
+} from './context';

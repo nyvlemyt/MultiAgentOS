@@ -103,6 +103,9 @@ importers:
       '@mas/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@mas/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
       drizzle-orm:
         specifier: 0.36.4
         version: 0.36.4(@types/better-sqlite3@7.6.13)(@types/react@19.2.15)(better-sqlite3@12.10.0)(react@19.2.6)

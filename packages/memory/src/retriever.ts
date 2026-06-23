@@ -57,16 +57,37 @@ export class FtsRetriever implements MemoryRetriever {
         id UNINDEXED, scope UNINDEXED, source UNINDEXED, title, body
       );`,
     );
+    // Sidecar table so a persistent index (indexPath) remembers which corpus it
+    // was built from — ensureIndexed rebuilds only when this differs (ADR 0003:
+    // index is derived & rebuildable from a SHA-256 hash of the .md source).
+    this.db.exec('CREATE TABLE IF NOT EXISTS mem_meta (key TEXT PRIMARY KEY, value TEXT);');
   }
 
-  /** Replace the entire indexed corpus (index is derived & rebuildable, ADR 0003). */
-  index(docs: MemoryDoc[]): void {
+  /** The corpus hash this index was last built from, or null when never indexed. */
+  indexedHash(): string | null {
+    const row = this.db
+      .prepare('SELECT value FROM mem_meta WHERE key = ?')
+      .get('corpus_hash') as { value: string } | undefined;
+    return row?.value ?? null;
+  }
+
+  /**
+   * Replace the entire indexed corpus (index is derived & rebuildable, ADR 0003).
+   * Pass `hash` to stamp the corpus hash inside the same transaction so a reopened
+   * persistent index can tell whether it is current (ensureIndexed).
+   */
+  index(docs: MemoryDoc[], hash?: string): void {
     const insert = this.db.prepare(
       'INSERT INTO mem_fts (id, scope, source, title, body) VALUES (?, ?, ?, ?, ?)',
+    );
+    const upsertHash = this.db.prepare(
+      'INSERT INTO mem_meta (key, value) VALUES (?, ?) ' +
+        'ON CONFLICT(key) DO UPDATE SET value = excluded.value',
     );
     const tx = this.db.transaction((rows: MemoryDoc[]) => {
       this.db.exec('DELETE FROM mem_fts');
       for (const d of rows) insert.run(d.id, d.scope, d.source, d.title, d.body);
+      if (hash !== undefined) upsertHash.run('corpus_hash', hash);
     });
     tx(docs);
   }
@@ -94,4 +115,26 @@ export class FtsRetriever implements MemoryRetriever {
   close(): void {
     this.db.close();
   }
+}
+
+/**
+ * Structural view of a corpus the retriever can index from. Declared here (not
+ * imported from `registers`) so retriever.ts has no dependency on registers.ts —
+ * MemoryStore satisfies it nominally, keeping the import graph acyclic.
+ */
+export interface IndexableCorpus {
+  corpusHash(): string;
+  allDocs(): MemoryDoc[];
+}
+
+/**
+ * Bring a (possibly persistent) retriever in sync with a corpus, re-indexing only
+ * when the stored hash differs from the corpus's current hash. Returns true when
+ * it rebuilt the index, false when the index was already current.
+ */
+export function ensureIndexed(r: FtsRetriever, corpus: IndexableCorpus): boolean {
+  const want = corpus.corpusHash();
+  if (r.indexedHash() === want) return false;
+  r.index(corpus.allDocs(), want);
+  return true;
 }

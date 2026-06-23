@@ -382,6 +382,66 @@ Implémenter dans `packages/core/src/llm.real.ts` : passer `effort` dans les opt
 
 ---
 
+## Phase 9 · Exploitation & Auto-construction  (C → destination B)
+
+> **Validée 2026-06-22 (user GO).** Principe : **on utilise MultiAgentOS pour construire et améliorer MultiAgentOS** (un seul projet, pas deux systèmes). Stratégie **C → destination B** : (A) outiller le build-time avec notre propre arsenal, puis (B) le vrai dogfooding (MultiAgentOS lance des missions sur son propre dépôt). Prérequis de B = finir la couche live — qui *est* la nouvelle vision produit. Doctrine §12/§13 : fondations d'abord, avec le meilleur savoir, **avant** de bâtir l'app dessus.
+>
+> **Constat des 4 audits (2026-06-22, `docs/learning/2026-06-22/`)** : la *conception* est best-in-class et les ressources sont intégrées (rien perdu), mais le *runtime n'est pas activé* — mémoire jamais seedée, critiques en *mock*, pas d'agent évaluateur, planner/orchestrateur fusionnés. L'Étape 0 transforme ce blueprint en fondation vivante et durcie.
+>
+> **Ré-séquencement vs vision initiale** : l'ex-« Étape 2 » (surfaces multi-LLM / comptes / console arsenal / pages projet) **se fond dans Étape 3** avec les interfaces. Priorité absolue = **Étape 0 + Étape 1**.
+
+**Méthode de build (toutes les étapes)** : doer/checker en sous-agents (`docs/learning/AUTONOMOUS-PIPELINE.md`), branche `phase/9-*`, PR en DRAFT (l'utilisateur merge), **5 checks** verts + Sonar exit 0 avant « fait ». Garde-fous permanents : abonnement-only (§11, garde CI actif), actions risquées gated (§5), consultation `docs/knowledge/` avant tout artefact mémoire/agent (§12). Budget : quota non bloquant (cf. mémoire `user_token-budget`) mais viser `eco`/`standard`, pause à 80 %.
+
+### Étape 0 · Activation & durcissement des fondations  *(prioritaire — « Tout », user GO)*
+
+Trois sous-étapes. Aucune ne touche l'app finale : on rend exploitable ce qui existe déjà.
+
+**0a · Mémoire vivante** (le pont savoir→mémoire + le second cerveau humain)
+- Exécuter/brancher le pont : `seedGlobalKnowledge` (`packages/memory/src/seed.ts`) sur `docs/knowledge/**` (+ `vibeflow/INDEX.md`) → peupler le store ; ajouter un script `mem:seed` dans `package.json` et l'invoquer au bootstrap worker. (Aujourd'hui : codé+testé mais jamais exécuté → mémoire vide.)
+- Persister l'index de recherche : passer un `indexPath` (`data/memory/index.db`) à `FtsRetriever` (`packages/memory/src/retriever.ts`), reconstruire seulement quand `corpusHash()` change (aujourd'hui : ré-indexation RAM à chaque requête, `corpusHash` mort).
+- **Couche humaine (Obsidian)** : faire écrire au Memory Keeper des liens `[[BDR-001]]` dans les registres (`packages/memory/src/registers.ts` — aujourd'hui zéro wikilink → graphe vide) ; documenter « ouvrir `data/memory/` comme vault ».
+- **Ajout manuel de notes** : nouvelle UI + route API « Nouvelle note » écrivant via le store Keeper (`apps/web/app/(cockpit)/memory/` — aujourd'hui : triage de candidats seulement, pas d'écriture à la main).
+- Lever l'ambiguïté de stockage : Markdown = source de vérité vivante ; trancher le sort de la table `memory_items` (orpheline) — supprimer ou documenter « réservée ».
+- **Cible retrieval** : FTS5 maintenant ; **QMD** (`QmdRetriever` derrière l'interface `MemoryRetriever`, collections MCP `mas-knowledge` + `mas-memory`) en **fast-follow** (audit supply-chain léger, swap 1 fichier — ADR 0003). Graphify **hors scope mémoire** (indexeur de code → Context Manager, Phase 5, ADR `0007-context-indexing` + audit sécu).
+- *Critères de sortie 0a* : `data/memory/` peuplé depuis `docs/knowledge/` (pont exécuté) ; une requête de récupération sur un fait build-time connu (ex. « BDR = nom canonique du registre décisions ») le retrouve (**hard gate Phase 4**) ; index persistant rebâti sur changement de hash ; une note ajoutée à la main apparaît dans Obsidian avec un graphe à arêtes (wikilinks) ; sort de `memory_items` tranché.
+
+**0b · Vrai pipeline doer/checker** (sortir du « prompt unique » + gardes mock)
+- Remplacer les critiques *mock* par de **vrais appels LLM** vers les fiches déjà spécifiées : `mockReviewer` / `mockCodeReviewer` / `mockSecReviewer` / `mockQualityController` / `mockRealityChecker` (`packages/core/src/llm.ts`) → délégation aux fiches (`reviewer`/`sec-reviewer` sonnet-4-6, `quality-controller`). Prompt de revue couvrant : `docs/knowledge/prompting-anthropic.md:104-110`.
+- **Boucle évaluateur-optimiseur** dans `runDelegatedTask` (`packages/agents/src/dispatch.ts` ~513-563) : un verdict `NEEDS_WORK`/`BLOCK` ré-invoque le producteur (`delegateWithDiff`, `delegate.ts`) avec les findings injectés, borné par `maxReviewIterations` (2-3) + budget tâche. (Aujourd'hui : verdict loggé puis ignoré.)
+- **Reality Checker réel** : calculer de vraies preuves (diff applique ? tests cités ? diff couvre la demande ?) au lieu de `evidence:false` codé en dur (`dispatch.ts` ~501).
+- **Self-verify producteur** : avant la garde, le doer lance `validateDiffApplies` + lint/test et révise une fois.
+- **Chaînage de prompts** : passer les sorties amont (`last_message`) aux tâches dépendantes (la mécanique de DAG existe, `selectRunnableTasks`/`dependsOnJson` ; manque le passage de contexte).
+- *Critères de sortie 0b* : une tâche s'exécute producteur → **vrai** critique → sur NEEDS_WORK, boucle de correction bornée ; plus aucun critique mock dans le chemin runtime ; tâches dépendantes reçoivent le contexte amont.
+
+**0c · Roster Tier A au meilleur niveau**
+- **Promouvoir un agent ÉVALUATEUR en Tier A** (juge de qualité sur grille + boucle de correction) — le `agent-evaluator` dort déjà dans `packages/agents/library/` ; doctrine RES-043 « agent-as-judge » (`docs/knowledge/vibeflow/agents-skills.md`). Distinct des gardes QC/Reviewer/Sec.
+- **Séparer planner et orchestrateur** : `mission-planner` = auteur one-shot du DAG ; nouvelle fiche `orchestrator`/`dispatcher` gouvernant la boucle de `dispatch.ts` (claim de tâches, budget, gates §5, pilotage de la boucle d'éval).
+- Réconcilier la dérive doc : `AGENTS.md` §3 (« 6 agents » → 7, ajouter `quality-controller`) + §7 liste de fichiers.
+- (Option) Avancer un agent `researcher` (cognition non-Claude, ADR 0002) si une mission a besoin de contexte externe frais.
+- *Critères de sortie 0c* : fiche évaluateur en Tier A + câblée dans la boucle 0b ; planner/orchestrateur séparés avec fiches complètes (schéma AGENTS.md §2) ; `AGENTS.md` à jour.
+
+### Étape 1 · Couche live simple  *(le cœur : ça doit juste marcher)*
+
+Le moteur d'exécution est **déjà réel** (`packages/core/src/llm.real.ts` via Agent SDK ; `runMission`/`executeNextTask` ; `apps/web/app/api/missions/[id]/run/route.ts` exécute inline). Le manque : **le chat est scripté** (`apps/web/lib/{manager,agent,mission}-script.ts`, `conversation-actions.ts`).
+
+- Brancher le chat sur le vrai LLM (remplacer les réponses scriptées par un appel réel via la couche LLM/Router), en gardant multi-conversation + historique (tables `conversations`/`messages`, `ConversationPanel` — déjà là).
+- Brancher le chat sur le vrai pipeline : un message peut **créer ET lancer** une mission (réutilise `runMission`/`executeNextTask` + le pipeline 0b), voir le découpage agents → skills s'exécuter, et récupérer le résultat (brief + diff) dans le chat.
+- Interface volontairement **sobre** : fonctionnelle d'abord, embellie ensuite (et via le produit lui-même).
+- *Critères de sortie* : je tape une demande dans un chat → une vraie mission se lance → agents/skills réels tournent (avec critiques réelles 0b) → résultat renvoyé dans le chat ; plusieurs chats persistent avec leur historique.
+
+### Étape 3 · Surfaces de la vision + Auto-construction  *(ex-Étape 2 fondue ici)*
+
+- **Chat multi-LLM façon Mammouth** : sélecteur modèle/provider (réutilise `RouterLLMClient` + `packages/core/src/providers/`).
+- **Gestion des abonnements/comptes** : déclarer plusieurs comptes (Claude ×N via `CLAUDE_CONFIG_DIR` par compte, clés provider en `.env.local`), **tout via Agent SDK, jamais PAYG** (backlog `per-provider-subscription-awareness`).
+- **Console de l'arsenal** : voir/gérer/promouvoir skills + agents froids (backlog `arsenal-management-console`).
+- **Pages projet structurées** (mission · agents · fiches · mémoire · santé) + **consolidation dans `PRODUCT_SPEC.md`**.
+- **Dogfooding (B)** : enregistrer le dépôt MultiAgentOS comme projet *dans* MultiAgentOS ; lancer de vraies missions d'amélioration sur lui-même (autonomie `assisted` au départ, actions risquées gated §5, diffs revus avant application). La mémoire s'enrichit des runs.
+- *Critères de sortie* : choisir le LLM selon l'abonnement ; gérer comptes + arsenal depuis le cockpit ; une amélioration réelle de MultiAgentOS produite par MultiAgentOS, revue et appliquée via le cockpit.
+
+> **Prompt de lancement de la construction** (à coller dans la session la mieux configurée) : `docs/learning/2026-06-22/PHASE9-KICKOFF.md`. Commencer par **Étape 0a**.
+
+---
+
 ## The "Future Build Prompt"
 
 Once this plan is validated, paste this in a fresh Claude Code session at the repo root to start **Phase 0**:

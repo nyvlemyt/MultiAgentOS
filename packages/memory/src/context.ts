@@ -1,4 +1,4 @@
-import { FtsRetriever, type MemoryHit } from './retriever';
+import { FtsRetriever, ensureIndexed, type MemoryHit } from './retriever';
 import { MemoryStore, type RegisterKind } from './registers';
 
 export interface MemoryContext {
@@ -8,10 +8,31 @@ export interface MemoryContext {
   globalItems: MemoryHit[];
 }
 
+export interface MemoryContextOpts {
+  /**
+   * Path of a persistent search index (e.g. data/memory/index.db). When set, the
+   * index is reused across calls and rebuilt only when corpusHash() changes —
+   * avoiding a full re-index on every query. Omit for the in-memory path.
+   */
+  indexPath?: string;
+}
+
 /** §12 cap — never inject more than 5 global memory items per mission call. */
 export const MAX_GLOBAL_ITEMS = 5;
 
 const SUMMARY_KINDS: RegisterKind[] = ['decisions', 'learnings', 'blockers'];
+
+/** Retrieve ≤5 relevant global items, persistent index when indexPath is set. */
+function retrieveGlobalItems(store: MemoryStore, query: string, indexPath?: string): MemoryHit[] {
+  const retriever = indexPath ? new FtsRetriever({ indexPath }) : new FtsRetriever();
+  try {
+    if (indexPath) ensureIndexed(retriever, store);
+    else retriever.index(store.allDocs());
+    return retriever.query(query, { scope: 'global', limit: MAX_GLOBAL_ITEMS });
+  } finally {
+    retriever.close();
+  }
+}
 
 /**
  * Build the on-demand memory block injected into the Mission Planner / executor
@@ -23,6 +44,7 @@ export function buildMemoryContext(
   store: MemoryStore,
   projectId: string,
   query: string,
+  opts: MemoryContextOpts = {},
 ): MemoryContext {
   const projectLines: string[] = [];
   let projectEntryCount = 0;
@@ -32,10 +54,7 @@ export function buildMemoryContext(
     for (const e of entries.slice(-3)) projectLines.push(`- [${e.id}] ${e.title}`);
   }
 
-  const retriever = new FtsRetriever();
-  retriever.index(store.allDocs());
-  const globalItems = retriever.query(query, { scope: 'global', limit: MAX_GLOBAL_ITEMS });
-  retriever.close();
+  const globalItems = retrieveGlobalItems(store, query, opts.indexPath);
 
   if (projectEntryCount === 0 && globalItems.length === 0) {
     return { text: '', projectEntryCount, globalItems };

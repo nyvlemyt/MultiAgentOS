@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import type { MemoryStore } from './registers';
+import { MemoryStore, MEMORY_KEEPER_AGENT } from './registers';
 
 export interface SeedResult {
   imported: string[];
@@ -27,7 +27,7 @@ export function seedGlobalKnowledge(store: MemoryStore, knowledgeDir: string): S
   const imported: string[] = [];
   const skipped: string[] = [];
   for (const file of walkMd(knowledgeDir).sort((a, b) => a.localeCompare(b))) {
-    const rel = relative(knowledgeDir, file).split(/[/\\]/).join('/');
+    const rel = relative(knowledgeDir, file).replaceAll(/[/\\]/g, '/');
     const source = `docs/knowledge/${rel}`;
     if (store.hasKnowledge(source)) {
       skipped.push(source);
@@ -37,4 +37,21 @@ export function seedGlobalKnowledge(store: MemoryStore, knowledgeDir: string): S
     imported.push(source);
   }
   return { imported, skipped };
+}
+
+export interface RunSeedOpts {
+  /** Root of the memory store, e.g. data/memory. */
+  memoryRoot: string;
+  /** Directory of build-time knowledge to import, e.g. docs/knowledge. */
+  knowledgeDir: string;
+}
+
+/**
+ * Bridge runner: construct a Keeper-identity MemoryStore and seed it. The store
+ * is built here (not passed in) so callers (CLI, worker bootstrap) cannot smuggle
+ * a non-Keeper writer past the §8 lock.
+ */
+export function runSeed({ memoryRoot, knowledgeDir }: RunSeedOpts): SeedResult {
+  const store = new MemoryStore({ root: memoryRoot, writerAgent: MEMORY_KEEPER_AGENT });
+  return seedGlobalKnowledge(store, knowledgeDir);
 }

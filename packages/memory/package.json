@@ -10,7 +10,8 @@
   },
   "scripts": {
     "lint": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed": "tsx src/seed-cli.ts"
   },
   "dependencies": {
     "@mas/db": "workspace:*",

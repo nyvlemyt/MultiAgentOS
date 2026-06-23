@@ -49,6 +49,18 @@ export interface NewEntry {
   body: string;
   source?: string;
   date?: string;
+  /** Related register ids to fold into a trailing `Related:` wikilink footer. */
+  links?: string[];
+}
+
+/**
+ * Wrap bare register ids (BDR/LRN/BLK/EVAL-NNN) in Obsidian `[[…]]` wikilinks so
+ * data/memory/ opens as a graph vault. The lookbehind/lookahead skip ids already
+ * inside `[[…]]`, making this idempotent (no double-wrapping). The `\d{3,}`
+ * quantifier is disjoint from its neighbours — no super-linear backtracking (S5852).
+ */
+export function linkifyIds(text: string): string {
+  return text.replace(/(?<!\[\[)(BDR|LRN|BLK|EVAL)-\d{3,}(?!\]\])/g, '[[$&]]');
 }
 
 export interface MemoryStoreOpts {
@@ -69,7 +81,8 @@ function serialize(entries: RegisterEntry[]): string {
       if (e.date) meta.push(`- date: ${e.date}`);
       if (e.source) meta.push(`- source: ${e.source}`);
       const head = e.title ? `## ${e.id} — ${e.title}` : `## ${e.id}`;
-      return `${head}\n${meta.join('\n')}${meta.length ? '\n' : ''}\n${e.body.trim()}\n`;
+      // linkifyIds is idempotent, so already-linked bodies survive a re-serialize.
+      return `${head}\n${meta.join('\n')}${meta.length ? '\n' : ''}\n${linkifyIds(e.body.trim())}\n`;
     })
     .join('\n');
 }
@@ -125,6 +138,12 @@ export class MemoryStore {
     return parse(readFileSync(f, 'utf8'));
   }
 
+  /** Raw on-disk Markdown of a register (linkified) — '' when the file is absent. */
+  raw(projectId: string, kind: RegisterKind): string {
+    const f = this.file(projectId, kind);
+    return existsSync(f) ? readFileSync(f, 'utf8') : '';
+  }
+
   private nextId(projectId: string, kind: RegisterKind): string {
     if (kind === 'journal') return today();
     const prefix = PREFIX[kind];
@@ -135,10 +154,12 @@ export class MemoryStore {
   append(projectId: string, kind: RegisterKind, entry: NewEntry): RegisterEntry {
     this.assertWriter();
     const existing = this.read(projectId, kind);
+    const links = (entry.links ?? []).filter((l) => l.trim().length > 0);
+    const body = links.length > 0 ? `${entry.body.trim()}\n\nRelated: ${links.join(', ')}` : entry.body;
     const created: RegisterEntry = {
       id: this.nextId(projectId, kind),
       title: entry.title,
-      body: entry.body,
+      body,
       date: entry.date ?? today(),
       source: entry.source,
     };
@@ -220,7 +241,12 @@ export class MemoryStore {
     return [...this.projectIds().flatMap((p) => this.toDocs(p)), ...this.knowledgeDocs()];
   }
 
-  /** SHA-256 over all register files — the index is derived & rebuilt when this changes (ADR 0003). */
+  /** Absolute path of the derived, persistent search index (ADR 0003). */
+  indexPath(): string {
+    return join(this.opts.root, 'index.db');
+  }
+
+  /** SHA-256 over all register files + seeded knowledge — the index is derived & rebuilt when this changes (ADR 0003). */
   corpusHash(): string {
     const h = createHash('sha256');
     const kinds: RegisterKind[] = ['decisions', 'learnings', 'blockers', 'journal', 'evals'];
@@ -228,6 +254,16 @@ export class MemoryStore {
       for (const kind of kinds) {
         const f = this.file(p, kind);
         if (existsSync(f)) h.update(`${p}/${kind}\n${readFileSync(f, 'utf8')}`);
+      }
+    }
+    // Fold seeded knowledge too — otherwise the hash wouldn't change after a seed
+    // and a persistent index would silently go stale (Phase 9 · 0a finding).
+    const kdir = this.knowledgeDir();
+    if (existsSync(kdir)) {
+      for (const f of readdirSync(kdir)
+        .filter((n) => n.endsWith('.md'))
+        .sort((a, b) => a.localeCompare(b))) {
+        h.update(`knowledge/${f}\n${readFileSync(join(kdir, f), 'utf8')}`);
       }
     }
     return h.digest('hex');

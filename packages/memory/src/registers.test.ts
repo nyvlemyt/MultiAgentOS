@@ -12,6 +12,7 @@ import {
   MemoryWriteForbiddenError,
   MEMORY_KEEPER_AGENT,
   promoteCandidate,
+  linkifyIds,
 } from './registers';
 import { FtsRetriever } from './retriever';
 
@@ -95,6 +96,69 @@ describe('MemoryStore registers', () => {
     const h0 = s.corpusHash();
     s.append('proj', 'decisions', { title: 'X', body: 'y' });
     expect(s.corpusHash()).not.toBe(h0);
+  });
+
+  it('corpusHash also folds seeded _global/knowledge (so a persistent index re-builds after a seed)', () => {
+    const s = keeperStore();
+    const h0 = s.corpusHash();
+    s.writeKnowledge('docs/knowledge/x.md', 'a build-time fact about BDR registers');
+    expect(s.corpusHash()).not.toBe(h0);
+  });
+
+  it('indexPath() points at index.db under the store root', () => {
+    expect(keeperStore().indexPath()).toBe(join(root, 'index.db'));
+  });
+});
+
+describe('linkifyIds (Obsidian wikilinks)', () => {
+  it('wraps a bare register id in [[…]]', () => {
+    expect(linkifyIds('see BDR-001 for context')).toBe('see [[BDR-001]] for context');
+  });
+
+  it('wraps every supported register prefix', () => {
+    expect(linkifyIds('LRN-002 BLK-013 EVAL-100 BDR-007')).toBe(
+      '[[LRN-002]] [[BLK-013]] [[EVAL-100]] [[BDR-007]]',
+    );
+  });
+
+  it('does not double-wrap an id already linked (idempotent)', () => {
+    expect(linkifyIds('see [[BDR-001]] there')).toBe('see [[BDR-001]] there');
+    expect(linkifyIds(linkifyIds('see BDR-001'))).toBe('see [[BDR-001]]');
+  });
+
+  it('leaves non-register tokens untouched', () => {
+    expect(linkifyIds('ADR-0003 is a build decision, FOO-001 too')).toBe(
+      'ADR-0003 is a build decision, FOO-001 too',
+    );
+  });
+});
+
+describe('MemoryStore wikilinks', () => {
+  it('linkifies register ids mentioned in a body when serialized', () => {
+    const s = keeperStore();
+    s.append('proj', 'learnings', { title: 'L', body: 'This builds on BDR-001 and LRN-002.' });
+    const raw = s.raw('proj', 'learnings');
+    expect(raw).toContain('[[BDR-001]]');
+    expect(raw).toContain('[[LRN-002]]');
+  });
+
+  it('folds links[] into a Related: footer with wikilinks', () => {
+    const s = keeperStore();
+    const e = s.append('proj', 'decisions', { title: 'D', body: 'Chose FTS5.', links: ['BDR-002', 'LRN-003'] });
+    expect(e.body).toContain('Related:');
+    const raw = s.raw('proj', 'decisions');
+    expect(raw).toContain('[[BDR-002]]');
+    expect(raw).toContain('[[LRN-003]]');
+  });
+
+  it('parse → serialize is idempotent (no double-wrapping across a round-trip)', () => {
+    const s = keeperStore();
+    s.append('proj', 'learnings', { title: 'L', body: 'refs BDR-001', links: ['LRN-009'] });
+    const first = s.raw('proj', 'learnings');
+    // Re-read and re-write the same entries — the on-disk content must not change.
+    const reparsed = s.read('proj', 'learnings');
+    expect(reparsed[0]!.body).not.toContain('[[[[');
+    expect(first.includes('[[[[')).toBe(false);
   });
 });
 
