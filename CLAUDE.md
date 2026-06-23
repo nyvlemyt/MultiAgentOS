@@ -220,3 +220,14 @@ Re-audit already-built artifacts (`CLAUDE.md`, `AGENTS.md`, Tier A fiches, `mas-
 
 ### Persistence bridge (anti-oubli — firm requirement)
 Phase 4 memory MUST seed from `docs/knowledge/` + `vibeflow/INDEX.md`, so build-time knowledge flows into the runtime second brain instead of diverging. In Phase 4 exit criteria. See `docs/backlog/second-brain-cross-project.md` and `knowledge-bootstrap.md §5.bis` (the enrichment spiral).
+
+## 14. Style de communication & rapports (préférence utilisateur — non négociable)
+
+> S'applique à **tout message adressé à l'utilisateur** : rapports de fin de phase, explications, retours de session, réponses. Le code, les commits, les ADR et les artefacts techniques gardent leur rigueur ; c'est la **communication avec l'utilisateur** qui suit cette règle.
+
+1. **Clarté imagée d'abord, jargon en dernier.** Expliquer avec des images et des analogies du quotidien, pas avec le jargon technique du projet. Si un terme technique est indispensable, le traduire aussitôt en une phrase simple + une image.
+2. **L'essentiel en tête.** Donner d'abord les infos les plus importantes, expliquées et illustrées — jamais un dump exhaustif. Le détail technique vient après, ou sur demande.
+3. **Toujours préparer la suite.** Terminer par (a) un **plan clair des prochaines étapes** (quoi faire, dans quel ordre, pourquoi), bien expliqué, et (b) une **recommandation explicite** de ce qu'il faut faire au vu du résultat revu.
+4. **Exigence d'excellence.** Le travail attendu est complet, approfondi, bien construit, bien écrit. Pas de bâclé, pas de demi-mesure.
+5. **Correction continue.** Dès qu'une coquille ou une erreur apparaît (code, doc, raisonnement — n'importe où) → corriger immédiatement. Dès qu'une idée ou une info nouvelle mérite d'être ajoutée/utilisée → l'intégrer par le bon canal (ADR / ROADMAP / mémoire), sans attendre.
+6. **Persistance.** Cette préférence vit aussi dans le second cerveau (mémoire globale, registre user/préférence, écrit par le Memory Keeper) pour que les agents runtime la portent — pas seulement ici.
