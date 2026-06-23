@@ -11,7 +11,10 @@
   "scripts": {
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "seed": "tsx src/seed-cli.ts"
+    "seed": "tsx src/seed-cli.ts",
+    "arsenal:build": "tsx src/arsenal-cli.ts",
+    "mem:eval": "tsx src/eval-cli.ts",
+    "mem:doctor": "tsx src/doctor-cli.ts"
   },
   "dependencies": {
     "@mas/db": "workspace:*",

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sem-forgetting",
+    "query": "how do I avoid forgetting things between work sessions",
+    "expect": ["memory-patterns", "continuous-learning", "memoire", "memory"],
+    "semantic": true,
+    "scope": "global",
+    "collections": ["mas-knowledge"]
+  },
+  {
+    "id": "sem-token-cost",
+    "query": "techniques to reduce how much I pay the provider for each model call",
+    "expect": ["anthropic-ecosystem", "production-patterns", "token", "prompt-caching"],
+    "semantic": true,
+    "scope": "global",
+    "collections": ["mas-knowledge"]
+  },
+  {
+    "id": "sem-prompt-quality",
+    "query": "how should I structure instructions so the model follows them reliably",
+    "expect": ["prompting-anthropic", "prompting", "agent-patterns"],
+    "semantic": true,
+    "scope": "global",
+    "collections": ["mas-knowledge"]
+  },
+  {
+    "id": "arsenal-audit-pr",
+    "query": "skill to audit a pull request",
+    "expect": ["audit", "review", "code-review", "pr"],
+    "qmdOnly": true
+  },
+  {
+    "id": "arsenal-security-agent",
+    "query": "agent for security review",
+    "expect": ["security", "sec", "threat", "defensive"],
+    "qmdOnly": true
+  },
+  {
+    "id": "arsenal-memory-skill",
+    "query": "skill to manage agent memory",
+    "expect": ["memory", "keeper", "context"],
+    "qmdOnly": true
+  }
+]

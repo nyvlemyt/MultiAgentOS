@@ -17,7 +17,7 @@
 
 1. **Mémoire = 4 étages sur une base Markdown** (`data/memory/`, 5 registres, Memory Keeper seul scripteur) :
    - **Toi (humain)** → **Obsidian** (vault Markdown + vue graphe via wikilinks `[[...]]`) + ajout manuel de notes.
-   - **L'agent (recherche)** → **FTS5 maintenant → QMD** en fast-follow (sémantique + rerank, local, pas de clé API), derrière l'interface `MemoryRetriever`.
+   - **L'agent (recherche)** → **QMD maintenant** (sémantique + rerank, local, pas de clé API), **FTS5 en fallback**, derrière l'interface `MemoryRetriever`. Recherche **unifiée** : savoir + mémoire + **arsenal** (skills/agents/règles/commandes). Frontière : QMD cherche, Markdown stocke, Skill Router décide. Détail + 8 principes : `docs/learning/2026-06-22/PHASE9-0a-UNIFIED-RETRIEVAL.md`.
    - **Le code (séparé)** → **Graphify/codegraph** pour le Context Manager, **plus tard** (Phase 5, ADR `0007-context-indexing` + audit sécu). **Hors fondation mémoire.**
 2. **Pipeline d'exécution = vrai doer/checker** (pas un prompt unique) : critiques réelles + boucle évaluateur-optimiseur bornée.
 3. **Roster Tier A renforcé** : + un agent **évaluateur** (promu de la bibliothèque froide), **planner et orchestrateur séparés**.
@@ -32,7 +32,7 @@
 - `packages/memory/src/registers.ts` — écrit `## BDR-001 — Titre`, **zéro `[[wikilink]]`** → graphe Obsidian sans arêtes.
 - `apps/web/app/(cockpit)/memory/` (+ routes `api/memory/*`) — triage de candidats uniquement, **pas d'écriture manuelle**.
 - `packages/db/src/schema.ts` — table `memory_items` orpheline (le store vivant = Markdown). Trancher.
-- Cible QMD : collections MCP `mas-knowledge` = [`docs/knowledge/`, `docs/workflows/`], `mas-memory` = [`data/memory/`] (cf. `docs/knowledge/memory-patterns.md`, `docs/intake/2026-06-08-qmd.md`, ADR 0003).
+- **Retrieval unifié (0a renforcée)** : QMD **maintenant** (`QmdRetriever` derrière `MemoryRetriever`, FTS5 fallback). 3 collections : `mas-knowledge` (`docs/knowledge/`, `docs/workflows/`), `mas-memory` (`data/memory/`), **`mas-arsenal`** (`packages/skills/library/`, `packages/agents/library/`, `.claude/agents/`, `docs/rules/`, `.claude/commands/` — résumé L1 + frontmatter). Recherche mémoire **projet** par pertinence (`scope:'project'` dans `buildMemoryContext`). Exposer en **MCP** + harnais d'éval. Amender **ADR 0003**. (cf. `docs/learning/2026-06-22/PHASE9-0a-UNIFIED-RETRIEVAL.md`, `docs/intake/2026-06-08-qmd.md`.)
 
 **0b Pipeline**
 
@@ -71,8 +71,8 @@
 
 > Reprends MultiAgentOS, **Phase 9 · Exploitation & Auto-construction**. Lis dans l'ordre : `CLAUDE.md` (surtout §5/§11/§12/§13), `ROADMAP.md` (la section Phase 9), `docs/learning/2026-06-22/PHASE9-KICKOFF.md` (ce fichier, coutures + décisions), et les 4 docs `docs/knowledge/` : `memory-patterns.md`, `agent-patterns.md`, `prompting-anthropic.md`, `production-patterns.md`.
 >
-> Objectif de session : **Étape 0a — Mémoire vivante** uniquement. Exécute le pont `seedGlobalKnowledge`, persiste l'index FTS, fais émettre les wikilinks `[[...]]` par le Memory Keeper, ajoute l'UI/route « Nouvelle note », tranche le sort de `memory_items`. Cible QMD en fast-follow derrière `MemoryRetriever` (ne pas l'installer maintenant).
+> Objectif de session : **Étape 0a renforcée — retrieval unifié** uniquement (la mémoire de base est faite, PR #35). Installe **QMD maintenant** derrière `MemoryRetriever` (FTS5 en fallback) ; crée 3 collections `mas-knowledge` / `mas-memory` / **`mas-arsenal`** (skills+agents froids + `.claude/agents/` + `docs/rules/` + `.claude/commands/`, indexés résumé L1 + frontmatter) ; branche la recherche mémoire **projet** par pertinence (`scope:'project'` dans `buildMemoryContext`) ; expose la recherche en **MCP** ; ajoute un **harnais d'éval retrieval** en CI ; amende **ADR 0003**. Frontière : QMD cherche, Markdown stocke, Skill Router décide (interroge QMD pour ses candidats).
 >
-> Contraintes : abonnement-only (jamais `@anthropic-ai/sdk`), Memory Keeper seul scripteur, consulter `docs/knowledge/` avant de toucher la mémoire (§12). Travaille en doer/checker (sous-agents), branche `phase/9a-memory`, PR DRAFT. « Fait » = les 5 checks verts + Sonar exit 0. Critère de sortie 0a : `data/memory/` peuplé depuis `docs/knowledge/`, une requête sur un fait build-time connu le retrouve (hard gate Phase 4), index persistant, note manuelle visible dans Obsidian avec graphe à arêtes.
+> Contraintes : abonnement-only (jamais `@anthropic-ai/sdk`), Memory Keeper seul scripteur, consulter `docs/knowledge/` avant de toucher la mémoire (§12). Travaille en doer/checker (sous-agents), branche `phase/9a2-qmd-arsenal`, PR DRAFT. « Fait » = les 5 checks verts + Sonar exit 0. Critère de sortie 0a renforcée : requête **sémantique** (« éviter d'oublier entre sessions ») → bon doc savoir ; requête **arsenal** (« skill audit PR », « agent revue sécu ») → bon skill/agent froid ; mémoire **projet** par pertinence ; **fallback FTS** si QMD coupé ; recherche **interrogeable en MCP** ; harnais d'éval vert.
 >
 > **Arrête-toi au critère de sortie 0a et demande mon GO explicite avant 0b.** Budget :  standard, pause + rapport à 80 %.
