@@ -384,6 +384,22 @@ async function lastMessageFor(db: Db, taskId: string): Promise<string> {
   return payload.lastMessage ?? '';
 }
 
+// Prompt chaining (anthropic-ecosystem.md:166, plan §2.9): build the
+// `### Upstream results:` block from each dependsOn task's persisted last_message.
+// Empty string when the task has no dependencies or none produced output.
+async function upstreamResults(db: Db, next: Task): Promise<string> {
+  const depIds = JSON.parse(next.dependsOnJson) as string[];
+  if (depIds.length === 0) return '';
+  const deps = await db.select({ id: tasks.id, title: tasks.title }).from(tasks).where(inArray(tasks.id, depIds));
+  const titleById = new Map(deps.map((d) => [d.id, d.title]));
+  const lines: string[] = [];
+  for (const id of depIds) {
+    const msg = await lastMessageFor(db, id);
+    if (msg) lines.push(`${titleById.get(id) ?? id}: ${msg}`);
+  }
+  return lines.length > 0 ? `### Upstream results:\n${lines.join('\n')}` : '';
+}
+
 async function selectRunnableTasks(db: Db, missionId: string): Promise<Task[]> {
   const all = await db.select().from(tasks).where(eq(tasks.missionId, missionId));
   const doneIds = new Set(all.filter((t) => t.status === 'done').map((t) => t.id));
@@ -568,6 +584,8 @@ interface DelegationContext {
   llm: LLMClient;
   skillContext: string;
   memCtx: MemoryContext;
+  /** Prompt-chaining block from upstream dependsOn tasks (plan §2.9). */
+  upstream: string;
   delegation: (typeof TIER_B_DELEGATION_MAP)[string];
   agentId: string;
 }
@@ -639,7 +657,10 @@ async function runDelegatedTask(
   ctx: DelegationContext,
   taskSkillIds: string[],
 ): Promise<{ kind: 'task_done'; taskId: string }> {
-  const { proj, llm, skillContext, memCtx, delegation, agentId } = ctx;
+  const { proj, llm, skillContext, memCtx, upstream, delegation, agentId } = ctx;
+  // Prompt chaining: the delegated path carries upstream output in skillContext
+  // (the producer/critic system prompt), since the user prompt is the task brief.
+  const chainedSkillContext = [skillContext, upstream].filter(Boolean).join('\n\n');
   const baseInput = {
     agentId,
     task: { title: next.title, description: next.description },
@@ -657,7 +678,7 @@ async function runDelegatedTask(
   // downstream throw propagates and never re-bills via runRawTask.
   let outcome: Awaited<ReturnType<typeof delegateWithDiff>>;
   try {
-    outcome = await delegateWithDiff({ ...baseInput, skillContext });
+    outcome = await delegateWithDiff({ ...baseInput, skillContext: chainedSkillContext });
   } catch (e) {
     logEventDetached(db, {
       missionId: m.id,
@@ -665,7 +686,7 @@ async function runDelegatedTask(
       type: 'delegation_fallback',
       payload: { fiche: delegation.fiche, message: String(e) },
     });
-    return runRawTask(db, m, next, { proj, llm, skillContext, memCtx }, taskSkillIds);
+    return runRawTask(db, m, next, { proj, llm, skillContext, memCtx, upstream }, taskSkillIds);
   }
 
   let outputPath = `${OUTPUTS_DIR}/${next.id}.md`;
@@ -683,7 +704,7 @@ async function runDelegatedTask(
       const lastSpend = outcome.response.inputTokens + outcome.response.outputTokens;
       if (spentTokens + lastSpend > (next.budgetTokens ?? Number.MAX_SAFE_INTEGER)) break;
 
-      const retrySkillContext = [skillContext, findingsBlock(review)].filter(Boolean).join('\n\n');
+      const retrySkillContext = [chainedSkillContext, findingsBlock(review)].filter(Boolean).join('\n\n');
       outcome = await delegateWithDiff({ ...baseInput, skillContext: retrySkillContext });
       spentTokens += outcome.response.inputTokens + outcome.response.outputTokens;
 
@@ -726,7 +747,7 @@ async function runRawTask(
   ctx: Omit<DelegationContext, 'delegation' | 'agentId'>,
   taskSkillIds: string[],
 ): Promise<{ kind: 'task_done'; taskId: string }> {
-  const { proj, llm, skillContext, memCtx } = ctx;
+  const { proj, llm, skillContext, memCtx, upstream } = ctx;
   const resp = await llm.call({
     system: [
       languageDirective(proj?.language),
@@ -734,7 +755,7 @@ async function runRawTask(
       memCtx.text,
       skillContext,
     ].filter(Boolean).join('\n\n'),
-    user: `Task: ${next.title}\n\n${next.description}`,
+    user: [`Task: ${next.title}\n\n${next.description}`, upstream].filter(Boolean).join('\n\n'),
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
     mode: (proj?.defaultMode ?? 'standard') as Mode,
     domain: getSkillRouter().domainFor(taskSkillIds),
@@ -768,27 +789,13 @@ async function executeTaskWithLLM(
     .innerJoin(missions, eq(missions.projectId, projects.id))
     .where(eq(missions.id, missionId));
 
-  const initialBlocked = await loadBlockedWindows(db, new Date());
-  const llm = selectLLM({
-    cwd: proj?.path,
-    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
-    sessionId: proj?.sessionId ?? undefined,
-    onRouterEvent: (evt) =>
-      logEventDetached(db, { missionId: m.id, taskId: next.id, type: 'provider_fallback', payload: evt }),
-    initialBlocked,
-    onBlock: (source, at) =>
-      logEventDetached(db, {
-        missionId: m.id,
-        taskId: next.id,
-        type: 'window_blocked',
-        payload: { source, blockedAt: at },
-      }),
-  });
+  const llm = await buildMissionLLM(db, m.id, next.id, proj, new Date());
 
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
   const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
   const memCtx = memoryContextFor(proj?.id, next.title);
-  const baseCtx = { proj, llm, skillContext, memCtx };
+  const upstream = await upstreamResults(db, next);
+  const baseCtx = { proj, llm, skillContext, memCtx, upstream };
 
   // Tier B delegation branch: a task whose agentId maps to a fiche goes through
   // delegate() → diff → review gate before user validation (CLAUDE.md §5). The
