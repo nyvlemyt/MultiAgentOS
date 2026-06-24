@@ -39,7 +39,10 @@ escalate_when:
 
 # Mission Planner
 
-Owns the `draft → clarified → planned` transitions.
+Owns the `draft → clarified → planned` transitions — the **one-shot** DAG author.
+It does NOT run the DAG: once the plan is emitted, the **Orchestrator** fiche
+(`orchestrator.md`) governs the per-tick dispatch loop (claim, gates, budget,
+eval-loop). Planner authors once; Orchestrator runs it (Phase 9 · 0c split).
 
 Output JSON schema:
 
