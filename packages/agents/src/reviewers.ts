@@ -50,19 +50,21 @@ const FICHE_FALLBACK: Record<string, string> = {
 };
 
 function loadFiche(id: keyof typeof FICHE_FALLBACK): string {
+  const fallback = FICHE_FALLBACK[id] ?? '';
   try {
     const here = fileURLToPath(new URL('.', import.meta.url));
     const path = resolve(here, `../fiches/${id}.md`);
     return readFileSync(path, 'utf-8').trim();
   } catch {
-    return FICHE_FALLBACK[id];
+    return fallback;
   }
 }
 
-const VERDICT_RE = /##\s*Verdict\s*\n+\s*(PASS|NEEDS_WORK|NEEDS_CHANGES|BLOCK)/i;
-// Disjoint quantifiers (S5852): the captured message is the rest of the line, so
-// [^\n]* cannot overlap the trailing newline boundary — no super-linear backtrack.
-const FINDING_RE = /^-\s*\[(block|warn|info)\]\s*([^\n]*)$/gim;
+// Disjoint quantifiers (S5852): `[^\n]*` (rest of the header line) cannot overlap
+// the single `\n` that follows, and `[ \t]*` (no newline) cannot overlap either —
+// no super-linear backtracking on either side of the newline boundary.
+const VERDICT_RE = /##[ \t]*Verdict[^\n]*\n[ \t]*(PASS|NEEDS_WORK|NEEDS_CHANGES|BLOCK)/i;
+const FINDING_RE = /^-[ \t]*\[(block|warn|info)\][ \t]*([^\n]*)$/gim;
 
 type Severity = ReviewerVerdict['findings'][number]['severity'];
 
@@ -80,13 +82,13 @@ export function parseVerdict(taskId: string, text: string): ReviewerVerdict {
       findings: [{ severity: 'warn', message: 'could not parse verdict — defaulting to NEEDS_WORK' }],
     };
   }
-  const raw = match[1].toUpperCase();
+  const raw = (match[1] ?? '').toUpperCase();
   const verdict: ReviewerVerdict['verdict'] = raw === 'NEEDS_CHANGES' ? 'NEEDS_WORK' : (raw as ReviewerVerdict['verdict']);
 
   const findings: ReviewerVerdict['findings'] = [];
   let f: RegExpExecArray | null;
   while ((f = FINDING_RE.exec(text)) !== null) {
-    findings.push({ severity: f[1].toLowerCase() as Severity, message: f[2].trim() });
+    findings.push({ severity: (f[1] ?? 'info').toLowerCase() as Severity, message: (f[2] ?? '').trim() });
   }
   if (findings.length === 0) {
     findings.push({ severity: 'info', message: 'no findings reported' });
