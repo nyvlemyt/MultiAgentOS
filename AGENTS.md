@@ -75,7 +75,7 @@ Every row is enforced at load by `validateFiche()` (§2/§10).
 | `sec-reviewer`      | Security Reviewer 🛡️ | Risk gate; mandatory before any `high` or `blocking` action | sonnet-4-6    | 3000           |
 | `agent-evaluator`   | Agent Evaluator 📊    | Transverse agent-as-judge (RES-043); advisory rubric score  | sonnet-4-6    | 3000           |
 
-## 4. Tier A roster — Phase 2 (9 more)
+## 4. Tier A roster — Phase 2 (8 more — quality-controller shipped)
 
 | ID                    | Name                 | Role                                                  | Provider hint |
 |-----------------------|----------------------|-------------------------------------------------------|---------------|
