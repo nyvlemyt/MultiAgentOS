@@ -1,5 +1,14 @@
 import type { Mode, Risk } from './types';
 
+/**
+ * Which critic lens a review call belongs to (Phase 9 · 0b). Set by the real
+ * critics in `@mas/agents/reviewers`. The REAL claudeCodeLLM ignores it (the
+ * fiche's `## Verdict` instruction drives the verdict); only the deterministic
+ * test seams (mockLLM + the vi.mock'd clients) read it to synthesize a parseable
+ * `## Verdict` so CI stays live-model-free.
+ */
+export type ReviewKind = 'reviewer' | 'sec' | 'qc' | 'code';
+
 export interface LLMRequest {
   system: string;
   user: string;
@@ -8,6 +17,8 @@ export interface LLMRequest {
   maxTokens?: number;
   /** Phase 3 skill-domain taxonomy tag — drives Phase 3.5 routing (ADR 0002). */
   domain?: string;
+  /** Phase 9 · 0b: marks a critic call so deterministic seams emit a verdict. */
+  reviewKind?: ReviewKind;
 }
 
 export interface LLMResponse {
@@ -27,10 +38,53 @@ export interface LLMClient {
   call(req: LLMRequest): Promise<LLMResponse>;
 }
 
+// Phase 9 · 0b determinism seam: the kind→label embedded in a synthesized
+// finding so message-substring asserts (e.g. `code-review`, `reality-check`)
+// keep passing under the mock. Hoisted to one literal each (S1192).
+const REVIEW_KIND_LABEL: Record<ReviewKind, string> = {
+  reviewer: 'review',
+  sec: 'sec-review',
+  qc: 'quality-control',
+  code: 'code-review',
+};
+
+// Sentinels a test can seed in the artifact (req.user) to drive a verdict.
+// Hoisted (S1192) — also referenced by the mock critic fns below. QC_BLOCK_SENTINEL
+// is the deterministic stand-in for a detected process violation (used by both
+// mockQualityController and the review-aware mockLLM above).
+const QC_BLOCK_SENTINEL = '[qc-block]';
+const NEEDS_WORK_SENTINEL = '[needs-work]';
+const SEC_BLOCK_SENTINEL = '[sec-block]';
+const BLOCKING_RISK_SENTINEL = 'risk=blocking';
+
+/**
+ * Synthesize a parseable `## Verdict` block from sentinels in the artifact.
+ * Keeps CI live-model-free: the deterministic test seams call this so a real
+ * critic still gets a verdict to parse. PASS unless a sentinel says otherwise.
+ */
+export function mockVerdictText(reviewKind: ReviewKind, artifact: string): string {
+  const label = REVIEW_KIND_LABEL[reviewKind];
+  let verdict: 'PASS' | 'NEEDS_WORK' | 'BLOCK' = 'PASS';
+  let severity: 'info' | 'warn' | 'block' = 'info';
+  let note = `${label}: no blocking issues found.`;
+  if (artifact.includes(QC_BLOCK_SENTINEL) || artifact.includes(SEC_BLOCK_SENTINEL) || artifact.includes(BLOCKING_RISK_SENTINEL)) {
+    verdict = 'BLOCK';
+    severity = 'block';
+    note = `${label}: process/risk violation detected.`;
+  } else if (artifact.includes(NEEDS_WORK_SENTINEL)) {
+    verdict = 'NEEDS_WORK';
+    severity = 'warn';
+    note = `${label}: change needs more work before it can pass.`;
+  }
+  return `## Verdict\n${verdict}\n\n## Findings\n- [${severity}] ${note}`;
+}
+
 export function mockLLM(): LLMClient {
   return {
     async call(req) {
-      const text = `[mock:${req.model}] ack ${req.user.slice(0, 60)}`;
+      const text = req.reviewKind
+        ? mockVerdictText(req.reviewKind, req.user)
+        : `[mock:${req.model}] ack ${req.user.slice(0, 60)}`;
       return {
         text,
         inputTokens: 200,
@@ -196,8 +250,8 @@ export function mockSecReviewer(taskId: string, prior: { risk: Risk }): Reviewer
 // drift, framework-without-ADR, output-language match) rather than the CODE.
 // At the mock stage it returns PASS unless a task carries the deterministic
 // '[qc-block]' sentinel — the stand-in for a detected process violation, which
-// a test can seed to exercise the block path.
-const QC_BLOCK_SENTINEL = '[qc-block]';
+// a test can seed to exercise the block path. The QC_BLOCK_SENTINEL constant is
+// hoisted near the other review sentinels above.
 
 export function mockQualityController(
   taskId: string,
