@@ -25,12 +25,14 @@ Détail des trous (preuves) : `selectLibrarySkills` choisit les skills par `rout
 
 | Vague | Livre | Branche (part de) | PR |
 |------|-------|-------------------|-----|
-| **0b · Pipeline doer/checker réel** | Vrais critiques (fiches sonnet-4-6) + boucle évaluateur-optimiseur bornée + reality checker réel + chaînage de prompts | `phase/9b-pipeline` *(existe, part de `main`@`ce04cf9`)* | DRAFT |
+| **0b · Pipeline doer/checker réel** | **Déjà construit en local (Checker PASS, 4/4 checks verts)** — reste à **finaliser** : push + PR DRAFT + **Sonar (check 5)** | `phase/9b-pipeline` *(existe, 12 commits au-dessus de `main`@`ce04cf9`)* | DRAFT |
 | **A · Auto-audit & durcissement 0a/0b** | Vérifier que les critères de sortie 0a tiennent **au runtime** ; solder la dette (27 `S5906`) ; corriger toute dérive trouvée | `phase/9-audit-0a0b` *(part du tip 0b)* | DRAFT |
 | **0c · Roster Tier A au meilleur niveau** | Agent **évaluateur** promu en Tier A + câblé dans la boucle 0b ; **planner / orchestrateur séparés** ; `AGENTS.md` réconcilié | `phase/9c-roster` *(part du tip A)* | DRAFT |
 | **0d · Exploitation de l'arsenal (le cerveau qui agit)** | Skill Router **interroge QMD** ; sélection d'agents **consulte l'arsenal** ; **cerveau MCP consommé** comme outil ; **golden set d'éval arsenal** | `phase/9d-arsenal-exploitation` *(part du tip 0c)* | DRAFT |
 
 Pile à merger **dans l'ordre** à la fin (comme #35→#36) : 0b → A → 0c → 0d. Chaque branche part du tip de la précédente, donc chaque PR ne montre que **son** diff.
+
+> **État de départ (vérifié 2026-06-24) — 0b est déjà construit.** Une session précédente a livré les 12 commits 0b sur `phase/9b-pipeline` : `reviewers.ts` (vrais critiques + `parseVerdict`), boucle évaluateur-optimiseur bornée, reality checker déterministe, chaînage de prompts, sec-reviewer plan-time, + tests (`reviewers`/`dispatch-eval-loop`/`dispatch-chaining`/`mock-llm-verdict`) + `build-report.md` + `checker-verdict.md` = **Checker PASS, 3 findings LOW/INFO non bloquants**. Les **4 checks locaux sont verts** (501 tests, lint/build exit 0, smoke 32). **Seul le check 5 (Sonar) manque** — la branche n'est ni poussée ni PR. Donc la **Vague 0b se réduit à : push → PR DRAFT → Sonar exit 0** (et re-jouer les 4 checks pour confirmer zéro régression). On ne reconstruit pas.
 
 ## 3. La méthode multi-agents (le cycle appliqué à CHAQUE vague)
 
@@ -54,8 +56,8 @@ C'est ici que « plein d'agents travaillent, checkent le travail, checkent le gl
 
 ## 5. Spécifications par vague (coutures exactes — point de départ des Planners)
 
-### Vague 0b — déjà entièrement préparée
-Exécuter le pack existant : `docs/learning/2026-06-24-0b-preflight/LAUNCH.md` (amorce à froid), `build-prompt.md` (Doer ① / Checker ② / orchestrateur ③), `plan.md` (spec complète). Branche `phase/9b-pipeline` (déjà créée, `git checkout`, ne pas recréer).
+### Vague 0b — déjà CONSTRUITE → seulement finaliser
+Le code 0b est livré sur `phase/9b-pipeline` (12 commits, Checker **PASS**, 4/4 checks locaux verts — cf. `docs/learning/2026-06-24-0b/{build-report,checker-verdict}.md`). **Ne pas reconstruire.** Reste : `git checkout phase/9b-pipeline`, re-jouer les 4 checks locaux (confirmer zéro régression), **push**, ouvrir la **PR DRAFT**, puis **Sonar** (`scripts/sonar-pr-issues.sh <pr>` exit 0 + gate OK) — corriger jusqu'à propre. Findings résiduels du Checker (3, LOW/INFO) à garder en tête, aucun bloquant. Le pack de référence reste `docs/learning/2026-06-24-0b-preflight/` si une reprise du code est nécessaire.
 
 ### Vague A — auto-audit & durcissement 0a/0b
 - **Re-tester les critères de sortie 0a *au runtime*** (pas juste « ça compile ») : requête sémantique → bon doc savoir ; requête arsenal → bon skill/agent froid ; mémoire projet par pertinence ; **fallback FTS** si QMD coupé ; **appel `query` MCP hors worker répond**. Noter honnêtement ce qui était « infra seulement » (l'audit a déjà repéré que le **MCP est exposé mais non consommé** — c'est attendu, **0d le consomme**).
@@ -99,7 +101,7 @@ Raison : ces trois-là, faits vite pour « tout caser », saboteraient le princi
 > **Méthode par vague** (applique-la à chaque vague) : (1) **Planner** sous-agent → `plan.md` de vague (TDD red→green, fichiers exacts, critère de sortie binaire) — pour 0b le plan existe déjà (`docs/learning/2026-06-24-0b-preflight/plan.md`) ; (2) **Doer(s)** sous-agents en TDD, **en parallèle sur les fichiers indépendants**, commit par étape ; (3) **auto-vérifie** (rejoue test+lint, grep invariants) ; (4) **Checker** sous-agent lecture seule → `checker-verdict.md` ; (5) **Reviewer transverse** sous-agent (global : ne casse pas les vagues précédentes ; `AGENTS.md` cohérent ; invariants tenus) — **dès 0c, c'est l'agent évaluateur promu qui joue ce rôle** ; (6) **boucle d'amélioration bornée** (`maxWaveIterations` 2-3 + budget) jusqu'à **Checker PASS + Reviewer PASS** ; (7) **porte** : 5 checks + Sonar exit 0 → push + **PR DRAFT** → enchaîne la vague suivante **sans merger**.
 >
 > **Les 4 vagues** (détail + coutures exactes : §5 de `CAMPAIGN.md`) :
-> - **0b** — exécute le pack `docs/learning/2026-06-24-0b-preflight/` (`LAUNCH.md`/`build-prompt.md`/`plan.md`) sur `phase/9b-pipeline`. Vrais critiques (fiches sonnet-4-6), boucle évaluateur-optimiseur bornée, reality checker réel, chaînage de prompts.
+> - **0b** — **déjà construit** sur `phase/9b-pipeline` (Checker PASS, 4/4 checks verts). **Ne reconstruis pas** : `git checkout phase/9b-pipeline`, re-joue les 4 checks locaux, **push + PR DRAFT + Sonar exit 0** (seul le check 5 manque). Pack de référence si reprise : `docs/learning/2026-06-24-0b-preflight/`.
 > - **A** — branche `phase/9-audit-0a0b` (du tip 0b). Re-prouve les **critères de sortie 0a au runtime** (sémantique, arsenal, mémoire projet, **fallback FTS**, **`query` MCP hors worker**), **solde les 27 `S5906`**, self-audit §13 des fondations. Documente honnêtement tout « infra seulement » (le MCP non-consommé est attendu → 0d le consomme).
 > - **0c** — branche `phase/9c-roster` (du tip A). Promeus `agent-evaluator` (library) en **fiche Tier A** câblée dans la boucle 0b ; **sépare** `mission-planner` et une nouvelle fiche `orchestrator` ; réconcilie `AGENTS.md` §3 (6→7, +`quality-controller`) + §7.
 > - **0d** — branche `phase/9d-arsenal-exploitation` (du tip 0c). **Câble le Skill Router pour interroger QMD** (`select.ts` + retriever `mas-arsenal`, union avec le score de tags, Router décideur, **fallback déterministe**) ; sélection d'agents qui **consulte l'arsenal** ; **consomme le cerveau MCP** (outil `query` appelable par les agents) ; **golden set d'éval arsenal** en CI. **Périmètre resserré** : PAS d'ingestion PDF `docs/ressources/`, PAS de passe frontmatter, PAS de console — backlog 0e/Étape 3, à documenter en fin de 0d.
