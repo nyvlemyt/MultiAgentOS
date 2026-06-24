@@ -96,3 +96,14 @@ literals S1192; strict-index guards; `localeCompare`; detached-promise logging).
   diffs only — never applies one, never bypasses a human gate.
 - §8: no `data/memory/` writes (only `data/outputs/` for diffs/artifacts).
 - Time-dependent logic (`loadBlockedWindows`) takes an explicit `now: Date`.
+
+## 7. Finalization (2026-06-24 — campaign Étape 0, orchestrator)
+
+The 0b code was frozen; only the orchestrator's finalization remained (push → DRAFT PR → check 5).
+
+- **Branch pushed**: `phase/9b-pipeline` → `origin`, HEAD **`b4c0538`** (adds only the campaign Action-0 docs commit on top of the 0b code: ROADMAP waves A/0c/0d + ADR 0007 — no source change to the pipeline).
+- **PR**: **#37** (DRAFT) — *"Phase 9·0b — real doer/checker pipeline (evaluator-optimizer + real critics)"*. User merges the stack.
+- **The 5 checks (re-confirmed on HEAD `b4c0538`)**: `pnpm -r test` **501/0 fail** (core 106 · db 15 · skills 28 · memory 87 · agents 114 · web 143 · worker 8) · `pnpm lint` **exit 0** · `pnpm build` **exit 0** · `pnpm --filter @mas/web smoke` **32/32** · **Sonar** `scripts/sonar-pr-issues.sh 37` **exit 0 (0 issues / 0 hotspots)** + `qualitygates/project_status` **OK**. CI run 28085889855 **success**.
+- **Checker verdict**: **PASS** (`checker-verdict.md`), 3 residual findings all LOW/INFO, none blocking — the only one (Sonar not-yet-runnable) is now discharged.
+
+**Wave 0b: DONE** — 5 checks green + Checker PASS. Merge-ready pending human approval; do not merge before the stack (A/0c/0d) lands.
