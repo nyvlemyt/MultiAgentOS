@@ -56,7 +56,7 @@ describe('writeFiche', () => {
     await writeFiche(getDb(), AGENT, 'v2', 'frontmatter tweak', { roots: [root] });
     expect(readFileSync(join(root, `${AGENT}.md`), 'utf-8')).toBe('v2');
     const revs = await listFicheRevisions(getDb(), AGENT);
-    expect(revs.length).toBe(1);
+    expect(revs).toHaveLength(1);
     expect(revs[0]!.content).toBe('v1');
     expect(revs[0]!.summary).toBe('frontmatter tweak');
   });
@@ -64,7 +64,7 @@ describe('writeFiche', () => {
   it('does not snapshot when there is no prior file', async () => {
     await writeFiche(getDb(), AGENT, 'first', 'create', { roots: [root] });
     expect(readFileSync(join(root, `${AGENT}.md`), 'utf-8')).toBe('first');
-    expect((await listFicheRevisions(getDb(), AGENT)).length).toBe(0);
+    expect(await listFicheRevisions(getDb(), AGENT)).toHaveLength(0);
   });
 });
 
@@ -99,7 +99,7 @@ describe('pruneFicheRevisions', () => {
     await seedRevisions([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 40, 50], now);
     const deleted = await pruneFicheRevisions(getDb(), AGENT, new Date(now));
     const remaining = await listFicheRevisions(getDb(), AGENT);
-    expect(remaining.length).toBe(10);
+    expect(remaining).toHaveLength(10);
     expect(remaining.every((r) => now - r.savedAt.getTime() <= 30 * DAY)).toBe(true);
     expect(deleted).toBe(4);
   });

@@ -36,27 +36,27 @@ describe('conversations (multi-thread)', () => {
     const a = await ensureConversation(getDb(), 'manager');
     const b = await ensureConversation(getDb(), 'manager');
     expect(a.id).toBe(b.id);
-    expect((await listConversations(getDb(), 'manager')).length).toBe(1);
+    expect(await listConversations(getDb(), 'manager')).toHaveLength(1);
   });
 
   it('supports several manager threads, newest first', async () => {
     await createConversation(getDb(), 'manager', null, null, new Date(1000));
     const second = await createConversation(getDb(), 'manager', null, null, new Date(2000));
     const threads = await listConversations(getDb(), 'manager');
-    expect(threads.length).toBe(2);
+    expect(threads).toHaveLength(2);
     expect(threads[0]!.id).toBe(second.id);
   });
 
   it('scopes agent threads per (project, agent)', async () => {
     const conv = await createConversation(getDb(), 'agent', 'p1', 'mission-planner');
     expect((await listConversations(getDb(), 'agent', 'p1', 'mission-planner'))[0]!.id).toBe(conv.id);
-    expect((await listConversations(getDb(), 'agent', 'p1', 'other')).length).toBe(0);
+    expect(await listConversations(getDb(), 'agent', 'p1', 'other')).toHaveLength(0);
   });
 
   it('scopes mission threads per (project, mission)', async () => {
     const conv = await createConversation(getDb(), 'mission', 'p1', null, new Date(), 'm1');
     expect((await listConversations(getDb(), 'mission', 'p1', null, 'm1'))[0]!.id).toBe(conv.id);
-    expect((await listConversations(getDb(), 'mission', 'p1', null, 'm2')).length).toBe(0);
+    expect(await listConversations(getDb(), 'mission', 'p1', null, 'm2')).toHaveLength(0);
   });
 
   it('ensureConversation seeds a mission thread then returns the same one', async () => {

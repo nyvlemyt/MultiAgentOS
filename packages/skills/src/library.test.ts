@@ -67,7 +67,7 @@ describe('buildLibraryIndex + loadLibraryIndex round-trip', () => {
   it('loadLibraryIndex reads the file back to the same metas (cheap runtime path)', () => {
     const loaded = loadLibraryIndex(REPO_ROOT);
     const scanned = scanLibrarySkills(REPO_ROOT);
-    expect(loaded.length).toBe(scanned.length);
+    expect(loaded).toHaveLength(scanned.length);
     const taste = loaded.find((m) => m.id === 'taste');
     expect(taste!.domain).toBe('research');
     expect(taste!.summary.length).toBeGreaterThan(0);
