@@ -55,6 +55,21 @@ const PERMISSION_SUBKEYS = ['fs_write', 'shell', 'network'] as const;
  * Validate a parsed fiche's frontmatter against the §2 schema. Returns the list
  * of missing/empty mandatory keys (empty array ⇒ valid). Does not throw.
  */
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return v !== null && typeof v === 'object' && !Array.isArray(v);
+}
+
+// A permission value is usable by the §5 gate only when it is 'scoped'-style
+// string or a boolean. Returns the qualified keys (`permissions.<sub>`) that are
+// missing or mistyped; empty when `permissions` is absent (the OBJECT_KEYS pass
+// already flags that) or fully typed.
+function permissionSubkeyErrors(perms: unknown): string[] {
+  if (!isPlainObject(perms)) return [];
+  return PERMISSION_SUBKEYS.filter(
+    (sub) => typeof perms[sub] !== 'string' && typeof perms[sub] !== 'boolean',
+  ).map((sub) => `permissions.${sub}`);
+}
+
 export function validateFiche(data: Record<string, unknown>): string[] {
   const missing: string[] = [];
   for (const key of STRING_KEYS) {
@@ -66,16 +81,9 @@ export function validateFiche(data: Record<string, unknown>): string[] {
     if (!Array.isArray(v) || v.length === 0) missing.push(key);
   }
   for (const key of OBJECT_KEYS) {
-    const v = data[key];
-    if (v === null || typeof v !== 'object' || Array.isArray(v)) missing.push(key);
+    if (!isPlainObject(data[key])) missing.push(key);
   }
-  const perms = data.permissions;
-  if (perms !== null && typeof perms === 'object' && !Array.isArray(perms)) {
-    for (const sub of PERMISSION_SUBKEYS) {
-      const pv = (perms as Record<string, unknown>)[sub];
-      if (typeof pv !== 'string' && typeof pv !== 'boolean') missing.push(`permissions.${sub}`);
-    }
-  }
+  missing.push(...permissionSubkeyErrors(data.permissions));
   return missing;
 }
 
