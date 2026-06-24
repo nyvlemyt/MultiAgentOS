@@ -45,6 +45,11 @@ const ARRAY_KEYS = [
   'escalate_when',
 ] as const;
 const OBJECT_KEYS = ['permissions', 'budget'] as const;
+// `permissions` must carry these three sub-keys — the §5 risk gate reads them to
+// decide what an agent may do. A typing-clean fiche can still ship a permissions
+// object that silently omits one (U3 hardening, Phase 9 · 0c). Each must be
+// string ('scoped') or boolean.
+const PERMISSION_SUBKEYS = ['fs_write', 'shell', 'network'] as const;
 
 /**
  * Validate a parsed fiche's frontmatter against the §2 schema. Returns the list
@@ -63,6 +68,13 @@ export function validateFiche(data: Record<string, unknown>): string[] {
   for (const key of OBJECT_KEYS) {
     const v = data[key];
     if (v === null || typeof v !== 'object' || Array.isArray(v)) missing.push(key);
+  }
+  const perms = data.permissions;
+  if (perms !== null && typeof perms === 'object' && !Array.isArray(perms)) {
+    for (const sub of PERMISSION_SUBKEYS) {
+      const pv = (perms as Record<string, unknown>)[sub];
+      if (typeof pv !== 'string' && typeof pv !== 'boolean') missing.push(`permissions.${sub}`);
+    }
   }
   return missing;
 }

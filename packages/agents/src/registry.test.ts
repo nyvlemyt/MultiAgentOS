@@ -58,6 +58,18 @@ describe('validateFiche (Phase 9 · 0c, finding U3)', () => {
     expect(errs).toContain('permissions');
     expect(errs).toContain('role');
   });
+
+  it('flags a permissions object missing or mistyping a sub-key (0c hardening)', () => {
+    // A permissions object that is present but omits a §5-gating sub-key.
+    const missingSub = completeFiche();
+    missingSub.permissions = { fs_write: false, shell: false }; // network omitted
+    expect(validateFiche(missingSub)).toContain('permissions.network');
+
+    // A sub-key present but not string|boolean is equally unusable by the gate.
+    const mistyped = completeFiche();
+    mistyped.permissions = { fs_write: false, shell: false, network: 3 };
+    expect(validateFiche(mistyped)).toContain('permissions.network');
+  });
 });
 
 describe('loadTierAFiches', () => {
