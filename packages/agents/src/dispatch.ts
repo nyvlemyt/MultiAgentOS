@@ -15,9 +15,6 @@ import {
 } from '@mas/db';
 import {
   mockMissionPlanner,
-  mockReviewer,
-  mockSecReviewer,
-  mockQualityController,
   classifyRisk,
   languageDirective,
   claudeCodeLLM,
@@ -51,6 +48,7 @@ import {
 } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
+import { realReviewer, realSecReviewer, realQualityController } from './reviewers';
 import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
 
 export type Db = ReturnType<typeof getDb>;
@@ -345,6 +343,47 @@ export async function archiveMission(missionId: string) {
   return { ...m, status: 'archived' as const };
 }
 
+// Max chars of producer output persisted/injected for prompt chaining (plan §2.9)
+// — bounds context growth (token discipline §6). Hoisted (S1192).
+const LAST_MESSAGE_MAX = 2000;
+
+// Build a mission-scoped LLM client with the standard router/window plumbing,
+// shared by the executor and the review phase so the seam (MAS_MOCK_LLM / vi.mock)
+// behaves identically everywhere. Time-dependent (loadBlockedWindows) → explicit now.
+async function buildMissionLLM(
+  db: Db,
+  missionId: string,
+  taskId: string | undefined,
+  proj: ExecProject | undefined,
+  now: Date,
+): Promise<LLMClient> {
+  const initialBlocked = await loadBlockedWindows(db, now);
+  return selectLLM({
+    cwd: proj?.path ?? undefined,
+    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
+    sessionId: proj?.sessionId ?? undefined,
+    onRouterEvent: (evt) =>
+      logEventDetached(db, { missionId, taskId, type: 'provider_fallback', payload: evt }),
+    initialBlocked,
+    onBlock: (source, at) =>
+      logEventDetached(db, { missionId, taskId, type: 'window_blocked', payload: { source, blockedAt: at } }),
+  });
+}
+
+// Read a finished task's producer output (the `last_message`) from its task_done
+// event payload — prompt chaining (plan §2.9), no schema migration. Newest first.
+async function lastMessageFor(db: Db, taskId: string): Promise<string> {
+  const [row] = await db
+    .select({ payloadJson: events.payloadJson })
+    .from(events)
+    .where(and(eq(events.taskId, taskId), eq(events.type, 'task_done')))
+    .orderBy(desc(events.createdAt))
+    .limit(1);
+  if (!row) return '';
+  const payload = JSON.parse(row.payloadJson) as { lastMessage?: string };
+  return payload.lastMessage ?? '';
+}
+
 async function selectRunnableTasks(db: Db, missionId: string): Promise<Task[]> {
   const all = await db.select().from(tasks).where(eq(tasks.missionId, missionId));
   const doneIds = new Set(all.filter((t) => t.status === 'done').map((t) => t.id));
@@ -371,10 +410,29 @@ async function runReviewPhase(
   // Deterministic "last task": sort by createdAt (mirrors selectRunnableTasks).
   const lastTask = [...all].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).at(-1);
 
+  // Real critics need an LLMClient. Same seam as the executor: MAS_MOCK_LLM=1 or
+  // a vi.mock'd claudeCodeLLM yields a deterministic, parseable verdict — CI never
+  // hits a live model. The §5 risk gate already fired during execution; this phase
+  // only judges the finished artifacts.
+  const [proj] = await db
+    .select({
+      id: projects.id,
+      path: projects.path,
+      autonomy: projects.autonomy,
+      sessionId: projects.sessionId,
+      defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode,
+      language: projects.language,
+    })
+    .from(projects)
+    .innerJoin(missions, eq(missions.projectId, projects.id))
+    .where(eq(missions.id, m.id));
+  const llm = await buildMissionLLM(db, m.id, lastTask?.id, proj, new Date());
+
   // Quality Controller gate (AGENTS.md §4): runs BEFORE the reviewer. It checks
   // PROCESS/RULES (conventions, no-PAYG drift, architecture, output language),
   // not the CODE. A QC BLOCK blocks the mission and short-circuits the reviewer.
-  const qc = mockQualityController(lastTask?.id ?? m.id, { taskTitles: all.map((t) => t.title) });
+  const qc = await realQualityController(llm, { taskId: lastTask?.id ?? m.id, taskTitles: all.map((t) => t.title) });
   await logEvent(db, { missionId: m.id, taskId: lastTask?.id, agentId: 'quality-controller', type: 'quality_control_verdict', payload: qc });
 
   // A QC BLOCK short-circuits the sec/reviewer stage; otherwise run sec-reviewer
@@ -384,13 +442,17 @@ async function runReviewPhase(
   if (qc.verdict !== 'BLOCK') {
     for (const t of all) {
       if (t.risk === 'high' || t.risk === 'blocking') {
-        const sec = mockSecReviewer(t.id, { risk: t.risk });
+        const sec = await realSecReviewer(llm, { taskId: t.id, risk: t.risk, brief: { title: t.title, description: t.description } });
         await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
         verdicts.push(sec);
       }
     }
     if (lastTask) {
-      const rev = mockReviewer(lastTask.id, { risk: lastTask.risk });
+      const rev = await realReviewer(llm, {
+        taskId: lastTask.id,
+        brief: { title: lastTask.title, description: lastTask.description },
+        lastMessage: await lastMessageFor(db, lastTask.id),
+      });
       await logEvent(db, { missionId: m.id, taskId: lastTask.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
       verdicts.push(rev);
     }
@@ -493,7 +555,9 @@ async function persistTaskDone(
     cacheCreation: resp.cacheCreationTokens,
     quotaUnits: resp.quotaUnits,
     risk: next.risk,
-    payload: { title: next.title, sessionId: resp.sessionId, provider: resp.provider, ...extraPayload },
+    // lastMessage = the producer's output, truncated (§6 token discipline). Read
+    // back by downstream tasks (prompt chaining, plan §2.9) and the reviewer.
+    payload: { title: next.title, sessionId: resp.sessionId, provider: resp.provider, lastMessage: resp.text.slice(0, LAST_MESSAGE_MAX), ...extraPayload },
   });
 
   return { kind: 'task_done', taskId: next.id };
