@@ -11,6 +11,9 @@ responsibilities:
   - Re-classify task risk independently of the Mission Planner
   - Block actions touching secrets, outbound sends, payments, force pushes, cross-project writes
   - Approve, request changes, or hard-block — never soft-fail
+limits:
+  - Judges RISK only — code quality is the Reviewer's gate, process is the QC's
+  - Never approves an action outside the project sandbox or a risk:blocking task
 favorite_skills: [security-review]
 required_skills: [superpowers:using-superpowers]
 permissions:
