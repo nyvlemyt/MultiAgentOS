@@ -47,6 +47,7 @@ const FICHE_FALLBACK: Record<string, string> = {
   reviewer: 'You are the Code Reviewer. Validate the change against the task brief; flag missing tests; reject if any task is missing its definition of done.',
   'sec-reviewer': 'You are the Security Reviewer. Default to NEEDS_CHANGES; evidence required for PASS. Block actions touching secrets, outbound sends, payments, force pushes, or cross-project writes.',
   'quality-controller': 'You are the Quality Controller. Check PROCESS and RULES (conventions, architecture, no-PAYG drift, output language) — not the code. BLOCK only on a concrete process/rule breach.',
+  'agent-evaluator': 'You are the Agent Evaluator (agent-as-judge, RES-043). Score the deliverable on Accuracy, Completeness, Clarity, Actionability, Conciseness with cited evidence; never re-perform the task. Verdict: deliver (PASS) | fix (NEEDS_WORK) | redo (BLOCK).',
 };
 
 function loadFiche(id: keyof typeof FICHE_FALLBACK): string {
@@ -179,6 +180,28 @@ export async function realQualityController(llm: LLMClient, input: QualityContro
     ficheId: 'quality-controller',
     reviewKind: 'qc',
     userPrompt: `## Task titles to audit for process/rules drift\n${bulletList(input.taskTitles)}`,
+  });
+}
+
+export interface EvaluatorInput {
+  taskId: string;
+  brief: CriticBrief;
+  lastMessage?: string;
+}
+
+/**
+ * Agent Evaluator (Phase 9 · 0c, RES-043 agent-as-judge). The transverse rubric
+ * judge of the mission output — DISTINCT from the QC/Reviewer/Sec gates: it scores
+ * the deliverable (deliver/fix/redo, mapped onto PASS/NEEDS_WORK/BLOCK) and is
+ * advisory (the caller logs it; it does not flip the mission to blocked). A producer
+ * never validates its own output — this is a separate critic instance.
+ */
+export async function realAgentEvaluator(llm: LLMClient, input: EvaluatorInput): Promise<ReviewerVerdict> {
+  return runCritic(llm, {
+    taskId: input.taskId,
+    ficheId: 'agent-evaluator',
+    reviewKind: 'evaluator',
+    userPrompt: briefBlock(input.brief, input.lastMessage),
   });
 }
 

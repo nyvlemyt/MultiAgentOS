@@ -26,6 +26,13 @@ describe('mockVerdictText (Phase 9 · 0b determinism seam)', () => {
     expect(text).toContain('NEEDS_WORK');
     expect(text).toContain('review');
   });
+
+  it('embeds the agent-eval label for the evaluator kind (Phase 9 · 0c)', () => {
+    const pass = mockVerdictText('evaluator', 'Task: ship\n\ndelivered');
+    expect(pass).toContain('PASS');
+    expect(pass).toContain('agent-eval');
+    expect(mockVerdictText('evaluator', '[needs-work] thin on evidence')).toContain('NEEDS_WORK');
+  });
 });
 
 describe('mockLLM review-awareness', () => {

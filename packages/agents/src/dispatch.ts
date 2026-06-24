@@ -48,7 +48,7 @@ import {
 } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
-import { realReviewer, realSecReviewer, realQualityController } from './reviewers';
+import { realReviewer, realSecReviewer, realQualityController, realAgentEvaluator } from './reviewers';
 import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
 
 export type Db = ReturnType<typeof getDb>;
@@ -484,13 +484,31 @@ async function runReviewPhase(
       }
     }
     if (lastTask) {
+      const lastMessage = await lastMessageFor(db, lastTask.id);
       const rev = await realReviewer(llm, {
         taskId: lastTask.id,
         brief: { title: lastTask.title, description: lastTask.description },
-        lastMessage: await lastMessageFor(db, lastTask.id),
+        lastMessage,
       });
       await logEvent(db, { missionId: m.id, taskId: lastTask.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
       verdicts.push(rev);
+
+      // Agent Evaluator (Phase 9 · 0c, RES-043 agent-as-judge): the transverse
+      // rubric judge — runs AFTER the gates and is ADVISORY (logged, never blocks).
+      // It scores the deliverable (deliver/fix/redo) so the autopilot/daily report
+      // surfaces output quality without changing the §5 gate semantics. Best-effort
+      // (like the close-out ritual below): an advisory score must never stall a
+      // mission at `review` — e.g. a stale DB missing the agent-evaluator row.
+      try {
+        const evaluation = await realAgentEvaluator(llm, {
+          taskId: lastTask.id,
+          brief: { title: lastTask.title, description: lastTask.description },
+          lastMessage,
+        });
+        await logEvent(db, { missionId: m.id, taskId: lastTask.id, agentId: 'agent-evaluator', type: 'agent_evaluation', payload: evaluation });
+      } catch (e) {
+        await logEvent(db, { missionId: m.id, taskId: lastTask.id, type: 'agent_evaluation_error', payload: { message: String(e) } });
+      }
     }
     blockReason = 'review_block';
   }
