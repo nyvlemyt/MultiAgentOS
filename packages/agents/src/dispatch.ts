@@ -410,11 +410,12 @@ async function upstreamResults(db: Db, next: Task): Promise<string> {
   const depIds = JSON.parse(next.dependsOnJson) as string[];
   if (depIds.length === 0) return '';
   const deps = await db.select({ id: tasks.id, title: tasks.title }).from(tasks).where(inArray(tasks.id, depIds));
-  const titleById = new Map(deps.map((d) => [d.id, d.title]));
+  const titleById = new Map<string, string>(deps.map((d) => [d.id, d.title]));
   const lines: string[] = [];
   for (const id of depIds) {
     const msg = await lastMessageFor(db, id);
-    if (msg) lines.push(`${titleById.get(id) ?? id}: ${msg}`);
+    const title = titleById.get(id) ?? id;
+    if (msg) lines.push(`${title}: ${msg}`);
   }
   return lines.length > 0 ? `### Upstream results:\n${lines.join('\n')}` : '';
 }
@@ -614,16 +615,21 @@ interface DelegationContext {
 // verdicts, log the result. The Reality Checker derives evidence from the diff +
 // producer output (plan §2.5) — never auto-approves an unsubstantiated diff
 // (CLAUDE.md §11.bis r4).
+interface GateArgs {
+  db: Db;
+  m: Mission;
+  next: Task;
+  repoDir: string;
+  diff: string;
+  fiche: string;
+  llm: LLMClient;
+  lastMessage: string;
+}
+
 async function gateProducedDiff(
-  db: Db,
-  m: Mission,
-  next: Task,
-  repoDir: string,
-  diff: string,
-  fiche: string,
-  llm: LLMClient,
-  lastMessage: string,
+  args: GateArgs,
 ): Promise<{ outputPath: string; review: ReviewGateResult }> {
+  const { db, m, next, repoDir, diff, fiche, llm, lastMessage } = args;
   const patchPath = `${OUTPUTS_DIR}/${next.id}.patch`;
   const absDir = resolve(repoRootDir(), OUTPUTS_DIR);
   mkdirSync(absDir, { recursive: true });
@@ -713,7 +719,7 @@ async function runDelegatedTask(
   let spentTokens = outcome.response.inputTokens + outcome.response.outputTokens;
 
   if (outcome.diff && proj?.path) {
-    const gated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche, llm, outcome.response.text);
+    const gated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
     outputPath = gated.outputPath;
     review = gated.review;
 
@@ -728,7 +734,7 @@ async function runDelegatedTask(
       spentTokens += outcome.response.inputTokens + outcome.response.outputTokens;
 
       if (!outcome.diff) break; // producer stopped emitting a diff — keep prior gate
-      const reGated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche, llm, outcome.response.text);
+      const reGated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
       outputPath = reGated.outputPath;
       review = reGated.review;
       await logEvent(db, {

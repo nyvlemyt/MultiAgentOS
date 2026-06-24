@@ -60,11 +60,12 @@ function loadFiche(id: keyof typeof FICHE_FALLBACK): string {
   }
 }
 
-// Disjoint quantifiers (S5852): `[^\n]*` (rest of the header line) cannot overlap
-// the single `\n` that follows, and `[ \t]*` (no newline) cannot overlap either —
-// no super-linear backtracking on either side of the newline boundary.
+// Disjoint quantifiers (S5852/S8786): in VERDICT_RE the `[ \t]*` and `[^\n]*` runs
+// are separated by literals; FINDING_RE captures everything after `]` in a single
+// greedy `(.*)` (leading space trimmed in code) so no two adjacent quantifiers can
+// overlap — no super-linear backtracking.
 const VERDICT_RE = /##[ \t]*Verdict[^\n]*\n[ \t]*(PASS|NEEDS_WORK|NEEDS_CHANGES|BLOCK)/i;
-const FINDING_RE = /^-[ \t]*\[(block|warn|info)\][ \t]*([^\n]*)$/gim;
+const FINDING_RE = /^-[ \t]*\[(block|warn|info)\](.*)$/gim;
 
 type Severity = ReviewerVerdict['findings'][number]['severity'];
 
@@ -124,11 +125,17 @@ export interface ReviewerInput {
   priorFindings?: string[];
 }
 
+// Render a list as markdown bullets. Extracted so the call sites avoid nested
+// template literals (S4624).
+function bulletList(items: string[]): string {
+  return items.map((item) => `- ${item}`).join('\n');
+}
+
 function briefBlock(brief: CriticBrief, lastMessage?: string, priorFindings?: string[]): string {
   const parts = [`## Task brief\n${brief.title}\n${brief.description}`];
   if (lastMessage) parts.push(`## Producer output\n${lastMessage}`);
   if (priorFindings && priorFindings.length > 0) {
-    parts.push(`## Reviewer findings to address\n${priorFindings.map((m) => `- ${m}`).join('\n')}`);
+    parts.push(`## Reviewer findings to address\n${bulletList(priorFindings)}`);
   }
   return parts.join('\n\n');
 }
@@ -171,7 +178,7 @@ export async function realQualityController(llm: LLMClient, input: QualityContro
     taskId: input.taskId,
     ficheId: 'quality-controller',
     reviewKind: 'qc',
-    userPrompt: `## Task titles to audit for process/rules drift\n${input.taskTitles.map((t) => `- ${t}`).join('\n')}`,
+    userPrompt: `## Task titles to audit for process/rules drift\n${bulletList(input.taskTitles)}`,
   });
 }
 
