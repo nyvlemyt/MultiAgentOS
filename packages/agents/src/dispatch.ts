@@ -509,9 +509,10 @@ interface DelegationContext {
 }
 
 // Runs the §5 review gate on a produced diff: write it under data/outputs, check
-// it applies + collect Code-Reviewer + Reality-Checker verdicts, log the result.
-// evidence:false keeps the Reality Checker at NEEDS_WORK (advisory, never
-// auto-approves an unsubstantiated diff — CLAUDE.md §11.bis r4).
+// it applies + collect the real Code-Reviewer (LLM) + deterministic Reality-Checker
+// verdicts, log the result. The Reality Checker derives evidence from the diff +
+// producer output (plan §2.5) — never auto-approves an unsubstantiated diff
+// (CLAUDE.md §11.bis r4).
 async function gateProducedDiff(
   db: Db,
   m: Mission,
@@ -519,6 +520,8 @@ async function gateProducedDiff(
   repoDir: string,
   diff: string,
   fiche: string,
+  llm: LLMClient,
+  lastMessage: string,
 ): Promise<{ outputPath: string; review: ReviewGateResult }> {
   const patchPath = `${OUTPUTS_DIR}/${next.id}.patch`;
   const absDir = resolve(repoRootDir(), OUTPUTS_DIR);
@@ -528,7 +531,15 @@ async function gateProducedDiff(
   const patch = diff.endsWith('\n') ? diff : `${diff}\n`;
   writeFileSync(resolve(repoRootDir(), patchPath), patch, 'utf-8');
 
-  const review = await reviewProducedDiff({ taskId: next.id, diff: patch, repoDir, evidence: false });
+  const review = await reviewProducedDiff({
+    taskId: next.id,
+    diff: patch,
+    repoDir,
+    llm,
+    taskBrief: { title: next.title, description: next.description },
+    lastMessage,
+    taskRisk: next.risk,
+  });
   await logEvent(db, {
     missionId: m.id,
     taskId: next.id,
@@ -579,7 +590,7 @@ async function runDelegatedTask(
   let outputPath = `${OUTPUTS_DIR}/${next.id}.md`;
   let review: ReviewGateResult | undefined;
   if (outcome.diff && proj?.path) {
-    const gated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche);
+    const gated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche, llm, outcome.response.text);
     outputPath = gated.outputPath;
     review = gated.review;
   }

@@ -7,9 +7,13 @@ vi.mock('@mas/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@mas/core')>();
   return {
     ...actual,
+    // A critic call (reviewKind set) gets a deterministic, parseable verdict so
+    // CI stays live-model-free; any other call returns the producer diff text.
     claudeCodeLLM: vi.fn(() => ({
-      call: vi.fn(async () => ({
-        text: `Here is the change:\n${DELEGATED_DIFF}`,
+      call: vi.fn(async (req: import('@mas/core').LLMRequest) => ({
+        text: req.reviewKind
+          ? actual.mockVerdictText(req.reviewKind, req.user)
+          : `Here is the change:\n${DELEGATED_DIFF}`,
         inputTokens: 220,
         outputTokens: 80,
         cacheReadTokens: 60,
