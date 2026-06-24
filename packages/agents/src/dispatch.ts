@@ -252,6 +252,21 @@ export async function planMission(missionId: string) {
   // Cache the cold-arsenal router once — don't rebuild the 877-entry index per task.
   const skillRouter = getSkillRouter();
 
+  // Plan-time sec fallback (plan §2.8): consulted only when the rule-based risk
+  // classifier abstains (needsLLMFallback). Built once; under the deterministic
+  // seam this is PASS unless a [sec-block]/risk=blocking sentinel is present, so
+  // the rule-driven risk-classify-wiring test (`rm`) is unaffected. This is the
+  // plan-time risk heuristic, NOT the doer/checker review gate.
+  const [planProj] = await db
+    .select({
+      id: projects.id, path: projects.path, autonomy: projects.autonomy,
+      sessionId: projects.sessionId, defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode, language: projects.language,
+    })
+    .from(projects)
+    .where(eq(projects.id, m.projectId));
+  const planLlm = await buildMissionLLM(db, m.id, undefined, planProj, new Date());
+
   for (const t of plan.tasks) {
     // Real engine (Wave 2): scope by the task's agent, select over the cold
     // arsenal. llm omitted ⇒ deterministic degrade (zero quota spent).
@@ -268,7 +283,11 @@ export async function planMission(missionId: string) {
     const classified = classifyRisk({ title: t.title, description: t.description });
     let finalRisk = stricterRisk(classified.risk, t.risk);
     if (classified.needsLLMFallback) {
-      const sec = mockSecReviewer(t.id, { risk: finalRisk });
+      const sec = await realSecReviewer(planLlm, {
+        taskId: t.id,
+        risk: finalRisk,
+        brief: { title: t.title, description: t.description },
+      });
       if (sec.verdict === 'BLOCK') finalRisk = 'blocking';
     }
 
