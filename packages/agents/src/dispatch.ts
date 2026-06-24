@@ -615,6 +615,23 @@ async function gateProducedDiff(
   return { outputPath: patchPath, review };
 }
 
+// Evaluator-Optimizer (anthropic-ecosystem.md:170): a produced diff that the gate
+// does not approve gets ONE bounded re-attempt cycle. Bounded by both the
+// iteration cap AND the task budget (production-patterns.md:101 circuit breaker) —
+// an unbounded "loop until satisfied" is a KILL criterion (plan §1). Default 2.
+const MAX_REVIEW_ITERATIONS = 2;
+
+// Findings the next producer attempt must address, as a prompt block. Hoisted
+// literal (S1192).
+const FINDINGS_HEADER = '### Reviewer findings to address:';
+function findingsBlock(review: ReviewGateResult): string {
+  const lines = review.verdicts
+    .flatMap((v) => v.findings)
+    .filter((f) => f.severity !== 'info')
+    .map((f) => `- [${f.severity}] ${f.message}`);
+  return lines.length > 0 ? `${FINDINGS_HEADER}\n${lines.join('\n')}` : FINDINGS_HEADER;
+}
+
 async function runDelegatedTask(
   db: Db,
   m: Mission,
@@ -623,24 +640,24 @@ async function runDelegatedTask(
   taskSkillIds: string[],
 ): Promise<{ kind: 'task_done'; taskId: string }> {
   const { proj, llm, skillContext, memCtx, delegation, agentId } = ctx;
+  const baseInput = {
+    agentId,
+    task: { title: next.title, description: next.description },
+    llm,
+    project: { defaultModel: proj?.defaultModel ?? undefined, defaultMode: (proj?.defaultMode ?? undefined) as Mode | undefined },
+    memoryText: memCtx.text,
+    language: proj?.language ?? undefined,
+  };
 
-  // Only the delegate call is fallback-eligible: a fiche-load failure (e.g. the
+  // Only the producer call is fallback-eligible: a fiche-load failure (e.g. the
   // Next bundler where import.meta.url is not a file: URL — same degradation as
   // getSkillRouter/selectLLM) or a failed LLM call falls back to the raw path,
   // which then issues the single bill. Once delegateWithDiff returns, the call is
-  // billed once; the gate + persist below run OUTSIDE the catch so a downstream
-  // throw propagates and never re-bills via runRawTask.
+  // billed; the gate + (bounded) loop + persist below run OUTSIDE the catch so a
+  // downstream throw propagates and never re-bills via runRawTask.
   let outcome: Awaited<ReturnType<typeof delegateWithDiff>>;
   try {
-    outcome = await delegateWithDiff({
-      agentId,
-      task: { title: next.title, description: next.description },
-      llm,
-      project: { defaultModel: proj?.defaultModel ?? undefined, defaultMode: (proj?.defaultMode ?? undefined) as Mode | undefined },
-      skillContext,
-      memoryText: memCtx.text,
-      language: proj?.language ?? undefined,
-    });
+    outcome = await delegateWithDiff({ ...baseInput, skillContext });
   } catch (e) {
     logEventDetached(db, {
       missionId: m.id,
@@ -653,13 +670,47 @@ async function runDelegatedTask(
 
   let outputPath = `${OUTPUTS_DIR}/${next.id}.md`;
   let review: ReviewGateResult | undefined;
+  let spentTokens = outcome.response.inputTokens + outcome.response.outputTokens;
+
   if (outcome.diff && proj?.path) {
     const gated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche, llm, outcome.response.text);
     outputPath = gated.outputPath;
     review = gated.review;
+
+    // Bounded correction loop: re-invoke the producer with the prior findings
+    // injected, re-gate, until approved OR the cap OR the budget is reached.
+    for (let iteration = 1; iteration <= MAX_REVIEW_ITERATIONS && review && !review.approved; iteration++) {
+      const lastSpend = outcome.response.inputTokens + outcome.response.outputTokens;
+      if (spentTokens + lastSpend > (next.budgetTokens ?? Number.MAX_SAFE_INTEGER)) break;
+
+      const retrySkillContext = [skillContext, findingsBlock(review)].filter(Boolean).join('\n\n');
+      outcome = await delegateWithDiff({ ...baseInput, skillContext: retrySkillContext });
+      spentTokens += outcome.response.inputTokens + outcome.response.outputTokens;
+
+      if (!outcome.diff) break; // producer stopped emitting a diff — keep prior gate
+      const reGated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche, llm, outcome.response.text);
+      outputPath = reGated.outputPath;
+      review = reGated.review;
+      await logEvent(db, {
+        missionId: m.id,
+        taskId: next.id,
+        agentId: next.agentId ?? undefined,
+        type: 'review_iteration',
+        risk: next.risk,
+        payload: { iteration, approved: review.approved, verdicts: review.verdicts },
+      });
+    }
   }
 
-  return persistTaskDone(db, m, next, proj, outcome.response, outputPath, {
+  // Single bill: charge the SUM of producer iterations (each bounded). Mirrors the
+  // response shape so persistTaskDone records the real spend, not just the last call.
+  const billedResponse: LLMResponse = {
+    ...outcome.response,
+    inputTokens: spentTokens,
+    outputTokens: 0,
+  };
+
+  return persistTaskDone(db, m, next, proj, billedResponse, outputPath, {
     delegated: true,
     tierBFiche: delegation.fiche,
     reviewApproved: review?.approved ?? null,
