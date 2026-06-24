@@ -32,14 +32,18 @@ afterEach(() => {
   delete process.env.MAS_MOCK_LLM;
 });
 
-async function seed(missionId: string): Promise<void> {
+async function seed(missionId: string, { withEvaluator = true } = {}): Promise<void> {
   const db = getDb();
   await db.insert(projects).values({
     id: PROJECT_ID, name: 'Eval', slug: 'eval', path: '/tmp/eval', type: 'other',
     createdAt: new Date(), lastActiveAt: new Date(),
   });
   // events.agentId FKs to agents.id — seed every agent the review phase logs.
-  for (const id of ['context-manager', 'quality-controller', 'reviewer', 'agent-evaluator']) {
+  // Omitting agent-evaluator simulates a stale DB so the advisory log's FK insert
+  // fails and the dispatch catch-branch (dispatch.ts:509-511) fires instead.
+  const agentIds = ['context-manager', 'quality-controller', 'reviewer'];
+  if (withEvaluator) agentIds.push('agent-evaluator');
+  for (const id of agentIds) {
     await db.insert(agents).values({
       id, tier: 'A', fichePath: `f/${id}.md`, name: id, model: 'claude-haiku-4-5',
       enabled: true, totalRuns: 0, totalTokens: 0, successRate: 1,
@@ -82,6 +86,34 @@ describe('runReviewPhase — Agent Evaluator wiring (Phase 9 · 0c, RES-043)', (
     expect(['PASS', 'NEEDS_WORK', 'BLOCK']).toContain(verdict.verdict);
 
     // Advisory: the evaluator does NOT block — a clean mission still validates.
+    const [m] = await db.select().from(missions).where(eq(missions.id, MID));
+    expect(m?.status).toBe('validated');
+  });
+
+  it('falls back to agent_evaluation_error and still validates when the agent-evaluator row is absent', async () => {
+    const MID = 'mid_eval_missing';
+    await seed(MID, { withEvaluator: false });
+    await runMission(MID);
+
+    expect((await executeNextTask(MID)).kind).toBe('task_done');
+    expect((await executeNextTask(MID)).kind).toBe('mission_complete');
+
+    const db = getDb();
+    // The advisory log's FK insert fails → the catch-branch fires an error event.
+    const errs = await db
+      .select()
+      .from(events)
+      .where(and(eq(events.missionId, MID), eq(events.type, 'agent_evaluation_error')));
+    expect(errs).toHaveLength(1);
+
+    // No successful agent_evaluation event was written.
+    const ok = await db
+      .select()
+      .from(events)
+      .where(and(eq(events.missionId, MID), eq(events.type, 'agent_evaluation')));
+    expect(ok).toHaveLength(0);
+
+    // Best-effort: a missing evaluator row must NOT stall the mission at review.
     const [m] = await db.select().from(missions).where(eq(missions.id, MID));
     expect(m?.status).toBe('validated');
   });
