@@ -100,6 +100,9 @@ spec-kit, taste-skill, impeccable, superpowers, build-your-own-x, awesome-design
 - [`self-audit-memoire-reaudit-debt.md`](self-audit-memoire-reaudit-debt.md) — **dette du cycle mémoire (2026-06-06)** : re-vérifier les stats ère-MCP de 044/034/045 (friction « n°9/10 », risque « 40 % Gartner ») + harmoniser les modèles de registres RES-013↔029 (nommage BDR). **Au pré-vol Phase 4, pas de sous-cycle dédié.**
 - [`continuous-learning-hooks.md`](continuous-learning-hooks.md) — **pont §13 ⇄ P4 (2026-06-21)** : cycle d'apprentissage continu (SessionStart inject borné / PreCompact+SessionEnd → MemoryProposal / observer → score → promote mémoire puis skill froid). Versant runtime du pont de persistance. Candidats MCP : longhand/squish/omega-memory. **Candidat ADR P4.**
 - [`cockpit-mcp-surface.md`](cockpit-mcp-surface.md) — **surface MCP du cockpit (2026-06-21)** : MCP opt-in par projet + règle connecteur 2-branches (universel+stateful) + défauts <10 ; découverte ≠ install ; onglet MCP de l'Arsenal console. Doctrine pour §11.bis. **Distillé, application P4/produit.**
+- [`test-coverage-measurement-gap.md`](test-coverage-measurement-gap.md) — **0d scan (2026-06-25)** : `@vitest/coverage-v8` absent partout → seuil §7 ≥80 % jamais mesuré ni vérifié en CI (`COV-1`) ; `@mas/db` largement sous le seuil (`COV-2`). **Gap de gouvernance, pas de défaut runtime.**
+- [`allowed-hosts-runtime-gate.md`](allowed-hosts-runtime-gate.md) — **0d scan (2026-06-25)** : `allowed_hosts` (§5) déclaré mais jamais lu au runtime (`S5-2`) — même classe que le bug perms câblé en #44. Inerte aujourd'hui, à brancher avec le 1er agent-domaine sortant. **Sécurité, MED.**
+- [`function-length-debt.md`](function-length-debt.md) — **0d scan (2026-06-25)** : 4 fonctions > cap §7 50 lignes (`F-FN-1..4`, dont `planMission` 138). Le sibling fichier `F-SIZE-1` (dispatch.ts) est **déjà résolu** par #42. **Dette lisibilité, aucune sur chemin chaud.**
 
 ## Principe (rappel)
 
