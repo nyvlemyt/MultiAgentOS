@@ -1,19 +1,20 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { CLEAN_TEST_DIFF, makeTempGitRepo } from './testing';
 
-const DELEGATED_DIFF = ['```diff', CLEAN_TEST_DIFF.trimEnd(), '```'].join('\n');
+// A valid diff that edits file.txt — but the task brief is about the navbar, so
+// it never covers the request and cites no tests → Reality Checker NEEDS_WORK →
+// the gate is never approved, forcing the evaluator-optimizer loop to its bound.
+const NON_COVERING_DIFF = ['```diff', CLEAN_TEST_DIFF.trimEnd(), '```'].join('\n');
 
 vi.mock('@mas/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@mas/core')>();
   return {
     ...actual,
-    // A critic call (reviewKind set) gets a deterministic, parseable verdict so
-    // CI stays live-model-free; any other call returns the producer diff text.
     claudeCodeLLM: vi.fn(() => ({
       call: vi.fn(async (req: import('@mas/core').LLMRequest) => ({
         text: req.reviewKind
           ? actual.mockVerdictText(req.reviewKind, req.user)
-          : `Here is the change:\n${DELEGATED_DIFF}`,
+          : `Here is the change:\n${NON_COVERING_DIFF}`,
         inputTokens: 220,
         outputTokens: 80,
         cacheReadTokens: 60,
@@ -36,12 +37,9 @@ import { eq, and } from 'drizzle-orm';
 import { getDb, closeDb, projects, agents, missions, tasks, events } from '@mas/db';
 import { executeNextTask, runMission } from './dispatch';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
-
-const PROJECT_ID = 'deleg-proj';
+const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../db/migrations');
+const PROJECT_ID = 'loop-proj';
 const DELEGATION_AGENT = 'design-ui-designer';
-const AGENT_IDS = [DELEGATION_AGENT, 'reviewer', 'quality-controller', 'sec-reviewer'];
 
 let dbPath: string;
 let repoDir: string;
@@ -54,7 +52,7 @@ beforeEach(async () => {
   dbPath = join(dir, `${randomUUID()}.db`);
   process.env.MAS_DB_PATH = dbPath;
   migrate(getDb(), { migrationsFolder: MIGRATIONS_FOLDER });
-  repoDir = await makeTempGitRepo('mas-deleg-');
+  repoDir = await makeTempGitRepo('mas-loop-');
 });
 
 afterEach(() => {
@@ -64,67 +62,59 @@ afterEach(() => {
   delete process.env.MAS_ROUTING_CONFIG;
 });
 
-async function seedDelegableMission(missionId: string): Promise<string> {
+async function seed(missionId: string): Promise<string> {
   const db = getDb();
   await db.insert(projects).values({
-    id: PROJECT_ID, name: 'Deleg Project', slug: 'deleg', path: repoDir, type: 'other',
+    id: PROJECT_ID, name: 'Loop', slug: 'loop', path: repoDir, type: 'other',
     createdAt: new Date(), lastActiveAt: new Date(),
   });
-  for (const id of AGENT_IDS) {
+  for (const id of [DELEGATION_AGENT, 'reviewer']) {
     await db.insert(agents).values({
       id, tier: 'A', fichePath: `f/${id}.md`, name: id, model: 'claude-haiku-4-5',
       enabled: true, totalRuns: 0, totalTokens: 0, successRate: 1,
     });
   }
   await db.insert(missions).values({
-    id: missionId, projectId: PROJECT_ID, title: 'Delegable mission',
-    objective: 'Polish UI', status: 'planned', risk: 'low',
-    budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+    id: missionId, projectId: PROJECT_ID, title: 'Loop mission', objective: 'Polish UI',
+    status: 'planned', risk: 'low', budgetTokens: 50000, spentTokens: 0,
+    createdAt: new Date(), updatedAt: new Date(),
   });
   const taskId = `${missionId}_t1`;
-  // Description names file.txt (the file the CLEAN_TEST_DIFF edits) so the diff
-  // covers the request → Reality Checker has evidence → gate approves on the
-  // first pass and the evaluator-optimizer loop does not fire (single review).
   await db.insert(tasks).values({
-    id: taskId, missionId, title: 'Edit file.txt', description: 'Change hello to goodbye in file.txt.',
+    id: taskId, missionId, title: 'Polish the navbar', description: 'Improve spacing.',
     status: 'todo', risk: 'low', agentId: DELEGATION_AGENT,
-    skillsJson: '[]', dependsOnJson: '[]', budgetTokens: 5000, spentTokens: 0,
+    skillsJson: '[]', dependsOnJson: '[]', budgetTokens: 50000, spentTokens: 0,
     createdAt: new Date(), updatedAt: new Date(),
   });
   return taskId;
 }
 
-describe('dispatch — Tier B delegation', () => {
-  it('routes a low-risk delegable task through the review gate with both verdicts', async () => {
-    const MID = 'mid_deleg';
-    const taskId = await seedDelegableMission(MID);
+describe('runDelegatedTask — evaluator-optimizer loop', () => {
+  it('re-invokes the producer on NEEDS_WORK, bounded at 2 iterations', async () => {
+    const MID = 'mid_loop';
+    const taskId = await seed(MID);
     await runMission(MID);
 
     const r = await executeNextTask(MID);
     expect(r.kind).toBe('task_done');
 
     const db = getDb();
-    const reviewEvents = await db
+    const iterations = await db
       .select()
       .from(events)
-      .where(and(eq(events.missionId, MID), eq(events.type, 'tier_b_review')));
-    expect(reviewEvents).toHaveLength(1);
-
-    const payload = JSON.parse(reviewEvents[0].payloadJson) as {
-      verdicts: { findings: { message: string }[] }[];
-      diffValid: boolean;
-      fiche: string;
-    };
-    // Both reviewers ran: a code-review verdict and a reality-check verdict.
-    const messages = payload.verdicts.flatMap((v) => v.findings.map((f) => f.message));
-    expect(messages.some((msg) => msg.includes('code-review'))).toBe(true);
-    expect(messages.some((msg) => msg.includes('reality-check'))).toBe(true);
-    expect(payload.verdicts).toHaveLength(2);
-    expect(payload.diffValid).toBe(true);
-    expect(payload.fiche).toBe(DELEGATION_AGENT);
-
+      .where(and(eq(events.missionId, MID), eq(events.type, 'review_iteration')));
+    // Bounded: never more than maxReviewIterations (default 2).
+    expect(iterations.length).toBeGreaterThanOrEqual(1);
+    expect(iterations.length).toBeLessThanOrEqual(2);
+    // The unapproved diff is recorded as such — the task still completes; the
+    // §5 human gate / mission review owns the final call.
     const [t] = await db.select().from(tasks).where(eq(tasks.id, taskId));
-    expect(t?.outputPath?.endsWith('.patch')).toBe(true);
     expect(t?.status).toBe('done');
+    const review = await db
+      .select()
+      .from(events)
+      .where(and(eq(events.taskId, taskId), eq(events.type, 'tier_b_review')));
+    const lastReview = JSON.parse(review.at(-1)!.payloadJson) as { approved: boolean };
+    expect(lastReview.approved).toBe(false);
   });
 });

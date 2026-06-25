@@ -4,9 +4,13 @@ vi.mock('@mas/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@mas/core')>();
   return {
     ...actual,
+    // A critic call (reviewKind set) gets a deterministic, parseable verdict so
+    // CI stays live-model-free; the producer call returns the executed-task text.
     claudeCodeLLM: vi.fn(() => ({
-      call: vi.fn(async () => ({
-        text: '[test-mock] task executed',
+      call: vi.fn(async (req: import('@mas/core').LLMRequest) => ({
+        text: req.reviewKind
+          ? actual.mockVerdictText(req.reviewKind, req.user)
+          : '[test-mock] task executed',
         inputTokens: 220,
         outputTokens: 80,
         cacheReadTokens: 60,

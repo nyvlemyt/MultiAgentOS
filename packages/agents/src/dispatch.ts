@@ -15,9 +15,6 @@ import {
 } from '@mas/db';
 import {
   mockMissionPlanner,
-  mockReviewer,
-  mockSecReviewer,
-  mockQualityController,
   classifyRisk,
   languageDirective,
   claudeCodeLLM,
@@ -51,6 +48,7 @@ import {
 } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
+import { realReviewer, realSecReviewer, realQualityController } from './reviewers';
 import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
 
 export type Db = ReturnType<typeof getDb>;
@@ -254,6 +252,21 @@ export async function planMission(missionId: string) {
   // Cache the cold-arsenal router once — don't rebuild the 877-entry index per task.
   const skillRouter = getSkillRouter();
 
+  // Plan-time sec fallback (plan §2.8): consulted only when the rule-based risk
+  // classifier abstains (needsLLMFallback). Built once; under the deterministic
+  // seam this is PASS unless a [sec-block]/risk=blocking sentinel is present, so
+  // the rule-driven risk-classify-wiring test (`rm`) is unaffected. This is the
+  // plan-time risk heuristic, NOT the doer/checker review gate.
+  const [planProj] = await db
+    .select({
+      id: projects.id, path: projects.path, autonomy: projects.autonomy,
+      sessionId: projects.sessionId, defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode, language: projects.language,
+    })
+    .from(projects)
+    .where(eq(projects.id, m.projectId));
+  const planLlm = await buildMissionLLM(db, m.id, undefined, planProj, new Date());
+
   for (const t of plan.tasks) {
     // Real engine (Wave 2): scope by the task's agent, select over the cold
     // arsenal. llm omitted ⇒ deterministic degrade (zero quota spent).
@@ -270,7 +283,11 @@ export async function planMission(missionId: string) {
     const classified = classifyRisk({ title: t.title, description: t.description });
     let finalRisk = stricterRisk(classified.risk, t.risk);
     if (classified.needsLLMFallback) {
-      const sec = mockSecReviewer(t.id, { risk: finalRisk });
+      const sec = await realSecReviewer(planLlm, {
+        taskId: t.id,
+        risk: finalRisk,
+        brief: { title: t.title, description: t.description },
+      });
       if (sec.verdict === 'BLOCK') finalRisk = 'blocking';
     }
 
@@ -345,6 +362,64 @@ export async function archiveMission(missionId: string) {
   return { ...m, status: 'archived' as const };
 }
 
+// Max chars of producer output persisted/injected for prompt chaining (plan §2.9)
+// — bounds context growth (token discipline §6). Hoisted (S1192).
+const LAST_MESSAGE_MAX = 2000;
+
+// Build a mission-scoped LLM client with the standard router/window plumbing,
+// shared by the executor and the review phase so the seam (MAS_MOCK_LLM / vi.mock)
+// behaves identically everywhere. Time-dependent (loadBlockedWindows) → explicit now.
+async function buildMissionLLM(
+  db: Db,
+  missionId: string,
+  taskId: string | undefined,
+  proj: ExecProject | undefined,
+  now: Date,
+): Promise<LLMClient> {
+  const initialBlocked = await loadBlockedWindows(db, now);
+  return selectLLM({
+    cwd: proj?.path ?? undefined,
+    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
+    sessionId: proj?.sessionId ?? undefined,
+    onRouterEvent: (evt) =>
+      logEventDetached(db, { missionId, taskId, type: 'provider_fallback', payload: evt }),
+    initialBlocked,
+    onBlock: (source, at) =>
+      logEventDetached(db, { missionId, taskId, type: 'window_blocked', payload: { source, blockedAt: at } }),
+  });
+}
+
+// Read a finished task's producer output (the `last_message`) from its task_done
+// event payload — prompt chaining (plan §2.9), no schema migration. Newest first.
+async function lastMessageFor(db: Db, taskId: string): Promise<string> {
+  const [row] = await db
+    .select({ payloadJson: events.payloadJson })
+    .from(events)
+    .where(and(eq(events.taskId, taskId), eq(events.type, 'task_done')))
+    .orderBy(desc(events.createdAt))
+    .limit(1);
+  if (!row) return '';
+  const payload = JSON.parse(row.payloadJson) as { lastMessage?: string };
+  return payload.lastMessage ?? '';
+}
+
+// Prompt chaining (anthropic-ecosystem.md:166, plan §2.9): build the
+// `### Upstream results:` block from each dependsOn task's persisted last_message.
+// Empty string when the task has no dependencies or none produced output.
+async function upstreamResults(db: Db, next: Task): Promise<string> {
+  const depIds = JSON.parse(next.dependsOnJson) as string[];
+  if (depIds.length === 0) return '';
+  const deps = await db.select({ id: tasks.id, title: tasks.title }).from(tasks).where(inArray(tasks.id, depIds));
+  const titleById = new Map<string, string>(deps.map((d) => [d.id, d.title]));
+  const lines: string[] = [];
+  for (const id of depIds) {
+    const msg = await lastMessageFor(db, id);
+    const title = titleById.get(id) ?? id;
+    if (msg) lines.push(`${title}: ${msg}`);
+  }
+  return lines.length > 0 ? `### Upstream results:\n${lines.join('\n')}` : '';
+}
+
 async function selectRunnableTasks(db: Db, missionId: string): Promise<Task[]> {
   const all = await db.select().from(tasks).where(eq(tasks.missionId, missionId));
   const doneIds = new Set(all.filter((t) => t.status === 'done').map((t) => t.id));
@@ -371,10 +446,29 @@ async function runReviewPhase(
   // Deterministic "last task": sort by createdAt (mirrors selectRunnableTasks).
   const lastTask = [...all].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).at(-1);
 
+  // Real critics need an LLMClient. Same seam as the executor: MAS_MOCK_LLM=1 or
+  // a vi.mock'd claudeCodeLLM yields a deterministic, parseable verdict — CI never
+  // hits a live model. The §5 risk gate already fired during execution; this phase
+  // only judges the finished artifacts.
+  const [proj] = await db
+    .select({
+      id: projects.id,
+      path: projects.path,
+      autonomy: projects.autonomy,
+      sessionId: projects.sessionId,
+      defaultModel: projects.defaultModel,
+      defaultMode: projects.defaultMode,
+      language: projects.language,
+    })
+    .from(projects)
+    .innerJoin(missions, eq(missions.projectId, projects.id))
+    .where(eq(missions.id, m.id));
+  const llm = await buildMissionLLM(db, m.id, lastTask?.id, proj, new Date());
+
   // Quality Controller gate (AGENTS.md §4): runs BEFORE the reviewer. It checks
   // PROCESS/RULES (conventions, no-PAYG drift, architecture, output language),
   // not the CODE. A QC BLOCK blocks the mission and short-circuits the reviewer.
-  const qc = mockQualityController(lastTask?.id ?? m.id, { taskTitles: all.map((t) => t.title) });
+  const qc = await realQualityController(llm, { taskId: lastTask?.id ?? m.id, taskTitles: all.map((t) => t.title) });
   await logEvent(db, { missionId: m.id, taskId: lastTask?.id, agentId: 'quality-controller', type: 'quality_control_verdict', payload: qc });
 
   // A QC BLOCK short-circuits the sec/reviewer stage; otherwise run sec-reviewer
@@ -384,13 +478,17 @@ async function runReviewPhase(
   if (qc.verdict !== 'BLOCK') {
     for (const t of all) {
       if (t.risk === 'high' || t.risk === 'blocking') {
-        const sec = mockSecReviewer(t.id, { risk: t.risk });
+        const sec = await realSecReviewer(llm, { taskId: t.id, risk: t.risk, brief: { title: t.title, description: t.description } });
         await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
         verdicts.push(sec);
       }
     }
     if (lastTask) {
-      const rev = mockReviewer(lastTask.id, { risk: lastTask.risk });
+      const rev = await realReviewer(llm, {
+        taskId: lastTask.id,
+        brief: { title: lastTask.title, description: lastTask.description },
+        lastMessage: await lastMessageFor(db, lastTask.id),
+      });
       await logEvent(db, { missionId: m.id, taskId: lastTask.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
       verdicts.push(rev);
     }
@@ -493,7 +591,9 @@ async function persistTaskDone(
     cacheCreation: resp.cacheCreationTokens,
     quotaUnits: resp.quotaUnits,
     risk: next.risk,
-    payload: { title: next.title, sessionId: resp.sessionId, provider: resp.provider, ...extraPayload },
+    // lastMessage = the producer's output, truncated (§6 token discipline). Read
+    // back by downstream tasks (prompt chaining, plan §2.9) and the reviewer.
+    payload: { title: next.title, sessionId: resp.sessionId, provider: resp.provider, lastMessage: resp.text.slice(0, LAST_MESSAGE_MAX), ...extraPayload },
   });
 
   return { kind: 'task_done', taskId: next.id };
@@ -504,22 +604,32 @@ interface DelegationContext {
   llm: LLMClient;
   skillContext: string;
   memCtx: MemoryContext;
+  /** Prompt-chaining block from upstream dependsOn tasks (plan §2.9). */
+  upstream: string;
   delegation: (typeof TIER_B_DELEGATION_MAP)[string];
   agentId: string;
 }
 
 // Runs the §5 review gate on a produced diff: write it under data/outputs, check
-// it applies + collect Code-Reviewer + Reality-Checker verdicts, log the result.
-// evidence:false keeps the Reality Checker at NEEDS_WORK (advisory, never
-// auto-approves an unsubstantiated diff — CLAUDE.md §11.bis r4).
+// it applies + collect the real Code-Reviewer (LLM) + deterministic Reality-Checker
+// verdicts, log the result. The Reality Checker derives evidence from the diff +
+// producer output (plan §2.5) — never auto-approves an unsubstantiated diff
+// (CLAUDE.md §11.bis r4).
+interface GateArgs {
+  db: Db;
+  m: Mission;
+  next: Task;
+  repoDir: string;
+  diff: string;
+  fiche: string;
+  llm: LLMClient;
+  lastMessage: string;
+}
+
 async function gateProducedDiff(
-  db: Db,
-  m: Mission,
-  next: Task,
-  repoDir: string,
-  diff: string,
-  fiche: string,
+  args: GateArgs,
 ): Promise<{ outputPath: string; review: ReviewGateResult }> {
+  const { db, m, next, repoDir, diff, fiche, llm, lastMessage } = args;
   const patchPath = `${OUTPUTS_DIR}/${next.id}.patch`;
   const absDir = resolve(repoRootDir(), OUTPUTS_DIR);
   mkdirSync(absDir, { recursive: true });
@@ -528,7 +638,15 @@ async function gateProducedDiff(
   const patch = diff.endsWith('\n') ? diff : `${diff}\n`;
   writeFileSync(resolve(repoRootDir(), patchPath), patch, 'utf-8');
 
-  const review = await reviewProducedDiff({ taskId: next.id, diff: patch, repoDir, evidence: false });
+  const review = await reviewProducedDiff({
+    taskId: next.id,
+    diff: patch,
+    repoDir,
+    llm,
+    taskBrief: { title: next.title, description: next.description },
+    lastMessage,
+    taskRisk: next.risk,
+  });
   await logEvent(db, {
     missionId: m.id,
     taskId: next.id,
@@ -540,6 +658,23 @@ async function gateProducedDiff(
   return { outputPath: patchPath, review };
 }
 
+// Evaluator-Optimizer (anthropic-ecosystem.md:170): a produced diff that the gate
+// does not approve gets ONE bounded re-attempt cycle. Bounded by both the
+// iteration cap AND the task budget (production-patterns.md:101 circuit breaker) —
+// an unbounded "loop until satisfied" is a KILL criterion (plan §1). Default 2.
+const MAX_REVIEW_ITERATIONS = 2;
+
+// Findings the next producer attempt must address, as a prompt block. Hoisted
+// literal (S1192).
+const FINDINGS_HEADER = '### Reviewer findings to address:';
+function findingsBlock(review: ReviewGateResult): string {
+  const lines = review.verdicts
+    .flatMap((v) => v.findings)
+    .filter((f) => f.severity !== 'info')
+    .map((f) => `- [${f.severity}] ${f.message}`);
+  return lines.length > 0 ? `${FINDINGS_HEADER}\n${lines.join('\n')}` : FINDINGS_HEADER;
+}
+
 async function runDelegatedTask(
   db: Db,
   m: Mission,
@@ -547,25 +682,28 @@ async function runDelegatedTask(
   ctx: DelegationContext,
   taskSkillIds: string[],
 ): Promise<{ kind: 'task_done'; taskId: string }> {
-  const { proj, llm, skillContext, memCtx, delegation, agentId } = ctx;
+  const { proj, llm, skillContext, memCtx, upstream, delegation, agentId } = ctx;
+  // Prompt chaining: the delegated path carries upstream output in skillContext
+  // (the producer/critic system prompt), since the user prompt is the task brief.
+  const chainedSkillContext = [skillContext, upstream].filter(Boolean).join('\n\n');
+  const baseInput = {
+    agentId,
+    task: { title: next.title, description: next.description },
+    llm,
+    project: { defaultModel: proj?.defaultModel ?? undefined, defaultMode: (proj?.defaultMode ?? undefined) as Mode | undefined },
+    memoryText: memCtx.text,
+    language: proj?.language ?? undefined,
+  };
 
-  // Only the delegate call is fallback-eligible: a fiche-load failure (e.g. the
+  // Only the producer call is fallback-eligible: a fiche-load failure (e.g. the
   // Next bundler where import.meta.url is not a file: URL — same degradation as
   // getSkillRouter/selectLLM) or a failed LLM call falls back to the raw path,
   // which then issues the single bill. Once delegateWithDiff returns, the call is
-  // billed once; the gate + persist below run OUTSIDE the catch so a downstream
-  // throw propagates and never re-bills via runRawTask.
+  // billed; the gate + (bounded) loop + persist below run OUTSIDE the catch so a
+  // downstream throw propagates and never re-bills via runRawTask.
   let outcome: Awaited<ReturnType<typeof delegateWithDiff>>;
   try {
-    outcome = await delegateWithDiff({
-      agentId,
-      task: { title: next.title, description: next.description },
-      llm,
-      project: { defaultModel: proj?.defaultModel ?? undefined, defaultMode: (proj?.defaultMode ?? undefined) as Mode | undefined },
-      skillContext,
-      memoryText: memCtx.text,
-      language: proj?.language ?? undefined,
-    });
+    outcome = await delegateWithDiff({ ...baseInput, skillContext: chainedSkillContext });
   } catch (e) {
     logEventDetached(db, {
       missionId: m.id,
@@ -573,18 +711,52 @@ async function runDelegatedTask(
       type: 'delegation_fallback',
       payload: { fiche: delegation.fiche, message: String(e) },
     });
-    return runRawTask(db, m, next, { proj, llm, skillContext, memCtx }, taskSkillIds);
+    return runRawTask(db, m, next, { proj, llm, skillContext, memCtx, upstream }, taskSkillIds);
   }
 
   let outputPath = `${OUTPUTS_DIR}/${next.id}.md`;
   let review: ReviewGateResult | undefined;
+  let spentTokens = outcome.response.inputTokens + outcome.response.outputTokens;
+
   if (outcome.diff && proj?.path) {
-    const gated = await gateProducedDiff(db, m, next, proj.path, outcome.diff, delegation.fiche);
+    const gated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
     outputPath = gated.outputPath;
     review = gated.review;
+
+    // Bounded correction loop: re-invoke the producer with the prior findings
+    // injected, re-gate, until approved OR the cap OR the budget is reached.
+    for (let iteration = 1; iteration <= MAX_REVIEW_ITERATIONS && review && !review.approved; iteration++) {
+      const lastSpend = outcome.response.inputTokens + outcome.response.outputTokens;
+      if (spentTokens + lastSpend > (next.budgetTokens ?? Number.MAX_SAFE_INTEGER)) break;
+
+      const retrySkillContext = [chainedSkillContext, findingsBlock(review)].filter(Boolean).join('\n\n');
+      outcome = await delegateWithDiff({ ...baseInput, skillContext: retrySkillContext });
+      spentTokens += outcome.response.inputTokens + outcome.response.outputTokens;
+
+      if (!outcome.diff) break; // producer stopped emitting a diff — keep prior gate
+      const reGated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
+      outputPath = reGated.outputPath;
+      review = reGated.review;
+      await logEvent(db, {
+        missionId: m.id,
+        taskId: next.id,
+        agentId: next.agentId ?? undefined,
+        type: 'review_iteration',
+        risk: next.risk,
+        payload: { iteration, approved: review.approved, verdicts: review.verdicts },
+      });
+    }
   }
 
-  return persistTaskDone(db, m, next, proj, outcome.response, outputPath, {
+  // Single bill: charge the SUM of producer iterations (each bounded). Mirrors the
+  // response shape so persistTaskDone records the real spend, not just the last call.
+  const billedResponse: LLMResponse = {
+    ...outcome.response,
+    inputTokens: spentTokens,
+    outputTokens: 0,
+  };
+
+  return persistTaskDone(db, m, next, proj, billedResponse, outputPath, {
     delegated: true,
     tierBFiche: delegation.fiche,
     reviewApproved: review?.approved ?? null,
@@ -600,7 +772,7 @@ async function runRawTask(
   ctx: Omit<DelegationContext, 'delegation' | 'agentId'>,
   taskSkillIds: string[],
 ): Promise<{ kind: 'task_done'; taskId: string }> {
-  const { proj, llm, skillContext, memCtx } = ctx;
+  const { proj, llm, skillContext, memCtx, upstream } = ctx;
   const resp = await llm.call({
     system: [
       languageDirective(proj?.language),
@@ -608,7 +780,7 @@ async function runRawTask(
       memCtx.text,
       skillContext,
     ].filter(Boolean).join('\n\n'),
-    user: `Task: ${next.title}\n\n${next.description}`,
+    user: [`Task: ${next.title}\n\n${next.description}`, upstream].filter(Boolean).join('\n\n'),
     model: proj?.defaultModel ?? 'claude-haiku-4-5',
     mode: (proj?.defaultMode ?? 'standard') as Mode,
     domain: getSkillRouter().domainFor(taskSkillIds),
@@ -642,27 +814,13 @@ async function executeTaskWithLLM(
     .innerJoin(missions, eq(missions.projectId, projects.id))
     .where(eq(missions.id, missionId));
 
-  const initialBlocked = await loadBlockedWindows(db, new Date());
-  const llm = selectLLM({
-    cwd: proj?.path,
-    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
-    sessionId: proj?.sessionId ?? undefined,
-    onRouterEvent: (evt) =>
-      logEventDetached(db, { missionId: m.id, taskId: next.id, type: 'provider_fallback', payload: evt }),
-    initialBlocked,
-    onBlock: (source, at) =>
-      logEventDetached(db, {
-        missionId: m.id,
-        taskId: next.id,
-        type: 'window_blocked',
-        payload: { source, blockedAt: at },
-      }),
-  });
+  const llm = await buildMissionLLM(db, m.id, next.id, proj, new Date());
 
   const taskSkillIds: string[] = JSON.parse(next.skillsJson ?? '[]');
   const skillContext = getSkillRouter().buildPromptContext(taskSkillIds);
   const memCtx = memoryContextFor(proj?.id, next.title);
-  const baseCtx = { proj, llm, skillContext, memCtx };
+  const upstream = await upstreamResults(db, next);
+  const baseCtx = { proj, llm, skillContext, memCtx, upstream };
 
   // Tier B delegation branch: a task whose agentId maps to a fiche goes through
   // delegate() → diff → review gate before user validation (CLAUDE.md §5). The

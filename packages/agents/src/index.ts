@@ -6,6 +6,7 @@ export * from './intake-gate';
 export * from './library';
 export * from './delegate';
 export * from './sandbox-diff';
+export * from './reviewers';
 export * from './review-gate';
 export * from './autopilot';
 export * from './daily-report';
