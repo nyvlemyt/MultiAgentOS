@@ -52,6 +52,23 @@ describe('runRetrievalEval (harness, principle 7)', () => {
     expect(report.failed).toBe(1);
   });
 
+  it('fails a row whose only matching hit is below minScore (rank-collapse guard)', () => {
+    const above: GoldenQuery[] = [
+      { id: 'floor-ok', query: 'memory storage recall judgment', expect: ['memory-patterns'], minScore: 0, scope: 'global' },
+    ];
+    const okReport = runRetrievalEval(ftsOver(corpus), above, 'fts');
+    expect(okReport.ok).toBe(true);
+    expect(okReport.passed).toBe(1);
+
+    const below: GoldenQuery[] = [
+      { id: 'floor-too-high', query: 'memory storage recall judgment', expect: ['memory-patterns'], minScore: 999, scope: 'global' },
+    ];
+    const badReport = runRetrievalEval(ftsOver(corpus), below, 'fts');
+    expect(badReport.ok).toBe(false);
+    expect(badReport.failed).toBe(1);
+    expect(badReport.cases.find((c) => c.id === 'floor-too-high')!.status).toBe('fail');
+  });
+
   it('formats a one-line-per-case report', () => {
     const report = runRetrievalEval(ftsOver(corpus), golden, 'fts');
     const txt = formatEvalReport(report);

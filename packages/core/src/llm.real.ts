@@ -47,6 +47,22 @@ export interface ClaudeCodeLLMOptions {
   autonomyLevel?: AutonomyLevel;
   /** Merged into the subprocess env — used for per-account CLAUDE_CONFIG_DIR (ADR 0002 Q1). */
   extraEnv?: Record<string, string>;
+  /**
+   * Opt-in (default OFF): expose the local QMD `query` MCP tool to the dispatched
+   * agent, scoped least-privilege to `mcp__qmd__query` only — never get/multi_get/
+   * status (CLAUDE.md §5, ADR 0007 §Décision-5). When false/undefined the options
+   * object passed to the SDK `query()` is byte-identical to the no-MCP default path.
+   * QMD stays queried out-of-worker via CLI; this only makes it reachable to agents.
+   */
+  mcp?: boolean;
+}
+
+/** Least-privilege QMD MCP wiring for in-loop agents (ADR 0007 §Décision-5). */
+function qmdMcpServers(): Record<string, { command: string; args: string[] }> {
+  return { qmd: { command: 'qmd', args: ['mcp'] } };
+}
+function qmdAllowedTools(): string[] {
+  return ['mcp__qmd__query'];
 }
 
 export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
@@ -86,6 +102,9 @@ export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
           // maxTokens not mapped: Agent SDK uses maxTurns, not per-call token limits.
           // Budget enforcement happens at the worker level via the budgets table check.
           env: { ...(safeEnv as Record<string, string>), ...opts.extraEnv },
+          // Opt-in only: when opts.mcp is off, these keys are absent and the options
+          // object is byte-identical to the historical default path.
+          ...(opts.mcp ? { mcpServers: qmdMcpServers(), allowedTools: qmdAllowedTools() } : {}),
         },
       });
 

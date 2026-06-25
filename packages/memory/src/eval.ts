@@ -29,6 +29,12 @@ export interface GoldenQuery {
   collections?: string[];
   /** Top-k window (default 5). */
   k?: number;
+  /**
+   * Score floor: a row passes only if at least one *matching* hit also clears
+   * this score. Guards against silent rank-collapse (a match still surfaces but
+   * its confidence has cratered). Omitted ⇒ any matching hit passes (legacy).
+   */
+  minScore?: number;
 }
 
 export type EvalBackend = 'qmd' | 'fts';
@@ -80,7 +86,11 @@ export function runRetrievalEval(
     };
     const hits = retriever.query(g.query, opts);
     const keys = hits.map((h) => `${h.id} ${h.source} ${h.title}`);
-    const pass = hits.some((h) => hitMatches([h.id, h.source, h.title], g.expect));
+    const pass = hits.some(
+      (h) =>
+        hitMatches([h.id, h.source, h.title], g.expect) &&
+        (g.minScore === undefined || h.score >= g.minScore),
+    );
     cases.push({
       id: g.id,
       query: g.query,
