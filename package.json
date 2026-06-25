@@ -11,6 +11,7 @@
     "dev": "pnpm -r --parallel --filter \"./apps/*\" dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
+    "test:coverage": "vitest run --coverage",
     "lint": "bash scripts/lint-no-sdk-payg.sh && pnpm -r lint",
     "db:migrate": "pnpm --filter @mas/db migrate",
     "db:seed": "pnpm --filter @mas/db seed",
@@ -23,6 +24,7 @@
     "skills:reindex": "pnpm --filter @mas/skills reindex"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "2",
     "typescript": "^5.5.4",
     "vitest": "^2.0.0"
   },

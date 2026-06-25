@@ -109,7 +109,7 @@ See `TOKEN_STRATEGY.md` for the full policy. Summary:
   - `useEffect` = external synchronization only (not derived state); do **not** memoize by default (profile first).
   - **Research-&-Reuse FIRST** — before writing new code, check existing repos/registries/our library (generalizes §9.bis Voie 2 to all code).
   - **Anti-template = UI done-criteria**: a delivered frontend surface must show ≥4 intentional qualities (hierarchy, rhythm, depth, designed hover/focus states), never raw Tailwind/shadcn default.
-  - Binary review thresholds: fn < 50 lines · file < 800 · nesting ≤ 4 · coverage ≥ 80 %.
+  - Binary review thresholds: fn < 50 lines · file < 800 · nesting ≤ 4 · coverage ≥ 80 % — coverage is now **measured** (`pnpm test:coverage`, v8 provider, report-only). 2026-06-25 baseline: 91 % lines / 84 % branches / 88 % functions. It is **advisory**, *not* a blocking gate yet (low spots are dev-only CLI shims); promotion to a 6th verification check is pending — see `docs/backlog/test-coverage-measurement-gap.md`.
   - Do **not** adopt ECC's "attribution disabled" git rule — it contradicts our mandatory `Co-Authored-By` (§ commit footer).
 - **Verification = 5 checks, not 4.** A phase/PR is done only when `pnpm -r test` · `pnpm lint` · `pnpm build` · `pnpm --filter @mas/web smoke` **and** SonarCloud are all clean. Sonar clean means `scripts/sonar-pr-issues.sh <pr>` exits 0 — **zero open issues and zero to-review hotspots**, not merely a green gate (the gate ignores MINOR/MAJOR smells). After `git push`, poll until the analysis of your HEAD sha lands, run the script, and fix everything it lists. Recurring rules + canonical fixes: `docs/knowledge/sonar-recurring-rules.md` — read it before writing UI/test code to avoid the round-trips.
 
