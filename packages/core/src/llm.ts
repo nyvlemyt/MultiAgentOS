@@ -7,7 +7,7 @@ import type { Mode, Risk } from './types';
  * test seams (mockLLM + the vi.mock'd clients) read it to synthesize a parseable
  * `## Verdict` so CI stays live-model-free.
  */
-export type ReviewKind = 'reviewer' | 'sec' | 'qc' | 'code';
+export type ReviewKind = 'reviewer' | 'sec' | 'qc' | 'code' | 'evaluator';
 
 export interface LLMRequest {
   system: string;
@@ -46,6 +46,9 @@ const REVIEW_KIND_LABEL: Record<ReviewKind, string> = {
   sec: 'sec-review',
   qc: 'quality-control',
   code: 'code-review',
+  // Phase 9 · 0c: the agent-as-judge rubric scorer (RES-043). Distinct label so
+  // the transverse evaluator's findings are greppable apart from the gates.
+  evaluator: 'agent-eval',
 };
 
 // Sentinels a test can seed in the artifact (req.user) to drive a verdict.

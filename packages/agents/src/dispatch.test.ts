@@ -51,12 +51,14 @@ const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
 const PROJECT_ID = 'test-proj';
 const AGENT_IDS = [
   'mission-planner',
+  'orchestrator',
   'skill-router',
   'design-ux-architect',
   'engineering-frontend-developer',
   'quality-controller',
   'sec-reviewer',
   'reviewer',
+  'agent-evaluator',
 ];
 
 async function seedMinimal(missionId: string) {

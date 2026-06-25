@@ -6,7 +6,7 @@
 Live in `packages/agents/fiches/`. They own the mission lifecycle, route work, and call Tier B. They never do specialized execution themselves.
 
 **Tier B — Library agents (pre-installed).**
-58 fiches already under `.claude/agents/` (agency-style + NEXUS doctrine). They do specialized execution. MultiAgentOS treats them as **callable functions**: a Tier A agent emits `delegate({ agent: "engineering-frontend-developer", task: {...} })`.
+60 fiches already under `.claude/agents/` (agency-style + NEXUS doctrine). They do specialized execution. MultiAgentOS treats them as **callable functions**: a Tier A agent emits `delegate({ agent: "engineering-frontend-developer", task: {...} })`.
 
 The dispatcher is the only path between tiers. **Tier B never calls Tier A.**
 
@@ -56,24 +56,32 @@ Body in Markdown: full responsibilities, examples of good vs bad output,
 JSON schema of the expected response, common failure modes with fixes.
 ```
 
-## 3. Tier A roster — MVP (6 agents)
+## 3. Tier A roster — shipped fiches (9)
 
-| ID                | Name                | Role                                                        | Model         | Default budget |
-|-------------------|---------------------|-------------------------------------------------------------|---------------|----------------|
-| `mission-planner` | Mission Planner 🗺️ | NL mission → clarifying Qs → task DAG                       | sonnet-4-6    | 4000           |
-| `skill-router`    | Skill Router 🧭     | Pick skills + Tier B agents + budget per task               | haiku-4-5     | 1500           |
-| `context-manager` | Context Manager 🧠  | Build/maintain per-project context packs and summaries      | haiku-4-5     | 2000           |
-| `memory-keeper`   | Memory Keeper 📚    | Promote memory candidates; write to memory store            | haiku-4-5     | 1500           |
-| `reviewer`        | Code Reviewer 🔍    | Diff + artifact review before `review → validated`          | sonnet-4-6    | 3000           |
-| `sec-reviewer`    | Security Reviewer 🛡️ | Risk gate; mandatory before any `high` or `blocking` action | sonnet-4-6    | 3000           |
+The Tier A agents that ship as complete fiches in `packages/agents/fiches/` today.
+The first six were the MVP slice; `quality-controller` (Phase 3.5), then
+`orchestrator` + `agent-evaluator` (Phase 9 · 0c) joined the governance layer.
+Every row is enforced at load by `validateFiche()` (§2/§10).
 
-## 4. Tier A roster — Phase 2 (9 more)
+| ID                  | Name                  | Role                                                        | Model         | Default budget |
+|---------------------|-----------------------|-------------------------------------------------------------|---------------|----------------|
+| `mission-planner`   | Mission Planner 🗺️   | One-shot: NL mission → clarifying Qs → task DAG (no loop)   | sonnet-4-6    | 4000           |
+| `orchestrator`      | Orchestrator 🎛️      | Govern the dispatch loop: claim, §5 gates, budget, eval-loop | haiku-4-5    | 2000           |
+| `skill-router`      | Skill Router 🧭       | Pick skills + Tier B agents + budget per task               | haiku-4-5     | 1500           |
+| `context-manager`   | Context Manager 🧠    | Build/maintain per-project context packs and summaries      | haiku-4-5     | 2000           |
+| `memory-keeper`     | Memory Keeper 📚      | Promote memory candidates; write to memory store            | haiku-4-5     | 1500           |
+| `quality-controller`| Quality Controller 🎯 | Post-execution PROCESS/RULES gate; runs before the Reviewer | sonnet-4-6    | 2500           |
+| `reviewer`          | Code Reviewer 🔍      | Diff + artifact review before `review → validated`          | sonnet-4-6    | 3000           |
+| `sec-reviewer`      | Security Reviewer 🛡️ | Risk gate; mandatory before any `high` or `blocking` action | sonnet-4-6    | 3000           |
+| `agent-evaluator`   | Agent Evaluator 📊    | Transverse agent-as-judge (RES-043); advisory rubric score  | sonnet-4-6    | 3000           |
+
+## 4. Tier A roster — Phase 2 (8 more — quality-controller shipped)
 
 | ID                    | Name                 | Role                                                  | Provider hint |
 |-----------------------|----------------------|-------------------------------------------------------|---------------|
 | `project-manager`     | Project Manager 📋   | Cross-mission planning, batching, deadlines           | Claude |
 | `architect`           | Architect 🏛️         | Domain modelling, ADR authoring                       | Claude |
-| `quality-controller`  | Quality Controller 🎯 | Vérifie que les règles, conventions et architecture sont respectées par tous les agents. Gate post-exécution avant Reviewer. | Claude / o1-mini |
+| `quality-controller`  | Quality Controller 🎯 | **Shipped — see §3.** Vérifie que les règles, conventions et architecture sont respectées par tous les agents. Gate post-exécution avant Reviewer. | Claude / o1-mini |
 | `frontend-builder`    | Frontend Builder 🎨  | Wraps Tier B frontend agents; produces diffs          | Claude |
 | `backend-builder`     | Backend Builder 🛠️   | Wraps Tier B backend agents                           | Claude |
 | `ux-critic`           | UX/UI Critic ✨      | Pre-merge UX gate                                     | GPT-4o |
@@ -140,22 +148,29 @@ Beyond the wired Tier B slice, the ECC harvest deposited **32 cold Tier B fiches
 
 ```
 packages/agents/
-├── fiches/
+├── fiches/                 # 9 shipped Tier A fiches (§3)
 │   ├── mission-planner.md
+│   ├── orchestrator.md
 │   ├── skill-router.md
 │   ├── context-manager.md
 │   ├── memory-keeper.md
+│   ├── quality-controller.md
 │   ├── reviewer.md
-│   └── sec-reviewer.md
+│   ├── sec-reviewer.md
+│   └── agent-evaluator.md
 ├── avatars/                # stylized SVG avatars per Tier A agent
 │   ├── mission-planner.svg
+│   ├── orchestrator.svg
 │   ├── skill-router.svg
 │   ├── context-manager.svg
 │   ├── memory-keeper.svg
+│   ├── quality-controller.svg
 │   ├── reviewer.svg
-│   └── sec-reviewer.svg
-├── registry.ts             # auto-loads Tier A fiches + indexes Tier B fiches
-├── dispatch.ts             # delegate() + risk gate + budget enforcement
+│   ├── sec-reviewer.svg
+│   └── agent-evaluator.svg
+├── registry.ts             # loadTierAFiches → validateFiche() guard (§2/§10) + indexes Tier B
+├── dispatch.ts             # orchestrator loop: delegate() + risk gate + budget + eval-loop
+├── reviewers.ts            # real critics incl. realAgentEvaluator (transverse judge)
 └── prompts/
     ├── tier-a-system.md    # shared system preface
     └── tier-b-system.md    # shared system preface for delegated calls
@@ -202,7 +217,7 @@ type TaskResult =
 
 ## 10. Authoring rule
 
-When creating a new Tier A fiche, copy the schema in §2 verbatim and fill every key. Empty keys are not allowed. A Tier A fiche without `escalate_when` clauses will be rejected by `registry.ts`.
+When creating a new Tier A fiche, copy the schema in §2 verbatim and fill every key. Empty keys are not allowed. This is **enforced at load**: `registry.ts` runs `validateFiche()` over every fiche and `loadTierAFiches()` throws if any mandatory key (incl. `escalate_when`, `limits`, `responsibilities`) is missing or empty (Phase 9 · 0c, finding U3). Typing the fields alone caught nothing — U1 was a mandatory key silently missing; `validateFiche()` closes that gap.
 
 ## 11. Forbidden patterns
 
