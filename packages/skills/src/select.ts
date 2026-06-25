@@ -142,8 +142,25 @@ async function rankWithLlm(
 }
 
 /**
+ * Normalize a retriever hit id back to a router skill slug.
+ *
+ * The live QMD arsenal retriever emits ids shaped `mas-arsenal/<type>/<slug>.md`
+ * (collection name + path relative to data/arsenal-index), whereas the router keys
+ * skills by the bare slug (e.g. `agent-eval`). Only `skill` stubs have a router
+ * counterpart — `agent`/`rule`/`command` stubs are dropped (returning undefined),
+ * so an agent slug that happens to collide with a skill slug never surfaces that
+ * skill. An already slug-shaped id (e.g. an in-process retriever) passes through.
+ */
+function normalizeArsenalHitId(id: string): string | undefined {
+  const m = /^mas-arsenal\/([^/]+)\/(.+)\.md$/.exec(id);
+  if (m) return m[1] === 'skill' ? m[2] : undefined;
+  return id;
+}
+
+/**
  * Source (b): query the semantic retriever, keep only hits that map to a known,
- * in-scope skill, ordered best-first. Any failure ⇒ [] (degrade to source a).
+ * in-scope skill, ordered best-first. Hit ids are normalized to router slugs first
+ * (see {@link normalizeArsenalHitId}). Any failure ⇒ [] (degrade to source a).
  */
 function arsenalIds(
   retriever: ArsenalRetriever | undefined,
@@ -158,8 +175,10 @@ function arsenalIds(
     const known = new Map(router.all().map((s) => [s.id, s]));
     const out: string[] = [];
     for (const hit of hits) {
-      const meta = known.get(hit.id);
-      if (meta && scopePasses(meta, scope)) out.push(hit.id);
+      const slug = normalizeArsenalHitId(hit.id);
+      if (slug === undefined) continue;
+      const meta = known.get(slug);
+      if (meta && scopePasses(meta, scope)) out.push(slug);
     }
     return out;
   } catch {
