@@ -1,6 +1,6 @@
 # Backlog — Activation runtime du MCP QMD pour les agents en boucle (0d/4c)
 
-**Quand** : follow-up immédiat de 0d (ou correctif avant merge). **Valeur** : haute — sans ça, ADR 0007 §Décision-5 est câblé mais inerte. **Statut** : gap d'audit U5 (F1). **Source** : `docs/learning/2026-06-25-night/U5-self-audit-0d.md` F1 · ADR 0007 §Décision-5 · `packages/core/src/llm.real.ts:57/107` · `packages/agents/src/mission-llm.ts:149-156,191` · `packages/agents/src/dispatch.ts:664`.
+**Quand** : Étape 1 (chat live / dogfooding), quand un besoin réel d'appel agent → `query` existe. **Valeur** : haute — réalise enfin §Décision-5 au runtime. **Statut** : ✅ **DÉCIDÉ 2026-06-25 — Option B** : ADR 0007 §Décision-5 re-cadrée « câblage seulement », activation **différée à l'Étape 1** (amendement ADR daté ; code annoté dans `llm.real.ts` + `mission-llm.ts`). ADR ↔ code cohérents. Cette carte **trace l'activation ciblée future**. **Source** : `docs/learning/2026-06-25-night/U5-self-audit-0d.md` F1 · ADR 0007 §Décision-5 + amendement 2026-06-25 · `packages/core/src/llm.real.ts:57/107` · `packages/agents/src/mission-llm.ts:149-156,191` · `packages/agents/src/dispatch.ts:664`.
 
 ## Identity (quoi)
 
@@ -16,12 +16,14 @@ Une décision ADR « Accepted » dont le runtime ne réalise pas la clause centr
 - **Maintenance** : faible — un flag opt-in de plus, aligné sur §11.bis (défaut OFF).
 - **Removal** : trivial (supprimer le forward).
 
-## Recommendation : **adopt** (fix-now, petit)
+## Décision (2026-06-25) : **Option B — amender l'ADR, activation différée**
 
-Soit câbler l'opt-in jusqu'au dispatch, soit — si l'activation runtime est volontairement différée — **amender ADR 0007 §Décision-5** en « wiring-only, activation reportée » pour que l'ADR et le code coïncident. Ne pas laisser le flou.
+Tranché par Melvyn : on **amende ADR 0007 §Décision-5** en « câblage seulement, activation reportée à l'Étape 1 » (fait — amendement daté + annotations code) plutôt que d'activer maintenant. Raison : l'activation lance un sous-process `qmd mcp` par appel (coût/latence), le hot-path MCP est interdit par le périmètre 0d, et activer sans besoin live = surface/risque pour zéro valeur immédiate. ADR ↔ code sont désormais cohérents (plus de flou).
+
+**Reste à faire (Étape 1, quand le besoin live est réel)** : câbler l'opt-in jusqu'au dispatch (`mcp?: boolean` sur l'opts de `selectLLM` → forward dans `claudeOpts` → exposé via `buildMissionLLM` derrière un opt-in env/config, défaut OFF) + **ciblage** (quels agents/missions) + 1 test « mcp on ⇒ options portent qmd ; off ⇒ byte-identique ».
 
 ## Liens
 - `docs/backlog/cockpit-mcp-surface.md` (gouvernance/surface MCP — distinct : ici c'est l'activation runtime, pas l'UI).
 - ADR 0003 amendement (QMD hors-worker via CLI ; MCP pour usage interactif + agent).
 
-**Re-audit** : prochain gate de phase (avec le merge de 0d).
+**Re-audit** : ouverture de l'Étape 1 (chat live).

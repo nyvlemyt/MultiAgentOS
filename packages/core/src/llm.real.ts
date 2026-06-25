@@ -53,6 +53,11 @@ export interface ClaudeCodeLLMOptions {
    * status (CLAUDE.md §5, ADR 0007 §Décision-5). When false/undefined the options
    * object passed to the SDK `query()` is byte-identical to the no-MCP default path.
    * QMD stays queried out-of-worker via CLI; this only makes it reachable to agents.
+   *
+   * Wiring-only by decision: the dispatch path (`selectLLM`/`buildMissionLLM`)
+   * intentionally does NOT plumb this flag yet — runtime activation is deferred to
+   * Étape 1 (ADR 0007 amendment 2026-06-25 / finding F1). Tracked in
+   * docs/backlog/arsenal-mcp-runtime-activation.md.
    */
   mcp?: boolean;
 }
