@@ -1,5 +1,15 @@
 import type { SkillMeta, Domain } from './types.js';
 import type { SkillRouter } from './router.js';
+import { rrfFuse } from './rrf.js';
+
+/**
+ * Minimal semantic-retriever contract (source b). Structurally compatible with
+ * `@mas/memory`'s QMD retriever (`{id,score}` hits) WITHOUT importing it — keeps
+ * `@mas/skills` free of a runtime dependency on the memory package.
+ */
+export interface ArsenalRetriever {
+  query(q: string, opts?: { limit?: number }): { id: string; score: number }[];
+}
 
 /**
  * Ranks a bounded shortlist of skill candidates. MUST receive only the L1
@@ -24,6 +34,14 @@ export interface SelectParams {
   router: SkillRouter;
   /** Optional bounded LLM ranker; absent ⇒ stage 2 skipped (deterministic). */
   llm?: RankFn;
+  /**
+   * Optional semantic retriever (source b). When present, its hits are mapped to
+   * known + in-scope skills and RRF-fused with the deterministic tag-score order
+   * (source a) so semantically-relevant skills a keyword pass missed surface in
+   * the shortlist. Absence ⇒ byte-identical to source-a only. Never flips
+   * `degraded` (that tracks LLM-rank absence only).
+   */
+  retriever?: ArsenalRetriever;
   /** Shortlist size (stage 1). */
   k?: number;
   /** Final selection size (stage 2 / degraded). */
@@ -124,6 +142,32 @@ async function rankWithLlm(
 }
 
 /**
+ * Source (b): query the semantic retriever, keep only hits that map to a known,
+ * in-scope skill, ordered best-first. Any failure ⇒ [] (degrade to source a).
+ */
+function arsenalIds(
+  retriever: ArsenalRetriever | undefined,
+  task: SelectParams['task'],
+  scope: DomainScope,
+  router: SkillRouter,
+  k: number,
+): string[] {
+  if (!retriever) return [];
+  try {
+    const hits = retriever.query(`${task.title} ${task.description}`, { limit: k });
+    const known = new Map(router.all().map((s) => [s.id, s]));
+    const out: string[] = [];
+    for (const hit of hits) {
+      const meta = known.get(hit.id);
+      if (meta && scopePasses(meta, scope)) out.push(hit.id);
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Two-stage skill selection over the cold-library arsenal.
  *
  * Stage 1 (0 tokens): scope-filter `router.all()`, score against the task,
@@ -143,7 +187,17 @@ export async function selectLibrarySkills(p: SelectParams): Promise<SelectResult
     .map((skill) => ({ skill, score: scoreSkill(skill, taskTokens, hints) }))
     .sort((a, b) => b.score - a.score || a.skill.id.localeCompare(b.skill.id));
 
-  const shortlist = ranked.slice(0, k).map((r) => r.skill);
+  // Source (a) tag-score order; source (b) semantic retriever (optional).
+  const tagOrder = ranked.map((r) => r.skill.id);
+  const semanticOrder = arsenalIds(p.retriever, p.task, p.scope, p.router, k);
+  // RRF fuse only when source (b) added something; otherwise keep (a) byte-identical.
+  const fusedIds = semanticOrder.length > 0 ? rrfFuse([tagOrder, semanticOrder]) : tagOrder;
+
+  const byId = new Map(eligible.map((s) => [s.id, s]));
+  const shortlist = fusedIds
+    .map((id) => byId.get(id))
+    .filter((s): s is SkillMeta => s !== undefined)
+    .slice(0, k);
   const deterministicTopN = shortlist.slice(0, n).map((s) => s.id);
 
   if (!p.llm) {
