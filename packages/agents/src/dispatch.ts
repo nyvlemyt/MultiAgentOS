@@ -2,13 +2,12 @@ import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { and, desc, eq, gte, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import {
   getDb,
   missions,
   projects,
   tasks,
-  events,
   validations,
   type Task,
   type Mission,
@@ -17,225 +16,58 @@ import {
   mockMissionPlanner,
   classifyRisk,
   languageDirective,
-  claudeCodeLLM,
-  createRouterLLM,
-  mockLLM,
   type AutonomyLevel,
   type LLMClient,
   type LLMResponse,
   type Mode,
-  type ProjectLanguage,
-  type ReviewerVerdict,
   type Risk,
-  type RouterEvent,
 } from '@mas/core';
-import {
-  scanOrchestratorSkills,
-  loadLibraryIndex,
-  mergeSkillMetas,
-  selectLibrarySkills,
-  SkillRouter,
-} from '@mas/skills';
-import {
-  MemoryStore,
-  buildMemoryContext,
-  runCloseOutRitual,
-  createRetriever,
-  QMD_MEMORY_COLLECTIONS,
-  type MemoryContext,
-  type MemoryRetriever,
-  type RetrievalBackend,
-} from '@mas/memory';
+import { selectLibrarySkills } from '@mas/skills';
+import { type MemoryContext } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
-import { realReviewer, realSecReviewer, realQualityController } from './reviewers';
-import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
+import { realSecReviewer } from './reviewers';
+import { TIER_B_DELEGATION_MAP, domainScopeFor, loadAgentLibraryIndex, type AgentLibraryMeta } from './library';
+import { scoreColdAgentSuggestion } from './cold-agent-suggest';
+import { type Db, logEvent, logEventDetached, lastMessageFor, loadBlockedWindows } from './mission-events';
+import {
+  getSkillRouter,
+  arsenalRetrieverFor,
+  selectLLM,
+  buildMissionLLM,
+  memoryContextFor,
+  type ExecProject,
+} from './mission-llm';
+import { runReviewPhase } from './review-phase';
 
-export type Db = ReturnType<typeof getDb>;
+// Re-exported for './dispatch' importers (router-persist.test.ts, package index).
+export { loadBlockedWindows, type Db };
 
 // All MultiAgentOS-produced task artifacts land here (CLAUDE.md §8: never
 // data/memory/). Hoisted to one literal (S1192).
 const OUTPUTS_DIR = 'data/outputs';
-
-// Quota-window TTL — must match RouterLLMClient's default (5 h subscription
-// window). Hoisted to one literal (S1192).
-const WINDOW_TTL_MS = 5 * 60 * 60 * 1000;
 
 function repoRootDir(): string {
   const here = fileURLToPath(new URL('.', import.meta.url));
   return resolve(here, '../../..');
 }
 
+// Load the cold-agent L1 index, degrading to [] when the repo root can't be
+// resolved (Next bundler: import.meta.url is not a file: URL ⇒ repoRootDir()
+// throws) or the index is absent. Mirrors getSkillRouter()'s try/catch seam so a
+// missing arsenal never crashes planning — at worst, no suggestion is emitted.
+function loadAgentLibrarySafely(): AgentLibraryMeta[] {
+  try {
+    return loadAgentLibraryIndex(repoRootDir());
+  } catch {
+    return [];
+  }
+}
+
 // Risk ordering for "persist the stricter of classified vs planner risk" (§5).
 const RISK_ORDER: Record<Risk, number> = { low: 0, medium: 1, high: 2, blocking: 3 };
 function stricterRisk(a: Risk, b: Risk): Risk {
   return RISK_ORDER[a] >= RISK_ORDER[b] ? a : b;
-}
-
-// Lazy read-only memory store (no writerAgent — injection only reads, never writes;
-// §8 keeps the Memory Keeper as the sole writer). Resolves data/memory at the repo
-// root; degrades to an empty context under a bundler, like the skill router above.
-let _memoryStore: MemoryStore | undefined;
-let _memRetriever: MemoryRetriever | undefined;
-
-// UnifiedRetriever (QMD primary, FTS fallback) over a store. createRetriever degrades
-// to FTS when QMD isn't configured (no .qmd / no binary) — retrieval never crashes
-// (Phase 9 · 0a exit criterion). `backend` lets the injected-store path force FTS.
-function buildRetriever(store: MemoryStore, repoRoot: string, backend: RetrievalBackend): MemoryRetriever {
-  return createRetriever({
-    cwd: repoRoot,
-    corpus: store,
-    indexPath: store.indexPath(),
-    collections: QMD_MEMORY_COLLECTIONS,
-    backend,
-  });
-}
-
-function memoryContextFor(projectId: string | undefined, query: string): MemoryContext {
-  const empty: MemoryContext = { text: '', projectEntryCount: 0, globalItems: [], projectItems: [] };
-  if (!projectId) return empty;
-  try {
-    const __dirname = fileURLToPath(new URL('.', import.meta.url));
-    const repoRoot = resolve(__dirname, '../../..');
-    const envRoot = process.env.MAS_MEMORY_ROOT;
-    if (envRoot) {
-      // Injected custom store (tests/dev) has no QMD index → force FTS over it.
-      const envStore = new MemoryStore({ root: envRoot });
-      return buildMemoryContext(envStore, projectId, query, { retriever: buildRetriever(envStore, repoRoot, 'fts') });
-    }
-    if (!_memoryStore) {
-      _memoryStore = new MemoryStore({ root: resolve(repoRoot, 'data/memory') });
-    }
-    // Worker default: QMD when the local .qmd index is present, else FTS (auto).
-    _memRetriever ??= buildRetriever(_memoryStore, repoRoot, 'auto');
-    return buildMemoryContext(_memoryStore, projectId, query, { retriever: _memRetriever });
-  } catch {
-    return empty;
-  }
-}
-
-// Lazy singleton — deferred so Next.js static analysis doesn't eval import.meta.url at bundle time.
-let _skillRouterInstance: SkillRouter | undefined;
-function getSkillRouter(): SkillRouter {
-  if (!_skillRouterInstance) {
-    try {
-      const __dirname = fileURLToPath(new URL('.', import.meta.url));
-      const repoRoot = resolve(__dirname, '../../..');
-      const merged = mergeSkillMetas(
-        scanOrchestratorSkills(repoRoot),
-        loadLibraryIndex(repoRoot),
-      );
-      _skillRouterInstance = new SkillRouter(merged);
-    } catch {
-      // Under a bundler (Next webpack RSC) import.meta.url is not a file: URL,
-      // so fileURLToPath rejects it (TypeError: ... Received an instance of URL).
-      // Skill-summary injection is a best-effort prompt enhancement, not required
-      // for correctness — degrade to an empty router rather than crash the run.
-      // Native execution (apps/worker, tsx) resolves the path fine and gets full
-      // injection. Moving the inline-Next run path to the worker is tracked in
-      // docs/backlog/run-inline-execution-in-next.md.
-      _skillRouterInstance = new SkillRouter([]);
-    }
-  }
-  return _skillRouterInstance;
-}
-
-// LLM selection. MAS_MOCK_LLM=1 short-circuits the real Agent SDK with a
-// deterministic, zero-cost mock (e2e smoke, offline dev, token budget). The §5
-// risk gate fires BEFORE any LLM call (executeNextTask), so gate behavior is
-// identical either way. Both branches go through @mas/core factories — no raw
-// SDK client is instantiated here (CLAUDE.md §11). The real path also keeps the
-// vi.mock('@mas/core') seam in dispatch.test.ts working unchanged.
-function selectLLM(opts: {
-  cwd?: string;
-  autonomyLevel?: AutonomyLevel;
-  sessionId?: string;
-  onRouterEvent?: (evt: RouterEvent) => void;
-  initialBlocked?: Record<string, number>;
-  onBlock?: (sourceId: string, blockedAt: number) => void;
-}) {
-  if (process.env.MAS_MOCK_LLM === '1') return mockLLM();
-  const { onRouterEvent, initialBlocked, onBlock, ...claudeOpts } = opts;
-  // Phase 3.5 (ADR 0002): the router takes over only when config/model-routing.json
-  // enables at least one non-default source; otherwise current behavior unchanged.
-  try {
-    const __dirname = fileURLToPath(new URL('.', import.meta.url));
-    const repoRoot = resolve(__dirname, '../../..');
-    const router = createRouterLLM({
-      configPath: process.env.MAS_ROUTING_CONFIG ?? resolve(repoRoot, 'config/model-routing.json'),
-      envPath: process.env.MAS_ENV_LOCAL ?? resolve(repoRoot, '.env.local'),
-      claudeOpts,
-      onEvent: onRouterEvent,
-      initialBlocked,
-      onBlock,
-    });
-    if (router) return router;
-  } catch {
-    // Bundler path (import.meta.url not a file: URL) — same degradation as
-    // getSkillRouter above: fall through to the plain Claude client.
-  }
-  return claudeCodeLLM(claudeOpts);
-}
-
-function logEvent(db: Db, evt: {
-  missionId?: string;
-  taskId?: string;
-  agentId?: string;
-  type: string;
-  payload?: unknown;
-  tokensIn?: number;
-  tokensOut?: number;
-  cacheRead?: number;
-  cacheCreation?: number;
-  quotaUnits?: number;
-  risk?: 'low' | 'medium' | 'high' | 'blocking';
-}) {
-  return db.insert(events).values({
-    id: `evt_${randomUUID()}`,
-    missionId: evt.missionId,
-    taskId: evt.taskId,
-    agentId: evt.agentId,
-    type: evt.type,
-    payloadJson: JSON.stringify(evt.payload ?? {}),
-    tokensIn: evt.tokensIn ?? 0,
-    tokensOut: evt.tokensOut ?? 0,
-    cacheRead: evt.cacheRead ?? 0,
-    cacheCreation: evt.cacheCreation ?? 0,
-    quotaUnits: evt.quotaUnits ?? 0,
-    risk: evt.risk ?? 'low',
-    createdAt: new Date(),
-  });
-}
-
-// Router fallback events fire inside a synchronous onRouterEvent callback, so
-// the logEvent insert cannot be awaited. Swallow rejections explicitly rather
-// than leaving a floating promise (telemetry must never fail a mission).
-function logEventDetached(db: Db, evt: Parameters<typeof logEvent>[1]): void {
-  logEvent(db, evt).then(undefined, () => undefined);
-}
-
-// Restore the router's quota-window block map from persisted `window_blocked`
-// events (5b). Without this, selectLLM builds a fresh router per call/restart and
-// retries a just-blocked source (one wasted 429). Newest-first so the first row
-// seen per source wins (its latest blockedAt). Time-dependent → explicit `now`.
-export async function loadBlockedWindows(
-  db: Db,
-  now: Date,
-  ttlMs = WINDOW_TTL_MS,
-): Promise<Record<string, number>> {
-  const since = new Date(now.getTime() - ttlMs);
-  const rows = await db
-    .select({ payloadJson: events.payloadJson })
-    .from(events)
-    .where(and(eq(events.type, 'window_blocked'), gte(events.createdAt, since)))
-    .orderBy(desc(events.createdAt));
-
-  const blocked: Record<string, number> = {};
-  for (const { payloadJson } of rows) {
-    const { source, blockedAt } = JSON.parse(payloadJson) as { source: string; blockedAt: number };
-    blocked[source] ??= blockedAt;
-  }
-  return blocked;
 }
 
 export async function planMission(missionId: string) {
@@ -251,6 +83,16 @@ export async function planMission(missionId: string) {
 
   // Cache the cold-arsenal router once — don't rebuild the 877-entry index per task.
   const skillRouter = getSkillRouter();
+  // ONE arsenal semantic retriever per mission (source b). QmdRetriever.query is a
+  // blocking 30s execFileSync, so build it once here, never inside the task loop.
+  const arsenalRetriever = arsenalRetrieverFor();
+  // Cold-agent library (4b): load the L1 index ONCE per mission. The planner picks
+  // agents; this only SUGGESTS a cold arsenal agent via a data-only event — §5: it
+  // never mutates t.agentHint / tasks.agentId / TIER_B_DELEGATION_MAP / delegation.
+  // Defensive: under the Next bundler import.meta.url is not a file: URL so
+  // repoRootDir() throws — degrade to no library (no suggestions) rather than
+  // crash planMission, mirroring getSkillRouter()/defaultFichesDir().
+  const agentLibrary = loadAgentLibrarySafely();
 
   // Plan-time sec fallback (plan §2.8): consulted only when the rule-based risk
   // classifier abstains (needsLLMFallback). Built once; under the deterministic
@@ -275,6 +117,7 @@ export async function planMission(missionId: string) {
       task: { id: t.id, title: t.title, description: t.description, skillsHint: t.skillsHint },
       scope,
       router: skillRouter,
+      retriever: arsenalRetriever,
     });
 
     // §5 risk classifier: persist the STRICTER of classified vs planner risk.
@@ -321,6 +164,30 @@ export async function planMission(missionId: string) {
       risk: finalRisk,
       payload: { rule: classified.rule, from: t.risk, to: finalRisk },
     });
+
+    // 4b cold-agent suggestion (§5: DATA ONLY). When a cold library agent
+    // out-scores the planner hint by a margin, surface it as a single event.
+    // No routing state above was touched — agentId persisted t.agentHint as-is.
+    const suggestion = scoreColdAgentSuggestion(
+      { title: t.title, description: t.description },
+      t.agentHint,
+      agentLibrary,
+    );
+    if (suggestion) {
+      await logEvent(db, {
+        missionId: m.id,
+        taskId: t.id,
+        // No agentId: this is mission/task-scoped suggestion DATA, not an action
+        // attributed to a roster agent (and FKs events.agent_id → agents.id).
+        type: 'cold_agent_suggested',
+        payload: {
+          taskId: t.id,
+          suggestedAgentId: suggestion.suggestedAgentId,
+          score: suggestion.score,
+          reason: suggestion.reason,
+        },
+      });
+    }
   }
 
   await db
@@ -366,43 +233,6 @@ export async function archiveMission(missionId: string) {
 // — bounds context growth (token discipline §6). Hoisted (S1192).
 const LAST_MESSAGE_MAX = 2000;
 
-// Build a mission-scoped LLM client with the standard router/window plumbing,
-// shared by the executor and the review phase so the seam (MAS_MOCK_LLM / vi.mock)
-// behaves identically everywhere. Time-dependent (loadBlockedWindows) → explicit now.
-async function buildMissionLLM(
-  db: Db,
-  missionId: string,
-  taskId: string | undefined,
-  proj: ExecProject | undefined,
-  now: Date,
-): Promise<LLMClient> {
-  const initialBlocked = await loadBlockedWindows(db, now);
-  return selectLLM({
-    cwd: proj?.path ?? undefined,
-    autonomyLevel: (proj?.autonomy ?? 'assisted') as AutonomyLevel,
-    sessionId: proj?.sessionId ?? undefined,
-    onRouterEvent: (evt) =>
-      logEventDetached(db, { missionId, taskId, type: 'provider_fallback', payload: evt }),
-    initialBlocked,
-    onBlock: (source, at) =>
-      logEventDetached(db, { missionId, taskId, type: 'window_blocked', payload: { source, blockedAt: at } }),
-  });
-}
-
-// Read a finished task's producer output (the `last_message`) from its task_done
-// event payload — prompt chaining (plan §2.9), no schema migration. Newest first.
-async function lastMessageFor(db: Db, taskId: string): Promise<string> {
-  const [row] = await db
-    .select({ payloadJson: events.payloadJson })
-    .from(events)
-    .where(and(eq(events.taskId, taskId), eq(events.type, 'task_done')))
-    .orderBy(desc(events.createdAt))
-    .limit(1);
-  if (!row) return '';
-  const payload = JSON.parse(row.payloadJson) as { lastMessage?: string };
-  return payload.lastMessage ?? '';
-}
-
 // Prompt chaining (anthropic-ecosystem.md:166, plan §2.9): build the
 // `### Upstream results:` block from each dependsOn task's persisted last_message.
 // Empty string when the task has no dependencies or none produced output.
@@ -427,94 +257,6 @@ async function selectRunnableTasks(db: Db, missionId: string): Promise<Task[]> {
     .filter((t) => t.status === 'todo')
     .filter((t) => (JSON.parse(t.dependsOnJson) as string[]).every((d) => doneIds.has(d)))
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-}
-
-async function runReviewPhase(
-  db: Db,
-  m: Mission,
-  all: Task[],
-): Promise<{ kind: 'mission_complete' }> {
-  // Atomic: only one executor enters the review phase
-  const reviewClaimed = await db
-    .update(missions)
-    .set({ status: 'review', updatedAt: new Date() })
-    .where(and(eq(missions.id, m.id), inArray(missions.status, ['executing', 'dispatched'])))
-    .returning({ id: missions.id });
-  if (reviewClaimed.length === 0) return { kind: 'mission_complete' };
-  await logEvent(db, { missionId: m.id, type: 'mission_review_started' });
-
-  // Deterministic "last task": sort by createdAt (mirrors selectRunnableTasks).
-  const lastTask = [...all].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).at(-1);
-
-  // Real critics need an LLMClient. Same seam as the executor: MAS_MOCK_LLM=1 or
-  // a vi.mock'd claudeCodeLLM yields a deterministic, parseable verdict — CI never
-  // hits a live model. The §5 risk gate already fired during execution; this phase
-  // only judges the finished artifacts.
-  const [proj] = await db
-    .select({
-      id: projects.id,
-      path: projects.path,
-      autonomy: projects.autonomy,
-      sessionId: projects.sessionId,
-      defaultModel: projects.defaultModel,
-      defaultMode: projects.defaultMode,
-      language: projects.language,
-    })
-    .from(projects)
-    .innerJoin(missions, eq(missions.projectId, projects.id))
-    .where(eq(missions.id, m.id));
-  const llm = await buildMissionLLM(db, m.id, lastTask?.id, proj, new Date());
-
-  // Quality Controller gate (AGENTS.md §4): runs BEFORE the reviewer. It checks
-  // PROCESS/RULES (conventions, no-PAYG drift, architecture, output language),
-  // not the CODE. A QC BLOCK blocks the mission and short-circuits the reviewer.
-  const qc = await realQualityController(llm, { taskId: lastTask?.id ?? m.id, taskTitles: all.map((t) => t.title) });
-  await logEvent(db, { missionId: m.id, taskId: lastTask?.id, agentId: 'quality-controller', type: 'quality_control_verdict', payload: qc });
-
-  // A QC BLOCK short-circuits the sec/reviewer stage; otherwise run sec-reviewer
-  // on every high/blocking-risk task and the reviewer on the last task.
-  const verdicts: ReviewerVerdict[] = [];
-  let blockReason = 'quality_control_block';
-  if (qc.verdict !== 'BLOCK') {
-    for (const t of all) {
-      if (t.risk === 'high' || t.risk === 'blocking') {
-        const sec = await realSecReviewer(llm, { taskId: t.id, risk: t.risk, brief: { title: t.title, description: t.description } });
-        await logEvent(db, { missionId: m.id, taskId: t.id, agentId: 'sec-reviewer', type: 'sec_review_verdict', payload: sec });
-        verdicts.push(sec);
-      }
-    }
-    if (lastTask) {
-      const rev = await realReviewer(llm, {
-        taskId: lastTask.id,
-        brief: { title: lastTask.title, description: lastTask.description },
-        lastMessage: await lastMessageFor(db, lastTask.id),
-      });
-      await logEvent(db, { missionId: m.id, taskId: lastTask.id, agentId: 'reviewer', type: 'review_verdict', payload: rev });
-      verdicts.push(rev);
-    }
-    blockReason = 'review_block';
-  }
-
-  const blocked = qc.verdict === 'BLOCK' || verdicts.some((v) => v.verdict === 'BLOCK');
-  if (blocked) {
-    await db.update(missions).set({ status: 'blocked', updatedAt: new Date() }).where(eq(missions.id, m.id));
-    await logEvent(db, { missionId: m.id, type: 'mission_blocked', payload: { reason: blockReason } });
-  } else {
-    await db.update(missions).set({ status: 'validated', updatedAt: new Date() }).where(eq(missions.id, m.id));
-    await logEvent(db, { missionId: m.id, type: 'mission_validated' });
-  }
-
-  // ADR 0004 §1: mission end auto-fires the close-out ritual. Candidates only —
-  // the §8 write-lock is untouched. Fired here (not in the worker loop) because
-  // runReviewPhase is the single chokepoint both the worker and the web inline
-  // path cross. Idempotent via AUTO_CAPTURE_EVENT, so a replayed tick is a no-op.
-  try {
-    await runCloseOutRitual(db, m.id);
-  } catch (e) {
-    // Capture is best-effort: a ritual failure must not fail the mission.
-    await logEvent(db, { missionId: m.id, type: 'auto_capture_error', payload: { message: String(e) } });
-  }
-  return { kind: 'mission_complete' };
 }
 
 async function pauseForRiskGate(
@@ -543,17 +285,6 @@ async function pauseForRiskGate(
   });
   return { kind: 'paused_for_validation', taskId: next.id };
 }
-
-// Project row shape shared by the raw and delegated execution paths.
-type ExecProject = {
-  id: string;
-  path: string | null;
-  autonomy: string | null;
-  sessionId: string | null;
-  defaultModel: string | null;
-  defaultMode: string | null;
-  language: ProjectLanguage | null;
-};
 
 // Shared finalize step for a completed task (raw + delegated paths): persist the
 // session id on first call, mark the task done + spend, bump mission spend, and

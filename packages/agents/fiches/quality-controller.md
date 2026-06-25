@@ -13,6 +13,9 @@ responsibilities:
   - Flag any architecture drift (new framework without an ADR)
   - Check token spend is justified by the quality produced
   - Confirm output language matches the project language (FR/EN)
+limits:
+  - Never reviews the CODE itself (that is the Reviewer's job) — only PROCESS and RULES
+  - Never writes or executes mission code (read-only inspection of diff, commits, config)
 favorite_skills: [superpowers:verification-before-completion]
 required_skills: [superpowers:using-superpowers]
 tools: [Read, Grep, Glob]

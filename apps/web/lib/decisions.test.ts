@@ -41,7 +41,7 @@ describe('listDecisions', () => {
     }
     await createDecision(getDb(), { scope: 'project', projectId: 'p1', title: 'proj-only' });
     const last5 = await listDecisions(getDb(), { scope: 'global', limit: 5 });
-    expect(last5.length).toBe(5);
+    expect(last5).toHaveLength(5);
     expect(last5[0]!.title).toBe('g6');
     expect(last5.some((d) => d.title === 'proj-only')).toBe(false);
   });

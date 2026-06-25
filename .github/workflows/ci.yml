@@ -11,6 +11,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Detects whether this PR touches any arsenal source (the exact globs from
+  # arsenalSources() in packages/memory/src/arsenal.ts) so the heavier
+  # arsenal-eval job runs ONLY when the cold library could have changed.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+    outputs:
+      arsenal: ${{ steps.filter.outputs.arsenal }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            arsenal:
+              - 'packages/skills/library/**'
+              - 'packages/agents/library/**'
+              - '.claude/agents/**'
+              - 'docs/rules/**'
+              - '.claude/commands/**'
+              - 'packages/memory/src/golden-queries.json'
+
   build-test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -44,6 +67,47 @@ jobs:
       # MAS_MOCK_LLM is set in playwright.config.ts webServer env (no real SDK).
       - name: E2E (Playwright)
         run: pnpm --filter @mas/web smoke
+
+  # Arsenal-change eval (0d/4d). Fires ONLY when an arsenal source changes
+  # (the exact arsenalSources() globs from packages/memory/src/arsenal.ts).
+  # It rebuilds the cold-library index then replays the golden set.
+  #
+  # HONEST-SKIP DECISION (build-note #5, NOT a silent skip-everything):
+  # this runner is Node 20, but QMD's `qmd:setup` needs Node >= 22 + ~4.4 GB
+  # models — the CI runner CANNOT host QMD. We therefore PIN the backend to
+  # `fts`: every `qmdOnly` golden row auto-SKIPs (eval.ts:69) and the step is
+  # green WITHOUT pretending to verify semantic recall it cannot reach here.
+  # What this step *does* prove on CI: `arsenal:build` regenerates the index
+  # without crashing and `mem:eval` parses + replays golden-queries.json
+  # end-to-end (catches a corrupt gold set or a broken harness). The real
+  # always-on recall gate is `eval.test.ts` over the in-memory FTS fixture,
+  # which rides `pnpm -r test` in build-test above. Live QMD recall is
+  # asserted locally (`MAS_RETRIEVAL_BACKEND=qmd pnpm mem:eval`) before each
+  # arsenal change lands — never silently on CI.
+  arsenal-eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: changes
+    if: needs.changes.outputs.arsenal == 'true'
+    env:
+      MAS_RETRIEVAL_BACKEND: fts
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build arsenal index + replay golden set (FTS-honest)
+        run: pnpm arsenal:build && pnpm mem:eval
 
 # SonarCloud is intentionally left on Automatic Analysis (zero-config, covers
 # 100% of this TS/JS/Shell codebase). CI-based Sonar is only needed for compiled

@@ -6,6 +6,7 @@ import {
   realSecReviewer,
   realQualityController,
   realCodeReviewer,
+  realAgentEvaluator,
 } from './reviewers';
 
 describe('parseVerdict', () => {
@@ -95,5 +96,24 @@ describe('real critics under the deterministic mock LLM', () => {
     });
     expect(v.verdict).toBe('PASS');
     expect(v.findings.some((f) => f.message.includes('code-review'))).toBe(true);
+  });
+
+  it('realAgentEvaluator scores deliver (PASS) by default with the agent-eval label', async () => {
+    const v = await realAgentEvaluator(llm, {
+      taskId: 't1',
+      brief: { title: 'Ship feature', description: 'do the thing' },
+      lastMessage: 'done',
+    });
+    expect(v.verdict).toBe('PASS');
+    expect(v.findings.some((f) => f.message.includes('agent-eval'))).toBe(true);
+  });
+
+  it('realAgentEvaluator returns NEEDS_WORK (fix) on the sentinel', async () => {
+    const v = await realAgentEvaluator(llm, {
+      taskId: 't1',
+      brief: { title: '[needs-work] thin', description: 'no evidence' },
+      lastMessage: 'done',
+    });
+    expect(v.verdict).toBe('NEEDS_WORK');
   });
 });

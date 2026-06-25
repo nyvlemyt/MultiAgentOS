@@ -61,12 +61,14 @@ export function useTestDb(migrationsFolder: string): void {
 
 export const TIER_A_ROSTER = [
   'mission-planner',
+  'orchestrator',
   'skill-router',
   'design-ux-architect',
   'engineering-frontend-developer',
   'quality-controller',
   'sec-reviewer',
   'reviewer',
+  'agent-evaluator',
 ] as const;
 
 export async function seedAgents(ids: readonly string[]): Promise<void> {

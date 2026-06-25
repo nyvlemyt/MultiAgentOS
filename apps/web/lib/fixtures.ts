@@ -10,6 +10,9 @@ export const tierAFixture: AgentCardData[] = [
   { id: 'memory-keeper', name: 'Memory Keeper', emoji: '📚', avatarPath: '/avatars/memory-keeper.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-haiku-4-5', successRate: 1, totalTokens: 3000, spark: [0, 1, 0, 1, 1, 0, 2, 1] },
   { id: 'reviewer', name: 'Code Reviewer', emoji: '🔍', avatarPath: '/avatars/reviewer.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.89, totalTokens: 18000, spark: [1, 2, 2, 1, 3, 4, 3, 5] },
   { id: 'sec-reviewer', name: 'Security Reviewer', emoji: '🛡️', avatarPath: '/avatars/sec-reviewer.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.96, totalTokens: 9000, spark: [0, 0, 1, 1, 1, 2, 1, 2] },
+  { id: 'quality-controller', name: 'Quality Controller', emoji: '✅', avatarPath: '/avatars/quality-controller.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.93, totalTokens: 16000, spark: [1, 2, 1, 2, 3, 2, 3, 4] },
+  { id: 'orchestrator', name: 'Orchestrator', emoji: '🎛️', avatarPath: '/avatars/orchestrator.svg', tier: 'A', status: 'running', currentTask: 'Steering dispatch loop', model: 'claude-sonnet-4-6', successRate: 0.95, totalTokens: 28000, spark: [3, 5, 4, 6, 5, 7, 6, 8] },
+  { id: 'agent-evaluator', name: 'Agent Evaluator', emoji: '⚖️', avatarPath: '/avatars/agent-evaluator.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.9, totalTokens: 6000, spark: [0, 1, 1, 2, 1, 2, 2, 3] },
 ];
 
 export const tierBFixture: AgentCardData[] = [
