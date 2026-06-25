@@ -153,6 +153,9 @@ export function selectLLM(opts: {
   onRouterEvent?: (evt: RouterEvent) => void;
   initialBlocked?: Record<string, number>;
   onBlock?: (sourceId: string, blockedAt: number) => void;
+  // No `mcp` field by decision: the QMD MCP wiring in claudeCodeLLM (ADR 0007
+  // §Décision-5) is câblage-only — runtime activation from dispatch is deferred to
+  // Étape 1 (ADR 0007 amendment 2026-06-25 / F1). Add it here when that lands.
 }) {
   if (process.env.MAS_MOCK_LLM === '1') return mockLLM();
   const { onRouterEvent, initialBlocked, onBlock, ...claudeOpts } = opts;
