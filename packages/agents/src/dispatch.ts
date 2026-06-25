@@ -16,10 +16,13 @@ import {
   mockMissionPlanner,
   classifyRisk,
   languageDirective,
+  loadPermissions,
+  EMPTY_PERMISSIONS,
   type AutonomyLevel,
   type LLMClient,
   type LLMResponse,
   type Mode,
+  type PermissionsConfig,
   type Risk,
 } from '@mas/core';
 import { selectLibrarySkills } from '@mas/skills';
@@ -64,6 +67,22 @@ function loadAgentLibrarySafely(): AgentLibraryMeta[] {
   }
 }
 
+// Load the §5 permissions config — the documented single extension point for
+// risky-action categories (CLAUDE.md §5). Path override via MAS_PERMISSIONS_PATH
+// (tests/worker), else repo-root config/permissions.json. Degrades to
+// EMPTY_PERMISSIONS on any read/parse failure (missing/malformed file, or the
+// Next bundler where repoRootDir() throws) so a bad perms file never crashes
+// planning — mirrors loadAgentLibrarySafely(). Without this, the perms-category
+// escalation branch in classifyRisk would never be exercised in planMission.
+function loadPermissionsSafely(): PermissionsConfig {
+  try {
+    const path = process.env.MAS_PERMISSIONS_PATH ?? resolve(repoRootDir(), 'config/permissions.json');
+    return loadPermissions(path);
+  } catch {
+    return EMPTY_PERMISSIONS;
+  }
+}
+
 // Risk ordering for "persist the stricter of classified vs planner risk" (§5).
 const RISK_ORDER: Record<Risk, number> = { low: 0, medium: 1, high: 2, blocking: 3 };
 function stricterRisk(a: Risk, b: Risk): Risk {
@@ -94,6 +113,13 @@ export async function planMission(missionId: string) {
   // crash planMission, mirroring getSkillRouter()/defaultFichesDir().
   const agentLibrary = loadAgentLibrarySafely();
 
+  // §5 perms config, loaded ONCE per mission. Passed to classifyRisk so a
+  // domain-agent-registered high/blocking category (sending messages, payments,
+  // outbound sends) escalates a task that mentions its action — see §5 "single
+  // extension point". Ships inert today (categories: []), live the moment a
+  // category is declared.
+  const perms = loadPermissionsSafely();
+
   // Plan-time sec fallback (plan §2.8): consulted only when the rule-based risk
   // classifier abstains (needsLLMFallback). Built once; under the deterministic
   // seam this is PASS unless a [sec-block]/risk=blocking sentinel is present, so
@@ -123,7 +149,7 @@ export async function planMission(missionId: string) {
     // §5 risk classifier: persist the STRICTER of classified vs planner risk.
     // When the classifier is unsure (shell-ish but no concrete rule) we consult
     // the (mocked) Sec Reviewer and bump to blocking on BLOCK.
-    const classified = classifyRisk({ title: t.title, description: t.description });
+    const classified = classifyRisk({ title: t.title, description: t.description }, { perms });
     let finalRisk = stricterRisk(classified.risk, t.risk);
     if (classified.needsLLMFallback) {
       const sec = await realSecReviewer(planLlm, {
