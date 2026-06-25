@@ -48,7 +48,9 @@ describe('delegateWithDiff', () => {
     expect(outcome.diff).toBe(DIFF_BODY);
     expect(outcome.result.kind).toBe('done');
     if (outcome.result.kind === 'done') {
-      expect(outcome.result.outputs[0].kind).toBe('patch');
+      expect(outcome.result.outputs).toHaveLength(1);
+      // safe: toHaveLength(1) above guarantees outputs[0] exists
+      expect(outcome.result.outputs[0]!.kind).toBe('patch');
     }
     expect(outcome.response.inputTokens).toBe(11);
   });
@@ -64,7 +66,9 @@ describe('delegateWithDiff', () => {
     expect(outcome.diff).toBeNull();
     expect(outcome.result.kind).toBe('done');
     if (outcome.result.kind === 'done') {
-      expect(outcome.result.outputs[0].kind).toBe('markdown');
+      expect(outcome.result.outputs).toHaveLength(1);
+      // safe: toHaveLength(1) above guarantees outputs[0] exists
+      expect(outcome.result.outputs[0]!.kind).toBe('markdown');
     }
   });
 
