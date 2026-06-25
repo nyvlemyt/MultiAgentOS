@@ -70,3 +70,14 @@ describe('dispatch — arsenal vivant (test 6)', () => {
     expect(pilotDecision!.payload.skills).toEqual(skillIds);
   });
 });
+
+describe('arsenalRetrieverFor — single construction (no per-task rebuild)', () => {
+  it('returns the same singleton across calls (built once, not per task)', async () => {
+    const { arsenalRetrieverFor } = await import('./mission-llm');
+    const a = arsenalRetrieverFor();
+    const b = arsenalRetrieverFor();
+    // Either both undefined (degraded) or the identical instance — never a fresh
+    // build per call (QmdRetriever.query is a blocking 30s execFileSync).
+    expect(a).toBe(b);
+  });
+});

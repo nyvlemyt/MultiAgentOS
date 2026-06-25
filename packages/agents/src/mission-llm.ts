@@ -19,11 +19,13 @@ import {
   MemoryStore,
   buildMemoryContext,
   createRetriever,
+  QMD_ARSENAL,
   QMD_MEMORY_COLLECTIONS,
   type MemoryContext,
   type MemoryRetriever,
   type RetrievalBackend,
 } from '@mas/memory';
+import type { ArsenalRetriever } from '@mas/skills';
 import { type Db, loadBlockedWindows, logEventDetached } from './mission-events';
 
 // Project row shape shared by the raw and delegated execution paths.
@@ -77,6 +79,39 @@ export function memoryContextFor(projectId: string | undefined, query: string): 
   } catch {
     return empty;
   }
+}
+
+// Arsenal semantic retriever (source b for skill selection). Queries the
+// QMD_ARSENAL collection (excluded from QMD_MEMORY_COLLECTIONS) and adapts
+// MemoryHit[] → the structural {id,score}[] ArsenalRetriever contract. Built
+// ONCE per worker (singleton) — QmdRetriever.query is a blocking 30s execFileSync,
+// so it must NEVER be reconstructed per task. Returns undefined on any failure so
+// skill selection silently degrades to source (a).
+let _arsenalRetriever: ArsenalRetriever | undefined;
+let _arsenalBuilt = false;
+export function arsenalRetrieverFor(): ArsenalRetriever | undefined {
+  if (_arsenalBuilt) return _arsenalRetriever;
+  _arsenalBuilt = true;
+  try {
+    const __dirname = fileURLToPath(new URL('.', import.meta.url));
+    const repoRoot = resolve(__dirname, '../../..');
+    if (!_memoryStore) {
+      _memoryStore = new MemoryStore({ root: resolve(repoRoot, 'data/memory') });
+    }
+    const base: MemoryRetriever = createRetriever({
+      cwd: repoRoot,
+      corpus: _memoryStore,
+      indexPath: _memoryStore.indexPath(),
+      collections: [QMD_ARSENAL],
+      backend: 'auto',
+    });
+    _arsenalRetriever = {
+      query: (q, opts) => base.query(q, { limit: opts?.limit, collections: [QMD_ARSENAL] }),
+    };
+  } catch {
+    _arsenalRetriever = undefined;
+  }
+  return _arsenalRetriever;
 }
 
 // Lazy singleton — deferred so Next.js static analysis doesn't eval import.meta.url at bundle time.

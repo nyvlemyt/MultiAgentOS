@@ -31,6 +31,7 @@ import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
 import { type Db, logEvent, logEventDetached, lastMessageFor, loadBlockedWindows } from './mission-events';
 import {
   getSkillRouter,
+  arsenalRetrieverFor,
   selectLLM,
   buildMissionLLM,
   memoryContextFor,
@@ -69,6 +70,9 @@ export async function planMission(missionId: string) {
 
   // Cache the cold-arsenal router once — don't rebuild the 877-entry index per task.
   const skillRouter = getSkillRouter();
+  // ONE arsenal semantic retriever per mission (source b). QmdRetriever.query is a
+  // blocking 30s execFileSync, so build it once here, never inside the task loop.
+  const arsenalRetriever = arsenalRetrieverFor();
 
   // Plan-time sec fallback (plan §2.8): consulted only when the rule-based risk
   // classifier abstains (needsLLMFallback). Built once; under the deterministic
@@ -93,6 +97,7 @@ export async function planMission(missionId: string) {
       task: { id: t.id, title: t.title, description: t.description, skillsHint: t.skillsHint },
       scope,
       router: skillRouter,
+      retriever: arsenalRetriever,
     });
 
     // §5 risk classifier: persist the STRICTER of classified vs planner risk.
