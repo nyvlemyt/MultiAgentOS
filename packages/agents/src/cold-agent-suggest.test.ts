@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { and, eq } from 'drizzle-orm';
 import { getDb, tasks, events } from '@mas/db';
 import { planMission } from './dispatch';
 import { useTestDb, seedProject, seedMission, seedAgentsRoster } from './testing';
-import { TIER_B_DELEGATION_MAP } from './library';
+import { TIER_B_DELEGATION_MAP, buildAgentLibraryIndex } from './library';
 import { scoreColdAgentSuggestion } from './cold-agent-suggest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -13,6 +13,13 @@ const REPO_ROOT = resolve(__dirname, '../../..');
 const MIGRATIONS_FOLDER = resolve(REPO_ROOT, 'packages/db/migrations');
 
 useTestDb(MIGRATIONS_FOLDER);
+
+// The agent library index.json is a gitignored build artifact (CLAUDE.md §3), so
+// it may be absent on a fresh checkout / CI. planMission reads the prebuilt index;
+// build it from the committed source fiches first so the suggestion path has data.
+beforeAll(() => {
+  buildAgentLibraryIndex(REPO_ROOT);
+});
 
 interface SuggestPayload {
   taskId: string;
