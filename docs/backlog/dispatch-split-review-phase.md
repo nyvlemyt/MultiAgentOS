@@ -1,6 +1,6 @@
 # Backlog — split dispatch.ts review phase (§7 size debt)
 
-**Status:** 🔵 DEFERRED — logged Phase 9 · 0c (2026-06-24). **Out of 0c scope.**
+**Status:** ✅ RESOLVED 2026-06-25 (night build, committed on `phase/9c-roster` → #39). Was DEFERRED in 0c.
 **Found:** Checker + cross-Reviewer, Wave 0c. **Severity:** low (pre-existing; runtime correct).
 
 ## What
@@ -43,3 +43,20 @@ Keep the contracts intact:
 
 `runReviewPhase` < 50 lines · `dispatch.ts` trending toward < 800 · 5 checks green
 · Sonar exit 0 · no change to mission-status outcomes across the dispatch suites.
+
+## Resolution (2026-06-25)
+
+Split executed exactly as proposed, plus two extra extractions to clear the §7
+file threshold:
+- `mission-events.ts` (84 L) ← `logEvent`/`logEventDetached`/`lastMessageFor`/
+  `loadBlockedWindows` + `type Db`.
+- `mission-llm.ts` (166 L) ← `buildRetriever`/`memoryContextFor`/`getSkillRouter`/
+  `selectLLM`/`buildMissionLLM` + `type ExecProject`.
+- `review-phase.ts` (113 L) ← new `runCriticGates` helper + `runReviewPhase`.
+- `dispatch.ts`: **1026 → 690 L** (< 800 ✓); `runReviewPhase` body **48 L** (< 50 ✓);
+  re-exports `loadBlockedWindows` + `type Db`; unused imports pruned (S1128).
+
+Behaviour preserved: `blocked` still from `qc.verdict` + `verdicts[]`; Agent-Evaluator
+stays advisory; acyclic import graph (events ← llm ← review-phase ← dispatch).
+5 local checks green (agents 125/125 unchanged, full suite 513 green, lint, build,
+smoke 32/32). Sonar verified at PR time.
