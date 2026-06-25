@@ -27,7 +27,8 @@ import { type MemoryContext } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
 import { realSecReviewer } from './reviewers';
-import { TIER_B_DELEGATION_MAP, domainScopeFor } from './library';
+import { TIER_B_DELEGATION_MAP, domainScopeFor, loadAgentLibraryIndex, type AgentLibraryMeta } from './library';
+import { scoreColdAgentSuggestion } from './cold-agent-suggest';
 import { type Db, logEvent, logEventDetached, lastMessageFor, loadBlockedWindows } from './mission-events';
 import {
   getSkillRouter,
@@ -49,6 +50,18 @@ const OUTPUTS_DIR = 'data/outputs';
 function repoRootDir(): string {
   const here = fileURLToPath(new URL('.', import.meta.url));
   return resolve(here, '../../..');
+}
+
+// Load the cold-agent L1 index, degrading to [] when the repo root can't be
+// resolved (Next bundler: import.meta.url is not a file: URL ⇒ repoRootDir()
+// throws) or the index is absent. Mirrors getSkillRouter()'s try/catch seam so a
+// missing arsenal never crashes planning — at worst, no suggestion is emitted.
+function loadAgentLibrarySafely(): AgentLibraryMeta[] {
+  try {
+    return loadAgentLibraryIndex(repoRootDir());
+  } catch {
+    return [];
+  }
 }
 
 // Risk ordering for "persist the stricter of classified vs planner risk" (§5).
@@ -73,6 +86,13 @@ export async function planMission(missionId: string) {
   // ONE arsenal semantic retriever per mission (source b). QmdRetriever.query is a
   // blocking 30s execFileSync, so build it once here, never inside the task loop.
   const arsenalRetriever = arsenalRetrieverFor();
+  // Cold-agent library (4b): load the L1 index ONCE per mission. The planner picks
+  // agents; this only SUGGESTS a cold arsenal agent via a data-only event — §5: it
+  // never mutates t.agentHint / tasks.agentId / TIER_B_DELEGATION_MAP / delegation.
+  // Defensive: under the Next bundler import.meta.url is not a file: URL so
+  // repoRootDir() throws — degrade to no library (no suggestions) rather than
+  // crash planMission, mirroring getSkillRouter()/defaultFichesDir().
+  const agentLibrary = loadAgentLibrarySafely();
 
   // Plan-time sec fallback (plan §2.8): consulted only when the rule-based risk
   // classifier abstains (needsLLMFallback). Built once; under the deterministic
@@ -144,6 +164,30 @@ export async function planMission(missionId: string) {
       risk: finalRisk,
       payload: { rule: classified.rule, from: t.risk, to: finalRisk },
     });
+
+    // 4b cold-agent suggestion (§5: DATA ONLY). When a cold library agent
+    // out-scores the planner hint by a margin, surface it as a single event.
+    // No routing state above was touched — agentId persisted t.agentHint as-is.
+    const suggestion = scoreColdAgentSuggestion(
+      { title: t.title, description: t.description },
+      t.agentHint,
+      agentLibrary,
+    );
+    if (suggestion) {
+      await logEvent(db, {
+        missionId: m.id,
+        taskId: t.id,
+        // No agentId: this is mission/task-scoped suggestion DATA, not an action
+        // attributed to a roster agent (and FKs events.agent_id → agents.id).
+        type: 'cold_agent_suggested',
+        payload: {
+          taskId: t.id,
+          suggestedAgentId: suggestion.suggestedAgentId,
+          score: suggestion.score,
+          reason: suggestion.reason,
+        },
+      });
+    }
   }
 
   await db
