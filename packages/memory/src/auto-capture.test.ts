@@ -49,7 +49,7 @@ describe('runCloseOutRitual (mission-complete → memory_candidates)', () => {
     expect(res.skipped).toBe(false);
     expect(res.candidateIds.length).toBeGreaterThanOrEqual(2); // mission summary + decision
     const rows = await db.select().from(memoryCandidates);
-    expect(rows.length).toBe(res.candidateIds.length);
+    expect(rows).toHaveLength(res.candidateIds.length);
     expect(rows.every((r) => r.status === 'pending')).toBe(true);
     const bodies = rows.map((r) => r.body).join('\n');
     expect(bodies).toContain('Polish feed');

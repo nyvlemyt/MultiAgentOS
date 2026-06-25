@@ -36,13 +36,13 @@ describe('reports', () => {
     await createReport(getDb(), { projectId: 'p1', missionId: 'm1', title: 'A', createdAt: new Date(1000) });
     const b = await createReport(getDb(), { projectId: 'p1', missionId: 'm1', title: 'B', createdAt: new Date(2000) });
     const list = await listMissionReports(getDb(), 'm1');
-    expect(list.length).toBe(2);
+    expect(list).toHaveLength(2);
     expect(list[0]!.id).toBe(b.id);
   });
 
   it('lists all project reports', async () => {
     await createReport(getDb(), { projectId: 'p1', missionId: 'm1', title: 'A' });
     await createReport(getDb(), { projectId: 'p1', kind: 'project', title: 'État projet' });
-    expect((await listProjectReports(getDb(), 'p1')).length).toBe(2);
+    expect(await listProjectReports(getDb(), 'p1')).toHaveLength(2);
   });
 });

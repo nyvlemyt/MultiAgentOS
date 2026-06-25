@@ -151,7 +151,7 @@ describe('selectLibrarySkills — degradation', () => {
   it('llm absent → deterministic top-N + degraded', async () => {
     const res = await selectLibrarySkills(base);
     expect(res.degraded).toBe(true);
-    expect(res.skillIds.length).toBe(5);
+    expect(res.skillIds).toHaveLength(5);
   });
 
   it('llm throws → degrades to deterministic top-N', async () => {
