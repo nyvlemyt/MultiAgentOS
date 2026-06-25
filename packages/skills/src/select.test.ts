@@ -161,6 +161,32 @@ describe('selectLibrarySkills — arsenal retriever (source b RRF fusion)', () =
     expect(fused.degraded).toBe(true);
   });
 
+  it('surfaces a tag-missed skill via the REAL qmd id shape (mas-arsenal/skill/<slug>.md)', async () => {
+    // Integration shape: the live QmdRetriever emits ids `mas-arsenal/skill/<slug>.md`
+    // (collection/<root-relative path>), NOT bare slugs. The union must normalize
+    // these back to the router slug before fusing, else known.get() never matches and
+    // the semantic branch is silently dead (ADR 0007 Decision 1).
+    const retriever: ArsenalRetriever = {
+      query: () => [{ id: 'mas-arsenal/skill/sec-19.md', score: 0.99 }],
+    };
+    const fused = await selectLibrarySkills({ ...base, retriever });
+    const plain = await selectLibrarySkills(base);
+    expect(fused.skillIds).toContain('sec-19');
+    expect(plain.skillIds).not.toContain('sec-19');
+    expect(fused.degraded).toBe(true);
+  });
+
+  it('drops non-skill arsenal hits (agent/rule/command stubs have no skill counterpart)', async () => {
+    // The mission-llm adapter queries the whole mas-arsenal collection; an agent stub
+    // whose slug collides with a skill slug must NOT surface that skill.
+    const retriever: ArsenalRetriever = {
+      query: () => [{ id: 'mas-arsenal/agent/sec-19.md', score: 0.99 }],
+    };
+    const res = await selectLibrarySkills({ ...base, retriever });
+    const plain = await selectLibrarySkills(base);
+    expect(res.skillIds).toEqual(plain.skillIds);
+  });
+
   it('omitted retriever ⇒ byte-identical to source-a only', async () => {
     const withUndef = await selectLibrarySkills({ ...base, retriever: undefined });
     const plain = await selectLibrarySkills(base);
