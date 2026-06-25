@@ -33,7 +33,8 @@ describe('delegate', () => {
     const { llm, calls } = stubLLM('A plain markdown report.');
     await delegate({ agentId: 'engineering-frontend-developer', task: TASK, llm, fichesDir: AGENTS_DIR });
     expect(calls).toHaveLength(1);
-    const system = calls[0].system;
+    // safe: toHaveLength(1) above guarantees calls[0] exists
+    const system = calls[0]!.system;
     expect(system).toContain('Tier B delegated call');
     expect(system).toContain('Frontend Developer');
   });
@@ -45,8 +46,9 @@ describe('delegate', () => {
     expect(result.kind).toBe('done');
     if (result.kind === 'done') {
       expect(result.outputs).toHaveLength(1);
-      expect(result.outputs[0].kind).toBe('patch');
-      expect(result.outputs[0].path).toContain('design-ui-designer.patch');
+      // safe: toHaveLength(1) above guarantees outputs[0] exists
+      expect(result.outputs[0]!.kind).toBe('patch');
+      expect(result.outputs[0]!.path).toContain('design-ui-designer.patch');
     }
   });
 
@@ -55,7 +57,9 @@ describe('delegate', () => {
     const result = await delegate({ agentId: 'design-ui-designer', task: TASK, llm, fichesDir: AGENTS_DIR });
     expect(result.kind).toBe('done');
     if (result.kind === 'done') {
-      expect(result.outputs[0].kind).toBe('markdown');
+      expect(result.outputs).toHaveLength(1);
+      // safe: toHaveLength(1) above guarantees outputs[0] exists
+      expect(result.outputs[0]!.kind).toBe('markdown');
     }
   });
 
@@ -71,7 +75,9 @@ describe('delegate', () => {
   it('passes the language directive into the system prompt', async () => {
     const { llm, calls } = stubLLM('ok');
     await delegate({ agentId: 'design-ui-designer', task: TASK, llm, language: 'fr', fichesDir: AGENTS_DIR });
-    expect(calls[0].system).toContain('Respond in French.');
+    expect(calls).toHaveLength(1);
+    // safe: toHaveLength(1) above guarantees calls[0] exists
+    expect(calls[0]!.system).toContain('Respond in French.');
   });
 
   it('throws on an unknown agent id', async () => {

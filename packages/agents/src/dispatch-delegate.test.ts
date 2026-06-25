@@ -103,7 +103,8 @@ describe('dispatch — Tier B delegation', () => {
       .where(and(eq(events.missionId, MID), eq(events.type, 'tier_b_review')));
     expect(reviewEvents).toHaveLength(1);
 
-    const payload = JSON.parse(reviewEvents[0].payloadJson) as {
+    // safe: toHaveLength(1) above guarantees reviewEvents[0] exists
+    const payload = JSON.parse(reviewEvents[0]!.payloadJson) as {
       verdicts: { findings: { message: string }[] }[];
       diffValid: boolean;
       fiche: string;
