@@ -80,7 +80,7 @@ describe('emitDailyReport', () => {
     await emitDailyReport(getDb(), report);
 
     const evs = await getDb().select().from(events).where(eq(events.type, 'daily_report'));
-    expect(evs.length).toBe(1);
+    expect(evs).toHaveLength(1);
 
     const date = until.toISOString().slice(0, 10);
     const reportPath = resolve(REPO_ROOT, `data/reports/${date}.md`);

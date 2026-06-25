@@ -51,12 +51,14 @@ const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
 const PROJECT_ID = 'test-proj';
 const AGENT_IDS = [
   'mission-planner',
+  'orchestrator',
   'skill-router',
   'design-ux-architect',
   'engineering-frontend-developer',
   'quality-controller',
   'sec-reviewer',
   'reviewer',
+  'agent-evaluator',
 ];
 
 async function seedMinimal(missionId: string) {
@@ -252,7 +254,7 @@ describe('dispatch — validation idempotency', () => {
       .select()
       .from(events)
       .where(and(eq(events.missionId, MID), eq(events.type, 'validation_rejected')));
-    expect(rejected.length).toBe(1);
+    expect(rejected).toHaveLength(1);
     expect(rejected[0]?.taskId).toBe(pausedTaskId);
   });
 });
@@ -320,7 +322,7 @@ describe('dispatch — duplicate execution prevention', () => {
       .select()
       .from(events)
       .where(and(eq(events.missionId, MID), eq(events.type, 'task_done')));
-    expect(doneEvents.length).toBe(1);
+    expect(doneEvents).toHaveLength(1);
   });
 });
 
@@ -330,7 +332,7 @@ describe('dispatch — smoke DB isolation', () => {
     await seedMinimal(MID);
     const db = getDb();
     const rows = await db.select().from(missions).where(eq(missions.id, MID));
-    expect(rows.length).toBe(1);
+    expect(rows).toHaveLength(1);
     // The DB file must be the temp path set in beforeEach, not the default data/mas.db.
     expect(dbPath).toContain(tmpdir());
     expect(dbPath).not.toContain('data/mas.db');

@@ -68,6 +68,6 @@ describe('language directive wiring (executeTaskWithLLM)', () => {
   it('adds no LLM call beyond the task itself (mock seam unchanged)', async () => {
     await runFirstTask('p_count', 'm_count');
     // One execution task → exactly one system assembled and sent.
-    expect(capturedSystems.length).toBe(1);
+    expect(capturedSystems).toHaveLength(1);
   });
 });

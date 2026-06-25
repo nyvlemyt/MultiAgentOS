@@ -80,7 +80,7 @@ describe('convertIdeaToMission — idempotent (mirrors Phase 1)', () => {
     expect(second.mission.id).toBe(first.mission.id);
 
     const all = await getDb().select().from(missions);
-    expect(all.length).toBe(1);
+    expect(all).toHaveLength(1);
   });
 
   it('refuses to convert an idea with no projectId (missions require a project)', async () => {

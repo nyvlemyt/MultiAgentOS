@@ -40,5 +40,36 @@
     "query": "skill to manage agent memory",
     "expect": ["memory", "keeper", "context"],
     "qmdOnly": true
+  },
+  {
+    "id": "arsenal-defensive-agent",
+    "query": "agent for defensive security review",
+    "expect": ["security-defensive-specialist", "defensive"],
+    "qmdOnly": true,
+    "minScore": 0.3
+  },
+  {
+    "id": "arsenal-prod-audit",
+    "query": "skill to audit a production system",
+    "expect": ["production-audit", "audit"],
+    "qmdOnly": true
+  },
+  {
+    "id": "arsenal-db-reviewer",
+    "query": "review SQL and migrations for safety",
+    "expect": ["database-reviewer"],
+    "qmdOnly": true
+  },
+  {
+    "id": "arsenal-security-scan",
+    "query": "scan agent config for security smells",
+    "expect": ["security-scan"],
+    "qmdOnly": true
+  },
+  {
+    "id": "arsenal-phishing",
+    "query": "detect phishing from email headers",
+    "expect": ["email", "phishing", "compromise"],
+    "qmdOnly": true
   }
 ]

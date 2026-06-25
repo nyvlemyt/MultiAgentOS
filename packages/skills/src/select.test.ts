@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { SkillRouter } from './router.js';
 import { mergeSkillMetas } from './merge.js';
-import { selectLibrarySkills, type RankFn } from './select.js';
+import { selectLibrarySkills, type RankFn, type ArsenalRetriever } from './select.js';
 import type { SkillMeta } from './types.js';
 
 function meta(over: Partial<SkillMeta> & { id: string }): SkillMeta {
@@ -144,6 +144,43 @@ describe('selectLibrarySkills — stage 2 bounded LLM rank', () => {
   });
 });
 
+describe('selectLibrarySkills — arsenal retriever (source b RRF fusion)', () => {
+  const router = new SkillRouter(arsenal());
+  const base = { task: SEC_TASK, scope: { domain: 'security' as const }, router, k: 15, n: 5 };
+
+  it('surfaces a tag-missed skill that the semantic retriever ranks first', async () => {
+    // sec-19 has no auth/login tag → low tag-score; the retriever ranks it #1.
+    const retriever: ArsenalRetriever = {
+      query: () => [{ id: 'sec-19', score: 0.99 }],
+    };
+    const fused = await selectLibrarySkills({ ...base, retriever });
+    const plain = await selectLibrarySkills(base);
+    expect(fused.skillIds).toContain('sec-19');
+    expect(plain.skillIds).not.toContain('sec-19');
+    // degraded tracks llm-rank absence only — unchanged by retriever presence.
+    expect(fused.degraded).toBe(true);
+  });
+
+  it('omitted retriever ⇒ byte-identical to source-a only', async () => {
+    const withUndef = await selectLibrarySkills({ ...base, retriever: undefined });
+    const plain = await selectLibrarySkills(base);
+    expect(withUndef.skillIds).toEqual(plain.skillIds);
+    expect(withUndef.degraded).toBe(plain.degraded);
+  });
+
+  it('throwing retriever ⇒ falls back to source-a, degraded unchanged', async () => {
+    const throwing: ArsenalRetriever = {
+      query: () => {
+        throw new Error('qmd offline');
+      },
+    };
+    const res = await selectLibrarySkills({ ...base, retriever: throwing });
+    const plain = await selectLibrarySkills(base);
+    expect(res.skillIds).toEqual(plain.skillIds);
+    expect(res.degraded).toBe(true);
+  });
+});
+
 describe('selectLibrarySkills — degradation', () => {
   const router = new SkillRouter(arsenal());
   const base = { task: SEC_TASK, scope: { domain: 'security' as const }, router, k: 15, n: 5 };
@@ -151,7 +188,7 @@ describe('selectLibrarySkills — degradation', () => {
   it('llm absent → deterministic top-N + degraded', async () => {
     const res = await selectLibrarySkills(base);
     expect(res.degraded).toBe(true);
-    expect(res.skillIds.length).toBe(5);
+    expect(res.skillIds).toHaveLength(5);
   });
 
   it('llm throws → degrades to deterministic top-N', async () => {

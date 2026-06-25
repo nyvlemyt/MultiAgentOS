@@ -11,6 +11,9 @@ responsibilities:
   - Validate unified diffs apply clean (`git apply --check`)
   - Flag missed tests for new domain logic
   - Reject mission if any task missing definition of done
+limits:
+  - Reviews the CODE only — process/rules drift is the Quality Controller's gate
+  - Never edits the diff itself; emits a verdict + findings, never a rewrite
 favorite_skills: [superpowers:receiving-code-review, superpowers:verification-before-completion]
 required_skills: [superpowers:using-superpowers]
 permissions:

@@ -70,7 +70,7 @@ describe('worker maybeEmitDailyReport — once per day', () => {
     await maybeEmitDailyReport(getDb(), now);
     await maybeEmitDailyReport(getDb(), now);
     const evs = await getDb().select().from(events).where(eq(events.type, 'daily_report'));
-    expect(evs.length).toBe(1);
+    expect(evs).toHaveLength(1);
   });
 });
 
@@ -80,7 +80,7 @@ describe('worker tick — multi-project dispatch (Phase 8a)', () => {
     await seedDispatchableMission('m2', 'p2');
     await tick(getDb(), new Date(2026, 5, 15, 3, 0));
     const rows = await getDb().select().from(tasks).where(inArray(tasks.id, ['m1_t1', 'm2_t1']));
-    expect(rows.length).toBe(2);
+    expect(rows).toHaveLength(2);
     expect(rows.every((t) => t.status === 'done')).toBe(true);
   });
 
@@ -101,7 +101,7 @@ describe('worker tick — multi-project dispatch (Phase 8a)', () => {
     const [t] = await getDb().select().from(tasks).where(eq(tasks.id, 'b1_t1'));
     expect(t?.status).not.toBe('done');
     const evs = await getDb().select().from(events).where(eq(events.type, 'budget_exceeded'));
-    expect(evs.length).toBe(1);
+    expect(evs).toHaveLength(1);
   });
 
   it('counts a concurrent running task as reserved spend and halts dispatch', async () => {
@@ -120,7 +120,7 @@ describe('worker tick — multi-project dispatch (Phase 8a)', () => {
     const [t] = await getDb().select().from(tasks).where(eq(tasks.id, 'fresh_t1'));
     expect(t?.status).toBe('todo');
     const evs = await getDb().select().from(events).where(eq(events.type, 'budget_exceeded'));
-    expect(evs.length).toBe(1);
+    expect(evs).toHaveLength(1);
   });
 
   it('honors the global concurrency cap in a single tick', async () => {
@@ -130,7 +130,7 @@ describe('worker tick — multi-project dispatch (Phase 8a)', () => {
       await seedDispatchableMission('g2', 'p2');
       await tick(getDb(), new Date(2026, 5, 15, 3, 0));
       const rows = await getDb().select().from(tasks).where(inArray(tasks.id, ['g1_t1', 'g2_t1']));
-      expect(rows.filter((t) => t.status === 'done').length).toBe(1);
+      expect(rows.filter((t) => t.status === 'done')).toHaveLength(1);
     } finally {
       delete process.env.MAS_MAX_GLOBAL_CONCURRENT;
     }

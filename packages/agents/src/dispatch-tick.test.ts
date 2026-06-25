@@ -74,8 +74,8 @@ describe('runDispatchTick — integration (mock LLM)', () => {
     await seedMission('a2', 'p1');
     await seedMission('a3', 'p1');
     const result = await runDispatchTick({ maxConcurrentPerProject: 1, maxGlobalConcurrent: 4 });
-    expect(result.advanced.length).toBe(1);
-    expect(result.skipped.length).toBe(2);
+    expect(result.advanced).toHaveLength(1);
+    expect(result.skipped).toHaveLength(2);
     expect(result.skipped.every((s) => s.reason === 'project_cap')).toBe(true);
   });
 
