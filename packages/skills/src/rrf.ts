@@ -20,6 +20,6 @@ export function rrfFuse(lists: readonly (readonly string[])[], c = 60): string[]
   }
   return [...scores.keys()].sort((a, b) => {
     const diff = scores.get(b)! - scores.get(a)!;
-    return diff !== 0 ? diff : a.localeCompare(b);
+    return diff === 0 ? a.localeCompare(b) : diff;
   });
 }
