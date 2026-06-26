@@ -75,11 +75,12 @@ describe('validateFiche (Phase 9 · 0c, finding U3)', () => {
 describe('loadTierAFiches', () => {
   it('loads every shipped Tier A fiche with zero validation errors', () => {
     const fiches = loadTierAFiches(FICHES_DIR);
-    // 9 shipped fiches (AGENTS.md §3) — regression guard on the roster count.
-    expect(fiches).toHaveLength(9);
+    // 10 shipped fiches (AGENTS.md §3) — regression guard on the roster count.
+    expect(fiches).toHaveLength(10);
     const ids = fiches.map((f) => f.id).sort();
     expect(ids).toContain('agent-evaluator');
     expect(ids).toContain('orchestrator');
+    expect(ids).toContain('architect');
     // Every shipped fiche passes the §2 schema (no silent drift).
     for (const f of fiches) {
       expect(validateFiche({ ...f })).toEqual([]);
