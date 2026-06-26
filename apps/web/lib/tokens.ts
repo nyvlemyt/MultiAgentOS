@@ -34,6 +34,34 @@ function providerPlanLabels(): Map<string, string> {
 }
 
 /**
+ * Pure per-provider reduce over today's LLM-call rows: provider rides the event
+ * payload (default 'claude' when absent/malformed), summed into calls + tokens,
+ * each tagged with its declared plan label (full id, else the prefix before ':'
+ * for pooled-account ids like "claude:pro20"), sorted by total tokens desc.
+ */
+export function aggregateProviderSpend(
+  callRows: ReadonlyArray<{ payloadJson: string | null; tokensIn: number | null; tokensOut: number | null }>,
+  planLabels: Map<string, string>,
+): ProviderSpendRow[] {
+  const byProviderMap = new Map<string, ProviderSpendRow>();
+  for (const row of callRows) {
+    let provider = 'claude';
+    try {
+      const parsed = JSON.parse(row.payloadJson ?? '{}') as { provider?: string };
+      if (parsed.provider) provider = parsed.provider;
+    } catch { /* unattributed */ }
+    const agg = byProviderMap.get(provider) ?? { provider, calls: 0, tokensIn: 0, tokensOut: 0 };
+    agg.calls += 1;
+    agg.tokensIn += row.tokensIn ?? 0;
+    agg.tokensOut += row.tokensOut ?? 0;
+    byProviderMap.set(provider, agg);
+  }
+  return [...byProviderMap.values()]
+    .map((r) => ({ ...r, plan: planLabels.get(r.provider) ?? planLabels.get(r.provider.split(':')[0]!) }))
+    .sort((a, b) => b.tokensIn + b.tokensOut - (a.tokensIn + a.tokensOut));
+}
+
+/**
  * A budget window for the meter. `tokensSpent` is logged spend (events);
  * `reserved` is in-flight (running tasks across all sessions); `remaining` is
  * cap − (spent + reserved), so the meter reflects concurrent agents, not just
@@ -94,6 +122,31 @@ function fiveHoursAgo(): Date {
   return new Date(Date.now() - 5 * 60 * 60 * 1000);
 }
 
+// Pure: shape a budget window for the meter. remaining = cap − (spent + reserved).
+function budgetMeterWindow(w: { spent: number; reserved: number }, cap: number): BudgetMeterWindow {
+  return {
+    tokensSpent: w.spent,
+    tokensCap: cap,
+    reserved: w.reserved,
+    remaining: Math.max(0, cap - w.spent - w.reserved),
+  };
+}
+
+// Today's cache-hit ratio (%) over llm_call events: read / (read + creation).
+async function cacheHitRatioSince(db: ReturnType<typeof getDb>, since: Date): Promise<number> {
+  const [agg] = await db
+    .select({
+      totalCacheRead: sum(events.cacheRead),
+      totalCacheCreation: sum(events.cacheCreation),
+    })
+    .from(events)
+    .where(and(gte(events.createdAt, since), eq(events.type, 'llm_call')));
+  const cacheRead = Number(agg?.totalCacheRead ?? 0);
+  const cacheCreation = Number(agg?.totalCacheCreation ?? 0);
+  const cacheTotal = cacheRead + cacheCreation;
+  return cacheTotal > 0 ? Math.round((cacheRead / cacheTotal) * 100) : 0;
+}
+
 /**
  * Quota/cache snapshot read straight from the DB. Server components call this
  * directly (no HTTP self-fetch); the /api/tokens route wraps it for clients.
@@ -113,15 +166,6 @@ export async function getTokenSnapshot(): Promise<TokenSnapshot> {
   const budget = await checkDispatchBudget(db);
   const dayCap = dayRow?.tokensCap ?? 1_000_000;
   const weekCap = weekRow?.tokensCap ?? 5_000_000;
-  const meterWindow = (
-    w: { spent: number; reserved: number },
-    cap: number,
-  ): BudgetMeterWindow => ({
-    tokensSpent: w.spent,
-    tokensCap: cap,
-    reserved: w.reserved,
-    remaining: Math.max(0, cap - w.spent - w.reserved),
-  });
 
   // 5-hour rolling window: COUNT llm_call events (§8 cap uses COUNT, not SUM).
   const windowStart = fiveHoursAgo();
@@ -131,20 +175,9 @@ export async function getTokenSnapshot(): Promise<TokenSnapshot> {
     .where(and(gte(events.createdAt, windowStart), eq(events.type, 'llm_call')));
   const messagesUsedInWindow = windowAgg[0]?.messagesUsed ?? 0;
 
-  // Cache hit ratio from today's llm_call events.
+  // Cache hit ratio + per-provider breakdown both scope to today's events.
   const since = startOfDay();
-  const cacheAgg = await db
-    .select({
-      totalCacheRead: sum(events.cacheRead),
-      totalCacheCreation: sum(events.cacheCreation),
-    })
-    .from(events)
-    .where(and(gte(events.createdAt, since), eq(events.type, 'llm_call')));
-
-  const cacheRead = Number(cacheAgg[0]?.totalCacheRead ?? 0);
-  const cacheCreation = Number(cacheAgg[0]?.totalCacheCreation ?? 0);
-  const cacheTotal = cacheRead + cacheCreation;
-  const cacheHitRatio = cacheTotal > 0 ? Math.round((cacheRead / cacheTotal) * 100) : 0;
+  const cacheHitRatio = await cacheHitRatioSince(db, since);
 
   // Per-provider breakdown: provider rides the event payload (router sources);
   // events without one predate the router or ran the plain Claude path.
@@ -152,33 +185,14 @@ export async function getTokenSnapshot(): Promise<TokenSnapshot> {
     .select({ payloadJson: events.payloadJson, tokensIn: events.tokensIn, tokensOut: events.tokensOut })
     .from(events)
     .where(and(gte(events.createdAt, since), inArray(events.type, LLM_CALL_TYPES)));
-  const byProviderMap = new Map<string, ProviderSpendRow>();
-  for (const row of callRows) {
-    let provider = 'claude';
-    try {
-      const parsed = JSON.parse(row.payloadJson ?? '{}') as { provider?: string };
-      if (parsed.provider) provider = parsed.provider;
-    } catch { /* unattributed */ }
-    const agg = byProviderMap.get(provider) ?? { provider, calls: 0, tokensIn: 0, tokensOut: 0 };
-    agg.calls += 1;
-    agg.tokensIn += row.tokensIn ?? 0;
-    agg.tokensOut += row.tokensOut ?? 0;
-    byProviderMap.set(provider, agg);
-  }
-  // Attach the declared plan per source (id, or its prefix before ':' for
-  // pooled-account ids like "claude:pro20") so the meter always shows the
-  // subscription behind each IA.
-  const planLabels = providerPlanLabels();
-  const byProvider = [...byProviderMap.values()]
-    .map((r) => ({ ...r, plan: planLabels.get(r.provider) ?? planLabels.get(r.provider.split(':')[0]!) }))
-    .sort((a, b) => b.tokensIn + b.tokensOut - (a.tokensIn + a.tokensOut));
+  const byProvider = aggregateProviderSpend(callRows, providerPlanLabels());
 
   // Month cap is resolved by the gate (plan quota overrides the budgets row).
   return {
     window5h: { messagesUsed: messagesUsedInWindow },
-    day: meterWindow(budget.day, dayCap),
-    week: meterWindow(budget.week, weekCap),
-    month: meterWindow(budget.month, budget.month.cap),
+    day: budgetMeterWindow(budget.day, dayCap),
+    week: budgetMeterWindow(budget.week, weekCap),
+    month: budgetMeterWindow(budget.month, budget.month.cap),
     cacheHitRatio,
     byProvider,
   };
