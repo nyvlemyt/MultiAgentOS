@@ -46,6 +46,18 @@ function eventAt(type: string, at: Date, quotaUnits = 0) {
   });
 }
 
+// Seed an `agent_evaluation` event whose payload is a real ReviewerVerdict
+// (the shape review-phase.ts logs via realAgentEvaluator).
+function evaluationAt(verdict: 'PASS' | 'NEEDS_WORK' | 'BLOCK', at: Date) {
+  return getDb().insert(events).values({
+    id: `evt_${randomUUID()}`, missionId: 'm', taskId: 'm_t1',
+    type: 'agent_evaluation',
+    payloadJson: JSON.stringify({ taskId: 'm_t1', verdict, findings: [{ severity: 'info', message: 'x' }] }),
+    tokensIn: 0, tokensOut: 0, cacheRead: 0, cacheCreation: 0, quotaUnits: 0,
+    risk: 'low', createdAt: at,
+  });
+}
+
 describe('buildDailyReport', () => {
   it('counts events/validations and sums quotaUnits within the window', async () => {
     const since = new Date(2026, 5, 15, 0, 0);
@@ -70,12 +82,39 @@ describe('buildDailyReport', () => {
     expect(r.validationsPending).toBe(1);
     expect(r.quotaUnits).toBe(8);
   });
+
+  it('tallies agent_evaluation verdicts within the window', async () => {
+    const since = new Date(2026, 5, 15, 0, 0);
+    const until = new Date(2026, 5, 16, 0, 0);
+    const inside = new Date(2026, 5, 15, 12, 0);
+    const outside = new Date(2026, 5, 14, 12, 0);
+
+    await evaluationAt('PASS', inside);
+    await evaluationAt('PASS', inside);
+    await evaluationAt('NEEDS_WORK', inside);
+    await evaluationAt('BLOCK', outside); // excluded (out of window)
+
+    const r = await buildDailyReport(getDb(), { since, until });
+    expect(r.agentEvaluations).toBe(3);
+    expect(r.agentEvalPass).toBe(2);
+    expect(r.agentEvalNeedsWork).toBe(1);
+    expect(r.agentEvalBlock).toBe(0);
+  });
+
+  it('reports zero agent evaluations when none exist', async () => {
+    const since = new Date(2026, 5, 15, 0, 0);
+    const until = new Date(2026, 5, 16, 0, 0);
+    const r = await buildDailyReport(getDb(), { since, until });
+    expect(r.agentEvaluations).toBe(0);
+    expect(r.agentEvalPass).toBe(0);
+  });
 });
 
 describe('emitDailyReport', () => {
   it('logs a daily_report event and writes markdown under data/reports', async () => {
     const since = new Date(2026, 5, 15, 0, 0);
     const until = new Date(2026, 5, 16, 0, 0);
+    await evaluationAt('PASS', new Date(2026, 5, 15, 12, 0));
     const report = await buildDailyReport(getDb(), { since, until });
     await emitDailyReport(getDb(), report);
 
@@ -88,6 +127,7 @@ describe('emitDailyReport', () => {
     const md = readFileSync(reportPath, 'utf-8');
     expect(md).not.toContain('€');
     expect(md).toContain('quotaUnits');
+    expect(md).toContain('Agent evaluations: 1');
     rmSync(reportPath, { force: true });
   });
 

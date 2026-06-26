@@ -483,6 +483,9 @@ async function runDelegatedTask(
     // Bounded correction loop: re-invoke the producer with the prior findings
     // injected, re-gate, until approved OR the cap OR the budget is reached.
     for (let iteration = 1; iteration <= MAX_REVIEW_ITERATIONS && review && !review.approved; iteration++) {
+      // Project the next retry's cost as ≈ the last iteration's spend and bail
+      // BEFORE incurring it: delegateWithDiff bills the moment it returns, so the
+      // bounded loop must stop here or it could overrun next.budgetTokens.
       const lastSpend = outcome.response.inputTokens + outcome.response.outputTokens;
       if (spentTokens + lastSpend > (next.budgetTokens ?? Number.MAX_SAFE_INTEGER)) break;
 
@@ -490,7 +493,20 @@ async function runDelegatedTask(
       outcome = await delegateWithDiff({ ...baseInput, skillContext: retrySkillContext });
       spentTokens += outcome.response.inputTokens + outcome.response.outputTokens;
 
-      if (!outcome.diff) break; // producer stopped emitting a diff — keep prior gate
+      if (!outcome.diff) {
+        // Optimizer regression: an earlier iteration produced a diff, this retry
+        // produced none. Keep the prior (unapproved) gate and stop — re-gating
+        // nothing would falsely "approve" by absence. Surfaced for the daily report.
+        await logEvent(db, {
+          missionId: m.id,
+          taskId: next.id,
+          agentId: next.agentId ?? undefined,
+          type: 'producer_regressed_no_diff',
+          risk: next.risk,
+          payload: { iteration },
+        });
+        break;
+      }
       const reGated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
       outputPath = reGated.outputPath;
       review = reGated.review;

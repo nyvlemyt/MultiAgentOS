@@ -56,12 +56,14 @@ Body in Markdown: full responsibilities, examples of good vs bad output,
 JSON schema of the expected response, common failure modes with fixes.
 ```
 
-## 3. Tier A roster — shipped fiches (9)
+## 3. Tier A roster — shipped fiches (10)
 
 The Tier A agents that ship as complete fiches in `packages/agents/fiches/` today.
 The first six were the MVP slice; `quality-controller` (Phase 3.5), then
-`orchestrator` + `agent-evaluator` (Phase 9 · 0c) joined the governance layer.
-Every row is enforced at load by `validateFiche()` (§2/§10).
+`orchestrator` + `agent-evaluator` (Phase 9 · 0c) joined the governance layer; and
+`architect` (Bloc C) promoted the domain-modelling + ADR-authoring role out of the
+§4 backlog into a shipped fiche. Every row is enforced at load by `validateFiche()`
+(§2/§10).
 
 | ID                  | Name                  | Role                                                        | Model         | Default budget |
 |---------------------|-----------------------|-------------------------------------------------------------|---------------|----------------|
@@ -74,13 +76,13 @@ Every row is enforced at load by `validateFiche()` (§2/§10).
 | `reviewer`          | Code Reviewer 🔍      | Diff + artifact review before `review → validated`          | sonnet-4-6    | 3000           |
 | `sec-reviewer`      | Security Reviewer 🛡️ | Risk gate; mandatory before any `high` or `blocking` action | sonnet-4-6    | 3000           |
 | `agent-evaluator`   | Agent Evaluator 📊    | Transverse agent-as-judge (RES-043); advisory rubric score  | sonnet-4-6    | 3000           |
+| `architect`         | Architect 🏛️         | Domain modelling + ADR authoring (proposes; never executes) | sonnet-4-6    | 3000           |
 
-## 4. Tier A roster — Phase 2 (8 more — quality-controller shipped)
+## 4. Tier A roster — Phase 2 (6 more — quality-controller + architect shipped)
 
 | ID                    | Name                 | Role                                                  | Provider hint |
 |-----------------------|----------------------|-------------------------------------------------------|---------------|
 | `project-manager`     | Project Manager 📋   | Cross-mission planning, batching, deadlines           | Claude |
-| `architect`           | Architect 🏛️         | Domain modelling, ADR authoring                       | Claude |
 | `quality-controller`  | Quality Controller 🎯 | **Shipped — see §3.** Vérifie que les règles, conventions et architecture sont respectées par tous les agents. Gate post-exécution avant Reviewer. | Claude / o1-mini |
 | `frontend-builder`    | Frontend Builder 🎨  | Wraps Tier B frontend agents; produces diffs          | Claude |
 | `backend-builder`     | Backend Builder 🛠️   | Wraps Tier B backend agents                           | Claude |
@@ -148,7 +150,7 @@ Beyond the wired Tier B slice, the ECC harvest deposited **32 cold Tier B fiches
 
 ```
 packages/agents/
-├── fiches/                 # 9 shipped Tier A fiches (§3)
+├── fiches/                 # 10 shipped Tier A fiches (§3)
 │   ├── mission-planner.md
 │   ├── orchestrator.md
 │   ├── skill-router.md
@@ -157,7 +159,8 @@ packages/agents/
 │   ├── quality-controller.md
 │   ├── reviewer.md
 │   ├── sec-reviewer.md
-│   └── agent-evaluator.md
+│   ├── agent-evaluator.md
+│   └── architect.md
 ├── avatars/                # stylized SVG avatars per Tier A agent
 │   ├── mission-planner.svg
 │   ├── orchestrator.svg
@@ -167,7 +170,8 @@ packages/agents/
 │   ├── quality-controller.svg
 │   ├── reviewer.svg
 │   ├── sec-reviewer.svg
-│   └── agent-evaluator.svg
+│   ├── agent-evaluator.svg
+│   └── architect.svg
 ├── registry.ts             # loadTierAFiches → validateFiche() guard (§2/§10) + indexes Tier B
 ├── dispatch.ts             # orchestrator loop: delegate() + risk gate + budget + eval-loop
 ├── reviewers.ts            # real critics incl. realAgentEvaluator (transverse judge)

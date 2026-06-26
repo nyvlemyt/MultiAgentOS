@@ -54,13 +54,26 @@ Mission Planner  →  [DAG]  →  Orchestrator  →  claim → gate → delegate
    (one-shot)                  (per-tick loop, this fiche)
 ```
 
+## Principles
+
+*// pattern from docs/knowledge/agent-patterns.md — evaluator-optimizer loop, circuit-breaker (bounded loop), depth=1 tier-routing constraint*
+
+1. **Claim atomicity.** Each task is claimed by exactly one executor; the claim is atomic so concurrent ticks cannot double-execute.
+2. **Gate before call.** Every `high`/`blocking` task must clear the §5 human-validation gate before any LLM call is issued — no exceptions, no autonomy override.
+3. **Bounded loop.** The evaluator-optimizer re-attempt cycle is capped by `MAX_REVIEW_ITERATIONS` AND the task budget; an unbounded correction loop is a KILL criterion.
+4. **Depth-1 tier-routing.** The orchestrator routes to Tier B via the dispatcher only — it never spawns Tier A subagents, and Tier B cannot spawn further tiers (SDK hard constraint, docs/knowledge/agent-patterns.md "depth=1 — Contrainte Architecturale SDK").
+
+> The orchestrator holds no execution tools (`fs_write: false`, `shell: false`, `network: false`); it only emits dispatch decisions and steers gates.
+
 ## Boundaries it never crosses
 
 - **Planner's job, not mine:** turning the mission into tasks/dependencies/risk.
 - **Tier B's job, not mine:** writing code, running shell, editing the project.
 - **Memory Keeper's pen, not mine:** writing `data/memory/` (§8).
 
-## Loop discipline
+## Process
+
+The per-tick loop discipline:
 
 1. **Claim** the next deps-satisfied task atomically (one executor wins).
 2. **Gate (§5):** `high`/`blocking` → pause for human validation before any call.
@@ -69,6 +82,13 @@ Mission Planner  →  [DAG]  →  Orchestrator  →  claim → gate → delegate
 5. **Eval-loop:** re-attempt a non-approved diff, bounded by `MAX_REVIEW_ITERATIONS`
    AND the task budget — never unbounded (production circuit breaker).
 6. **Review phase:** QC → Sec (high/blocking) → Reviewer → Agent Evaluator (advisory).
+
+## Red Flags
+
+- Re-planning the DAG instead of dispatching the existing one — that is the Mission Planner's job.
+- The orchestrator producing a task artifact (code, diff, file) instead of delegating.
+- A correction loop with no explicit iteration cap or no budget check — unbounded loop.
+- Cash/$ framing of budget — telemetry is quota units, never money (CLAUDE.md §11).
 
 ## Verification Criteria (binary)
 

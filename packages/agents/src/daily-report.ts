@@ -16,6 +16,12 @@ export interface DailyReport {
   readonly validationsPending: number;
   // Quota proxy only — NEVER a € figure (CLAUDE.md §11).
   readonly quotaUnits: number;
+  // Agent-quality signal: advisory Agent-Evaluator verdicts (review-phase.ts) in
+  // the window, tallied by verdict (categorical, not a numeric rubric score).
+  readonly agentEvaluations: number;
+  readonly agentEvalPass: number;
+  readonly agentEvalNeedsWork: number;
+  readonly agentEvalBlock: number;
 }
 
 // Status-change events that count as a mission "advancing".
@@ -25,6 +31,25 @@ const ADVANCE_TYPES = new Set([
   'mission_validated',
   'mission_review_started',
 ]);
+
+const EVAL_VERDICTS = new Set(['PASS', 'NEEDS_WORK', 'BLOCK']);
+
+// Narrow the untrusted payloadJson at the boundary (CLAUDE.md §7: unknown, never
+// any). An `agent_evaluation` payload is a ReviewerVerdict; we only need its
+// verdict. A malformed payload returns null → skipped, never thrown.
+function evalVerdict(payloadJson: string): 'PASS' | 'NEEDS_WORK' | 'BLOCK' | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(payloadJson);
+  } catch {
+    return null;
+  }
+  if (typeof parsed !== 'object' || parsed === null) return null;
+  const verdict = (parsed as { verdict?: unknown }).verdict;
+  return typeof verdict === 'string' && EVAL_VERDICTS.has(verdict)
+    ? (verdict as 'PASS' | 'NEEDS_WORK' | 'BLOCK')
+    : null;
+}
 
 export async function buildDailyReport(db: Db, window: { since: Date; until: Date }): Promise<DailyReport> {
   const inWindow = and(gte(events.createdAt, window.since), lt(events.createdAt, window.until));
@@ -36,10 +61,15 @@ export async function buildDailyReport(db: Db, window: { since: Date; until: Dat
   let missionsBlocked = 0;
   let tasksDone = 0;
   let quotaUnits = 0;
+  const evalTally = { PASS: 0, NEEDS_WORK: 0, BLOCK: 0 };
   for (const e of rows) {
     if (ADVANCE_TYPES.has(e.type) && e.missionId) advancedMissions.add(e.missionId);
     if (e.type === 'mission_blocked') missionsBlocked += 1;
     if (e.type === 'task_done') tasksDone += 1;
+    if (e.type === 'agent_evaluation') {
+      const verdict = evalVerdict(e.payloadJson);
+      if (verdict) evalTally[verdict] += 1;
+    }
     quotaUnits += e.quotaUnits;
   }
 
@@ -53,6 +83,10 @@ export async function buildDailyReport(db: Db, window: { since: Date; until: Dat
     tasksDone,
     validationsPending: pending.length,
     quotaUnits,
+    agentEvaluations: evalTally.PASS + evalTally.NEEDS_WORK + evalTally.BLOCK,
+    agentEvalPass: evalTally.PASS,
+    agentEvalNeedsWork: evalTally.NEEDS_WORK,
+    agentEvalBlock: evalTally.BLOCK,
   };
 }
 
@@ -72,6 +106,7 @@ function toMarkdown(report: DailyReport): string {
     `- Missions blocked: ${report.missionsBlocked}`,
     `- Tasks done: ${report.tasksDone}`,
     `- Validations pending: ${report.validationsPending}`,
+    `- Agent evaluations: ${report.agentEvaluations} (pass ${report.agentEvalPass} · needs-work ${report.agentEvalNeedsWork} · block ${report.agentEvalBlock})`,
     `- quotaUnits spent: ${report.quotaUnits}`,
     '',
   ].join('\n');
