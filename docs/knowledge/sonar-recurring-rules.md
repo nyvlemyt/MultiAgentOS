@@ -22,6 +22,7 @@ Avoid these upfront — they recur and each one costs a fix round-trip:
 | **S4623** | passing `undefined` for an optional param | omit the argument |
 | **S7780** | `'a\\b'` string with escaped backslash | `String.raw\`a\b\`` |
 | **S4036** | `execFileSync('bash', ...)` resolved via PATH | absolute path: `execFileSync('/bin/bash', ...)` |
+| **S5906** | `expect(arr.length).toBe(n)` in a test | use the dedicated matcher: `expect(arr).toHaveLength(n)` (only the `.length).toBe()` exact-equality form trips it; comparison matchers like `toBeGreaterThanOrEqual` are fine) |
 
 **Process:** after `git push`, poll Sonar (the analysis keys off your HEAD sha), then
 `scripts/sonar-pr-issues.sh <pr>`. Fix everything it lists — gate-failing or not —

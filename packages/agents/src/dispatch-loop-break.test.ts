@@ -120,7 +120,7 @@ describe('runDelegatedTask — loop break paths', () => {
       .select()
       .from(events)
       .where(and(eq(events.missionId, MID), eq(events.type, 'producer_regressed_no_diff')));
-    expect(regressed.length).toBe(1);
+    expect(regressed).toHaveLength(1);
     expect(JSON.parse(regressed[0]!.payloadJson)).toMatchObject({ iteration: 1 });
 
     // The regression breaks BEFORE re-gating, so no review_iteration is recorded.
@@ -128,7 +128,7 @@ describe('runDelegatedTask — loop break paths', () => {
       .select()
       .from(events)
       .where(and(eq(events.missionId, MID), eq(events.type, 'review_iteration')));
-    expect(iterations.length).toBe(0);
+    expect(iterations).toHaveLength(0);
 
     const [t] = await db.select().from(tasks).where(eq(tasks.id, taskId));
     expect(t?.status).toBe('done'); // prior (unapproved) gate is kept; §5 owns the call
@@ -152,12 +152,12 @@ describe('runDelegatedTask — loop break paths', () => {
       .select()
       .from(events)
       .where(and(eq(events.missionId, MID), eq(events.type, 'producer_regressed_no_diff')));
-    expect(regressed.length).toBe(0);
+    expect(regressed).toHaveLength(0);
     const iterations = await db
       .select()
       .from(events)
       .where(and(eq(events.missionId, MID), eq(events.type, 'review_iteration')));
-    expect(iterations.length).toBe(0);
+    expect(iterations).toHaveLength(0);
 
     const [t] = await db.select().from(tasks).where(eq(tasks.id, taskId));
     expect(t?.status).toBe('done');
