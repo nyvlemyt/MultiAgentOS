@@ -79,6 +79,11 @@ export function claudeCodeLLM(opts: ClaudeCodeLLMOptions = {}): LLMClient {
   }
 
   return {
+    // §7 length exception (F-FN-4, docs/backlog/function-length-debt.md): call() runs ~74 lines
+    // but is intentionally NOT split. It is the single §11 billing-isolation injection point —
+    // ANTHROPIC_API_KEY strip, query() option assembly, the result for-await loop, and quota/usage
+    // mapping are kept co-located so the whole subscription-billing path stays auditable in one
+    // place. Long-but-linear (nesting ≤ 4); no hot-path or correctness concern.
     async call(req: LLMRequest): Promise<LLMResponse> {
       const permissionMode: PermissionMode =
         AUTONOMY_TO_PERMISSION[opts.autonomyLevel ?? 'assisted'];

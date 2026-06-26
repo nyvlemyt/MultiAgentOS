@@ -6,7 +6,7 @@
 Live in `packages/agents/fiches/`. They own the mission lifecycle, route work, and call Tier B. They never do specialized execution themselves.
 
 **Tier B — Library agents (pre-installed).**
-60 fiches already under `.claude/agents/` (agency-style + NEXUS doctrine). They do specialized execution. MultiAgentOS treats them as **callable functions**: a Tier A agent emits `delegate({ agent: "engineering-frontend-developer", task: {...} })`.
+60 fiches already under `.claude/agents/` (agency-style + NEXUS doctrine). They do specialized execution. MultiAgentOS treats them as **callable functions**: a Tier A agent emits `delegate({ agent: "engineering-frontend-developer", task: {...} })`. These 60 are the raw source pool and are **not** scanned into a router index. Separately, the ECC harvest mirrors **32** cold Tier B fiches into `packages/agents/library/` — that set *is* router-indexed (`loadAgentLibraryIndex()`) and is the callable cold arsenal at runtime (§6.bis). The two counts measure different things; neither is a subset claim.
 
 The dispatcher is the only path between tiers. **Tier B never calls Tier A.**
 
@@ -91,6 +91,8 @@ The first six were the MVP slice; `quality-controller` (Phase 3.5), then
 | `automation-designer` | Automation Designer ⚙️ | Pipelines, cron/autopilot specs                       | Claude |
 | `docs-writer`         | Docs Writer 📝       | README, ADRs, runbooks, technical writeups            | GPT-4o |
 
+> **`researcher` / Perplexity routing (§11.bis).** The provider hints above are targets — these agents are not yet shipped. When `researcher` is built, Perplexity (and any paid third-party provider) is reached via an MCP/subscription path, gated behind `paid_apis_enabled` (**default OFF**, CLAUDE.md §11.bis); it must never be silently wired to a billed REST endpoint, and the Anthropic-PAYG ban (§11) stays absolute regardless of provider.
+
 ### Quality Controller — détail
 
 Pipeline :
@@ -140,11 +142,13 @@ The Tier B agents wired in MVP and who calls them (8 MVP rows + the scoped pilot
 | `testing-reality-checker`               | Reviewer, Sec Reviewer     | Default-to-needs-work gate before archive    |
 | `security-defensive-specialist` *(pilot)* | Mission Planner, Sec Reviewer | Defensive cyber tasks: detection, mitigation, hardening, analysis |
 
-> **Domain-scoped pilot.** `security-defensive-specialist` is the first *light* agent of the arsenal-runtime-wiring slice: it carries no fixed skill bag. Its delegation entry holds a `scope` (`{ domain: 'security', clusterPrefix: 'cyber:' }`); at plan-time `domainScopeFor(agentHint)` feeds that scope to `selectLibrarySkills` (`@mas/skills`), which picks the best cold-library skills **within that scope** and injects their L1 summaries. Posture is **defensive-only** (detect/mitigate/analyze, never offensive — CLAUDE.md §5). Generalising scoped selection to the other domain agents is the next cycle.
+> **Called-by column = intended ownership, not shipped wiring.** `Frontend Builder`, `Backend Builder`, `UX/UI Critic` and `Docs Writer` are **§4 Phase 2** agents — not yet shipped; today these delegations are issued by the dispatcher and the shipped Tier A agents (§3). The live runtime wiring is `TIER_B_DELEGATION_MAP`, keyed by Tier B id in `packages/agents/src/library.ts`, not these named callers.
+
+> **Domain-scoped pilot.** `security-defensive-specialist` is the first *light* agent of the arsenal-runtime-wiring slice: it carries no fixed skill bag. Its delegation entry holds a `scope` (`{ domain: 'security', clusterPrefix: 'cyber:' }`); at plan-time `domainScopeFor(agentHint)` — the planner's `agentHint`, taken by the function as its `agentId` parameter (hint and id share one string space here) — feeds that scope to `selectLibrarySkills` (`@mas/skills`), which picks the best cold-library skills **within that scope** and injects their L1 summaries. Posture is **defensive-only** (detect/mitigate/analyze, never offensive — CLAUDE.md §5). Generalising scoped selection to the other domain agents is the next cycle.
 
 ### 6.bis Cold agent library (ECC harvest)
 
-Beyond the wired Tier B slice, the ECC harvest deposited **32 cold Tier B fiches** in `packages/agents/library/<id>.md` (mirror of the cold skills arsenal in `packages/skills/library/`). They are **not auto-registered**; they are scanned into a router-readable `packages/agents/library/index.json` (a **generated, gitignored** build artifact — regen via `pnpm --filter @mas/agents build-library-index`) and loaded on demand via `loadAgentLibraryIndex()` in `packages/agents/src/library.ts`. The dispatcher consults this index the same way `mas-skill-router` consults the cold skills index — discover first, register/delegate on need.
+Beyond the wired Tier B slice, the ECC harvest deposited **32 cold Tier B fiches** in `packages/agents/library/<id>.md` (mirror of the cold skills arsenal in `packages/skills/library/`; distinct from the 60-fiche `.claude/agents/` source pool of §1, which is not router-indexed). They are **not auto-registered**; they are scanned into a router-readable `packages/agents/library/index.json` (a **generated, gitignored** build artifact — regen via `pnpm --filter @mas/agents build-library-index`) and loaded on demand via `loadAgentLibraryIndex()` in `packages/agents/src/library.ts`. The dispatcher consults this index the same way `mas-skill-router` consults the cold skills index — discover first, register/delegate on need.
 
 ## 7. Files to create at MVP
 

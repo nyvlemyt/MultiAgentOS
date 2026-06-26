@@ -1,6 +1,15 @@
-# Backlog — AGENTS.md roster-doc reconciliation (counts, ghost callers, provider routing)
+# Backlog — AGENTS.md roster-doc reconciliation (counts, ghost callers, provider routing) — RESOLVED 2026-06-26 (Bloc D)
 
 **Source**: Bloc C agent audit, 2026-06-26 (Dim 4). Surfaced while promoting `architect` to a shipped Tier A fiche. These are documentation-accuracy gaps in `AGENTS.md`, not runtime defects — deferred so the bloc-c PR stays mechanical and low-risk.
+
+## Status — RESOLVED (Bloc D, branch `chore/bloc-d-hardening`)
+
+All four drifts fixed in `AGENTS.md`:
+
+1. **Count ambiguity** — §1 now states the 60 `.claude/agents/` fiches are the un-indexed source pool while the 32 `packages/agents/library/` fiches are the router-indexed callable cold arsenal; §6.bis carries the reciprocal cross-reference. No subset relationship is asserted.
+2. **Ghost callers** — a note under §6 flags the *Called by* column as intended ownership; live wiring is `TIER_B_DELEGATION_MAP`, and `Frontend/Backend Builder`, `UX/UI Critic`, `Docs Writer` are marked §4 Phase 2 (not shipped).
+3. **`domainScopeFor` naming** — §6 prose now annotates the hint→id resolution: the planner's `agentHint` is taken by the function as its `agentId` parameter.
+4. **`researcher` / Perplexity routing** — a §11.bis note under §4 pins Perplexity to an MCP/subscription path gated behind `paid_apis_enabled` (default OFF), never a billed REST endpoint. The fiche-level Red Flag still lands when the `researcher` agent is authored.
 
 ## What
 
@@ -20,7 +29,7 @@ Three doc/code drifts in [AGENTS.md](../../AGENTS.md), plus one provider constra
 - Fixing them well means a small editorial pass with judgement calls (how much of §6 is doctrine vs. wiring), which is out of scope for a mechanical agent-hardening PR.
 - The `researcher` item is a constraint to honour at build time, not a change to make now.
 
-## What to do (when picked up)
+## Original plan (executed — see Status above)
 
 1. Add one sentence under §1/§6.bis clarifying that the 32-fiche `packages/agents/library/` index is the router-callable cold arsenal, and the 60 `.claude/agents/` fiches are the unindexed source pool.
 2. Either (a) trim the §6 "Called by" column to shipped Tier A agents only, or (b) add a note that it documents intended ownership, with the live wiring being `TIER_B_DELEGATION_MAP`/`domainScopeFor`.

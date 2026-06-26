@@ -23,6 +23,7 @@ import {
   type LLMResponse,
   type Mode,
   type PermissionsConfig,
+  type PlannerTask,
   type Risk,
 } from '@mas/core';
 import { selectLibrarySkills } from '@mas/skills';
@@ -89,6 +90,146 @@ function stricterRisk(a: Risk, b: Risk): Risk {
   return RISK_ORDER[a] >= RISK_ORDER[b] ? a : b;
 }
 
+// Resolve a task's §5 risk: take the STRICTER of the rule-classified risk and the
+// planner's risk, then — ONLY when the rule classifier abstains
+// (needsLLMFallback) — consult the (mocked in CI) Sec Reviewer and bump to
+// blocking on BLOCK. Free of the DB so it is unit-testable in isolation
+// (dispatch-resolve-risk.test.ts). planLlm is consulted lazily, never on a
+// rule-decisive or benign task, so plan-time risk stays quota-free.
+export async function resolveTaskRisk(
+  brief: { title: string; description: string; taskId: string },
+  plannerRisk: Risk,
+  perms: PermissionsConfig,
+  planLlm: LLMClient,
+): Promise<{ finalRisk: Risk; classified: ReturnType<typeof classifyRisk> }> {
+  const classified = classifyRisk({ title: brief.title, description: brief.description }, { perms });
+  let finalRisk = stricterRisk(classified.risk, plannerRisk);
+  if (classified.needsLLMFallback) {
+    const sec = await realSecReviewer(planLlm, {
+      taskId: brief.taskId,
+      risk: finalRisk,
+      brief: { title: brief.title, description: brief.description },
+    });
+    if (sec.verdict === 'BLOCK') finalRisk = 'blocking';
+  }
+  return { finalRisk, classified };
+}
+
+// Per-mission planning dependencies: cold-arsenal router/retriever/library + §5
+// perms, built once in planMission and threaded through every task so none is
+// rebuilt per task. See planMission for how each is constructed (and degrades).
+interface PlanTaskDeps {
+  db: Db;
+  missionId: string;
+  skillRouter: ReturnType<typeof getSkillRouter>;
+  arsenalRetriever: ReturnType<typeof arsenalRetrieverFor>;
+  agentLibrary: AgentLibraryMeta[];
+  perms: PermissionsConfig;
+  planLlm: LLMClient;
+}
+
+// 4b cold-agent suggestion (§5: DATA ONLY). When a cold library agent out-scores
+// the planner hint by a margin, surface it as a single mission/task-scoped event.
+// No routing state is touched — agentId stays the planner's t.agentHint.
+async function suggestColdAgent(
+  db: Db,
+  missionId: string,
+  t: PlannerTask,
+  agentLibrary: AgentLibraryMeta[],
+): Promise<void> {
+  const suggestion = scoreColdAgentSuggestion(
+    { title: t.title, description: t.description },
+    t.agentHint,
+    agentLibrary,
+  );
+  if (!suggestion) return;
+  await logEvent(db, {
+    missionId,
+    taskId: t.id,
+    // No agentId: mission/task-scoped suggestion DATA, not a roster-agent action
+    // (events.agent_id FKs agents.id).
+    type: 'cold_agent_suggested',
+    payload: {
+      taskId: t.id,
+      suggestedAgentId: suggestion.suggestedAgentId,
+      score: suggestion.score,
+      reason: suggestion.reason,
+    },
+  });
+}
+
+// Plan one task: select cold-arsenal skills within the task's agent scope,
+// resolve its §5 risk, persist the row, and emit the skill-router +
+// risk-classified + cold-agent-suggestion events. llm omitted on
+// selectLibrarySkills ⇒ deterministic degrade (zero quota spent).
+async function classifyAndPersistTask(t: PlannerTask, deps: PlanTaskDeps): Promise<void> {
+  const { db, missionId, skillRouter, arsenalRetriever, agentLibrary, perms, planLlm } = deps;
+  const scope = domainScopeFor(t.agentHint);
+  const sel = await selectLibrarySkills({
+    task: { id: t.id, title: t.title, description: t.description, skillsHint: t.skillsHint },
+    scope,
+    router: skillRouter,
+    retriever: arsenalRetriever,
+  });
+
+  const { finalRisk, classified } = await resolveTaskRisk(
+    { title: t.title, description: t.description, taskId: t.id },
+    t.risk,
+    perms,
+    planLlm,
+  );
+
+  await db.insert(tasks).values({
+    id: t.id,
+    missionId,
+    title: t.title,
+    description: t.description,
+    status: 'todo',
+    risk: finalRisk,
+    agentId: t.agentHint,
+    skillsJson: JSON.stringify(sel.skillIds),
+    dependsOnJson: JSON.stringify(t.dependsOn),
+    budgetTokens: t.budgetTokens,
+    spentTokens: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  await logEvent(db, {
+    missionId,
+    taskId: t.id,
+    agentId: 'skill-router',
+    type: 'skill_router_decision',
+    payload: { rationale: sel.rationale, degraded: sel.degraded, skills: sel.skillIds },
+  });
+  await logEvent(db, {
+    missionId,
+    taskId: t.id,
+    agentId: 'sec-reviewer',
+    type: 'risk_classified',
+    risk: finalRisk,
+    payload: { rule: classified.rule, from: t.risk, to: finalRisk },
+  });
+  await suggestColdAgent(db, missionId, t, agentLibrary);
+}
+
+// Mark the mission planned, record its token budget, and emit mission_planned.
+async function finalizeMissionPlan(
+  db: Db,
+  m: Mission,
+  plan: ReturnType<typeof mockMissionPlanner>,
+): Promise<void> {
+  await db
+    .update(missions)
+    .set({ status: 'planned', budgetTokens: plan.estimatedTokens, updatedAt: new Date() })
+    .where(eq(missions.id, m.id));
+  await logEvent(db, {
+    missionId: m.id,
+    agentId: 'mission-planner',
+    type: 'mission_planned',
+    payload: { tasks: plan.tasks.length, estimatedTokens: plan.estimatedTokens },
+  });
+}
+
 export async function planMission(missionId: string) {
   const db = getDb();
   const [m] = await db.select().from(missions).where(eq(missions.id, missionId));
@@ -100,31 +241,19 @@ export async function planMission(missionId: string) {
   // Wipe and rewrite task list for an idempotent plan.
   await db.delete(tasks).where(eq(tasks.missionId, m.id));
 
-  // Cache the cold-arsenal router once — don't rebuild the 877-entry index per task.
+  // Per-mission singletons, built once (never per task): cold-arsenal router +
+  // semantic retriever (QmdRetriever.query is a blocking 30s execFileSync),
+  // cold-agent L1 index (4b suggestions), and the §5 perms config. Each loader
+  // degrades to a safe empty default under the Next bundler — see its definition.
   const skillRouter = getSkillRouter();
-  // ONE arsenal semantic retriever per mission (source b). QmdRetriever.query is a
-  // blocking 30s execFileSync, so build it once here, never inside the task loop.
   const arsenalRetriever = arsenalRetrieverFor();
-  // Cold-agent library (4b): load the L1 index ONCE per mission. The planner picks
-  // agents; this only SUGGESTS a cold arsenal agent via a data-only event — §5: it
-  // never mutates t.agentHint / tasks.agentId / TIER_B_DELEGATION_MAP / delegation.
-  // Defensive: under the Next bundler import.meta.url is not a file: URL so
-  // repoRootDir() throws — degrade to no library (no suggestions) rather than
-  // crash planMission, mirroring getSkillRouter()/defaultFichesDir().
   const agentLibrary = loadAgentLibrarySafely();
-
-  // §5 perms config, loaded ONCE per mission. Passed to classifyRisk so a
-  // domain-agent-registered high/blocking category (sending messages, payments,
-  // outbound sends) escalates a task that mentions its action — see §5 "single
-  // extension point". Ships inert today (categories: []), live the moment a
-  // category is declared.
   const perms = loadPermissionsSafely();
 
-  // Plan-time sec fallback (plan §2.8): consulted only when the rule-based risk
-  // classifier abstains (needsLLMFallback). Built once; under the deterministic
-  // seam this is PASS unless a [sec-block]/risk=blocking sentinel is present, so
-  // the rule-driven risk-classify-wiring test (`rm`) is unaffected. This is the
-  // plan-time risk heuristic, NOT the doer/checker review gate.
+  // Plan-time sec fallback (plan §2.8): build the mission LLM once. Consulted
+  // only when the rule classifier abstains; under the deterministic seam it is
+  // PASS unless a [sec-block] sentinel is present, so the rule-driven
+  // risk-classify-wiring test is unaffected. NOT the doer/checker review gate.
   const [planProj] = await db
     .select({
       id: projects.id, path: projects.path, autonomy: projects.autonomy,
@@ -135,103 +264,14 @@ export async function planMission(missionId: string) {
     .where(eq(projects.id, m.projectId));
   const planLlm = await buildMissionLLM(db, m.id, undefined, planProj, new Date());
 
+  const deps: PlanTaskDeps = {
+    db, missionId: m.id, skillRouter, arsenalRetriever, agentLibrary, perms, planLlm,
+  };
   for (const t of plan.tasks) {
-    // Real engine (Wave 2): scope by the task's agent, select over the cold
-    // arsenal. llm omitted ⇒ deterministic degrade (zero quota spent).
-    const scope = domainScopeFor(t.agentHint);
-    const sel = await selectLibrarySkills({
-      task: { id: t.id, title: t.title, description: t.description, skillsHint: t.skillsHint },
-      scope,
-      router: skillRouter,
-      retriever: arsenalRetriever,
-    });
-
-    // §5 risk classifier: persist the STRICTER of classified vs planner risk.
-    // When the classifier is unsure (shell-ish but no concrete rule) we consult
-    // the (mocked) Sec Reviewer and bump to blocking on BLOCK.
-    const classified = classifyRisk({ title: t.title, description: t.description }, { perms });
-    let finalRisk = stricterRisk(classified.risk, t.risk);
-    if (classified.needsLLMFallback) {
-      const sec = await realSecReviewer(planLlm, {
-        taskId: t.id,
-        risk: finalRisk,
-        brief: { title: t.title, description: t.description },
-      });
-      if (sec.verdict === 'BLOCK') finalRisk = 'blocking';
-    }
-
-    await db.insert(tasks).values({
-      id: t.id,
-      missionId: m.id,
-      title: t.title,
-      description: t.description,
-      status: 'todo',
-      risk: finalRisk,
-      agentId: t.agentHint,
-      skillsJson: JSON.stringify(sel.skillIds),
-      dependsOnJson: JSON.stringify(t.dependsOn),
-      budgetTokens: t.budgetTokens,
-      spentTokens: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-    await logEvent(db, {
-      missionId: m.id,
-      taskId: t.id,
-      agentId: 'skill-router',
-      type: 'skill_router_decision',
-      payload: { rationale: sel.rationale, degraded: sel.degraded, skills: sel.skillIds },
-    });
-    await logEvent(db, {
-      missionId: m.id,
-      taskId: t.id,
-      agentId: 'sec-reviewer',
-      type: 'risk_classified',
-      risk: finalRisk,
-      payload: { rule: classified.rule, from: t.risk, to: finalRisk },
-    });
-
-    // 4b cold-agent suggestion (§5: DATA ONLY). When a cold library agent
-    // out-scores the planner hint by a margin, surface it as a single event.
-    // No routing state above was touched — agentId persisted t.agentHint as-is.
-    const suggestion = scoreColdAgentSuggestion(
-      { title: t.title, description: t.description },
-      t.agentHint,
-      agentLibrary,
-    );
-    if (suggestion) {
-      await logEvent(db, {
-        missionId: m.id,
-        taskId: t.id,
-        // No agentId: this is mission/task-scoped suggestion DATA, not an action
-        // attributed to a roster agent (and FKs events.agent_id → agents.id).
-        type: 'cold_agent_suggested',
-        payload: {
-          taskId: t.id,
-          suggestedAgentId: suggestion.suggestedAgentId,
-          score: suggestion.score,
-          reason: suggestion.reason,
-        },
-      });
-    }
+    await classifyAndPersistTask(t, deps);
   }
 
-  await db
-    .update(missions)
-    .set({
-      status: 'planned',
-      budgetTokens: plan.estimatedTokens,
-      updatedAt: new Date(),
-    })
-    .where(eq(missions.id, m.id));
-
-  await logEvent(db, {
-    missionId: m.id,
-    agentId: 'mission-planner',
-    type: 'mission_planned',
-    payload: { tasks: plan.tasks.length, estimatedTokens: plan.estimatedTokens },
-  });
-
+  await finalizeMissionPlan(db, m, plan);
   return { ...m, status: 'planned' as const };
 }
 

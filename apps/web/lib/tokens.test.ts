@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb, events, budgets, projects, missions, tasks } from '@mas/db';
-import { getTokenSnapshot } from './tokens';
+import { getTokenSnapshot, aggregateProviderSpend, type ProviderSpendRow } from './tokens';
 
 const MIGRATIONS = resolve(dirname(fileURLToPath(import.meta.url)), '../../../packages/db/migrations');
 
@@ -82,5 +82,45 @@ describe('getTokenSnapshot — concurrency-aware day meter', () => {
     expect(snap.day.tokensSpent).toBe(300);
     expect(snap.day.reserved).toBe(250);
     expect(snap.day.remaining).toBe(450); // 1000 − 300 − 250
+  });
+});
+
+// Pure per-provider reduce extracted from getTokenSnapshot (F-FN-3): no DB.
+const callRow = (provider: string | undefined, tokensIn: number, tokensOut: number) => ({
+  payloadJson: provider === undefined ? null : JSON.stringify({ provider }),
+  tokensIn,
+  tokensOut,
+});
+
+describe('aggregateProviderSpend', () => {
+  it('groups rows by provider and sums calls + tokens', () => {
+    const out = aggregateProviderSpend(
+      [callRow('gemini-free', 100, 50), callRow('gemini-free', 20, 10)],
+      new Map(),
+    );
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ provider: 'gemini-free', calls: 2, tokensIn: 120, tokensOut: 60 });
+  });
+
+  it('defaults missing/malformed provider attribution to claude', () => {
+    const out = aggregateProviderSpend(
+      [callRow(undefined, 5, 5), { payloadJson: '{not json', tokensIn: 1, tokensOut: 1 }],
+      new Map(),
+    );
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ provider: 'claude', calls: 2 });
+  });
+
+  it('resolves a pooled-account plan label by its prefix before ":"', () => {
+    const out = aggregateProviderSpend([callRow('claude:pro20', 10, 10)], new Map([['claude', 'max']]));
+    expect(out[0]?.plan).toBe('max');
+  });
+
+  it('sorts providers by total tokens descending', () => {
+    const out: ProviderSpendRow[] = aggregateProviderSpend(
+      [callRow('small', 1, 1), callRow('big', 500, 500)],
+      new Map(),
+    );
+    expect(out.map((r) => r.provider)).toEqual(['big', 'small']);
   });
 });

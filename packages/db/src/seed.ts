@@ -48,25 +48,37 @@ function resolveDbPath(): string {
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../migrations');
 
-async function main() {
-  const repoRoot = findRepoRoot();
-  const dbPath = resolveDbPath();
-  assertSafeToWipe(dbPath, {
-    repoRoot,
-    allowOverride: process.env.MAS_ALLOW_DESTRUCTIVE_SEED === 'true',
-    nodeEnv: process.env.NODE_ENV,
-  });
-  console.log(`[seed] target DB: ${dbPath}`);
-  const db = getDb(dbPath);
+// One DB handle type, threaded through every seed* helper so each owns one table
+// group and main() stays a flat orchestration (§7 fn-length: the seed is a
+// linear data-fixture script split by domain, not by control flow).
+type SeedDb = ReturnType<typeof getDb>;
 
-  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
-  console.log('seeding…');
+const PROJECT_ID = 'proj_otakugo';
+const MISSION_ID = 'mission_seed_001';
 
-  const projectId = 'proj_otakugo';
+const TIER_A = [
+  { id: 'mission-planner', name: 'Mission Planner', emoji: '🗺️', avatar: 'mission-planner.svg' },
+  { id: 'orchestrator', name: 'Orchestrator', emoji: '🎛️', avatar: 'orchestrator.svg' },
+  { id: 'skill-router', name: 'Skill Router', emoji: '🧭', avatar: 'skill-router.svg' },
+  { id: 'context-manager', name: 'Context Manager', emoji: '🧠', avatar: 'context-manager.svg' },
+  { id: 'memory-keeper', name: 'Memory Keeper', emoji: '📚', avatar: 'memory-keeper.svg' },
+  { id: 'quality-controller', name: 'Quality Controller', emoji: '🎯', avatar: 'quality-controller.svg' },
+  { id: 'reviewer', name: 'Code Reviewer', emoji: '🔍', avatar: 'reviewer.svg' },
+  { id: 'sec-reviewer', name: 'Security Reviewer', emoji: '🛡️', avatar: 'sec-reviewer.svg' },
+  { id: 'agent-evaluator', name: 'Agent Evaluator', emoji: '📊', avatar: 'agent-evaluator.svg' },
+];
 
-  // Deterministic reset: every table the seed owns gets wiped, then rewritten.
-  // FK cascades cover most of the chain but we wipe explicitly so reseeds are
-  // idempotent regardless of prior mutations from the lifecycle tests.
+const TIER_B = [
+  { id: 'engineering-frontend-developer', name: 'Frontend Developer', emoji: '🎨' },
+  { id: 'engineering-backend-architect', name: 'Backend Architect', emoji: '🛠️' },
+  { id: 'design-ux-architect', name: 'UX Architect', emoji: '✨' },
+  { id: 'testing-reality-checker', name: 'Reality Checker', emoji: '🧪' },
+];
+
+// Deterministic reset: every table the seed owns gets wiped, then rewritten.
+// FK cascades cover most of the chain but we wipe explicitly so reseeds are
+// idempotent regardless of prior mutations from the lifecycle tests.
+async function resetSeededTables(db: SeedDb) {
   await db.delete(decisions);
   await db.delete(ideas);
   await db.delete(conversations); // messages cascade; FK to missions is RESTRICT, wipe before missions
@@ -83,10 +95,13 @@ async function main() {
   await db.delete(skills);
   await db.delete(budgets);
   await db.delete(permissions);
+}
+
+async function seedProjectRow(db: SeedDb) {
   await db
     .insert(projects)
     .values({
-      id: projectId,
+      id: PROJECT_ID,
       name: 'OtakuGO_UP',
       slug: 'otakugo',
       path: '/Users/melvyn/Documents/03_PROFESSIONNEL/OtakuGO_UP',
@@ -100,20 +115,10 @@ async function main() {
       lastActiveAt: minutesAgo(15),
     })
     .onConflictDoNothing();
+}
 
-  const tierA = [
-    { id: 'mission-planner', name: 'Mission Planner', emoji: '🗺️', avatar: 'mission-planner.svg' },
-    { id: 'orchestrator', name: 'Orchestrator', emoji: '🎛️', avatar: 'orchestrator.svg' },
-    { id: 'skill-router', name: 'Skill Router', emoji: '🧭', avatar: 'skill-router.svg' },
-    { id: 'context-manager', name: 'Context Manager', emoji: '🧠', avatar: 'context-manager.svg' },
-    { id: 'memory-keeper', name: 'Memory Keeper', emoji: '📚', avatar: 'memory-keeper.svg' },
-    { id: 'quality-controller', name: 'Quality Controller', emoji: '🎯', avatar: 'quality-controller.svg' },
-    { id: 'reviewer', name: 'Code Reviewer', emoji: '🔍', avatar: 'reviewer.svg' },
-    { id: 'sec-reviewer', name: 'Security Reviewer', emoji: '🛡️', avatar: 'sec-reviewer.svg' },
-    { id: 'agent-evaluator', name: 'Agent Evaluator', emoji: '📊', avatar: 'agent-evaluator.svg' },
-  ];
-
-  for (const a of tierA) {
+async function seedAgentRoster(db: SeedDb) {
+  for (const a of TIER_A) {
     await db
       .insert(agents)
       .values({
@@ -132,14 +137,7 @@ async function main() {
       .onConflictDoNothing();
   }
 
-  const tierB = [
-    { id: 'engineering-frontend-developer', name: 'Frontend Developer', emoji: '🎨' },
-    { id: 'engineering-backend-architect', name: 'Backend Architect', emoji: '🛠️' },
-    { id: 'design-ux-architect', name: 'UX Architect', emoji: '✨' },
-    { id: 'testing-reality-checker', name: 'Reality Checker', emoji: '🧪' },
-  ];
-
-  for (const b of tierB) {
+  for (const b of TIER_B) {
     await db
       .insert(agents)
       .values({
@@ -157,13 +155,14 @@ async function main() {
       })
       .onConflictDoNothing();
   }
+}
 
-  const missionId = 'mission_seed_001';
+async function seedMissionRow(db: SeedDb) {
   await db
     .insert(missions)
     .values({
-      id: missionId,
-      projectId,
+      id: MISSION_ID,
+      projectId: PROJECT_ID,
       title: 'Polish OtakuGO feed empty-state',
       objective:
         'Redesign the manga feed empty-state with empty-state UX best practices (illustration, primary CTA, secondary CTA, supportive copy).',
@@ -179,7 +178,9 @@ async function main() {
       updatedAt: minutesAgo(5),
     })
     .onConflictDoNothing();
+}
 
+async function seedTaskRows(db: SeedDb) {
   const taskRows = [
     { title: 'Survey 5 best-in-class empty-states', status: 'todo', risk: 'low', agentId: 'mission-planner' },
     { title: 'Pick skills + tier B agents', status: 'todo', risk: 'low', agentId: 'skill-router' },
@@ -194,7 +195,7 @@ async function main() {
       .insert(tasks)
       .values({
         id: `task_seed_${++i}`,
-        missionId,
+        missionId: MISSION_ID,
         title: t.title,
         description: '',
         status: t.status,
@@ -209,7 +210,9 @@ async function main() {
       })
       .onConflictDoNothing();
   }
+}
 
+async function seedReportRows(db: SeedDb) {
   const reportRows = [
     { id: 'rep_seed_1', taskId: 'task_seed_1', agentId: 'mission-planner', kind: 'task' as const, title: 'Survey des empty-states',
       humanMd: '# Survey des empty-states\n\n**Objectif** : recenser 5 références best-in-class.\n\n## Trouvailles\n- Linear — illustration + 1 CTA\n- Notion — phrase + raccourci\n- GitHub — checklist d\'onboarding\n\n## Reco\nUn message court + **un seul** CTA, ton de la marque.',
@@ -227,19 +230,21 @@ async function main() {
   ];
   for (const r of reportRows) {
     await db.insert(reports).values({
-      id: r.id, projectId, missionId: r.kind === 'project' ? null : missionId,
+      id: r.id, projectId: PROJECT_ID, missionId: r.kind === 'project' ? null : MISSION_ID,
       taskId: r.taskId ?? null, agentId: r.agentId ?? null, kind: r.kind, title: r.title,
       humanMd: r.humanMd, ai: r.ai, diff: 'diff' in r ? (r as { diff: string }).diff : '',
       createdAt: minutesAgo(20 - reportRows.indexOf(r) * 3),
     }).onConflictDoNothing();
   }
+}
 
+async function seedEventLog(db: SeedDb) {
   const eventTypes = ['llm_call', 'task_start', 'task_done', 'skill_used', 'delegate', 'tick'];
   // Provider attribution for the /tokens per-source breakdown (Phase 3.5).
   const seedProviders = ['claude:pro20', 'gemini-free', 'claude:max100'];
   for (let e = 0; e < 30; e++) {
     const eventType = eventTypes[e % eventTypes.length] ?? 'tick';
-    const agent = tierA[e % tierA.length] ?? tierA[0]!;
+    const agent = TIER_A[e % TIER_A.length] ?? TIER_A[0]!;
     const isLlmCall = eventType === 'llm_call' || eventType === 'task_done';
     const payload: Record<string, unknown> = { note: `seed event ${e + 1}` };
     if (isLlmCall) payload.provider = seedProviders[e % seedProviders.length];
@@ -247,7 +252,7 @@ async function main() {
       .insert(events)
       .values({
         id: `evt_${randomUUID()}`,
-        missionId,
+        missionId: MISSION_ID,
         taskId: `task_seed_${(e % 5) + 1}`,
         agentId: agent.id,
         type: eventType,
@@ -262,7 +267,9 @@ async function main() {
       })
       .onConflictDoNothing();
   }
+}
 
+async function seedMemorySeed(db: SeedDb) {
   await db
     .insert(memoryItems)
     .values([
@@ -279,7 +286,7 @@ async function main() {
       {
         id: 'mem_proj_1',
         scope: 'project',
-        projectId,
+        projectId: PROJECT_ID,
         type: 'reference',
         title: 'OtakuGO uses Tailwind tokens with manga-themed palette',
         body: 'Brand colors: ink-black, scroll-cream, sakura-pink. Documented in OtakuGO/THEME.md.',
@@ -288,7 +295,9 @@ async function main() {
       },
     ])
     .onConflictDoNothing();
+}
 
+async function seedSkillCatalog(db: SeedDb) {
   // Library skills carry domain + tags so the Phase 3.5 router can route to them.
   // domain ∈ research|code-execution|code-review|planning|memory|security|ux|writing|search
   const installedSkills: Array<{
@@ -338,7 +347,9 @@ async function main() {
         set: { domain: skill.domain, tagsJson: JSON.stringify(skill.tags) },
       });
   }
+}
 
+async function seedBudgetRows(db: SeedDb) {
   await db
     .insert(budgets)
     .values([
@@ -364,21 +375,23 @@ async function main() {
       },
     ])
     .onConflictDoNothing();
+}
 
-  // Phase 4.5-receptacle: Ideas Inbox + Decision Log fixtures for smoke.
+// Phase 4.5-receptacle: Ideas Inbox + Decision Log fixtures for smoke.
+async function seedIdeasAndDecisions(db: SeedDb) {
   await db
     .insert(ideas)
     .values([
       {
         id: 'idea_seed_dark', title: 'Add dark mode toggle', body: 'Readers keep asking for a night theme.',
-        scope: 'project', projectId, status: 'inbox',
+        scope: 'project', projectId: PROJECT_ID, status: 'inbox',
         impact: 70, urgency: 40, effortEst: 30, riskScore: 10,
         priorityScore: Math.round(70 * 0.35 + 40 * 0.3 + (100 - 30) * 0.2 + (100 - 10) * 0.15),
         costEstTokens: 8000, createdAt: minutesAgo(120), updatedAt: minutesAgo(120),
       },
       {
         id: 'idea_seed_search', title: 'Manga full-text search', body: 'Search across titles + chapters.',
-        scope: 'project', projectId, status: 'prioritized',
+        scope: 'project', projectId: PROJECT_ID, status: 'prioritized',
         impact: 90, urgency: 60, effortEst: 70, riskScore: 30,
         priorityScore: Math.round(90 * 0.35 + 60 * 0.3 + (100 - 70) * 0.2 + (100 - 30) * 0.15),
         costEstTokens: 25000, createdAt: minutesAgo(200), updatedAt: minutesAgo(90),
@@ -389,12 +402,39 @@ async function main() {
   await db
     .insert(decisions)
     .values({
-      id: 'dec_seed_stack', scope: 'project', projectId, source: 'user',
+      id: 'dec_seed_stack', scope: 'project', projectId: PROJECT_ID, source: 'user',
       title: 'Keep OtakuGO on Postgres (no Mongo migration)',
       body: 'Relational integrity for manga metadata outweighs document flexibility.',
       createdAt: minutesAgo(300),
     })
     .onConflictDoNothing();
+}
+
+async function main() {
+  const repoRoot = findRepoRoot();
+  const dbPath = resolveDbPath();
+  assertSafeToWipe(dbPath, {
+    repoRoot,
+    allowOverride: process.env.MAS_ALLOW_DESTRUCTIVE_SEED === 'true',
+    nodeEnv: process.env.NODE_ENV,
+  });
+  console.log(`[seed] target DB: ${dbPath}`);
+  const db = getDb(dbPath);
+
+  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+  console.log('seeding…');
+
+  await resetSeededTables(db);
+  await seedProjectRow(db);
+  await seedAgentRoster(db);
+  await seedMissionRow(db);
+  await seedTaskRows(db);
+  await seedReportRows(db);
+  await seedEventLog(db);
+  await seedMemorySeed(db);
+  await seedSkillCatalog(db);
+  await seedBudgetRows(db);
+  await seedIdeasAndDecisions(db);
 
   console.log('seed complete.');
   closeDb();
