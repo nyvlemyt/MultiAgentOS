@@ -66,6 +66,7 @@ const TIER_A = [
   { id: 'reviewer', name: 'Code Reviewer', emoji: '🔍', avatar: 'reviewer.svg' },
   { id: 'sec-reviewer', name: 'Security Reviewer', emoji: '🛡️', avatar: 'sec-reviewer.svg' },
   { id: 'agent-evaluator', name: 'Agent Evaluator', emoji: '📊', avatar: 'agent-evaluator.svg' },
+  { id: 'architect', name: 'Architect', emoji: '🏛️', avatar: 'architect.svg' },
 ];
 
 const TIER_B = [
