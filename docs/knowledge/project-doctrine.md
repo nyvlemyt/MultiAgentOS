@@ -148,6 +148,36 @@ Ouvrir `.claude/memory/` comme vault Obsidian (sans rien modifier) donne :
 
 ---
 
+## Wiki thématique auto-entretenu (principe Karpathy — adopté, encadré)
+
+Audit : [`docs/intake/2026-06-27-karpathy-second-brain.md`](../intake/2026-06-27-karpathy-second-brain.md) (décision `adapt_now` + `backlog_next`).
+
+Le pattern « LLM Wiki » de Karpathy — *l'IA écrit et entretient une encyclopédie par
+sujet, l'humain ne l'édite quasiment jamais à la main* — est adopté **comme principe**,
+pas comme prompt parallèle (un « prompt système Karpathy » dédié serait un doublon de
+`CLAUDE.md §8/§12` + de cette doctrine → divergence, anti-§13). Distinction utile :
+
+- les **5 registres** ci-dessus = mémoire **épisodique** (traces datées : décisions, learnings, blocages) ;
+- le **wiki thématique** = couche **encyclopédique** (articles par sujet, qui grossissent), distincte et complémentaire.
+
+**Garde-fous non négociables (sinon le pattern casse nos règles) :**
+
+1. **§8 — pas d'écriture libre.** Karpathy laisse l'IA écrire le wiki directement ; nous
+   non. Les articles entrent comme **candidats** (`captureCandidates()`), promus par le
+   **Memory Keeper seul**. Aucun nouveau chemin d'écriture.
+2. **§6 — budget plafonné.** L'auto-synthèse (chez Karpathy : ~400 k mots) est un brûleur
+   de quota → effort eco/medium, sous budget, derrière le write-path Keeper.
+3. **Index = QMD, jamais un index manuel.** L'index « fait main » de Karpathy (et le
+   Smart Connections d'Obsidian) est la moitié faible du pattern ; QMD (BM25+vec+rerank,
+   headless) le remplace (ADR 0003 amendement 2026-06-22). Obsidian reste la **vitrine
+   humaine**, QMD le **moteur agents** — deux couches, pas des rivaux.
+
+**Statut de build** : la *couche wiki thématique* (le register lui-même) est `backlog_next`
+→ Phase 4.5/5, sous l'ADR candidat « second cerveau cross-projet ». Ne pas la construire
+hors de cette phase (back-door = casse les gates).
+
+---
+
 ## Project templates & autonomy floors (Phase 7)
 
 Le wizard "New project" enregistre un projet à partir d'un **modèle** (`apps/web/lib/templates.ts`).
