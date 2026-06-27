@@ -66,4 +66,16 @@ Fiche-quality guard (`fiche-quality.test.ts`) checks the 4 REQUIRED_SECTIONS as 
 - **mas-skill-router** — explicit slug map `low→haiku-4-5 / medium→sonnet-4-6 / high·blocking→opus-4-8`; skills/agents count caps; rationale quotes verbatim task token; escalation→`requires_validation`; **new criterion: only L1 summaries read, no L2 body loaded**; valid JSON.
 - **mas-memory-keeper** — `COUNT(*) WHERE status='pending' == 0` post-run; touched rows ∈ {promoted,rejected} w/ reason; register-template match; dedup ran; ≤5 global promotions.
 
-## Wave 4 — single-source dedup — PARTIAL (PRODUCT_SPEC §8 + SKILLS_REGISTRY §7 done in Wave 1; TOKEN_STRATEGY pending)
+## Wave 4 — single-source dedup — DONE
+
+PRODUCT_SPEC §8 (Drizzle schema → entity summary + pointer) and SKILLS_REGISTRY §7 (caveman `(canonical: CLAUDE.md §6)` back-ref) were already done in Wave 1. TOKEN_STRATEGY:
+
+- **§8 marked canonical** for the window/weekly quota caps + a blockquote stating §3 and §11 point here.
+- **§3.1** gained a pointer: the ≥30 % window cap lives in §8; §3.1 only governs a single project's *share* of the shared window.
+- **§11** phase-ramp table gained a note: the phase-3+ row mirrors §8's steady-state caps; update §8, not the table.
+
+### ⚠️ Handoff correction — "CLAUDE §6 restates the 30 % margin" is FALSE on disk
+
+The audit/handoff said to "replace §3/**CLAUDE §6** restatements [of the 30 % margin] with pointers." On-disk check: **CLAUDE.md §6 contains no 30 % figure** — it says only "Each mission has a hard token budget. Going over → pause + ask" and already points to `TOKEN_STRATEGY.md` for the full policy. So there was nothing to dedup there; I did not edit CLAUDE §6 (editing it to "fix" a non-existent dup would be a defect). Likewise §3's number is the **40 % project share**, a distinct rule from the 30 % window margin — I cross-linked them rather than collapsing them. The only genuine quota-cap duplication was §8 ↔ §11, now resolved by the §8-canonical pointer.
+
+The `claude-opus-4-7` model in §2 (expert mode) is a **§5 refuted finding** — Opus 4.7 is a real model — left untouched.

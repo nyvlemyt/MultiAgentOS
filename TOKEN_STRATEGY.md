@@ -18,7 +18,7 @@ The cockpit shows the current mode in the topbar. Mode switches are logged as ev
 
 Lower wins.
 
-1. **Project window share** — default: no single project may consume > 40 % of the current 5-hour window without user confirmation. The window is shared across all projects under the subscription (key: `subscriptionUserId + windowStart`).
+1. **Project window share** — default: no single project may consume > 40 % of the current 5-hour window without user confirmation. The window is shared across all projects under the subscription (key: `subscriptionUserId + windowStart`). The window-level quota cap (≥ 30 % free) is defined once in **§8**; this rule only governs a single project's *share* of that shared window.
 2. **Mission budget** — estimated by Skill Router on `planned`; enforced as a hard cap.
 3. **Task budget** — per Tier A fiche default (see `AGENTS.md §3`).
 
@@ -62,7 +62,9 @@ Per call:
 
 Target ≥ 60 % cache hit rate across all calls in a 5-min window. Track `cache_creation_input_tokens` vs `cache_read_input_tokens` in `events` and surface the ratio in `/tokens`.
 
-## 8. Subscription quota cap (hard)
+## 8. Subscription quota cap (hard) — canonical
+
+> **Single source of truth for the window/weekly quota caps.** §3 (budget hierarchy) and §11 (phase ramp) point here for the steady-state numbers — change the caps in this section only.
 
 `/tokens` page shows **messages used in current 5-hour window / week** live. No € figures — the subscription cost is fixed.
 
@@ -118,4 +120,4 @@ The strictness of these rules can ramp up across phases:
 | 2     | 24 k tokens           | ≥ 40 %        | ≥ 30 %           |
 | 3+    | 32 k tokens           | ≥ 30 %        | ≥ 60 %           |
 
-Defaults above are MVP baselines; the user can override per-project from `/tokens`.
+The phase-3+ row mirrors the canonical steady-state caps in **§8** (window margin ≥ 30 %, ceiling 32 k tokens) — the table shows only the ramp toward them, so update §8 (not this table) when a steady-state cap changes. Defaults above are MVP baselines; the user can override per-project from `/tokens`.
