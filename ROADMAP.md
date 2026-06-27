@@ -32,7 +32,7 @@ Résout le paradoxe de bootstrap : l'outil qui doit créer des projets parfaits 
 
 **Avant de construire chaque phase N (pré-vol obligatoire) :**
 
-1. **Intake-audit ciblé** des ressources pertinentes pour N (`docs/ressources/` + sources), méthode [`docs/workflows/intake-audit-template.md`](docs/workflows/intake-audit-template.md). Cibler la phase, pas tout le lot.
+1. **Intake-audit ciblé** des ressources pertinentes pour N (`docs/resources/` + sources), méthode [`docs/workflows/intake-audit-template.md`](docs/workflows/intake-audit-template.md). Cibler la phase, pas tout le lot.
 2. **Distiller** le retenu dans `docs/knowledge/` (et `CLAUDE.md` / skills `mas-*` si ça devient une règle).
 3. **Puis** construire la phase N.
 
@@ -438,7 +438,7 @@ La **mémoire de base** est livrée (PR #35, `phase/9a-memory` : pont savoir→m
 - **Sélection d'agents consulte l'arsenal** : au-delà de `TIER_B_DELEGATION_MAP`, l'orchestrateur (0c) **suggère** un agent froid pertinent via requête arsenal (couche de suggestion ; l'humain/§5 garde la main — jamais de dispatch autonome d'agent froid).
 - **Consommer le cerveau MCP** : rendre l'outil `query` (QMD MCP) **appelable par les agents** dans la boucle (pas seulement déclaré dans `.mcp.json`). Preuve : un agent appelle `query` pendant une mission et reçoit des candidats.
 - **Golden set d'éval arsenal** en CI : requêtes-or → bon skill/agent/règle, rejouées à chaque changement de collection (anti-régression silencieuse, principe 7).
-- **Périmètre resserré (recommandation user 2026-06-24)** — **différé** : ingestion des 20+ PDF `docs/ressources/` → **vague 0e** dédiée (pipeline d'intake : normalisation Markdown + gate sécu/qualité + Keeper) ; **passe frontmatter unifié** → en tête de 0e (elle en a besoin) ; **console arsenal (UI)** → **Étape 3**. Bâclés pour « tout caser », ils saboteraient le principe qualité ; faits ensuite, ils s'appuient sur un cœur 0d éprouvé.
+- **Périmètre resserré (recommandation user 2026-06-24)** — **différé** : ingestion des 20+ PDF `docs/resources/` → **vague 0e** dédiée (pipeline d'intake : normalisation Markdown + gate sécu/qualité + Keeper) ; **passe frontmatter unifié** → en tête de 0e (elle en a besoin) ; **console arsenal (UI)** → **Étape 3**. Bâclés pour « tout caser », ils saboteraient le principe qualité ; faits ensuite, ils s'appuient sur un cœur 0d éprouvé.
 - *Critères de sortie 0d* : une mission réelle voit **le bon skill/agent remonter par recherche sémantique** (pas tag statique) ; un agent peut **interroger le cerveau via MCP** ; golden set vert ; fallback FTS intact ; 5 checks + Sonar exit 0.
 
 ### Étape 1 · Couche live simple  *(le cœur : ça doit juste marcher)*

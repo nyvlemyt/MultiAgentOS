@@ -48,5 +48,5 @@ Construire le skill avant = payer des tokens pour du provisoire sans réceptacle
 
 ## Action
 
-1. **Maintenant** : utiliser le template manuel pour tout ajout. Les PDFs Notion (`docs/ressources/`) → lancer le master-prompt existant (mode expert) au jalon "traiter les modules d'apprentissage", pas avant.
+1. **Maintenant** : utiliser le template manuel pour tout ajout. Les PDFs Notion (`docs/resources/`) → lancer le master-prompt existant (mode expert) au jalon "traiter les modules d'apprentissage", pas avant.
 2. **Phase 4.5** : construire le skill `intake-audit` + câbler la sortie sur Ideas Inbox / Decision Log. Candidat ADR si on ajoute l'agent Tier-A.

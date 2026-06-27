@@ -1,8 +1,8 @@
 # Principes de Prompting Anthropic / Claude
 
 Sources :
-- `docs/claude doc/prompt_best_practice.pdf` (guide officiel Anthropic, couvre Opus 4.8)
-- `docs/claude doc/Console_prompting_tools.pdf` (outils Console)
+- `docs/claude-doc/prompt_best_practice.pdf` (guide officiel Anthropic, couvre Opus 4.8)
+- `docs/claude-doc/Console_prompting_tools.pdf` (outils Console)
 - https://github.com/anthropics/prompt-eng-interactive-tutorial
 
 ---

@@ -34,11 +34,11 @@ Distiller 40+ ressources d'un bloc = cher (budget ~20€, cf. `user_token-budget
 > 2. Distiller le retenu dans `docs/knowledge/` (et CLAUDE.md / skills si règle).
 > 3. **Ensuite** construire la phase N.
 
-Les ressources de `docs/ressources/` sont un **input par phase**, pas un bloc de fin. Et ce pré-vol applique l'intake-audit **à nous-mêmes** : le projet se bootstrap avec sa propre méthode (récursion saine).
+Les ressources de `docs/resources/` sont un **input par phase**, pas un bloc de fin. Et ce pré-vol applique l'intake-audit **à nous-mêmes** : le projet se bootstrap avec sa propre méthode (récursion saine).
 
 ### Mapping indicatif ressource → phase (à raffiner au pré-vol de chaque phase)
 
-| Thème ressources `docs/ressources/` | Phase qui en a besoin |
+| Thème ressources `docs/resources/` | Phase qui en a besoin |
 |--------------------------------------|------------------------|
 | Hooks Claude Code (8 hooks, 3 hooks) | Phase 6 (risky gates) — mais hooks build-time utiles dès maintenant |
 | Mémoire (5 registres, consolidation, registre learning, sommaire) | Phase 4 + second cerveau |
@@ -63,7 +63,7 @@ L'intake-audit regarde les **nouveaux** ajouts. Il faut aussi ré-auditer **l'ex
 
 > **Cadence de durcissement.** À chaque pré-vol de phase (et au minimum à chaque gate de phase) : ré-auditer les artefacts de base déjà construits (`CLAUDE.md`, `AGENTS.md`, fiches Tier A, skills `mas-*`, ADRs) contre le meilleur savoir courant. Corriger ou backloguer la dette.
 
-Source à distiller pour formaliser ça : `docs/ressources/DURCIR gouverner ses règles capitalisées dans la durée.pdf` + `Le Registre Learning Records...` + `Le rituel de consolidation memoire...`.
+Source à distiller pour formaliser ça : `docs/resources/DURCIR gouverner ses règles capitalisées dans la durée.pdf` + `Le Registre Learning Records...` + `Le rituel de consolidation memoire...`.
 
 ## 5.bis La spirale d'enrichissement & le pont de persistance (anti-oubli)
 

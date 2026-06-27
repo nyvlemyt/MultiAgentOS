@@ -1,6 +1,6 @@
 # Doctrine de Projet pour Agents IA
 
-Sources : `docs/claude doc/vrai-memoire-agent-claude.md`, `docs/claude doc/Le Stack Doctrine.md`, `docs/claude doc/3 checks a faire avant d'upgrader ton modele IA.md`
+Sources : `docs/claude-doc/vrai-memoire-agent-claude.md`, `docs/claude-doc/le-stack-doctrine.md`, `docs/claude-doc/3-checks-avant-upgrade-modele-ia.md`
 Auteur : @le_gouverneur_ia
 
 ---

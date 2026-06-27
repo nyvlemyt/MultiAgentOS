@@ -16,7 +16,7 @@ Tu es le DOER du cycle "{{CYCLE_SLUG}}". Travail = docs uniquement (docs/knowled
 PÉRIMÈTRE : {{SCOPE}}
 
 MÉTHODE (intake-audit léger par ressource, cf. intake-audit-template.md) :
-1. Mapping RES↔PDF par TITRE (les noms de docs/ressources/ ne portent pas le numéro RES sauf RES-040). Marque "non mappable" / "nouveau".
+1. Mapping RES↔PDF par TITRE (les noms de docs/resources/ ne portent pas le numéro RES sauf RES-040). Marque "non mappable" / "nouveau".
 2. Pour chaque ressource du périmètre : ouvre le PDF source + le passage distillé existant, vérifie fidélité, corrige toute invention/sur-interprétation, enrichis les trous. Décision enum (implement_now/adapt_now/backlog_next/watch/reject) + justif.
 3. Distille le retenu dans les fichiers docs/knowledge/ EXISTANTS (pas de nouveaux fichiers sauf nécessité). Mets à jour les statuts INDEX (vraie source : PDF vs MCP).
 
@@ -30,7 +30,7 @@ SORTIE OBLIGATOIRE (avant le résumé terminal) : écris docs/learning/{{CYCLE_S
 ```
 Lis CLAUDE.md (§11, §12, §13), docs/learning/README.md, puis docs/learning/{{CYCLE_SLUG}}/build-report.md.
 
-Tu es le CHECKER indépendant du cycle "{{CYCLE_SLUG}}". Tu ne fais confiance à AUCUNE affirmation du build-report : tu vérifies tout depuis les PDFs sources (docs/ressources/) et les fichiers réels. Défaut = sceptique. Tu NE modifies AUCUN fichier.
+Tu es le CHECKER indépendant du cycle "{{CYCLE_SLUG}}". Tu ne fais confiance à AUCUNE affirmation du build-report : tu vérifies tout depuis les PDFs sources (docs/resources/) et les fichiers réels. Défaut = sceptique. Tu NE modifies AUCUN fichier.
 
 VÉRIFIE :
 1. Fidélité : pour chaque ressource que le Doer dit corrigée/enrichie/distillée, ouvre PDF + fichier, confirme. Cherche toute invention, chiffre non sourcé, sur-interprétation.

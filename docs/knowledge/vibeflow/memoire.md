@@ -80,7 +80,7 @@ Doctrine racine : VibeFlow Philosophy, Principe P1 "Capitaliser : le projet n'ou
 
 ## RES-029 — Mémoire agent : 5 registres (déjà local)
 
-Contenu intégral dans `docs/claude doc/vrai-memoire-agent-claude.md`. Résumé : 5 registres `decisions.md` (BDR), `learnings.md` (LRN), `blockers.md` (BLK), `journal.md`, `evals.md` (EVAL) + rituel close-out + Obsidian comme amplificateur (graph view sur les wikilinks `[[BDR-001]]`).
+Contenu intégral dans `docs/claude-doc/vrai-memoire-agent-claude.md`. Résumé : 5 registres `decisions.md` (BDR), `learnings.md` (LRN), `blockers.md` (BLK), `journal.md`, `evals.md` (EVAL) + rituel close-out + Obsidian comme amplificateur (graph view sur les wikilinks `[[BDR-001]]`).
 
 **Application MAS** : la spec exacte de `data/memory/<projectId>/`. Voir `docs/knowledge/memory-patterns.md` §vrai-memoire.
 
@@ -88,7 +88,7 @@ Contenu intégral dans `docs/claude doc/vrai-memoire-agent-claude.md`. Résumé 
 
 ## RES-056 — Le sommaire que ton IA lit avant (déjà local)
 
-Contenu intégral dans `docs/claude doc/sommaire-que-l-IA-lit-avant-de-fouiller-sa-mémoire.md`. Résumé : un fichier sommaire/index que l'agent lit AVANT de fouiller la mémoire complète. Règle de lecture + prompt qui le maintient à jour.
+Contenu intégral dans `docs/claude-doc/sommaire-que-l-ia-lit-avant-de-fouiller-sa-memoire.md`. Résumé : un fichier sommaire/index que l'agent lit AVANT de fouiller la mémoire complète. Règle de lecture + prompt qui le maintient à jour.
 
 **Application MAS** : c'est `data/memory/<projectId>/SUMMARY.md`, chargé par Context Manager au début de chaque mission. ≤500 tokens. Évite de recharger tous les registres.
 

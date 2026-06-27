@@ -1,6 +1,6 @@
 # Backlog — Skill Install Policy (méthode audit skills.sh)
 
-**Quand** : Phase 6 prep (ADR 0005). **Valeur** : haute (sécurité). **Source** : `docs/claude doc/skill-sh.md` (guide skills.sh by Vercel).
+**Quand** : Phase 6 prep (ADR 0005). **Valeur** : haute (sécurité). **Source** : `docs/claude-doc/skill-sh.md` (guide skills.sh by Vercel).
 
 ## Pourquoi pas maintenant
 

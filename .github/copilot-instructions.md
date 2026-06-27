@@ -23,7 +23,7 @@ MultiAgentOS is a **local-first, single-user multi-agent mission control** (not 
 ## What NOT to flag
 
 - The opt-in `packages/core/src/api-fallback/` directory importing the SDK (it is the one legal place, behind a config flag).
-- `data/`, `docs/ressources/*.pdf`, and `docs/ressources/md/` being gitignored (intentional).
+- `data/`, `docs/resources/*.pdf`, and `docs/resources/md/` being gitignored (intentional).
 - Mock/deterministic values in seed and test fixtures.
 
 Keep comments specific and actionable: file, line, problem, suggested fix.

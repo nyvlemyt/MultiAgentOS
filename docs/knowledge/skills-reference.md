@@ -185,7 +185,7 @@ Source: https://github.com/gepa-ai/gepa
 
 ## Processus 5-Phases pour Créer un Skill (RES-054 @le_gouverneur_ia)
 
-Source: `docs/claude doc/ressources.md` RES-054 "L'usine à compétences sur mesure"
+Source: `docs/claude-doc/ressources.md` RES-054 "L'usine à compétences sur mesure"
 
 Ce process est utilisé par `pnpm skills:reindex` pour générer les summaries L1 des 6 orchestrator skills. Il est aussi la méthode canonique pour créer tout nouveau skill dans MAS.
 

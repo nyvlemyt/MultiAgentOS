@@ -214,4 +214,4 @@ Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Agents/Skills
 | Test 3-Q + Mix/hybride + 10-Q gouverné (RES-015) | affine risk classifier ; output Fait/Evidence/Impact/Reco ; « cas limite » → Verification Criteria | 3.5 |
 | Managed vs Local (RES-016) | ⚠️ Managed = PAYG interdit §11 ; matrice valide local-first ; pattern session-resume à miner | doctrine |
 
-**Distillation Batch 1 (2026-06-04)** : RES-015, 016 + **RES-059** (« Gouverner Templates+Prompts », ex-candidat RES-023) ✅ intégrés ici depuis `docs/ressources/`. **RES-023 tranché (2026-06-05) = « Structurer la gouvernance AVANT de déployer »** → `vibeflow/gouvernance.md` (4 piliers + verdict). RES-009a/009b : superseded (cf. INDEX.md).
+**Distillation Batch 1 (2026-06-04)** : RES-015, 016 + **RES-059** (« Gouverner Templates+Prompts », ex-candidat RES-023) ✅ intégrés ici depuis `docs/resources/`. **RES-023 tranché (2026-06-05) = « Structurer la gouvernance AVANT de déployer »** → `vibeflow/gouvernance.md` (4 piliers + verdict). RES-009a/009b : superseded (cf. INDEX.md).

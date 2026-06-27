@@ -187,7 +187,7 @@ Humain VISUALISE    → Obsidian sur le même dossier (Phase 6+)
 
 ```json
 {
-  "mas-knowledge": ["docs/knowledge/", "docs/claude doc/", "docs/workflows/"],
+  "mas-knowledge": ["docs/knowledge/", "docs/claude-doc/", "docs/workflows/"],
   "mas-memory":    ["data/memory/"]
 }
 ```
@@ -260,7 +260,7 @@ Pas d'intégration directe. Référence pour Phase 4/5 si MAS ingère des source
 
 ## vrai-memoire-agent-claude.md — Prompts Phase 4 Ready-to-Use
 
-Source: `docs/claude doc/vrai-memoire-agent-claude.md`
+Source: `docs/claude-doc/vrai-memoire-agent-claude.md`
 
 Ce fichier contient les prompts copy-paste complets pour implémenter la mémoire Phase 4 :
 
@@ -340,4 +340,4 @@ Auto-fire capture : dans `runReviewPhase()` (chokepoint web+worker), `validated`
 - https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
 - **https://github.com/tobi/qmd** — retrieval layer Phase 4 (NOUVEAU)
 - **https://github.com/kepano/obsidian-skills** — Phase 6 memory visualization
-- `docs/claude doc/vrai-memoire-agent-claude.md` — prompts Phase 4 ready-to-use
+- `docs/claude-doc/vrai-memoire-agent-claude.md` — prompts Phase 4 ready-to-use
