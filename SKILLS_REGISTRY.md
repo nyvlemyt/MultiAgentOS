@@ -120,7 +120,7 @@ For every skill in `.claude/skills/`:
 
 ## 7. Forbidden combinations
 
-- `caveman` MUST NOT be active for: code generation, commit messages, PR descriptions, ADRs, user-facing UI copy, error messages, validation modal text. Caveman is **agent-to-agent prose only**.
+- `caveman` MUST NOT be active for: code generation, commit messages, PR descriptions, ADRs, user-facing UI copy, error messages, validation modal text. Caveman is **agent-to-agent prose only** (canonical rule: `CLAUDE.md §6`).
 - `web-artifacts-builder` MUST NOT be active for missions whose deliverable is a repo change — only for standalone HTML artifacts.
 - `pptx` / `docx` / `xlsx` / `pdf` MUST be on-demand only — never auto-load; they carry large body content.
 - `algorithmic-art` and `canvas-design` MUST NOT auto-load — only when the mission deliverable is explicitly an image/art file.
@@ -128,8 +128,9 @@ For every skill in `.claude/skills/`:
 ## 8. Where the policy lives in code
 
 ```
-config/skills.policy.json     # declarative tiering + project bindings
-packages/skills/registry.ts   # discovery, indexing, summary IO
-packages/skills/router.ts     # Skill Router prompt + JSON schema
-packages/skills/cache.ts      # data/skill-cache/* IO
+config/skills.policy.json        # declarative tiering + project bindings
+packages/skills/src/scanner.ts   # discovery, indexing, summary IO
+packages/skills/src/router.ts    # Skill Router prompt + JSON schema
+packages/skills/src/select.ts    # skill + Tier B agent selection (RRF over warm + cold arsenal)
+packages/skills/src/index.ts     # package exports + library-index entry
 ```

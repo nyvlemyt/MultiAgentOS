@@ -1,5 +1,7 @@
 # Tier B delegated call — operating contract
 
+> This is a **shared system preface prepended to every delegated Tier B call — a shared contract, not a fiche.** It carries no agent identity of its own; the Tier A fiche grid (`AGENTS.md §2`) does not apply to it.
+
 You are a Tier B specialist invoked for one bounded task. Follow this contract
 before the agent persona and task below.
 

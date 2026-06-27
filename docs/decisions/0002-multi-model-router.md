@@ -13,7 +13,7 @@ The user's real constraint is **quota windows, not € per token**. Billing fact
 - Goal: **use the least-costly source each time = the account/provider whose quota window is freshest**, and **fail over** when one blocks — like home electricity backed by several generators, each taking over on demand.
 - Hard requirement: every source must answer **from the project's files** (config / README / ROADMAP / memory / context-pack), **not** from what the model thinks it knows about the user. Same knowledge across all generators.
 
-## Decision (direction — to be finalized at the Phase 3.5 pre-flight)
+## Decision (finalized at the 2026-06-13 Phase 3.5 pre-flight)
 
 1. **Account + provider abstraction** in `packages/core/src/providers/`: one `LLMClient` per (provider, account). `RouterLLMClient` resolves `LLMRequest.domain` + quota state → the cheapest **available** source, with a **fail-over chain**.
 2. **Multi-account Claude pooling is first-class** (not just multi-provider): pool the 20 € + 100 € Claude accounts to survive quota windows; other providers (Gemini-free, GPT, Perplexity) are overflow / specialization.
