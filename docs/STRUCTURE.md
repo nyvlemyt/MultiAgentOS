@@ -78,6 +78,6 @@ Every fiche declares its links, and all of them must resolve. Summary of the rel
 
 Every fiche carries a schema version from doc 1 so the corpus can migrate without a fork:
 
-Current = `'1'`. Every fiche carries it from doc 1. Bump = idempotent migration runner keyed off the version; cross-project register refuses a fiche newer than the host (ADR 0008 §10/§11).
+Current = `'1'`. Every fiche carries it from doc 1. Bump = idempotent migration runner keyed off the version; cross-project register refuses a fiche newer than the host (ADR 0008 clause 10).
 
 > Governance events → `docs/knowledge/consolidation-log.md`.
