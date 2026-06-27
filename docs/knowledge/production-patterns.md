@@ -1,3 +1,11 @@
+---
+id: patterns-de-production-pour-agents
+slug: patterns-de-production-pour-agents
+source_key: 'sha256:3ef7ceb246adf4e1976b1c779b9e6c0c7875a4787aa5d8b081e175ea71e0bd8f'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Patterns de Production pour Agents
 
 ## Experts de référence

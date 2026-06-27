@@ -1,3 +1,11 @@
+---
+id: vibeflow-workflows-doctrine-modeles-patterns-extraits
+slug: vibeflow-workflows-doctrine-modeles-patterns-extraits
+source_key: 'sha256:e3ec19724a5fb55e58aff5ebf2ce55c1846c38b95a6946e0872265d778b947de'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow — Workflows, Doctrine & Modèles (patterns extraits)
 
 Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Workflows. Source intégrale fetchée 2026-06-03.

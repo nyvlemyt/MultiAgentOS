@@ -1,3 +1,11 @@
+---
+id: patterns-d-architecture-multi-agents
+slug: patterns-d-architecture-multi-agents
+source_key: 'sha256:77ed6f9c95507d9d8a1578cad5c95d127148a445e0ee6aa26fff880c4f07334d'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Patterns d'Architecture Multi-Agents
 
 ## Pattern : Manager d'Agent (Quality Controller)

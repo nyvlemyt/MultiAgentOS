@@ -1,3 +1,11 @@
+---
+id: vibeflow-memoire-contexte-patterns-extraits
+slug: vibeflow-memoire-contexte-patterns-extraits
+source_key: 'sha256:1779b90bbe6f6ff454463aaa3fc508d718d86f2c0158bb64ee343c6044c215f0'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow — Mémoire & Contexte (patterns extraits)
 
 Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Mémoire. Source intégrale fetchée 2026-06-03. **Critique pour Phase 4.**

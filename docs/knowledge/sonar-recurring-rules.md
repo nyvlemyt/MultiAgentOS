@@ -1,3 +1,11 @@
+---
+id: sonar-recurring-rules-canonical-fixes
+slug: sonar-recurring-rules-canonical-fixes
+source_key: 'sha256:04af60f8a50fc92c39afafa72c8f0727ed25e4f14ec5bc4b0a4bf97dd3f414e6'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Sonar — recurring rules + canonical fixes
 
 SonarCloud scans every PR (project `nyvlemyt_MultiAgentOS2`). The quality **gate**

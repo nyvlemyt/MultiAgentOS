@@ -1,3 +1,11 @@
+---
+id: skills-et-librairies-de-reference
+slug: skills-et-librairies-de-reference
+source_key: 'sha256:20726fb1afb17a389637ade6eda0ab20d6228a9099a615fcdee694559ebdd2b2'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Skills et Librairies de Référence
 
 ## skills.sh — registre interrogeable (intake 2026-06-13)

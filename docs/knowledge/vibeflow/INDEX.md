@@ -1,3 +1,11 @@
+---
+id: vibeflow-resources-index-integre
+slug: vibeflow-resources-index-integre
+source_key: 'sha256:4fbd6da107d59be344ecec2db3831e77774e7419243d43b8c581aa1af9a3a6b9'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow Resources — Index Intégré
 
 Source : Notion database wiki @le_gouverneur_ia (`collection://37424138-fc8c-80d9-b8f6-000b35b15256`, page https://tangible-mink-e9a.notion.site/Ressources-62124138fc8c834cb89581026c259dcd). Prompts copy-paste de gouvernance IA pour Claude Code.

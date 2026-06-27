@@ -1,3 +1,11 @@
+---
+id: vibeflow-agents-skills-patterns-extraits
+slug: vibeflow-agents-skills-patterns-extraits
+source_key: 'sha256:0af6e8e729251652513a72c5dba32605c21594d012548b7233ee491a3d5c7e84'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow — Agents & Skills (patterns extraits)
 
 Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Agents/Skills. Chaque section = pattern extractible + application MAS. Source intégrale fetchée 2026-06-03.

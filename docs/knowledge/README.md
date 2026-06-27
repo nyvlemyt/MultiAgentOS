@@ -1,3 +1,11 @@
+---
+id: docs-knowledge-index-des-sources-de-connaissance
+slug: docs-knowledge-index-des-sources-de-connaissance
+source_key: 'sha256:f2d058a9ea8ffb20b296cee13feddf7c169e43d88df1e3861a7eefb4010764b9'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # docs/knowledge/ — Index des sources de connaissance
 
 Ce dossier agrège **toute la connaissance curatée** qui informe MultiAgentOS. **Aucune source n'est la vérité unique.** Les sources se croisent : une décision d'architecture solide est confirmée par ≥2 sources indépendantes (recherche académique + pratique terrain + doctrine projet).

@@ -1,3 +1,11 @@
+---
+id: claude-code-architecture-du-contexte-6-modes-de-permission
+slug: claude-code-architecture-du-contexte-6-modes-de-permission
+source_key: 'sha256:81901b0e568842373499a489b2f0e7d8dc0049bdd7474cb2956b03a0d12d92ba'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Claude Code — Architecture du contexte & 6 modes de permission
 
 **Distillé** : 2026-06-03 (pré-vol build-time, cf. `docs/workflows/knowledge-bootstrap.md`).

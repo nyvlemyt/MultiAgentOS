@@ -1,3 +1,11 @@
+---
+id: memoire-et-gestion-de-contexte-pour-agents
+slug: memoire-et-gestion-de-contexte-pour-agents
+source_key: 'sha256:d1d23bf3d59e113af5d2be67501cc43185616d16b82db31a024c07195a00e252'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Mémoire et Gestion de Contexte pour Agents
 
 ## Architecture recommandée pour MultiAgentOS

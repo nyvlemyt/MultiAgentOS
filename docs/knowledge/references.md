@@ -1,3 +1,11 @@
+---
+id: references-ressources
+slug: references-ressources
+source_key: 'sha256:16e11defd88b63c30f62541fc5ef38a0a80c606c340d52b7e5424f06d44d5c5a'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Références & Ressources
 
 Légende : ✅ indexé dans docs/knowledge/ — 🔐 auth requise (Notion) — ⏳ à explorer

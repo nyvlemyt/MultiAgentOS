@@ -1,3 +1,11 @@
+---
+id: risk-scoring-session-orchestration-ecc2-patterns
+slug: risk-scoring-session-orchestration-ecc2-patterns
+source_key: 'sha256:d7696a2b9511235943b00b1dab81ad4826c3bf83399ef0282fe9ef14ae08326c'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Risk Scoring + Session Orchestration (ecc2 patterns)
 
 *Source: `affaan-m/ecc` `research/ecc2-codebase-analysis.md` — analysis of `ecc-tui` v0.1.0, a 4.4k-line Rust TUI control-plane that orchestrates agent sessions (MIT). Distilled 2026-06-21. Feeds CLAUDE.md §5 (risky actions) + Phase 6 (autonomy/risk classifier) + the worker.*

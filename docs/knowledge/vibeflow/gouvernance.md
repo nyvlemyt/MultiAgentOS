@@ -1,3 +1,11 @@
+---
+id: vibeflow-gouvernance-architecture-patterns-extraits
+slug: vibeflow-gouvernance-architecture-patterns-extraits
+source_key: 'sha256:9c43b5ddb1b4d428a2cc39948328d658916e1a435592eb7cd60f078f096cd68e'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow — Gouvernance & Architecture (patterns extraits)
 
 Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Gouvernance. Source intégrale fetchée 2026-06-03.
