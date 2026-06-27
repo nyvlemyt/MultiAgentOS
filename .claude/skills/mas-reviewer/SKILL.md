@@ -1,6 +1,6 @@
 ---
 name: mas-reviewer
-description: "Use to verify mission outputs against the brief before archiving. Returns ReviewerVerdict: PASS, NEEDS_WORK, or BLOCK with findings. Prioritize coverage over filtering. Do NOT modify files, do NOT skip findings because they seem minor."
+description: "Use to verify mission outputs against the brief before archiving. Returns ReviewerVerdict: PASS, NEEDS_WORK, or BLOCK with findings. Prioritize coverage over filtering. Not for security gating of high-risk tasks (that is mas-sec-reviewer, which runs first). Do NOT modify files, do NOT skip findings because they seem minor."
 domain: code-review
 tags: ["review","quality","verification","code-review","adversarial","coverage"]
 summary: "Reviews diff and artifacts against the mission brief, CLAUDE.md conventions, and architecture rules. Goal is COVERAGE not precision: surface all issues, let the human filter. Output: ReviewerVerdict with verdict (PASS|NEEDS_WORK|BLOCK) and findings list (severity: info|warn|block). Never modifies files. Uses adversarial verification pattern."
@@ -107,10 +107,11 @@ Run each check. Do not skip any.
 
 ## Verification Criteria
 
-- [ ] All 6 checklist items were run (not just some)
-- [ ] Findings include location + consequence + confidence for each entry
-- [ ] Verdict set based on finding severity, not subjective judgment
-- [ ] No files were modified during this review
+- [ ] `verdict` is exactly one of `PASS` / `NEEDS_WORK` / `BLOCK` (set, never null).
+- [ ] The run records a result for all 6 `Verification Checklist` items (recorded count == 6 — none silently skipped).
+- [ ] Every `findings[]` entry has a non-empty `where` (file:line), `consequence`, and `confidence`.
+- [ ] `verdict == BLOCK` if and only if ≥1 finding has `severity: block` (verdict derives from severities, not judgment).
+- [ ] `git diff --name-only` over the review run is empty (the Reviewer modified no file).
 
 ## Related Skills
 

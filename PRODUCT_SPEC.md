@@ -1,5 +1,7 @@
 # MultiAgentOS — Product Specification
 
+> **Last updated:** 2026-06-27 · **Status:** living spec — tracks the shipped product (MVP through Phase 7) and the in-progress Phase 9 exploitation layer. The agent roster is canonical in `AGENTS.md §3`; the data model is canonical in `packages/db/src/schema.ts`.
+
 ## 0. One-line pitch
 
 A local cockpit that turns natural-language missions into orchestrated, budget-aware multi-agent execution across all your projects.
@@ -235,53 +237,23 @@ Three layers, expanded in `SKILLS_REGISTRY.md`:
 2. **Project-pinned** — full summary (≤ 200 tokens) loaded when the matching project is active.
 3. **On-demand** — full content loaded only when the Skill Router emits an explicit `requireSkill(<id>)`.
 
-## 8. Data model (initial Drizzle schema)
+## 8. Data model (entity summary)
 
-```ts
-projects(
-  id, name, slug,
-  path,                              -- absolute filesystem path, never copied into this repo
-  type,                              -- free-form tag: "manga-app" | "bot" | "business-website" | "automation" | "other"
-  stack_json,                        -- detected/declared stack tags ["next", "ts", "prisma", ...]
-  autonomy,                          -- default level for this project
-  default_model, default_mode,
-  monthly_budget_cents,
-  created_at, last_active_at
-)
-project_links(                       -- M:N links between projects + Tier A agents + Tier B agents + skills
-  project_id, kind, ref_id,
-  pinned, weight                     -- weight feeds the Skill Router's relevance score
-)
-missions(id, project_id, title, objective, status, risk, budget_tokens, spent_tokens, autonomy_override, mode_override,
-         deadline date,              -- optional, for planning/calendar
-         milestone text,             -- optional free-form label
-         priority_score int,         -- 0-100, computed or user-set
-         idea_id text,               -- FK to ideas.id if converted from an idea
-         created_at, updated_at)
-tasks(id, mission_id, parent_task_id, title, description, status, risk, agent_id, skills_json, depends_on_json, budget_tokens, spent_tokens, output_path, created_at, updated_at)
-ideas(id, title, body, scope enum(global|project), project_id,
-      status enum(inbox|to_clarify|prioritized|converted|archived),
-      priority_score int,            -- 0-100
-      impact int, urgency int, effort_est int,  -- 0-100 sliders
-      cost_est_tokens int,           -- estimated LLM cost if converted to mission
-      created_at, updated_at)
-decisions(id, scope enum(global|project), project_id,
-          source enum(user|mission|validation|agent),
-          source_mission_id text, source_task_id text,
-          title text, body text,
-          created_at)
-agents(id, tier, fiche_path, name, emoji, avatar_path, model, enabled, total_runs, total_tokens, success_rate)
-skills(id, source, path, summary_path, tags_json, tier, auto_load, last_used_at)
-events(id, mission_id, task_id, agent_id, type, payload_json, tokens_in, tokens_out, cache_read, cache_creation, cost_cents, risk, created_at)
-memory_items(id, scope, project_id, type, title, body, source_mission_id, accepted, created_at)
-memory_candidates(id, source_task_id, type, body, status, created_at)
-validations(id, task_id, requested_by_agent, action_summary, status, decided_at, decided_by_user, payload_json)
-budgets(id, scope, scope_id, period, tokens_cap, tokens_spent, money_cap_cents, money_spent_cents)
-context_packs(id, project_id, version, path, generated_at, token_size, file_count)
-permissions(id, category, action, risk, allow_list_json)   -- declarative risky-action registry (see CLAUDE.md §5)
-```
+> **Canonical schema:** `packages/db/src/schema.ts` (Drizzle) is the single source of truth. This section summarizes the entities and their roles; it deliberately does **not** restate column lists — those belong in the schema and drift if duplicated here.
 
-Indices: `(mission_id, status)`, `(task_id, created_at)`, `(agent_id, created_at)`, `(scope, scope_id, period)`.
+- **projects** — registered external projects, keyed by absolute `path` (never copied into this repo); per-project autonomy, mode, monthly budget, detected stack.
+- **project_links** — M:N pins between a project and Tier A agents / Tier B agents / skills; a `weight` feeds the Skill Router's relevance score.
+- **missions / tasks** — the mission FSM (§5) and its task DAG; budgets, risk, autonomy/mode overrides, deadlines, milestone, priority score, `idea_id` back-link.
+- **ideas / decisions** — capture surfaces (§4.6b/§4.6c); an idea converts to a `missions` row, a decision is logged from several contexts.
+- **agents / skills** — roster + skill-registry rows (tier, fiche/summary paths, model, enable flag, usage stats).
+- **events** — append-only trace (§4.6): per-action token in/out, cache read/creation, quota units, risk.
+- **memory_items / memory_candidates** — the Keeper-written memory store + the agent-proposed candidate inbox (§8 doctrine).
+- **validations** — human-gate rows for risky actions (§5).
+- **budgets** — hard window/quota caps per scope (`TOKEN_STRATEGY.md §8`).
+- **context_packs** — per-project context-pack manifest (version, path, token size, file count).
+- **permissions** — declarative risky-action registry (CLAUDE.md §5).
+
+Key indices (defined in `schema.ts`): `(mission_id, status)`, `(task_id, created_at)`, `(agent_id, created_at)`, `(scope, scope_id, period)`.
 
 ## 9. MVP scope (v0.1)
 
@@ -290,7 +262,7 @@ Indices: `(mission_id, status)`, `(task_id, created_at)`, `(agent_id, created_at
 - All cockpit routes wired with the full visual identity (§4.1) — light + dark themes, agent avatars, studio view, multi-level dashboards. Where backends are absent, the UI is populated with mocked fixtures so the product concept is immediately legible at first launch.
 - External Projects Registry: register, edit, remove a project by absolute path; per-project autonomy + mode + budget.
 - Mission lifecycle FSM under manual + assisted autonomy.
-- 6 Tier A orchestrator agents wired end-to-end: Mission Planner, Skill Router, Context Manager, Memory Keeper, Code Reviewer, Security Reviewer.
+- 10 Tier A orchestrator agents now ship (canonical roster: `AGENTS.md §3`). The MVP slice was the first six — Mission Planner, Skill Router, Context Manager, Memory Keeper, Code Reviewer, Security Reviewer — since joined by Orchestrator, Quality Controller, Agent Evaluator, and Architect.
 - 8 Tier B library agents callable via the delegator: Software Architect, Frontend Developer, Backend Architect, UX Architect, UI Designer, Technical Writer, Performance Benchmarker, Reality Checker.
 - Skill Registry auto-discovery + per-skill `summary.md` generation.
 - Token meter (real cost per Claude SDK call) + per-mission budget enforcement.

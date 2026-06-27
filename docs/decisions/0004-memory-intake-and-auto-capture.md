@@ -1,6 +1,6 @@
 # ADR 0004 — Memory & knowledge intake + auto-capture (Phase 4.5)
 
-- **Status**: Accepted (producer half built 2026-06-12, Checker PASS 2026-06-13 on `phase/4.5-memory-intake`; receptacle half follows Phase 3.5)
+- **Status**: Accepted — **both halves shipped**. Producer half built 2026-06-12 (Checker PASS 2026-06-13 on `phase/4.5-memory-intake`); receptacle half (Ideas Inbox / Decision Log / prioritization) since shipped — `/ideas`, `/priorities`, the `decisions` table. See the 2026-06-27 amendment.
 - **Date**: 2026-06-09
 - **Deciders**: Melvyn + Claude (pre-flight Phase 4.5)
 - **Sources**: `docs/backlog/intake-audit-skill.md`, `docs/backlog/second-brain-cross-project.md`, `docs/workflows/intake-audit-template.md`, `docs/knowledge/memory-patterns.md` (§agentmemory), `docs/knowledge/project-doctrine.md` (close-out ritual, 5 registers), `CLAUDE.md §5/§8/§11/§12`, ADR 0003 (storage/retrieval seam), Phase 4 capture BDR (`packages/memory/src/capture.ts` `CAPTURE_DECISION`).
@@ -64,4 +64,10 @@ This phase is **re-sequenced before Phase 3.5** (the multi-account router): the 
 - The `mas-sec-reviewer` skill becomes a hard pre-step in the intake path (wired in the dispatcher, not re-implemented).
 - `/memory` (Memory Center) gains an intake-source filter; the receptacle (`/ideas`, Decision Log) receives dossiers.
 - **Scope risk**: Phase 4.5 now spans producer + receptacle. If too large, split at the pre-flight gate — producer (this ADR) before 3.5, receptacle (Ideas/Decisions/prioritization UI) after 3.5. Documented in ROADMAP "Build order".
-- Deferred to later: agentmemory backend adoption (own intake-audit), QMD retriever (ADR 0003, 4.x), Graphify codebase indexing (future ADR 0006), cross-project second-brain promotion (`second-brain-cross-project.md`, candidate ADR).
+- Deferred to later: agentmemory backend adoption (own intake-audit), Graphify codebase indexing (future **ADR 0008-context-indexing** — number reserved; *not* 0006, which is risk-scoring), cross-project second-brain promotion (`second-brain-cross-project.md`, candidate ADR). *(QMD retriever — originally deferred here to ADR 0003 §4.x — has since shipped as the live primary retriever; see the 2026-06-27 amendment.)*
+
+## Amendement (2026-06-27) — état réel
+
+- **Receptacle livré.** La moitié receptacle (Ideas Inbox / Decision Log / prioritization), notée « follows Phase 3.5 » à l'origine, est en place : routes `/ideas` et `/priorities`, table `decisions` (`packages/db/src/schema.ts`).
+- **QMD vivant.** Le retriever QMD, listé en « deferred » ci-dessus (ADR 0003, 4.x), a été promu **retriever primaire en production** en Phase 9a2 (2026-06-23), avec FTS5 en fallback. Le seam `MemoryRetriever` de cet ADR reste l'interface ; QMD en est l'implémentation par défaut.
+- **Correction de renvoi.** L'indexation de code « Graphify » était renvoyée à un « future ADR 0006 ». Le numéro **0006** a en réalité été attribué au scoring de risque 4-axes ; l'ADR context-indexing reste **0008** (numéro réservé). Renvoi corrigé ci-dessus.

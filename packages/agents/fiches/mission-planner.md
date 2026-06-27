@@ -48,6 +48,10 @@ It does NOT run the DAG: once the plan is emitted, the **Orchestrator** fiche
 (`orchestrator.md`) governs the per-tick dispatch loop (claim, gates, budget,
 eval-loop). Planner authors once; Orchestrator runs it (Phase 9 · 0c split).
 
+## Trigger
+
+Invoked **once per mission**, at intake, via `planMission` (`packages/agents/src/dispatch.ts`) while the mission is still `draft` — a non-`draft` mission is a no-op, so the plan is authored exactly once. It clarifies the objective, emits the `PlannerOutput` DAG, and transitions the mission `draft → planned`. After that it never runs again for that mission; the Orchestrator governs execution.
+
 ## Principles
 
 *// pattern from docs/knowledge/agent-patterns.md — RES-035 mandate/decisions/escalade test (line 66) and last_message handoff discipline (line 166)*

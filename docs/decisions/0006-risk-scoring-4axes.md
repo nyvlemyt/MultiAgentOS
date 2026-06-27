@@ -1,6 +1,6 @@
 # ADR 0006 — Scoring de risque 4-axes (composite) pour le tagger Phase 6
 
-- **Statut** : Proposed (2026-06-21) — à valider au gate de pré-vol Phase 6
+- **Statut** : Proposed (2026-06-21) — **raffinement non implémenté**. Phase 6 a livré le classifieur enum déterministe `packages/core/src/risk-classifier.ts` (PR #11 mergée 2026-06-14, *avant* cet ADR) ; le composite 4-axes décrit ici reste un raffinement à construire sur go séparé. Voir l'amendement daté en fin de document.
 - **Date** : 2026-06-21
 - **Décideurs** : Melvyn + Claude (application des distillations ECC, campagne harvest)
 - **Sources** : `docs/knowledge/risk-scoring-and-session-orchestration.md §1` (modèle 4-axes d'ecc2, MIT), `CLAUDE.md §5` (actions risquées, enum actuel), `config/permissions.json` + `config/project-stack-mappings.json` (listes allow/deny par stack), `mas-sec-reviewer` (gate existant), Phase 6 (classifieur de risque + autopilot).
@@ -73,3 +73,12 @@ Le score est donc une **couche d'affinement au-dessus** des règles déterminist
 - `CLAUDE.md §5` (interface de gating, plancher déterministe — inchangé).
 - `config/permissions.json` (catégories risquées) + `config/project-stack-mappings.json` (listes allow/deny par stack — entrée base-tool).
 - `mas-sec-reviewer` (consommateur du tag), Phase 6 ROADMAP (classifieur + autopilot).
+
+## Amendement (2026-06-27) — état réel vs code
+
+Cet ADR a été rédigé le **2026-06-21**, soit *après* la livraison de la Phase 6 (PR #11 mergée le **2026-06-14**). La Phase 6 a donc shippé **sans** ce modèle : le classifieur en production est `packages/core/src/risk-classifier.ts`, une **table de règles déterministe** qui mappe la liste « always-gate » de CLAUDE.md §5 vers `blocking`, ajoute les catégories `high`/`blocking` de `config/permissions.json`, et signale via `needsLLMFallback` la zone ambiguë au Sec Reviewer. **Il n'existe à ce jour aucun tagger composite à 4 axes dans le code.**
+
+En conséquence :
+- Le statut reste **Proposed** (pas Accepted) : le modèle est tranché *sur le papier* mais **non implémenté**. La mention d'origine « à valider au gate de pré-vol Phase 6 » est caduque — la Phase 6 est passée avant cet ADR.
+- Le « Plan d'intégration (Phase 6) » ci-dessus se lit désormais comme un **plan post-Phase-6** : il demande un **go séparé** et une vague dédiée (le composite se brancherait *au-dessus* de `risk-classifier.ts`, sans toucher le plancher déterministe §5).
+- Invariant inchangé et déjà tenu par le code actuel : les KILL §5 sont des `blocking` inconditionnels que ni score ni LLM ne peuvent rétrograder.

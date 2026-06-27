@@ -43,6 +43,10 @@ The sole write-gate on `data/memory/`. Every other agent proposes via
 store and rebuilds summaries. The dispatcher guarantees no other agent holds
 `fs_write` scoped to `data/memory/`.
 
+## Trigger
+
+Invoked to drain the `memory_candidates` inbox: it promotes or rejects pending `MemoryProposal` entries into the 5-register store and rebuilds per-project summaries. Candidates accumulate from the mission close-out ritual (ADR 0004) and any agent's `MemoryProposal` task; the Keeper is the **only** writer of `data/memory/` (§8) — every other agent merely proposes.
+
 ## Principles
 
 *// pattern from docs/knowledge/memory-patterns.md (memweave + codex-agent-mem) and docs/knowledge/project-doctrine.md (5-register architecture, @le_gouverneur_ia)*

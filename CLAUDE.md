@@ -28,7 +28,7 @@ The product surface and detailed scope live in `PRODUCT_SPEC.md`. The agent rost
 
 Do not introduce frameworks outside this list without an ADR in `docs/decisions/`.
 
-## 3. Repository layout (planned)
+## 3. Repository layout
 
 ```
 multiAgentOS/
@@ -40,8 +40,8 @@ multiAgentOS/
 │   ├── db/                  # Drizzle schema + migrations
 │   ├── agents/              # Tier A fiches + dispatcher; agents/library/ = cold Tier B arsenal (ECC, ADR 0005)
 │   ├── skills/              # Skill router + summaries; skills/library/ + index.json = cold skill arsenal (ECC, ADR 0005)
-│   ├── memory/              # Memory store + summarizer
-│   └── tokens/              # Budget + cost meter
+│   └── memory/              # Memory store + summarizer
+│                            # (budget/cost meter folded into apps/web/lib/tokens.ts + packages/agents/src/budget-gate.ts — no packages/tokens)
 ├── .claude/                 # Existing — see AGENTS.md, SKILLS_REGISTRY.md
 ├── data/                    # SQLite + caches (gitignored)
 ├── docs/
@@ -110,7 +110,7 @@ See `TOKEN_STRATEGY.md` for the full policy. Summary:
   - **Research-&-Reuse FIRST** — before writing new code, check existing repos/registries/our library (generalizes §9.bis Voie 2 to all code).
   - **Anti-template = UI done-criteria**: a delivered frontend surface must show ≥4 intentional qualities (hierarchy, rhythm, depth, designed hover/focus states), never raw Tailwind/shadcn default.
   - Binary review thresholds: fn < 50 lines · file < 800 · nesting ≤ 4 · coverage ≥ 80 % — coverage is now **measured** (`pnpm test:coverage`, v8 provider, report-only). 2026-06-25 baseline: 91 % lines / 84 % branches / 88 % functions. It is **advisory**, *not* a blocking gate yet (low spots are dev-only CLI shims); promotion to a 6th verification check is pending — see `docs/backlog/test-coverage-measurement-gap.md`.
-  - Do **not** adopt ECC's "attribution disabled" git rule — it contradicts our mandatory `Co-Authored-By` (§ commit footer).
+  - Do **not** adopt ECC's "attribution disabled" git rule — it contradicts our mandatory `Co-Authored-By` commit footer (§7 Commits).
 - **Verification = 5 checks, not 4.** A phase/PR is done only when `pnpm -r test` · `pnpm lint` · `pnpm build` · `pnpm --filter @mas/web smoke` **and** SonarCloud are all clean. Sonar clean means `scripts/sonar-pr-issues.sh <pr>` exits 0 — **zero open issues and zero to-review hotspots**, not merely a green gate (the gate ignores MINOR/MAJOR smells). After `git push`, poll until the analysis of your HEAD sha lands, run the script, and fix everything it lists. Recurring rules + canonical fixes: `docs/knowledge/sonar-recurring-rules.md` — read it before writing UI/test code to avoid the round-trips.
 
 ## 8. Memory
@@ -149,77 +149,40 @@ When building features of MultiAgentOS, follow `ROADMAP.md` phase by phase. Do n
 
 ## 11. Billing isolation (CRITICAL)
 
-MultiAgentOS has **one** billing mode: the Claude Code subscription (Pro/Max). PAYG via API key is a **forbidden** mode.
-
-| Mode | Trigger | Billing |
-|------|---------|---------|
-| **Subscription** *(only legal mode)* | `claude login` + `@anthropic-ai/claude-agent-sdk` | Fixed monthly |
-| ~~API PAYG~~ *(forbidden)* | `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY` | Per token — facture salée |
+MultiAgentOS has **one** legal billing mode — the Claude Code subscription (Pro/Max, fixed monthly) via `claude login` + `@anthropic-ai/claude-agent-sdk`. PAYG via `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY` (per-token "facture salée") is **forbidden**.
 
 **Rules — enforce always, never override:**
 
 1. **No runtime code may `import` from `@anthropic-ai/sdk`** in `apps/` or `packages/*/src/`. The only legal location is an opt-in `packages/core/src/api-fallback/` behind an explicit config flag. Enforcement: **CI lint guard active** — `scripts/lint-no-sdk-payg.sh`, wired into `pnpm lint` (matches any import form: quotes, dynamic `import()`, `require`, subpaths).
-2. `ANTHROPIC_API_KEY` presence at worker init triggers a **warning log + refusal to start**. The key is treated as a smell, not a feature.
+2. `ANTHROPIC_API_KEY` presence at worker init triggers a **warning log + refusal to start** — the key is a smell, not a feature.
 3. `ANTHROPIC_API_KEY` must never be exported in global shell config (`~/.zshrc`, `~/.bashrc`, `~/.zshenv`, `~/.profile`). Verify: `echo $ANTHROPIC_API_KEY` in a fresh terminal must be empty.
 4. Claude Code authenticates exclusively via `claude login`. If it prompts for an API key, something is wrong — investigate before entering one.
 5. `.env` files are gitignored and must stay that way. Never commit a file containing `ANTHROPIC_API_KEY`.
 
-**In MultiAgentOS code:** `packages/core/src/llm.ts` is the single LLM injection point. It drives the Claude Code engine via `@anthropic-ai/claude-agent-sdk`. No other file may instantiate an LLM client.
+`packages/core/src/llm.ts` is the single LLM injection point (drives the engine via `@anthropic-ai/claude-agent-sdk`); no other file may instantiate an LLM client.
 
-**§11.bis — Non-Anthropic providers (Phase 3.5, ADR 0002):** provider SDKs (`openai`, `@google/generative-ai`, Perplexity via OpenAI-compatible endpoint) are allowed **only** under `packages/core/src/providers/`, resolved exclusively by the `RouterLLMClient`, configured via `config/model-routing.json`. Rules:
-1. The Anthropic-PAYG ban above is **unchanged** — `@anthropic-ai/sdk` stays forbidden everywhere.
-2. Paid third-party APIs (OpenAI, Perplexity) ship **opt-in, default OFF** (`paid_apis_enabled: false`). Default-enabled sources: pooled Claude accounts (per-account `CLAUDE_CONFIG_DIR`) + Gemini free tier.
-3. Provider keys live in `.env.local` (gitignored); a missing key disables that provider with a startup warning, never a crash.
-4. Execution tasks (file I/O, bash, git) are **Claude-only**; non-Claude providers do cognition, grounded by explicit memory/context-pack injection.
-5. The lint guard confines provider SDK imports to `packages/core/src/providers/`.
+**§11.bis — Non-Anthropic providers (ADR 0002):** provider SDKs (`openai`, `@google/generative-ai`, Perplexity) are allowed **only** under `packages/core/src/providers/`, resolved by `RouterLLMClient`; paid APIs ship opt-in / default-OFF and the lint guard confines them there. The `@anthropic-ai/sdk` PAYG ban above is unchanged.
 
-**Guard against runaway quota:** the `budgets` table + `TOKEN_STRATEGY.md §8` define hard window caps. The worker checks the active budget row before every LLM call and returns `budget_exceeded` if the cap is reached.
-
-**⚠️ Billing change effective 2026-06-15:** Agent SDK usage on subscription plans consumes a **separate** monthly credit from Claude.ai conversations. The `budgets` table must track Agent SDK quota independently from interactive Claude.ai usage. Agents consume ~4× quota vs normal chat; multi-agent research missions ~15×. Source: `docs/knowledge/anthropic-ecosystem.md`.
+> Full rationale, the provider sub-rules, the 2026-06-15 Agent-SDK credit split, and the runaway-quota guard live in **`docs/decisions/0009-billing-isolation.md`** — update that ADR (not this prose) when the billing model changes.
 
 ## 12. Knowledge Base — mandatory consultation rules
 
-`docs/knowledge/` contains curated research on agents, prompting, memory, and production patterns. **Ignoring it produces mediocre work.** These rules are non-negotiable:
+`docs/knowledge/` holds curated research on agents, prompting, memory, and production patterns. **Ignoring it produces mediocre work** — these rules are non-negotiable.
 
-### Before creating or modifying any SKILL.md file
-1. Read `docs/knowledge/prompting-anthropic.md` — apply XML tags, chain-of-thought, effort mapping
-2. Read `docs/knowledge/skills-reference.md` — use the lifecycle structure (Overview → When to Use → Process → Rationalizations → Red Flags → Verification Criteria)
-3. Read the relevant domain file (`agent-patterns.md`, `memory-patterns.md`, `production-patterns.md`, or `project-doctrine.md`)
-4. SKILL.md body must include: Principles section (citing source), Process (numbered steps), Rationalizations Table, Red Flags, Verification Criteria (binary pass/fail)
-5. `summary:` field (L1, ≤200 tokens) = one-paragraph précis for prompt injection. Body (L2) = full operational guide.
+- **Before creating/modifying any `SKILL.md`:** read `prompting-anthropic.md` (XML tags, chain-of-thought, effort mapping) + `skills-reference.md` (lifecycle: Overview → When to Use → Process → Rationalizations → Red Flags → Verification) + the relevant domain file (`agent-patterns.md` / `memory-patterns.md` / `production-patterns.md` / `project-doctrine.md`). Body must carry Principles (cite source) · numbered Process · Rationalizations table · Red Flags · binary Verification Criteria. `summary:` = L1 précis (≤200 tok); body = L2 full guide — **both required**.
+- **Before creating/modifying any agent fiche:** check `AGENTS.md` for tier/domain/responsibility; read `agent-patterns.md`; apply the **≤7 tools** rule (MLOps Community research).
+- **Before any memory feature:** read `memory-patterns.md` (5-register architecture from `project-doctrine.md`); apply the signal-density test; never inject >5 global memory items per mission.
 
-### Before creating or modifying any agent fiche
-1. Check `AGENTS.md` for the correct tier, domain, and responsibility
-2. Read `docs/knowledge/agent-patterns.md` for the relevant patterns
-3. Apply ≤7 tools per agent rule (MLOps Community research)
-
-### Before implementing a memory feature
-1. Read `docs/knowledge/memory-patterns.md` — use the 5-register architecture from `project-doctrine.md`
-2. Apply signal-density test to every piece of context injected
-3. Never inject more than 5 global memory items per mission
-
-### Red flag phrases — stop and consult docs/knowledge/ if you think any of these
-- "The skill is just instructions, it doesn't need much content" → wrong, see §12.1
-- "I'll keep the summary short for now" → summary=L1 brief, body=L2 rich — both required
-- "I don't need to look at the knowledge base for this" → always do
+**Red-flag thoughts — stop and consult `docs/knowledge/` if you catch any of these:** "the skill is just instructions, it doesn't need much content" · "I'll keep the summary short for now" · "I don't need the knowledge base for this." All three are wrong (see the rules above).
 
 ## 13. Learning bootstrap — pre-flight, intake-audit & persistence (mandatory)
 
 The tool that builds great projects must itself be built with the best knowledge — learned *before* each phase, never last. Full doctrine: `docs/workflows/knowledge-bootstrap.md`.
 
-### Before building any ROADMAP phase N
-1. **Pre-flight** — run a targeted intake-audit of the resources relevant to phase N (`docs/ressources/`, `docs/knowledge/`), method in `docs/workflows/intake-audit-template.md`. Scope to the phase, not the whole batch.
-2. **Distill** the kept items into the existing `docs/knowledge/` files (and CLAUDE.md / skills only if it becomes a rule).
-3. **Then** build. Resources are a per-phase input, not an end-of-project block.
-
-### Adding anything (resource / skill / agent / idea / memory / principle)
-Run the intake-audit (`docs/workflows/intake-audit-template.md`): identity → fit → 3 costs (install/maintenance/removal) → score → **KILL criteria** (the audit must be able to say `reject`) → decision enum → adaptation → integration plan → re-audit date. The audit *decides*; implementation reuses the mission lifecycle.
-
-### Self-audit (at every phase gate)
-Re-audit already-built artifacts (`CLAUDE.md`, `AGENTS.md`, Tier A fiches, `mas-*` skills, ADRs) against current best knowledge. Fix or backlog the debt.
-
-### Persistence bridge (anti-oubli — firm requirement)
-Phase 4 memory MUST seed from `docs/knowledge/` + `vibeflow/INDEX.md`, so build-time knowledge flows into the runtime second brain instead of diverging. In Phase 4 exit criteria. See `docs/backlog/second-brain-cross-project.md` and `knowledge-bootstrap.md §5.bis` (the enrichment spiral).
+- **Before building ROADMAP phase N:** run a phase-scoped intake-audit of relevant resources (`docs/ressources/`, `docs/knowledge/`; method in `docs/workflows/intake-audit-template.md`), **distill** kept items into `docs/knowledge/` (and CLAUDE.md / skills only if it becomes a rule), **then** build. Resources are a per-phase input, not an end-of-project block.
+- **Adding anything (resource / skill / agent / idea / memory / principle):** run the intake-audit — identity → fit → 3 costs → score → **KILL criteria** (must be able to say `reject`) → decision enum → adaptation → integration plan → re-audit date. The audit *decides*; the mission lifecycle executes.
+- **Self-audit at every phase gate:** re-audit shipped artifacts (`CLAUDE.md`, `AGENTS.md`, Tier A fiches, `mas-*` skills, ADRs) against current best knowledge; fix or backlog the debt.
+- **Persistence bridge (anti-oubli):** Phase 4 memory was seeded from `docs/knowledge/` + `vibeflow/INDEX.md` (2026-06-09), so build-time knowledge flows into the runtime second brain instead of diverging. See `docs/backlog/second-brain-cross-project.md` and `knowledge-bootstrap.md §5.bis` (the enrichment spiral).
 
 ## 14. Style de communication & rapports (préférence utilisateur — non négociable)
 

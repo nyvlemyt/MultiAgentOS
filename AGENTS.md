@@ -78,12 +78,13 @@ The first six were the MVP slice; `quality-controller` (Phase 3.5), then
 | `agent-evaluator`   | Agent Evaluator 📊    | Transverse agent-as-judge (RES-043); advisory rubric score  | sonnet-4-6    | 3000           |
 | `architect`         | Architect 🏛️         | Domain modelling + ADR authoring (proposes; never executes) | sonnet-4-6    | 3000           |
 
-## 4. Tier A roster — Phase 2 (6 more — quality-controller + architect shipped)
+## 4. Tier A roster — Phase 2 backlog (not yet shipped)
+
+> `quality-controller` and `architect` have since **shipped** — they live in the §3 roster now, not here. The rows below are the remaining backlog targets; provider hints are aspirational and gated by `paid_apis_enabled` (CLAUDE.md §11.bis).
 
 | ID                    | Name                 | Role                                                  | Provider hint |
 |-----------------------|----------------------|-------------------------------------------------------|---------------|
 | `project-manager`     | Project Manager 📋   | Cross-mission planning, batching, deadlines           | Claude |
-| `quality-controller`  | Quality Controller 🎯 | **Shipped — see §3.** Vérifie que les règles, conventions et architecture sont respectées par tous les agents. Gate post-exécution avant Reviewer. | Claude / o1-mini |
 | `frontend-builder`    | Frontend Builder 🎨  | Wraps Tier B frontend agents; produces diffs          | Claude |
 | `backend-builder`     | Backend Builder 🛠️   | Wraps Tier B backend agents                           | Claude |
 | `ux-critic`           | UX/UI Critic ✨      | Pre-merge UX gate                                     | GPT-4o |
@@ -93,21 +94,7 @@ The first six were the MVP slice; `quality-controller` (Phase 3.5), then
 
 > **`researcher` / Perplexity routing (§11.bis).** The provider hints above are targets — these agents are not yet shipped. When `researcher` is built, Perplexity (and any paid third-party provider) is reached via an MCP/subscription path, gated behind `paid_apis_enabled` (**default OFF**, CLAUDE.md §11.bis); it must never be silently wired to a billed REST endpoint, and the Anthropic-PAYG ban (§11) stays absolute regardless of provider.
 
-### Quality Controller — détail
-
-Pipeline :
-```
-[agents d'exécution] → Quality Controller → Reviewer → SecReviewer → archive
-```
-
-Responsabilités :
-- Vérifier que les outputs respectent CLAUDE.md (conventions, architecture, no PAYG)
-- Vérifier que les commits sont Conventional Commits ≤ 60 chars
-- Signaler toute dérive d'architecture (nouveau framework sans ADR)
-- Contrôler que le token spend est justifié par la qualité produite
-- Langue de sortie cohérente avec le mode projet (FR/EN)
-
-Différence avec Reviewer : le Reviewer vérifie le CODE. Le Quality Controller vérifie que le PROCESSUS et les RÈGLES ont été respectés.
+> **Quality Controller — shipped (§3).** Full spec: `packages/agents/fiches/quality-controller.md`. In one line: the Reviewer checks the **CODE**; the Quality Controller checks that the **PROCESS and RULES** (CLAUDE.md conventions, Conventional Commits, no architecture drift without an ADR, justified token spend, output language) were respected — it gates post-execution, before the Reviewer.
 
 ## 5. Tier A roster — Project-specialized (later, on demand)
 
@@ -180,8 +167,7 @@ packages/agents/
 ├── dispatch.ts             # orchestrator loop: delegate() + risk gate + budget + eval-loop
 ├── reviewers.ts            # real critics incl. realAgentEvaluator (transverse judge)
 └── prompts/
-    ├── tier-a-system.md    # shared system preface
-    └── tier-b-system.md    # shared system preface for delegated calls
+    └── tier-b-system.md    # shared system preface for delegated calls (a shared contract, not a fiche)
 ```
 
 Tier B agents inherit a default avatar derived from their domain prefix (`engineering-*` → cog, `design-*` → palette, etc.); they can be overridden later by dropping an SVG in `packages/agents/avatars/library/<id>.svg`.
@@ -226,6 +212,8 @@ type TaskResult =
 ## 10. Authoring rule
 
 When creating a new Tier A fiche, copy the schema in §2 verbatim and fill every key. Empty keys are not allowed. This is **enforced at load**: `registry.ts` runs `validateFiche()` over every fiche and `loadTierAFiches()` throws if any mandatory key (incl. `escalate_when`, `limits`, `responsibilities`) is missing or empty (Phase 9 · 0c, finding U3). Typing the fields alone caught nothing — U1 was a mandatory key silently missing; `validateFiche()` closes that gap.
+
+Keep each agent's **tool surface ≤ 7** — the MLOps "≤7 tools per agent" rule (`docs/knowledge/agent-patterns.md`). The fiche's effective tools are its `favorite_skills` + `required_skills` plus the runtime tools in §8 (`delegate`, `proposeMemory`, `requestValidation`, `requireSkill`); an agent that needs more than seven is a decomposition smell — split the responsibility rather than widen the surface.
 
 ## 11. Forbidden patterns
 

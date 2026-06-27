@@ -138,11 +138,11 @@ Max 5 global memory items injected per mission to keep context windows bounded. 
 
 ## Verification Criteria
 
-- [ ] All candidates reviewed — none skipped
-- [ ] Each promoted entry uses the correct register format (BDR/LRN/BLK)
-- [ ] No duplicate check was skipped
-- [ ] `memory_candidates.status` updated for every processed row
-- [ ] Global item injection ≤ 5
+- [ ] After the run, `SELECT COUNT(*) FROM memory_candidates WHERE status = 'pending'` returns 0 (every candidate processed).
+- [ ] Every row touched this run has `status` ∈ {`promoted`, `rejected`} with a non-null decision reason.
+- [ ] Each promoted entry matches its register template (BDR/LRN/BLK heading + required sections present).
+- [ ] No promoted entry duplicates an existing memory id (dedup ran; duplicates merged, not appended).
+- [ ] The count of promoted global items for this invocation is ≤ 5.
 
 ## Related Skills
 

@@ -51,6 +51,10 @@ position (AGENTS.md §4):
 Read-only toolset (Read, Grep, Glob): inspects the diff, commits, and config.
 Never writes a file; never runs a shell command (no Bash — `shell: false`).
 
+## Trigger
+
+Invoked first in the **review phase**, after execution: `runReviewPhase` → `runCriticGates` calls `realQualityController` before the Reviewer (`packages/agents/src/review-phase.ts`). A QC `BLOCK` short-circuits the sec/reviewer stage and blocks the mission. It judges PROCESS/RULES on the finished diff, commits, and config only — never the code.
+
 ## Principles
 
 *// pattern from docs/knowledge/agent-patterns.md — RES-035 (skill-vs-agent binary test) and RES-037 (3 audit modes in production)*

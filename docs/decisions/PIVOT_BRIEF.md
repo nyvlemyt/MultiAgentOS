@@ -1,5 +1,9 @@
 # Pivot Brief — From Voie 1 (API SDK) to Voie 3 (Claude Code engine), inspired by Voie 2
 
+- **Status:** Superseded — **pivot executed**. The Voie 3 pivot was carried out: `packages/core/src/llm.real.ts` drives the Claude Agent SDK (no `@anthropic-ai/sdk` at runtime), `CLAUDE.md §11` was restructured to "one subscription mode + a forbidden PAYG mode", `§9.bis Inspiration Voie 2` was added, and the CI guard `scripts/lint-no-sdk-payg.sh` enforces the import ban. The authoritative record is now **ADR 0001** (`0001-claude-code-engine-over-api-sdk.md`). This brief is kept as the historical relay handoff.
+- **Date:** 2026-06-01 (superseded note added 2026-06-27)
+- **Deciders:** Melvyn + Claude
+
 > Read this **before any further work on `phase/2-real-claude`** and before opening any new phase. Reading order is: this brief → `docs/decisions/0001-claude-code-engine-over-api-sdk.md` → the file paths cited in the checklist.
 
 ## Why this brief exists
