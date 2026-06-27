@@ -43,6 +43,16 @@ export const CLEAN_TEST_DIFF = [
 export const GARBAGE_TEST_DIFF = 'this is not a diff at all\n@@ broken @@\n';
 
 /**
+ * A non-git temp dir seeded with the same file.txt the diff fixtures target.
+ * Exercises sandbox-diff's "source is not a repo → git-init the sandbox" path.
+ */
+export function makeTempNonRepo(prefix = 'mas-nonrepo-'): string {
+  const dir = mkdtempSync(join(tmpdir(), prefix));
+  writeFileSync(join(dir, 'file.txt'), 'hello\nworld\n');
+  return dir;
+}
+
+/**
  * Test-only helpers (not exported from the package index). Deduplicate the
  * per-suite DB boilerplate and the project/mission/roster fixtures shared by
  * the dispatch-flow tests.

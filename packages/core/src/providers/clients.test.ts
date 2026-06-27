@@ -3,7 +3,9 @@ import type { LLMClient, LLMRequest, LLMResponse } from '../llm.js';
 import { claudeAccountLLM } from './claude-account.js';
 import { geminiLLM } from './gemini.js';
 import { openaiLLM } from './openai.js';
+import { openaiCompatLLM } from './openai-compat.js';
 import { perplexityLLM } from './perplexity.js';
+import type { ProviderDef } from './types.js';
 
 const req: LLMRequest = {
   system: 'sys',
@@ -121,5 +123,36 @@ describe('openaiLLM / perplexityLLM', () => {
       'https://api.perplexity.ai/chat/completions',
     );
     expect(resp.provider).toBe('perplexity');
+  });
+});
+
+describe('openaiCompatLLM fallback branches', () => {
+  it('falls back to defaultModel, omits the system message, and zero-fills a sparse response', async () => {
+    const def: ProviderDef = { id: 'openai', kind: 'openai', paid: true }; // no model set
+    let sentBody: { model?: string; messages?: { role: string; content: string }[] } = {};
+    const fetchImpl = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      sentBody = JSON.parse(String(init?.body));
+      return new Response(JSON.stringify({}), { status: 200 }); // no choices, no usage
+    });
+    const llm = openaiCompatLLM(def, 'sk', 'https://x/v1', 'fallback-model', fetchImpl);
+    // system: '' is falsy → the no-system branch; model:'ignored' is overridden by def/default.
+    const resp = await llm.call({ system: '', user: 'hi', model: 'ignored', mode: 'eco' });
+
+    expect(sentBody.model).toBe('fallback-model'); // def.model ?? defaultModel
+    expect(sentBody.messages).toEqual([{ role: 'user', content: 'hi' }]); // no system message
+    expect(resp.text).toBe(''); // content ?? ''
+    expect(resp.inputTokens).toBe(0); // prompt_tokens ?? 0
+    expect(resp.outputTokens).toBe(0); // completion_tokens ?? 0
+    expect(resp.model).toBe('fallback-model');
+    expect(resp.provider).toBe('openai');
+  });
+
+  it('throws a coded error when the API responds non-2xx', async () => {
+    const def: ProviderDef = { id: 'openai', kind: 'openai', model: 'gpt-4o', paid: true };
+    const fetchImpl = vi.fn(async () => new Response('nope', { status: 500 }));
+    const llm = openaiCompatLLM(def, 'sk', 'https://x/v1', 'fallback-model', fetchImpl);
+    await expect(
+      llm.call({ system: '', user: 'hi', model: 'm', mode: 'eco' }),
+    ).rejects.toMatchObject({ status: 500 });
   });
 });

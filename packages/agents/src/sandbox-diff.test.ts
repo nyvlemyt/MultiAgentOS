@@ -3,7 +3,12 @@ import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { validateDiffApplies, applyDiffToSandbox } from './sandbox-diff';
-import { makeTempGitRepo, CLEAN_TEST_DIFF as CLEAN_DIFF, GARBAGE_TEST_DIFF as GARBAGE_DIFF } from './testing';
+import {
+  makeTempGitRepo,
+  makeTempNonRepo,
+  CLEAN_TEST_DIFF as CLEAN_DIFF,
+  GARBAGE_TEST_DIFF as GARBAGE_DIFF,
+} from './testing';
 
 describe('validateDiffApplies', () => {
   let repo: string;
@@ -54,5 +59,30 @@ describe('applyDiffToSandbox', () => {
     // Sandbox changed.
     expect(readFileSync(join(res.sandboxDir, 'file.txt'), 'utf-8')).toContain('goodbye');
     rmSync(res.sandboxDir, { recursive: true, force: true });
+  });
+
+  it('git-inits the sandbox when the source is not a repo, then applies the diff', async () => {
+    const nonRepo = makeTempNonRepo('mas-nonrepo-src-');
+    try {
+      const res = await applyDiffToSandbox(CLEAN_DIFF, nonRepo);
+      expect(res.ok).toBe(true);
+      expect(readFileSync(join(res.sandboxDir, 'file.txt'), 'utf-8')).toContain('goodbye');
+      rmSync(res.sandboxDir, { recursive: true, force: true });
+    } finally {
+      rmSync(nonRepo, { recursive: true, force: true });
+    }
+  });
+
+  it('returns ok:false (never throws) when the diff fails to apply in a fresh sandbox repo', async () => {
+    const nonRepo = makeTempNonRepo('mas-nonrepo-bad-');
+    try {
+      const res = await applyDiffToSandbox(GARBAGE_DIFF, nonRepo);
+      expect(res.ok).toBe(false);
+      expect(res.error?.length).toBeGreaterThan(0);
+      expect(res.sandboxDir).toBeTruthy();
+      rmSync(res.sandboxDir, { recursive: true, force: true });
+    } finally {
+      rmSync(nonRepo, { recursive: true, force: true });
+    }
   });
 });
