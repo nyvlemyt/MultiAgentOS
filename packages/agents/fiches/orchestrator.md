@@ -54,6 +54,10 @@ Mission Planner  →  [DAG]  →  Orchestrator  →  claim → gate → delegate
    (one-shot)                  (per-tick loop, this fiche)
 ```
 
+## Trigger
+
+Invoked by the worker on **every dispatch tick** (`runDispatchTick` → `executeNextTask`, `packages/agents/src/dispatch-tick.ts`) for each mission selected within the concurrency budget — i.e. whenever a mission is `executing`/`dispatched` and a task's dependencies are satisfied. One *claim → gate → delegate → eval-loop → review* pass per tick. It is never invoked to author a DAG (that is the Mission Planner, one-shot at `draft → planned`).
+
 ## Principles
 
 *// pattern from docs/knowledge/agent-patterns.md — evaluator-optimizer loop, circuit-breaker (bounded loop), depth=1 tier-routing constraint*

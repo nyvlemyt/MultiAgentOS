@@ -45,5 +45,25 @@ referenced §3 in ROADMAP instead of hard-coding "10 seeded".)
 - **CLAUDE.md 234 → 196 lines** (`wc -l`, ≤200 ✓). §11 condensed to the 5 enforcement rules + the `llm.ts` single-injection-point line + a one-line §11.bis stub (anchor preserved so AGENTS.md §4 / ADR 0002 / §7 cross-refs still resolve) + a pointer to ADR 0009; the mode table, the full §11.bis provider detail, the runaway-quota guard and the billing-change notice now live only in the ADR. §12 + §13 condensed to bullet form (no rule dropped — ≤7-tools, signal-density, 5-item cap, KILL-criteria, self-audit, persistence bridge all retained).
 - **Stale/anchors:** §3 heading dropped "(planned)"; §13 persistence bridge future→past ("was seeded … 2026-06-09"); broken anchors fixed — §12's "see §12.1" → inline "see the rules above"; "(§ commit footer)" → "(§7 Commits)".
 
-## Wave 3 — fiche Triggers + skill binary criteria — PENDING
+## Wave 3 — fiche Triggers + skill binary criteria — DONE
+
+### ⚠️ Handoff correction — the "model on the 5 fiches that already have `## Trigger`" premise is FALSE on disk
+
+`grep -rn "## Trigger\|## When" packages/agents/fiches/` returns **nothing** — *no* fiche (target or "excellent") has a `## Trigger`/when-to-use heading. The F3-passing fiches express when-invoked only via `role:`/intro prose. So I did not copy a template; I **added a new `## Trigger` section grounded in the real dispatcher code** to each of the 5 needs-work fiches (after the intro, before `## Principles`). Each dispatch condition was verified on disk:
+
+- **orchestrator** — `runDispatchTick` → `executeNextTask` (`dispatch-tick.ts`), per mission selected within the concurrency budget; never authors a DAG.
+- **mission-planner** — `planMission` (`dispatch.ts:233`, `if (m.status !== 'draft') return m`) — once per mission, `draft → planned`.
+- **architect** — task tagged `agentHint: architect`, routed via `t.agentHint` (`dispatch.ts`); upstream of Tier B; may `delegate()` to cold `engineering-software-architect`.
+- **quality-controller** — `runReviewPhase` → `runCriticGates` → `realQualityController` BEFORE the Reviewer (`review-phase.ts:19`); a QC BLOCK short-circuits.
+- **memory-keeper** — drains the `memory_candidates` inbox (close-out ritual ADR 0004 + `MemoryProposal` tasks); sole writer of `data/memory/` (§8).
+
+Fiche-quality guard (`fiche-quality.test.ts`) checks the 4 REQUIRED_SECTIONS as substrings + Principles/RedFlags/VC content — the `## Trigger` addition sits before `## Principles` and disturbs none of them.
+
+### Skill S6 — process-phrasing → observable binary assertions (4 skills)
+
+- **mas-reviewer** — verdict ∈ enum; 6 checklist results recorded; findings carry where/consequence/confidence; `BLOCK ⇔ ≥1 severity:block`; `git diff --name-only` empty.
+- **mas-sec-reviewer** — verdict for all 6 perms categories; `risk:blocking ⇒ BLOCK`; BLOCK findings carry category+matchedText; verdict ∈ {PASS,BLOCK}; no file modified.
+- **mas-skill-router** — explicit slug map `low→haiku-4-5 / medium→sonnet-4-6 / high·blocking→opus-4-8`; skills/agents count caps; rationale quotes verbatim task token; escalation→`requires_validation`; **new criterion: only L1 summaries read, no L2 body loaded**; valid JSON.
+- **mas-memory-keeper** — `COUNT(*) WHERE status='pending' == 0` post-run; touched rows ∈ {promoted,rejected} w/ reason; register-template match; dedup ran; ≤5 global promotions.
+
 ## Wave 4 — single-source dedup — PARTIAL (PRODUCT_SPEC §8 + SKILLS_REGISTRY §7 done in Wave 1; TOKEN_STRATEGY pending)

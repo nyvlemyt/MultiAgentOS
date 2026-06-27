@@ -99,11 +99,11 @@ For `risk: blocking` tasks: BLOCK immediately. No exceptions. The user must over
 
 ## Verification Criteria
 
-- [ ] `config/permissions.json` was read before evaluating
-- [ ] All 6 categories were checked (not just the obvious ones)
-- [ ] `risk: blocking` tasks return BLOCK unconditionally
-- [ ] BLOCK findings include category name + matched text
-- [ ] No files modified
+- [ ] The output records a verdict for all 6 risky-action categories from `config/permissions.json` (recorded count == 6 — not just the obvious ones).
+- [ ] `task.risk == blocking` ⇒ `verdict == BLOCK`, unconditionally (asserted by test).
+- [ ] Every BLOCK finding carries a `category` name and the `matchedText` that triggered it.
+- [ ] `verdict` is `PASS` or `BLOCK` only (never NEEDS_WORK; no `warn` severity emitted).
+- [ ] `git diff --name-only` over the run is empty (no file modified).
 
 ## Related Skills
 

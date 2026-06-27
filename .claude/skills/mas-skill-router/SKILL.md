@@ -102,11 +102,12 @@ These task descriptions trigger automatic escalation regardless of routing confi
 
 ## Verification Criteria
 
-- [ ] Model tier matches task risk level
-- [ ] `requiredSkills` ≤ 3, `favoriteSkills` ≤ 2
-- [ ] `rationale` cites at least one concrete signal from task description
-- [ ] `requires_validation: true` if any escalation signal detected
-- [ ] Output is valid JSON
+- [ ] `model` matches risk by the three-tier map: `low → claude-haiku-4-5`, `medium → claude-sonnet-4-6`, `high`/`blocking → claude-opus-4-8`.
+- [ ] `requiredSkills.length ≤ 3` AND `favoriteSkills.length ≤ 2` AND `tierBAgents.length ≤ 2`.
+- [ ] `rationale` quotes ≥1 verbatim token/phrase from the task text (non-empty, not generic).
+- [ ] `requires_validation == true` whenever an escalation signal (trade/buy/sell/send/deploy/`push --force`/secret) is present in the task.
+- [ ] Only L1 summaries (`data/skill-cache/<id>/summary.md`) were read — no full L2 skill body was loaded during routing.
+- [ ] Output parses as valid JSON.
 
 ## Cold Library Arsenal (ECC harvest — ADR 0005)
 

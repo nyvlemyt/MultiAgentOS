@@ -63,6 +63,10 @@ produces the durable ADR record. When a system-level design is needed it may
 `delegate({ agent: "engineering-software-architect", … })` through the dispatcher
 (AGENTS.md §6) — it never calls another Tier A agent directly (§11).
 
+## Trigger
+
+Invoked when the Mission Planner tags a task with `agentHint: architect`, routed through the dispatcher (`t.agentHint`, `packages/agents/src/dispatch.ts`): design/decision work — domain modelling, or a choice significant enough to need an ADR (e.g. a new framework or dependency, §2/§7). It runs upstream of Tier B execution and may itself `delegate()` a system-level design to the cold `engineering-software-architect`; it never calls another Tier A agent directly (§11).
+
 ## Principles
 
 *// pattern from docs/knowledge/agent-patterns.md (single-responsibility agent, propose-not-execute) and the cold seed packages/agents/library/architect.md*
