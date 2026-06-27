@@ -78,7 +78,7 @@ Les ressources sont un **input par phase**, pas un bloc de fin. Le pré-vol appl
 - `packages/db`: Drizzle schema + initial migration covering every table in `PRODUCT_SPEC.md §8` (including `projects.path`, `project_links`, `permissions`).
 - `apps/worker`: Node `tsx` daemon — logs "worker alive", polls `tasks` table every 2 s.
 - SSE channel `/api/stream`: worker emits 1 test event per 5 s; web subscribes and renders it on `/trace`.
-- `config/permissions.json` skeleton (empty allowlists, schema-only) and a typed loader in `packages/core/permissions.ts`.
+- `config/permissions.json` skeleton (empty allowlists, schema-only) and a typed loader in `packages/core/src/permissions.ts`.
 - Seed script (`pnpm db:seed`) populates: 1 external project — **OtakuGO_UP** at `/Users/melvyn/Documents/03_PROFESSIONNEL/OtakuGO_UP` (type: `manga-app`, autonomy: `manual`, mode: `eco`) — the Tier A roster agents (`AGENTS.md §3`) with their geometric SVG avatars, 4 mock Tier B agents, 1 demo mission in `draft`, 30 mock trace events.
 - Avatar style: stylized geometric SVGs (no faces, no characters). One distinct geometric mark per Tier A agent (compass for Skill Router, map for Mission Planner, brain-circuit for Context Manager, book for Memory Keeper, magnifier for Reviewer, shield for Sec Reviewer). Tier B inherits a domain-prefix default.
 - Theme default: **dark**. Light mode is toggleable in the topbar. Both themes generated through `theme-factory`.
@@ -108,7 +108,7 @@ Les ressources sont un **input par phase**, pas un bloc de fin. Le pré-vol appl
 **Goal:** end-to-end mission run with **mocked** Claude — proves the FSM and the UI before paying for real tokens.
 
 - Tier A fiches written for the 6 MVP agents (the first six of the now-10 roster; `AGENTS.md §3`); content stubbed where LLM is needed.
-- Mocked LLM in `packages/core/llm.ts` returns deterministic JSON per agent.
+- Mocked LLM in `packages/core/src/llm.ts` returns deterministic JSON per agent.
 - Mission Planner produces a fixed task DAG for the seed mission.
 - Skill Router picks from a hardcoded matrix per task tag.
 - Task dispatcher in worker: topological execution, concurrency = 1, risk gate stub.

@@ -40,8 +40,8 @@ multiAgentOS/
 │   ├── db/                  # Drizzle schema + migrations
 │   ├── agents/              # Tier A fiches + dispatcher; agents/library/ = cold Tier B arsenal (ECC, ADR 0005)
 │   ├── skills/              # Skill router + summaries; skills/library/ + index.json = cold skill arsenal (ECC, ADR 0005)
-│   ├── memory/              # Memory store + summarizer
-│   └── tokens/              # Budget + cost meter
+│   └── memory/              # Memory store + summarizer
+│                            # (budget/cost meter folded into apps/web/lib/tokens.ts + packages/agents/src/budget-gate.ts — no packages/tokens)
 ├── .claude/                 # Existing — see AGENTS.md, SKILLS_REGISTRY.md
 ├── data/                    # SQLite + caches (gitignored)
 ├── docs/

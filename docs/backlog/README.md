@@ -103,6 +103,7 @@ spec-kit, taste-skill, impeccable, superpowers, build-your-own-x, awesome-design
 - [`test-coverage-measurement-gap.md`](test-coverage-measurement-gap.md) — **0d scan (2026-06-25)** : `@vitest/coverage-v8` absent partout → seuil §7 ≥80 % jamais mesuré ni vérifié en CI (`COV-1`) ; `@mas/db` largement sous le seuil (`COV-2`). **Gap de gouvernance, pas de défaut runtime.**
 - [`allowed-hosts-runtime-gate.md`](allowed-hosts-runtime-gate.md) — **0d scan (2026-06-25)** : `allowed_hosts` (§5) déclaré mais jamais lu au runtime (`S5-2`) — même classe que le bug perms câblé en #44. Inerte aujourd'hui, à brancher avec le 1er agent-domaine sortant. **Sécurité, MED.**
 - [`function-length-debt.md`](function-length-debt.md) — **0d scan (2026-06-25)** : 4 fonctions > cap §7 50 lignes (`F-FN-1..4`, dont `planMission` 138). Le sibling fichier `F-SIZE-1` (dispatch.ts) est **déjà résolu** par #42. **Dette lisibilité, aucune sur chemin chaud.**
+- [`quota-window-doc-schema-drift.md`](quota-window-doc-schema-drift.md) — **`.md`-excellence round-2 (2026-06-27)** : TOKEN_STRATEGY §1/§3/§8 décrit un quota « fenêtre 5 h » clé `(subscriptionUserId, windowStart)` absent de `budgets` (vrai schéma = `(scope, scopeId, period)`) ; §4 caching au présent mais dirs `data/context-packs`/`mission-summaries` absents ; + PRODUCT_SPEC §8 indices (item D round-1). **Dérive doc↔schéma, design-intent non bâti, pas de défaut runtime.**
 
 ## Principe (rappel)
 

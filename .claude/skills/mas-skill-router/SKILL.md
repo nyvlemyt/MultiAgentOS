@@ -105,13 +105,13 @@ These task descriptions trigger automatic escalation regardless of routing confi
 - [ ] `model` matches risk by the three-tier map: `low → claude-haiku-4-5`, `medium → claude-sonnet-4-6`, `high`/`blocking → claude-opus-4-8`.
 - [ ] `requiredSkills.length ≤ 3` AND `favoriteSkills.length ≤ 2` AND `tierBAgents.length ≤ 2`.
 - [ ] `rationale` quotes ≥1 verbatim token/phrase from the task text (non-empty, not generic).
-- [ ] `requires_validation == true` whenever an escalation signal (trade/buy/sell/send/deploy/`push --force`/secret) is present in the task.
-- [ ] Only L1 summaries (`data/skill-cache/<id>/summary.md`) were read — no full L2 skill body was loaded during routing.
+- [ ] `requires_validation == true` whenever an escalation signal (see the **Escalation Signals** list above — the single source) is present in the task.
+- [ ] Every `requiredSkills`/`favoriteSkills` id resolves to an L1 index entry (`.claude/skills/<id>/` or `packages/skills/library/index.json`); the output names skills by `id` only and embeds no L2 skill-body prose.
 - [ ] Output parses as valid JSON.
 
 ## Cold Library Arsenal (ECC harvest — ADR 0005)
 
-Beyond the auto-injected `.claude/skills/`, MultiAgentOS keeps a large **cold library** of boosted skills at `packages/skills/library/<slug>/SKILL.md`. They are NOT injected into every session (TOKEN_STRATEGY §6). Consult them at routing time via the index, never by reading bodies:
+Beyond the auto-injected `.claude/skills/`, MultiAgentOS keeps a large **cold library** of boosted skills at `packages/skills/library/<slug>/SKILL.md`. They are NOT injected into every session (TOKEN_STRATEGY §5). Consult them at routing time via the index, never by reading bodies:
 
 - **Index**: `packages/skills/library/index.json` — one L1 entry per skill (`id`, `name`, `summary`, `domain`, `cluster`, `origin`, `tier`). Regenerate with `pnpm --filter @mas/skills build-library-index`.
 - **Programmatic**: `loadLibraryIndex(repoRoot)` → `SkillMeta[]`; feed into `new SkillRouter([...orchestrator, ...library])`, then `findByDomain` / `findByTags` (tag = cluster) / `buildPromptContext` (L1 summaries only).

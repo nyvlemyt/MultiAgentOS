@@ -1,6 +1,6 @@
 ---
 name: mas-reviewer
-description: "Use to verify mission outputs against the brief before archiving. Returns ReviewerVerdict: PASS, NEEDS_WORK, or BLOCK with findings. Prioritize coverage over filtering. Do NOT modify files, do NOT skip findings because they seem minor."
+description: "Use to verify mission outputs against the brief before archiving. Returns ReviewerVerdict: PASS, NEEDS_WORK, or BLOCK with findings. Prioritize coverage over filtering. Not for security gating of high-risk tasks (that is mas-sec-reviewer, which runs first). Do NOT modify files, do NOT skip findings because they seem minor."
 domain: code-review
 tags: ["review","quality","verification","code-review","adversarial","coverage"]
 summary: "Reviews diff and artifacts against the mission brief, CLAUDE.md conventions, and architecture rules. Goal is COVERAGE not precision: surface all issues, let the human filter. Output: ReviewerVerdict with verdict (PASS|NEEDS_WORK|BLOCK) and findings list (severity: info|warn|block). Never modifies files. Uses adversarial verification pattern."

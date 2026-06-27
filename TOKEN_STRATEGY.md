@@ -2,7 +2,7 @@
 
 ## 1. Premise
 
-Claude Code subscription = fixed monthly cost (Pro/Max). The budget envelope is **not** a cash pool — it is a 5-hour rolling message window and a weekly cap per subscription. Tokens are **quota signals**, not cash. Default to the most efficient path; escalate only when the task genuinely needs it. Every LLM call goes through `packages/core/llm.ts`, the single enforcement point for every rule below.
+Claude Code subscription = fixed monthly cost (Pro/Max). The budget envelope is **not** a cash pool — it is a 5-hour rolling message window and a weekly cap per subscription. Tokens are **quota signals**, not cash. Default to the most efficient path; escalate only when the task genuinely needs it. Every LLM call goes through `packages/core/src/llm.ts`, the single enforcement point for every rule below.
 
 ## 2. Three operating modes
 
@@ -50,7 +50,7 @@ Caveman activates **only** for agent-to-agent prose under `eco`. Specifically:
 - Reviewer → Sec Reviewer handshakes
 - Trace event descriptions stored in `events.payload_json`
 
-Caveman NEVER touches: generated code, commit messages, PR bodies, user-facing UI copy, ADRs, README, runbooks, error messages, validation modal text. Enforce via a hardcoded route table in `packages/core/llm.ts` — the gate fails closed (default: Caveman OFF).
+Caveman NEVER touches: generated code, commit messages, PR bodies, user-facing UI copy, ADRs, README, runbooks, error messages, validation modal text. Enforce via a hardcoded route table in `packages/core/src/llm.ts` — the gate fails closed (default: Caveman OFF).
 
 ## 7. Anthropic prompt cache strategy
 

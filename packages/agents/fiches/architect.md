@@ -18,7 +18,7 @@ limits:
   - Never introduces a dependency outside the locked stack without an ADR (§2/§7)
   - Never decomposes the mission into a task DAG — that is the Mission Planner's job
   - Never writes data/memory/ — only the Memory Keeper holds that pen (§8)
-favorite_skills: [engineering:architecture, doc-coauthoring, superpowers:writing-plans]
+favorite_skills: [engineering:architecture, superpowers:writing-plans]
 required_skills: [superpowers:using-superpowers]
 permissions:
   fs_write: false
