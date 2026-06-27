@@ -39,6 +39,11 @@ fiche (`packages/agents/fiches/architect.md`) and avatar (`avatars/architect.svg
 fix, out of the doc-only scope of this PR → flagged as a background task. (This is also *why* I
 referenced §3 in ROADMAP instead of hard-coding "10 seeded".)
 
-## Wave 2 — CLAUDE.md hygiene (≤200 lines) + new ADR 0009 — PENDING
+## Wave 2 — CLAUDE.md hygiene (≤200 lines) + new ADR 0009 — DONE
+
+- **ADR 0009** authored (commit `1ff716b`): status/context/decision/alternatives/consequences/date/deciders; holds the mode table, the §11.bis provider sub-rules, the 2026-06-15 Agent-SDK credit split, the runaway-quota guard. Number is **0009** (0008 reserved for context-indexing per §5).
+- **CLAUDE.md 234 → 196 lines** (`wc -l`, ≤200 ✓). §11 condensed to the 5 enforcement rules + the `llm.ts` single-injection-point line + a one-line §11.bis stub (anchor preserved so AGENTS.md §4 / ADR 0002 / §7 cross-refs still resolve) + a pointer to ADR 0009; the mode table, the full §11.bis provider detail, the runaway-quota guard and the billing-change notice now live only in the ADR. §12 + §13 condensed to bullet form (no rule dropped — ≤7-tools, signal-density, 5-item cap, KILL-criteria, self-audit, persistence bridge all retained).
+- **Stale/anchors:** §3 heading dropped "(planned)"; §13 persistence bridge future→past ("was seeded … 2026-06-09"); broken anchors fixed — §12's "see §12.1" → inline "see the rules above"; "(§ commit footer)" → "(§7 Commits)".
+
 ## Wave 3 — fiche Triggers + skill binary criteria — PENDING
 ## Wave 4 — single-source dedup — PARTIAL (PRODUCT_SPEC §8 + SKILLS_REGISTRY §7 done in Wave 1; TOKEN_STRATEGY pending)
