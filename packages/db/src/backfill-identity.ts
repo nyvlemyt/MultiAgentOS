@@ -28,7 +28,7 @@ interface StampResult {
 function kebab(s: string): string {
   return s
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[̀-ͯ]/g, '') // Combining Diacritical Marks block (U+0300–U+036F)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/-+/g, '-')
@@ -57,11 +57,25 @@ function deriveTitle(data: Frontmatter, content: string, path: string): string {
   return fromData ?? firstH1(content) ?? basename(path).replace(/\.md$/, '');
 }
 
+// Tier-1 backfill mints a plain kebab(title) slug — NOT STRUCTURE.md §5's
+// `<kind>-<title>-<hash[:8]>` conveyor shape — on purpose; cross-tier
+// identity/idempotence resolves via source_key (content hash), not slug shape;
+// the slug is immutable once minted. Empty kebab (e.g. non-ASCII basename, no
+// title/H1) falls back to a hash-derived anchor so the slug is never ''.
+function deriveSlug(title: string, contentHash: string): string {
+  const k = kebab(title);
+  if (k.length > 0) return k;
+  return `doc-${contentHash.replace(/^sha256:/, '').slice(0, 8)}`;
+}
+
 export function stampIdentity(raw: string, opts: StampOpts): StampResult {
   const parsed = matter(raw);
   const data = parsed.data as Frontmatter;
 
-  const slug = (data.slug as string | undefined) ?? opts.slug ?? kebab(deriveTitle(data, parsed.content, opts.path));
+  const slug =
+    (data.slug as string | undefined) ??
+    opts.slug ??
+    deriveSlug(deriveTitle(data, parsed.content, opts.path), opts.contentHash);
   const identity: Frontmatter = {
     id: data.id ?? slug,
     slug: data.slug ?? slug,
@@ -121,7 +135,8 @@ function processFile(file: string, taken: Set<string>, dryRun: boolean, result: 
   if (typeof existingSlug === 'string' && existingSlug.length > 0) {
     slug = existingSlug;
   } else {
-    slug = allocateSlug(deriveTitle(parsed.data as Frontmatter, parsed.content, file), taken);
+    const title = deriveTitle(parsed.data as Frontmatter, parsed.content, file);
+    slug = allocateSlug(deriveSlug(title, contentHash), taken);
     taken.add(slug);
   }
 
