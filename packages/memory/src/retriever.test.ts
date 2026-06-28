@@ -9,6 +9,8 @@ import {
   createRetriever,
   retrievalDoctor,
   ensureIndexed,
+  QMD_RESOURCES,
+  QMD_MEMORY_COLLECTIONS,
   type MemoryDoc,
   type MemoryHit,
   type MemoryRetriever,
@@ -336,5 +338,36 @@ describe('retrievalDoctor (boot diagnostic, never silent)', () => {
     const d = retrievalDoctor(dir, bin);
     expect(d.qmdActive).toBe(false);
     expect(d.forcedFts).toBe(true);
+  });
+
+  it('reports the mas-resources collection even when its folder is absent', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    const d = retrievalDoctor(dir, bin);
+    const resources = d.collections.find((c) => c.name === QMD_RESOURCES);
+    expect(resources).toBeDefined();
+    expect(resources!.root).toBe('docs/resources');
+    // docs/resources is not created in the temp cwd → reported as missing, not crashed on.
+    expect(resources!.present).toBe(false);
+  });
+
+  it('reports each known collection with its repo-relative root', () => {
+    const bin = writeFakeQmd(dir, QMD_FIXTURE);
+    const d = retrievalDoctor(dir, bin);
+    const names = d.collections.map((c) => c.name);
+    expect(names).toContain('mas-resources');
+    expect(names).toContain('mas-knowledge');
+    expect(names).toContain('mas-arsenal');
+  });
+});
+
+describe('QMD collection constants (Brique 4 — mas-resources scope)', () => {
+  it('QMD_RESOURCES is the mas-resources collection', () => {
+    expect(QMD_RESOURCES).toBe('mas-resources');
+  });
+
+  it('EXCLUDES mas-resources from the mission-memory retrieval scope', () => {
+    // Raw ingested docs are candidate material, not mission-memory judgment —
+    // including them would leak raw docs into dispatch context (a real bug).
+    expect(QMD_MEMORY_COLLECTIONS).not.toContain(QMD_RESOURCES);
   });
 });
