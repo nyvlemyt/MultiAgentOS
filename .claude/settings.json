@@ -12,6 +12,17 @@
             "statusMessage": "Vérification budget tokens session"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/frontmatter-validate.sh\"",
+            "timeout": 30,
+            "statusMessage": "Validation frontmatter (gardien fiche)"
+          }
+        ]
       }
     ],
     "SessionStart": [

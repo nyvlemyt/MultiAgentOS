@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { checkBody, checkFiche, type CheckResult, type FicheTier } from './frontmatter-check';
 
@@ -59,12 +60,15 @@ function checkFile(repoRoot: string, file: string, known: Set<string>, tier: Fic
   return { errors: [...fm.errors, ...body.errors], warnings: [...fm.warnings, ...body.warnings] };
 }
 
-function resolveTargets(repoRoot: string, args: string[], corpus: string[]): string[] {
+// Explicit file args are selected by watched-ROOT prefix, NOT by corpus (git
+// ls-files) membership: the PostToolUse hook validates a file the instant it is
+// written — before it is tracked — so a brand-new fiche must still be checked.
+// Out-of-scope or non-markdown paths are ignored. No args → the whole corpus (CI).
+export function resolveTargets(repoRoot: string, args: string[], corpus: string[]): string[] {
   if (args.length === 0) return corpus;
-  const corpusSet = new Set(corpus);
   return args
     .map((a) => relative(repoRoot, resolve(process.cwd(), a)))
-    .filter((p) => corpusSet.has(p)); // only watched roots; ignore out-of-scope paths
+    .filter((p) => p.endsWith('.md') && ROOTS.some((root) => p.startsWith(`${root}/`)));
 }
 
 function main(): void {
@@ -99,4 +103,8 @@ function main(): void {
   }
 }
 
-main();
+// Run main only as a CLI entrypoint, so importing resolveTargets in tests (and
+// the PostToolUse hook wrapper) does not execute the whole gardien.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}
