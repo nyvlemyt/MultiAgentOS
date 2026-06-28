@@ -82,3 +82,8 @@ export {
   type MemoryContext,
   type MemoryContextOpts,
 } from './context';
+// NOTE: the fiche contract (./fiche) and the CI gardien (./frontmatter-check)
+// are deliberately NOT re-exported through this barrel. They are internal CI/CLI
+// tooling consumed only by frontmatter-check-cli.ts + the .claude hook (relative
+// imports). Keeping them out of the barrel means @mas/agents / the Next plan
+// route never pull them into their compile graph (Brique 1d).
