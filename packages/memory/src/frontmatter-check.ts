@@ -91,9 +91,10 @@ function stripCode(body: string): string {
 }
 
 export function scanWikilinks(body: string): string[] {
-  // Match the inner span lazily up to the closing `]]` (the class excludes `]`,
-  // so there is no super-linear backtracking), then drop any `|alias` in code.
-  const re = /\[\[([^\]]+?)\]\]/g;
+  // Greedy negated class: `[^\]]+` stops at the first `]`, then `\]\]` checks —
+  // disjoint sets, so the match is linear with no backtracking. Drop `|alias`
+  // in code rather than in the pattern (avoids an alternation Sonar flags S8786).
+  const re = /\[\[([^\]]+)\]\]/g;
   const targets: string[] = [];
   for (const match of stripCode(body).matchAll(re)) {
     const inner = match[1] ?? '';
