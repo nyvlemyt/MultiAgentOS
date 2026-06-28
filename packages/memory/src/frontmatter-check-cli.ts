@@ -10,6 +10,9 @@ import { checkBody, checkFiche, type CheckResult, type FicheTier } from './front
 // args check only those files. Exits 1 on any error; warnings never fail.
 
 const ROOTS = ['docs/resources', 'docs/knowledge'];
+// Absolute path, never PATH-resolved (Sonar S4036): present on the macOS dev box
+// and the Linux CI runner alike.
+const GIT = '/usr/bin/git';
 
 // pattern from packages/memory/src/doctor-cli.ts (findRepoRoot walk-up)
 function findRepoRoot(): string {
@@ -24,7 +27,7 @@ function findRepoRoot(): string {
 }
 
 function trackedMarkdown(repoRoot: string): string[] {
-  const out = execFileSync('git', ['ls-files', '-z', ...ROOTS], { cwd: repoRoot, encoding: 'utf8' });
+  const out = execFileSync(GIT, ['ls-files', '-z', ...ROOTS], { cwd: repoRoot, encoding: 'utf8' });
   return out.split('\0').filter((p) => p.endsWith('.md'));
 }
 

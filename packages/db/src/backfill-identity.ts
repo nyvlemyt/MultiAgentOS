@@ -46,7 +46,7 @@ export function allocateSlug(title: string, taken: Set<string>): string {
 
 function firstH1(body: string): string | null {
   for (const line of body.split('\n')) {
-    const m = /^#\s+(.+)$/.exec(line);
+    const m = /^#\s+(\S.*)$/.exec(line);
     if (m?.[1]) return m[1].trim();
   }
   return null;
@@ -155,7 +155,7 @@ export function runBackfill(roots: string[], opts: { dryRun?: boolean } = {}): B
   for (const root of roots) {
     if (existsSync(root) && statSync(root).isDirectory()) collectMarkdown(root, files);
   }
-  files.sort();
+  files.sort((a, b) => a.localeCompare(b));
 
   const taken = new Set<string>();
   reserveExistingSlugs(files, taken);

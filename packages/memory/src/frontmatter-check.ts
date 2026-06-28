@@ -91,10 +91,14 @@ function stripCode(body: string): string {
 }
 
 export function scanWikilinks(body: string): string[] {
-  const re = /\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g;
+  // Match the inner span lazily up to the closing `]]` (the class excludes `]`,
+  // so there is no super-linear backtracking), then drop any `|alias` in code.
+  const re = /\[\[([^\]]+?)\]\]/g;
   const targets: string[] = [];
   for (const match of stripCode(body).matchAll(re)) {
-    const target = (match[1] ?? '').trim();
+    const inner = match[1] ?? '';
+    const pipe = inner.indexOf('|');
+    const target = (pipe === -1 ? inner : inner.slice(0, pipe)).trim();
     if (target.length > 0) targets.push(target);
   }
   return unique(targets);
