@@ -58,7 +58,7 @@ export function markSuperseded(
   frontmatter: Record<string, unknown>,
   supersededBy: string,
 ): Record<string, unknown> {
-  const from = String(frontmatter.lifecycle ?? '');
+  const from = typeof frontmatter.lifecycle === 'string' ? frontmatter.lifecycle : '';
   if (!isLegalTransition(from, 'superseded')) {
     throw new Error(`illegal lifecycle transition: ${from} → superseded`);
   }
