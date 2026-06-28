@@ -29,7 +29,7 @@ La Phase 4 est le socle (registres, Memory Keeper, write-path verrouillé). Le s
 
 ## Ressources à distiller pour ça (au pré-vol Phase 4)
 
-Dans `docs/ressources/` : « Mémoire d'un système IA — 3 niveaux + mapping outil », « La vraie mémoire de ton agent — 5 registres + Obsidian », « Le rituel de consolidation mémoire », « Le Registre Learning Records », « La Mémoire Projet pour ton IA », « Rituel close-out de session ». Déjà partiellement dans `docs/knowledge/memory-patterns.md`.
+Dans `docs/resources/` : « Mémoire d'un système IA — 3 niveaux + mapping outil », « La vraie mémoire de ton agent — 5 registres + Obsidian », « Le rituel de consolidation mémoire », « Le Registre Learning Records », « La Mémoire Projet pour ton IA », « Rituel close-out de session ». Déjà partiellement dans `docs/knowledge/memory-patterns.md`.
 
 ## Pont de persistance (exigence ferme — anti-oubli)
 

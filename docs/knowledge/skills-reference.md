@@ -1,3 +1,11 @@
+---
+id: skills-et-librairies-de-reference
+slug: skills-et-librairies-de-reference
+source_key: 'sha256:20726fb1afb17a389637ade6eda0ab20d6228a9099a615fcdee694559ebdd2b2'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Skills et Librairies de Référence
 
 ## skills.sh — registre interrogeable (intake 2026-06-13)
@@ -185,7 +193,7 @@ Source: https://github.com/gepa-ai/gepa
 
 ## Processus 5-Phases pour Créer un Skill (RES-054 @le_gouverneur_ia)
 
-Source: `docs/claude doc/ressources.md` RES-054 "L'usine à compétences sur mesure"
+Source: `docs/claude-doc/ressources.md` RES-054 "L'usine à compétences sur mesure"
 
 Ce process est utilisé par `pnpm skills:reindex` pour générer les summaries L1 des 6 orchestrator skills. Il est aussi la méthode canonique pour créer tout nouveau skill dans MAS.
 

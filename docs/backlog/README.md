@@ -61,7 +61,7 @@ spec-kit, taste-skill, impeccable, superpowers, build-your-own-x, awesome-design
 | Graphify | ✅ | memory-patterns.md §Graphify (Context Manager Phase 4/5) |
 | Obsidian + obsidian-skills | ✅ | memory-patterns.md, skills-reference.md |
 | Instagram×Obsidian (Loucash) | ✅ | memory-patterns.md (pattern ingestion) |
-| sommaire mémoire (RES-056) | ✅ | vibeflow/memoire.md, docs/claude doc local |
+| sommaire mémoire (RES-056) | ✅ | vibeflow/memoire.md, docs/claude-doc local |
 
 ### Docs locaux & cours
 

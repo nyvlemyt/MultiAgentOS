@@ -18,7 +18,7 @@ and hotspots via `.../api/hotspots/search?projectKey=nyvlemyt_MultiAgentOS2&stat
 ## Hard rules (read CLAUDE.md first)
 - §11 no PAYG (no `@anthropic-ai/sdk`), §5 risky actions gated, Conventional Commits ≤60 chars, **no force-push**, **never touch `main`** (work only on `chore/sonar-cleanup`).
 - **Budget**: this is an authorised **full local session** (~5 h window). Use it — keep going until the issue list is cleared or no safe progress remains. **Do NOT pause at a % and do NOT ask the user anything** (they are asleep). Eco style for prose only.
-- PDFs → read the local `docs/ressources/md/*.md` cache, never image-mode.
+- PDFs → read the local `docs/resources/md/*.md` cache, never image-mode.
 - **Sonar line numbers shift** — ALWAYS re-fetch the live issue list before editing; locate by symbol/context, not stale lines.
 - **Verify after each batch** (local toolchain works): `pnpm -r test` (28 unit) + `pnpm --filter @mas/web lint` (tsc). Then the e2e: `lsof -ti:3000 | xargs kill` (free the user's dev server) → `pnpm --filter @mas/web smoke` (smoke + lifecycle + skills; MAS_MOCK_LLM is in the config). The `build-test` CI also re-runs it on push (double check).
 - **Commit + push per batch** (small commits) so a later failure never loses earlier good work. PR auto-updates. **Don't merge.**

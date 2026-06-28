@@ -12,7 +12,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "test:coverage": "vitest run --coverage",
-    "lint": "bash scripts/lint-no-sdk-payg.sh && pnpm -r lint",
+    "lint": "bash scripts/lint-no-sdk-payg.sh && bash scripts/lint-frontmatter.sh && pnpm -r lint",
     "db:migrate": "pnpm --filter @mas/db migrate",
     "db:seed": "pnpm --filter @mas/db seed",
     "mem:seed": "pnpm --filter @mas/memory seed",

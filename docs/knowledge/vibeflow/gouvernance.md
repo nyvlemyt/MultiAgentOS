@@ -1,3 +1,11 @@
+---
+id: vibeflow-gouvernance-architecture-patterns-extraits
+slug: vibeflow-gouvernance-architecture-patterns-extraits
+source_key: 'sha256:9c43b5ddb1b4d428a2cc39948328d658916e1a435592eb7cd60f078f096cd68e'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow — Gouvernance & Architecture (patterns extraits)
 
 Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Gouvernance. Source intégrale fetchée 2026-06-03.
@@ -153,7 +161,7 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 
 ## RES-023 — Structurer la gouvernance AVANT de déployer (framework 4 piliers détaillé, compagnon RES-024)
 
-**Mapping RES (tranché 2026-06-05)** : PDF `docs/ressources/023-Structurer la gouvernance AVANT de déployer tes agents IA.pdf` (14 p., préfixe `023-`) = **RES-023**. Compagnon de RES-024 (« Audite 10 min ») qui le référence (« la version longue 100+ lignes du contrat est dans RES-023 »), cohérent avec la description INDEX « governance agents IA, cadrage→monitoring ». Le PDF « Gouverner tes Agents IA Templates + Prompts » (4 prompts + 5 patterns de contrats, distillé dans `agents-skills.md`) **n'est PAS RES-023** → renuméroté **RES-059**. **C'est la source réelle du « 40 % Gartner » mal attribué à RES-024 au Batch 1.**
+**Mapping RES (tranché 2026-06-05)** : PDF `docs/resources/023-Structurer la gouvernance AVANT de déployer tes agents IA.pdf` (14 p., préfixe `023-`) = **RES-023**. Compagnon de RES-024 (« Audite 10 min ») qui le référence (« la version longue 100+ lignes du contrat est dans RES-023 »), cohérent avec la description INDEX « governance agents IA, cadrage→monitoring ». Le PDF « Gouverner tes Agents IA Templates + Prompts » (4 prompts + 5 patterns de contrats, distillé dans `agents-skills.md`) **n'est PAS RES-023** → renuméroté **RES-059**. **C'est la source réelle du « 40 % Gartner » mal attribué à RES-024 au Batch 1.**
 
 **Principe** : Managed Agents (beta 8 avril 2026) fournit les murs *techniques* (sandbox, scoped permissions, observabilité) ; la couche *projet* (gouvernance) reste à construire. Avant tout déploiement, répondre par écrit à 4 questions : **qui** décide quoi quand l'agent tourne sans toi · **quel** périmètre exact · **qui** valide à chaque étape critique · **qu'est-ce qui se passe** quand il hésite/se trompe. Chiffre cité : **40 % des initiatives agentiques sont annulées avant la fin (source : Gartner)** — pas par échec technique, par absence de gouvernance.
 
@@ -240,7 +248,7 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 
 ## RES-061 — Les 3 Paradigmes de la Gouvernance IA : Prompt → Context → Agentic Engineering [n° local]
 
-**Source** : `docs/ressources/Les 3 Paradigmes de la Gouvernance IA Du Prompt à l'Orchestre.pdf` (9 p., distillé cycle `2026-06-07-vibeflow-paradigmes-statsweep`). Catégorie INDEX = Gouvernance & Architecture.
+**Source** : `docs/resources/Les 3 Paradigmes de la Gouvernance IA Du Prompt à l'Orchestre.pdf` (9 p., distillé cycle `2026-06-07-vibeflow-paradigmes-statsweep`). Catégorie INDEX = Gouvernance & Architecture.
 
 **Principe** : les modèles sont devenus *trop puissants pour être pilotés par un simple prompt*. « La qualité de la sortie dépend de la qualité du **contexte**, pas de la qualité de la question » (PDF p3). La gouvernance IA est une **échelle de maturité à 3 paliers** — chaque palier englobe le précédent et ajoute une couche.
 
@@ -289,7 +297,7 @@ Intégré : Agent SDK subscription = crédit mensuel séparé de Claude.ai depui
 | 3 types fichiers + 5 registres (013) | triple structure + seed mémoire Phase 4 | 4 |
 | 3 paradigmes Prompt→Context→Agentic (061) | MAS = palier 3 ; échelle de maturité projet ; heuristique Planner | 3.5, 5 |
 
-**Distillation Batch 1 (2026-06-04)** : RES-024, 008, 012, 013 ✅ intégrés ici depuis `docs/ressources/`. RES-022 (lean CLAUDE.md) : **PDF absent** → `docs/backlog/self-audit-lean-claude-md.md`. RES-006/004/003 : superseded (cf. INDEX.md). RES-023/015/016 → `agents-skills.md`.
+**Distillation Batch 1 (2026-06-04)** : RES-024, 008, 012, 013 ✅ intégrés ici depuis `docs/resources/`. RES-022 (lean CLAUDE.md) : **PDF absent** → `docs/backlog/self-audit-lean-claude-md.md`. RES-006/004/003 : superseded (cf. INDEX.md). RES-023/015/016 → `agents-skills.md`.
 
 **Ré-audit cycle `2026-06-04-vibeflow-reaudit`** : (1) « 40 % Gartner » **re-sourcé** — il vient du PDF « Structurer AVANT », pas de RES-024 ; corrigé dans l'ouverture RES-024. (2) Framework 4 piliers **détaillé** + checklist pre-deploy 10-Q + **contract.yaml long-form** distillés (lus mais non distillés au Batch 1). Mapping RES-023 **tranché (2026-06-05)** = « Structurer AVANT » (préfixe `023-`) ; « Gouverner Templates+Prompts » renuméroté **RES-059**.
 

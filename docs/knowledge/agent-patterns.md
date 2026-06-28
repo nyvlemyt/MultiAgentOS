@@ -1,3 +1,11 @@
+---
+id: patterns-d-architecture-multi-agents
+slug: patterns-d-architecture-multi-agents
+source_key: 'sha256:77ed6f9c95507d9d8a1578cad5c95d127148a445e0ee6aa26fff880c4f07334d'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Patterns d'Architecture Multi-Agents
 
 ## Pattern : Manager d'Agent (Quality Controller)
@@ -64,7 +72,7 @@ Source : colbymchenry/codegraph
 
 ## Pattern : Test Binaire Skill vs Agent (RES-035 @le_gouverneur_ia)
 
-Source: `docs/claude doc/ressources.md` RES-035 + Anthropic "Building Effective Agents"
+Source: `docs/claude-doc/ressources.md` RES-035 + Anthropic "Building Effective Agents"
 
 **Question unique** : "Est-ce que cette chose doit ARBITRER ?"
 - **OUI** → AGENT (acteur autonome avec mandat, décisions dans son scope, escalade définie)
@@ -86,7 +94,7 @@ Source: `docs/claude doc/ressources.md` RES-035 + Anthropic "Building Effective 
 
 ## Pattern : 3 Modes d'Audit Agent en Production (RES-037)
 
-Source: `docs/claude doc/ressources.md` RES-037
+Source: `docs/claude-doc/ressources.md` RES-037
 
 | Mode | Comportement | Usage MAS |
 |------|-------------|-----------|
@@ -232,6 +240,6 @@ au MVP et leurs appelants sont la table `AGENTS.md §6` (`TIER_B_DELEGATION_MAP`
 - https://github.com/bobmatnyc/claude-mpm
 - https://github.com/msitarzewski/agency-agents
 - https://github.com/github/spec-kit
-- `docs/claude doc/ressources.md` RES-035, RES-037
+- `docs/claude-doc/ressources.md` RES-035, RES-037
 - `docs/knowledge/anthropic-ecosystem.md`
 - `docs/knowledge/frameworks-comparison.md`

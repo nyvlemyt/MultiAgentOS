@@ -1,3 +1,11 @@
+---
+id: ecosysteme-officiel-anthropic
+slug: ecosysteme-officiel-anthropic
+source_key: 'sha256:c9ed92090a6b35776be90f934b3b5c628dc2ac983656e0dc30a0aeeeeaa86a13'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Écosystème Officiel Anthropic
 
 ## Repos GitHub officiels prioritaires

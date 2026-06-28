@@ -1,3 +1,11 @@
+---
+id: mcp-connector-policy-catalog
+slug: mcp-connector-policy-catalog
+source_key: 'sha256:98a839308aeb590aec2b7443a6dfb13f70a88d64f2d0d6f8417aafbe06f58fe8'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # MCP Connector Policy + Catalog
 
 *Source: `affaan-m/ecc` `docs/MCP-CONNECTOR-POLICY.md` + `mcp-configs/mcp-servers.json` (MIT), distilled 2026-06-21. Aligns to CLAUDE.md §11.bis (provider policy) and feeds [[project_linked_memory]] (Phase 4 second-brain / MCP work).*

@@ -1,3 +1,11 @@
+---
+id: references-ressources
+slug: references-ressources
+source_key: 'sha256:16e11defd88b63c30f62541fc5ef38a0a80c606c340d52b7e5424f06d44d5c5a'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Références & Ressources
 
 Légende : ✅ indexé dans docs/knowledge/ — 🔐 auth requise (Notion) — ⏳ à explorer
@@ -25,8 +33,8 @@ Légende : ✅ indexé dans docs/knowledge/ — 🔐 auth requise (Notion) — �
 | Prompt tutorial interactif | https://github.com/anthropics/prompt-eng-interactive-tutorial | ✅ prompting-anthropic.md |
 | Webinaire Advanced Patterns | https://resources.anthropic.com/hubfs/Claude%20Code%20Advanced%20Patterns_%20Subagents,%20MCP,%20and%20Scaling%20to%20Real%20Codebases.pdf | ⏳ |
 | Anthropic Academy | https://anthropic.skilljar.com/ | ⏳ s'inscrire |
-| Best practices PDF (local) | `docs/claude doc/prompt_best_practice.pdf` | ✅ prompting-anthropic.md |
-| Console tools PDF (local) | `docs/claude doc/Console_prompting_tools.pdf` | ✅ prompting-anthropic.md |
+| Best practices PDF (local) | `docs/claude-doc/prompt_best_practice.pdf` | ✅ prompting-anthropic.md |
+| Console tools PDF (local) | `docs/claude-doc/Console_prompting_tools.pdf` | ✅ prompting-anthropic.md |
 
 ---
 
@@ -88,12 +96,12 @@ Légende : ✅ indexé dans docs/knowledge/ — 🔐 auth requise (Notion) — �
 | Context Mode plugin | https://context-mode.com | ✅ memory-patterns.md |
 | memweave | https://towardsdatascience.com/memweave-zero-infra-ai-agent-memory-with-markdown-and-sqlite-no-vector-database-required/ | ✅ memory-patterns.md |
 | colbymchenry/codegraph | https://github.com/colbymchenry/codegraph | ✅ agent-patterns.md |
-| Vraie mémoire Claude Code (5 registres + Obsidian) | `docs/claude doc/vrai-memoire-agent-claude.md` | ✅ project-doctrine.md |
+| Vraie mémoire Claude Code (5 registres + Obsidian) | `docs/claude-doc/vrai-memoire-agent-claude.md` | ✅ project-doctrine.md |
 | **tobi/qmd** — local doc search, BM25+vector+LLM reranking, MCP server, Node 22+, SQLite FTS5 | https://github.com/tobi/qmd | ✅ memory-patterns.md — **Phase 4 retrieval layer** (mémoire/docs) |
 | **Graphify** (`graphifyy`) — knowledge graph codebase, AST tree-sitter + Whisper + Leiden, -71.5× tokens | Google Doc + `uv tool install graphifyy` | ✅ memory-patterns.md — **Context Manager codebase indexing** Phase 4/5, audit sécu requis |
 | **Instagram × Obsidian** (Loucash) — sync IG saves → Obsidian markdown, pattern ingestion+dédup | Google Doc | ✅ memory-patterns.md — pattern ingestion référence |
 | **Ultimate Design Stack** (0xLoucash) — taste-skill + 21st.dev + ui-ux-pro-max, params DESIGN_VARIANCE/MOTION/DENSITY | Google Doc | ✅ backlog/design-stack-phase7.md — Phase 7, 21st.dev rejeté (PAYG) |
-| **skills.sh audit method** (Vercel) — Find→Audit→Install→Use + 6 checks sécu | `docs/claude doc/skill-sh.md` | ✅ backlog/skill-install-policy.md — ADR 0005, grille Sec Reviewer |
+| **skills.sh audit method** (Vercel) — Find→Audit→Install→Use + 6 checks sécu | `docs/claude-doc/skill-sh.md` | ✅ backlog/skill-install-policy.md — ADR 0005, grille Sec Reviewer |
 | eugeniughelbur/obsidian-second-brain | https://github.com/eugeniughelbur/obsidian-second-brain | ⏳ Phase 6 |
 
 ---
@@ -136,12 +144,12 @@ Légende : ✅ indexé dans docs/knowledge/ — 🔐 auth requise (Notion) — �
 
 | Ressource | URL |
 |-----------|-----|
-| Stack Doctrine (RES-032, 3 fichiers par framework) | `docs/claude doc/Le Stack Doctrine.md` ✅ project-doctrine.md |
-| 6 commandes anti-vibe-coding | `docs/claude doc/6 commandes anti-vibe-coding.md` ⚠️ doublon Stack Doctrine |
-| 3 checks avant upgrade modèle (RES-031) | `docs/claude doc/3 checks a faire avant d'upgrader ton modele IA.md` ✅ project-doctrine.md |
-| Vraie mémoire 5 registres (RES-029) | `docs/claude doc/vrai-memoire-agent-claude.md` ✅ memory-patterns.md, vibeflow/memoire.md |
-| Sommaire que l'IA lit (RES-056) | `docs/claude doc/sommaire-que-l-IA-lit-avant-de-fouiller-sa-mémoire.md` ✅ vibeflow/memoire.md |
-| Système distribution (RES-053) | `docs/claude doc/système-qui-fai-tourner-une-distribution-claude.md` ✅ vibeflow/workflows.md |
+| Stack Doctrine (RES-032, 3 fichiers par framework) | `docs/claude-doc/le-stack-doctrine.md` ✅ project-doctrine.md |
+| 6 commandes anti-vibe-coding | `docs/claude-doc/6-commandes-anti-vibe-coding.md` ⚠️ doublon Stack Doctrine |
+| 3 checks avant upgrade modèle (RES-031) | `docs/claude-doc/3-checks-avant-upgrade-modele-ia.md` ✅ project-doctrine.md |
+| Vraie mémoire 5 registres (RES-029) | `docs/claude-doc/vrai-memoire-agent-claude.md` ✅ memory-patterns.md, vibeflow/memoire.md |
+| Sommaire que l'IA lit (RES-056) | `docs/claude-doc/sommaire-que-l-ia-lit-avant-de-fouiller-sa-memoire.md` ✅ vibeflow/memoire.md |
+| Système distribution (RES-053) | `docs/claude-doc/systeme-qui-fai-tourner-une-distribution-claude.md` ✅ vibeflow/workflows.md |
 
 ---
 

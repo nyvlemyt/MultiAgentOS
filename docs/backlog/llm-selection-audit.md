@@ -69,7 +69,7 @@ Sortie : une table `domain × risk → modèle optimal` **justifiée par les chi
 
 ### 4. Cadence de ré-évaluation (anti-dérive)
 
-- **RES-031 "3 checks avant upgrade"** (`docs/claude doc/3 checks...IA.md`) : avant de switcher sur un nouveau modèle (Opus 5, Gemini 3...), vérifier règles propres + décisions tracées + learnings actifs. Un modèle puissant amplifie le chaos d'une base floue.
+- **RES-031 "3 checks avant upgrade"** (`docs/claude-doc/3 checks...IA.md`) : avant de switcher sur un nouveau modèle (Opus 5, Gemini 3...), vérifier règles propres + décisions tracées + learnings actifs. Un modèle puissant amplifie le chaos d'une base floue.
 - **RES-040 dérive temporelle** : la table de routing est un "template" qui périme. Re-auditer trimestriellement (nouveaux modèles, prix changés, deprecations).
 - **RES-030 "6 modes Claude Code"** (404, à ré-exporter) : mapper eco/standard/expert sur les modes natifs.
 

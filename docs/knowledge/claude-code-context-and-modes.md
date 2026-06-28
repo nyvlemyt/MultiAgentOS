@@ -1,7 +1,15 @@
+---
+id: claude-code-architecture-du-contexte-6-modes-de-permission
+slug: claude-code-architecture-du-contexte-6-modes-de-permission
+source_key: 'sha256:81901b0e568842373499a489b2f0e7d8dc0049bdd7474cb2956b03a0d12d92ba'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Claude Code — Architecture du contexte & 6 modes de permission
 
 **Distillé** : 2026-06-03 (pré-vol build-time, cf. `docs/workflows/knowledge-bootstrap.md`).
-**Sources** : `docs/ressources/L'Architecture Complete du Contexte dans Claude Code.pdf` + `docs/ressources/Audit des 6 modes Claude Code...pdf` (récupère RES-030, qui était en 404 dans `vibeflow/INDEX.md`).
+**Sources** : `docs/resources/L'Architecture Complete du Contexte dans Claude Code.pdf` + `docs/resources/Audit des 6 modes Claude Code...pdf` (récupère RES-030, qui était en 404 dans `vibeflow/INDEX.md`).
 **Obsolescence** : medium — modes valides ≥ Claude Code v2.1.83 ; le mode `auto` (classifier) date de mars 2026. Re-vérifier à `code.claude.com/docs/en/permission-modes`.
 
 ---

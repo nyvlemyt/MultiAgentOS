@@ -1,3 +1,11 @@
+---
+id: vibeflow-workflows-doctrine-modeles-patterns-extraits
+slug: vibeflow-workflows-doctrine-modeles-patterns-extraits
+source_key: 'sha256:e3ec19724a5fb55e58aff5ebf2ce55c1846c38b95a6946e0872265d778b947de'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow — Workflows, Doctrine & Modèles (patterns extraits)
 
 Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Workflows. Source intégrale fetchée 2026-06-03.
@@ -67,14 +75,14 @@ Patterns issus des ressources Notion @le_gouverneur_ia, catégorie Workflows. So
 
 ## RES-053 — Le système qui fait tourner ma distribution (déjà local)
 
-Contenu intégral dans `docs/claude doc/système-qui-fai-tourner-une-distribution-claude.md`. Architecture complète orchestrateur + sous-agents + skills d'un Lab réel (ContentFlow). Valide le pattern Orchestrator-Workers de MAS.
+Contenu intégral dans `docs/claude-doc/systeme-qui-fai-tourner-une-distribution-claude.md`. Architecture complète orchestrateur + sous-agents + skills d'un Lab réel (ContentFlow). Valide le pattern Orchestrator-Workers de MAS.
 
 ---
 
 ## RES-032 / RES-031 (déjà local)
 
-- RES-032 "Superpowers stack + doctrine" → `docs/claude doc/Le Stack Doctrine.md`. Doctrine par-dessus le framework (auditor agent + audit-weekly.sh).
-- RES-031 "3 checks avant upgrade" → `docs/claude doc/3 checks a faire avant d'upgrader ton modele IA.md`. Checklist pour ADR 0002 multi-model.
+- RES-032 "Superpowers stack + doctrine" → `docs/claude-doc/le-stack-doctrine.md`. Doctrine par-dessus le framework (auditor agent + audit-weekly.sh).
+- RES-031 "3 checks avant upgrade" → `docs/claude-doc/3-checks-avant-upgrade-modele-ia.md`. Checklist pour ADR 0002 multi-model.
 
 ---
 

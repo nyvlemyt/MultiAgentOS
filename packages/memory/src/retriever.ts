@@ -222,6 +222,7 @@ export const QMD_KNOWLEDGE = 'mas-knowledge';
 export const QMD_WORKFLOWS = 'mas-workflows';
 export const QMD_MEMORY = 'mas-memory';
 export const QMD_ARSENAL = 'mas-arsenal';
+export const QMD_RESOURCES = 'mas-resources';
 
 /**
  * Default collections for the MISSION-MEMORY context path (dispatch). Memory +
@@ -238,6 +239,7 @@ const COLLECTION_ROOT: Record<string, string> = {
   [QMD_WORKFLOWS]: 'docs/workflows',
   [QMD_MEMORY]: 'data/memory',
   [QMD_ARSENAL]: 'data/arsenal-index',
+  [QMD_RESOURCES]: 'docs/resources',
 };
 
 /** Map one `qmd://<collection>/<rest>` hit to a MemoryDoc scope/source/project. */
@@ -432,6 +434,16 @@ export function createRetriever(opts: CreateRetrieverOpts): MemoryRetriever {
   return fts;
 }
 
+/** Per-collection presence, reported by the doctor (incl. candidate-only mas-resources). */
+export interface CollectionHealth {
+  /** qmd collection name, e.g. `mas-resources`. */
+  name: string;
+  /** Repo-relative folder it indexes, e.g. `docs/resources`. */
+  root: string;
+  /** Does that folder exist on disk? Missing is acceptable (forward-compatible). */
+  present: boolean;
+}
+
 export interface RetrievalDoctorResult {
   /** Will runtime retrieval use QMD (semantic)? False → FTS keyword fallback. */
   qmdActive: boolean;
@@ -443,6 +455,21 @@ export interface RetrievalDoctorResult {
   forcedFts: boolean;
   /** Human-facing one-liner — logged at boot and by `pnpm mem:doctor`. */
   message: string;
+  /** Health of every known collection (incl. mas-resources). Diagnostic only. */
+  collections: CollectionHealth[];
+}
+
+/**
+ * Snapshot every known collection's on-disk presence. mas-resources is reported
+ * like the rest even though its folder is forward-compatibly optional and it is
+ * deliberately absent from QMD_MEMORY_COLLECTIONS (raw candidate docs, not memory).
+ */
+function diagnoseCollections(cwd: string): CollectionHealth[] {
+  return Object.entries(COLLECTION_ROOT).map(([name, root]) => ({
+    name,
+    root,
+    present: existsSync(join(cwd, root)),
+  }));
 }
 
 /**
@@ -477,5 +504,5 @@ export function retrievalDoctor(cwd: string, bin = 'qmd'): RetrievalDoctorResult
       'QMD non détecté → recherche en FTS (mots-clés). ' +
       'Lance pnpm qmd:setup pour le sémantique (~4,4 Go, Node ≥22).';
   }
-  return { qmdActive, indexFound, binFound, forcedFts, message };
+  return { qmdActive, indexFound, binFound, forcedFts, message, collections: diagnoseCollections(cwd) };
 }

@@ -1,3 +1,11 @@
+---
+id: vibeflow-hooks-sortir-du-terminal-patterns-extraits
+slug: vibeflow-hooks-sortir-du-terminal-patterns-extraits
+source_key: 'sha256:76d8daa683f0f724096b061c9df9f03828c28cb70933b46ff9f1232d7a16c780'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow — Hooks & Sortir du Terminal (patterns extraits)
 
 Catégorie Hooks de la page Notion @le_gouverneur_ia. **Les 3 ressources de cette catégorie utilisent des IDs `248dc06a` morts (404 au fetch 2026-06-03).** À récupérer via `notion-search` ou ré-export utilisateur.

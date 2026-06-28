@@ -226,14 +226,17 @@ export const memoryCandidates = sqliteTable('memory_candidates', {
   sourceTaskId: text('source_task_id').references(() => tasks.id, { onDelete: 'cascade' }),
   type: text('type', { enum: ['user', 'feedback', 'project', 'reference'] }).notNull(),
   body: text('body').notNull(),
-  status: text('status', { enum: ['pending', 'accepted', 'rejected'] }).notNull().default('pending'),
+  status: text('status', { enum: ['pending', 'accepted', 'rejected', 'capture_failed'] }).notNull().default('pending'),
   // Intake provenance (Phase 4.5, ADR 0004). Null for ritual/legacy candidates.
   sourceKind: text('source_kind', { enum: ['note', 'skill', 'pattern', 'repo', 'course', 'mission'] }),
   dossierPath: text('dossier_path'),
   classifierDecision: text('classifier_decision'),
   autoFiled: integer('auto_filed', { mode: 'boolean' }).notNull().default(false),
+  // Brique 1 deltas (ADR 0008 / fiche-contract spec migration):
+  sourceKey: text('source_key'),                                              // match key: idempotence/supersede/dedup
+  trust: text('trust', { enum: ['trusted', 'untrusted', 'low'] }),            // security invariant: untrusted-never-auto-promote
   createdAt: epoch().notNull(),
-});
+}, (t) => ({ bySourceKey: index('memory_candidates_source_key_idx').on(t.sourceKey) }));
 
 export const validations = sqliteTable('validations', {
   id: text('id').primaryKey(),

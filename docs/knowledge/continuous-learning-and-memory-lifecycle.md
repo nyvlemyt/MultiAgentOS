@@ -1,3 +1,11 @@
+---
+id: continuous-learning-memory-persistence-lifecycle-ecc-patterns
+slug: continuous-learning-memory-persistence-lifecycle-ecc-patterns
+source_key: 'sha256:d4edd97ebfe3f3240b94d7107c558d726b512794f4cccc049d199bad1d57422c'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Continuous Learning + Memory-Persistence Lifecycle (ECC patterns)
 
 *Source: `affaan-m/ecc` `hooks/memory-persistence/`, `scripts/hooks/*.js`, `docs/continuous-learning-v2-spec.md` (MIT). Distilled 2026-06-21 — PATTERN only; ECC's JS hook impls are not copied (MAOS ships its own hook surface). Feeds CLAUDE.md §13 (persistence bridge / enrichment spiral) + Phase 4 memory.*

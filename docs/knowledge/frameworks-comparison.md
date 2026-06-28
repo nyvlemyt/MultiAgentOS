@@ -1,3 +1,11 @@
+---
+id: comparaison-frameworks-multi-agents
+slug: comparaison-frameworks-multi-agents
+source_key: 'sha256:548ea776c2e784af85b4718f4f5def4e5f7c160f6f6a5fc90496025b8cacf7bc'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # Comparaison Frameworks Multi-Agents
 
 ## Tableau de décision

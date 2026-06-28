@@ -1,3 +1,11 @@
+---
+id: vibeflow-resources-index-integre
+slug: vibeflow-resources-index-integre
+source_key: 'sha256:4fbd6da107d59be344ecec2db3831e77774e7419243d43b8c581aa1af9a3a6b9'
+lifecycle: active
+trust: trusted
+schema_version: '1'
+---
 # VibeFlow Resources — Index Intégré
 
 Source : Notion database wiki @le_gouverneur_ia (`collection://37424138-fc8c-80d9-b8f6-000b35b15256`, page https://tangible-mink-e9a.notion.site/Ressources-62124138fc8c834cb89581026c259dcd). Prompts copy-paste de gouvernance IA pour Claude Code.
@@ -6,7 +14,7 @@ Source : Notion database wiki @le_gouverneur_ia (`collection://37424138-fc8c-80d
 
 ## Statut d'accès
 
-**Réconciliation 2026-06-04 → mise à jour 2026-06-05** (cycle `vibeflow-index-reconciliation`) : **44 PDFs présents** dans `docs/ressources/` ré-appariés à l'INDEX. Le statut « ❌ 404 / à ré-exporter » de l'ère MCP est **caduc**. Détail : `docs/learning/2026-06-04-vibeflow-index-reconciliation/build-report.md`.
+**Réconciliation 2026-06-04 → mise à jour 2026-06-05** (cycle `vibeflow-index-reconciliation`) : **44 PDFs présents** dans `docs/resources/` ré-appariés à l'INDEX. Le statut « ❌ 404 / à ré-exporter » de l'ère MCP est **caduc**. Détail : `docs/learning/2026-06-04-vibeflow-index-reconciliation/build-report.md`.
 
 - **44 PDFs** → **42 mappés à un n° RES** (`+RES-058/059/060/061` nouveaux locaux), **1 nouveau sans n°** (« Comment rendre tes projets IA portables »), 1 méta (page catalogue Notion).
 - **RES-023 TRANCHÉ (2026-06-05, utilisateur)** = `023-Structurer la gouvernance AVANT...pdf`. Le PDF « Gouverner tes Agents IA Templates+Prompts » **renuméroté RES-059** (n° local, source Notion 404) — distillation dans agents-skills.md.
@@ -17,7 +25,7 @@ Source : Notion database wiki @le_gouverneur_ia (`collection://37424138-fc8c-80d
 
 ### Historique (ère MCP, 2026-06-03)
 - **Intégration Notion MCP ~17 pages** (RES-034→057) ; anciennes RES-003→033 en 404 via MCP. **Ce blocage est levé** par les PDFs locaux.
-- **6 ressources sauvées localement** dans `docs/claude doc/`.
+- **6 ressources sauvées localement** dans `docs/claude-doc/`.
 
 ## Catégorisation autoritaire (5 catégories)
 
@@ -42,7 +50,7 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012, **058** (nouveau : setup SaaS)
 
 ## Table d'intégration (statut réel)
 
-**Colonnes** : `Accès` = présence d'un PDF dans `docs/ressources/` (vérifié 2026-06-04). `Statut catalogage` = `distilled <fichier>` | `backlog_next:<phase>` (PDF prêt, distillation au pré-vol) | `superseded` | `orphelin` (pas de PDF, source MCP/local) | `nouveau` | `méta`.
+**Colonnes** : `Accès` = présence d'un PDF dans `docs/resources/` (vérifié 2026-06-04). `Statut catalogage` = `distilled <fichier>` | `backlog_next:<phase>` (PDF prêt, distillation au pré-vol) | `superseded` | `orphelin` (pas de PDF, source MCP/local) | `nouveau` | `méta`.
 
 | RES | Titre | Cat | Phase | Accès | Statut catalogage |
 |-----|-------|-----|-------|-------|---------|
@@ -105,9 +113,9 @@ RES-053, 052, 039, 038, 032, 031, 030, 028, 012, **058** (nouveau : setup SaaS)
 
 L'utilisateur peut ré-exporter ces pages depuis Notion (markdown) pour intégration complète :
 
-**Note (Batch 1, 2026-06-04)** : les ressources « à ré-exporter » étaient en fait disponibles en PDF dans `docs/ressources/`. Batch 1 Gouvernance+Agents distillé directement depuis ces PDFs (RES-024/023/013/008/012/015/016 ✅). Seule RES-022 (lean CLAUDE.md) n'a pas de PDF correspondant.
+**Note (Batch 1, 2026-06-04)** : les ressources « à ré-exporter » étaient en fait disponibles en PDF dans `docs/resources/`. Batch 1 Gouvernance+Agents distillé directement depuis ces PDFs (RES-024/023/013/008/012/015/016 ✅). Seule RES-022 (lean CLAUDE.md) n'a pas de PDF correspondant.
 
-**Ré-audit (cycle `2026-06-04-vibeflow-reaudit`)** : 1 PDF supplémentaire identifié dans `docs/ressources/` et distillé — « Structurer la gouvernance AVANT de déployer tes agents IA » (4 piliers détaillé + contract.yaml long-form) = **RES-023** (tranché 2026-06-05 ; « Gouverner Templates+Prompts » → **RES-059**). Correction de fidélité : « 40 % Gartner » re-sourcé (vient de ce PDF, pas de RES-024). Détail : `docs/learning/2026-06-04-vibeflow-reaudit/build-report.md`.
+**Ré-audit (cycle `2026-06-04-vibeflow-reaudit`)** : 1 PDF supplémentaire identifié dans `docs/resources/` et distillé — « Structurer la gouvernance AVANT de déployer tes agents IA » (4 piliers détaillé + contract.yaml long-form) = **RES-023** (tranché 2026-06-05 ; « Gouverner Templates+Prompts » → **RES-059**). Correction de fidélité : « 40 % Gartner » re-sourcé (vient de ce PDF, pas de RES-024). Détail : `docs/learning/2026-06-04-vibeflow-reaudit/build-report.md`.
 
 ### Radar « à distiller » par phase (PDF prêt, `backlog_next` — distillation au pré-vol de la phase)
 
@@ -125,10 +133,10 @@ Orphelins (pas de PDF, à ré-exporter si besoin) : 014 (prompt context agentic)
 
 ## Total catalogué (2026-06-05)
 
-- **44 PDFs** dans `docs/ressources/` : **42 mappés à un n° RES** (dont 058/059/060/061 nouveaux locaux ; RES-023 = 1 PDF après arbitrage) · **1 sans n°** (portables) · **1 méta**.
+- **44 PDFs** dans `docs/resources/` : **42 mappés à un n° RES** (dont 058/059/060/061 nouveaux locaux ; RES-023 = 1 PDF après arbitrage) · **1 sans n°** (portables) · **1 méta**.
 - **distilled / couvert** : ~30 RES (gouvernance/agents-skills/memoire/memory-patterns/workflows + claude-code-context-and-modes + CLAUDE.md §11 ; inclut RES-059, **RES-060 LRN, RES-041 3 niveaux, RES-061 3 paradigmes**). **RES-022 = Overview = référence NON distillée** (hors compte).
 - **backlog_next (PDF prêt)** : 025, 026, 027, 028, 039, **058** + portables = ~7, à distiller au pré-vol de leur phase.
 - **watch** : 003 (contexte, re-promouvable Phase 4/5).
 - **superseded** : 006, 004, 007, 011, 009a, 009b, 038.
 - **orphelins** (pas de PDF) : 004, 009a, 011, 014, 048, 049, 050 + 047 archivée.
-- **2 Google Docs** (Graphify, Instagram×Obsidian) + **6 locales** (`docs/claude doc/`) inchangées.
+- **2 Google Docs** (Graphify, Instagram×Obsidian) + **6 locales** (`docs/claude-doc/`) inchangées.
