@@ -37,7 +37,7 @@
     "code-execution": { "primary": "claude", "fallback": [] },
     "code-review": { "primary": "openai", "fallback": ["claude"] },
     "planning": { "primary": "claude", "fallback": ["openai"] },
-    "memory": { "primary": "gemini-free", "fallback": ["openai", "claude"] },
+    "memory": { "primary": "claude", "fallback": ["gemini-free"] },
     "security": { "primary": "claude", "fallback": ["openai"] },
     "ux": { "primary": "openai", "fallback": ["claude"] },
     "writing": { "primary": "openai", "fallback": ["gemini-free", "claude"] },

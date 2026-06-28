@@ -47,7 +47,7 @@ describe('createRouterLLM', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('gemini key in .env.local ⇒ router routes memory domain to gemini (mock fetch)', async () => {
+  it('gemini key in .env.local ⇒ router routes search domain to gemini-free (paid off, mock fetch)', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const envPath = tmpFile('.env.local', 'GEMINI_API_KEY=test-key\n');
     const fetchSpy = vi.fn(async () =>
@@ -66,7 +66,8 @@ describe('createRouterLLM', () => {
       fetchImpl: fetchSpy,
     });
     expect(router).toBeDefined();
-    const resp = await router!.call({ system: '', user: 'u', model: 'm', mode: 'eco', domain: 'memory' });
+    // search: perplexity primary is paid (OFF by default) ⇒ first eligible provider is gemini-free.
+    const resp = await router!.call({ system: '', user: 'u', model: 'm', mode: 'eco', domain: 'search' });
     expect(resp.provider).toBe('gemini-free');
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     warn.mockRestore();
