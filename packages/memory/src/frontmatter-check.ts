@@ -91,16 +91,24 @@ function stripCode(body: string): string {
 }
 
 export function scanWikilinks(body: string): string[] {
-  // Greedy negated class: `[^\]]+` stops at the first `]`, then `\]\]` checks —
-  // disjoint sets, so the match is linear with no backtracking. Drop `|alias`
-  // in code rather than in the pattern (avoids an alternation Sonar flags S8786).
-  const re = /\[\[([^\]]+)\]\]/g;
+  // String scan (no regex) so the `]]` terminator can never backtrack — a
+  // `[[…]]` regex trips Sonar S8786 and JS has no atomic groups to pin it.
+  // For each `[[`, take the span up to the next `]]` and drop any `|alias`.
+  // Code spans are stripped first so a `[[BDR-001]]` example in prose is never
+  // read as a live relation (the trap).
+  const text = stripCode(body);
   const targets: string[] = [];
-  for (const match of stripCode(body).matchAll(re)) {
-    const inner = match[1] ?? '';
+  let cursor = 0;
+  for (;;) {
+    const open = text.indexOf('[[', cursor);
+    if (open === -1) break;
+    const close = text.indexOf(']]', open + 2);
+    if (close === -1) break;
+    const inner = text.slice(open + 2, close);
     const pipe = inner.indexOf('|');
     const target = (pipe === -1 ? inner : inner.slice(0, pipe)).trim();
     if (target.length > 0) targets.push(target);
+    cursor = close + 2;
   }
   return unique(targets);
 }
