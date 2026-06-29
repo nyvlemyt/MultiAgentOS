@@ -8,6 +8,7 @@ export type DeadLetterCause =
   | 'ocr_empty'
   | 'paywall_404'
   | 'oversize'
+  | 'host_not_allowed'
   | 'double_abstain'
   | 'unknown_source_kind';
 
@@ -48,6 +49,7 @@ const CAUSE_PHRASE: Record<DeadLetterCause, string> = {
   ocr_empty: 'extraction produced no text (OCR empty)',
   paywall_404: 'source unreachable (404 / paywall)',
   oversize: 'source exceeds the size limit',
+  host_not_allowed: 'outbound host not in allowed_hosts (blocked by net-guard §5)',
   double_abstain: 'classifier double-abstain (rules + LLM)',
   unknown_source_kind: 'no extractor registered for this source kind',
 };

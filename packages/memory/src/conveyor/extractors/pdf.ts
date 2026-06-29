@@ -4,26 +4,14 @@
 // cross-check: it recovers text when markitdown under-extracts and proves a real text layer
 // exists. Both empty ⇒ ExtractorEmptyError (no text layer — real OCR is a deferred leaf).
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import type { ExtractResult, Extractor } from '../extractor';
+import { resolveBin } from './bin';
 
 /** Below this many non-blank chars an extraction counts as "empty" and triggers the cross-check. */
 export const MIN_EXTRACT_CHARS = 20;
 const MAX_SUBPROCESS_BUFFER = 64 * 1024 * 1024;
-
-/** Fixed, unwriteable-by-default install dirs — resolve binaries here, never via PATH lookup (S4036). */
-const BIN_DIRS = ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', '/bin'];
-
-/** Resolve a binary to an absolute path from the fixed allowlist; throw if absent (no silent PATH fallback). */
-function resolveBin(name: string): string {
-  for (const dir of BIN_DIRS) {
-    const abs = join(dir, name);
-    if (existsSync(abs)) return abs;
-  }
-  throw new Error(`required executable not found in ${BIN_DIRS.join(', ')}: ${name}`);
-}
 
 /** Both extractors produced no usable text — a scanned/image PDF (deferred OCR leaf). */
 export class ExtractorEmptyError extends Error {
