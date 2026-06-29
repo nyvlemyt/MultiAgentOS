@@ -3,6 +3,8 @@
   "categories": [],
   "allowed_hosts": [
     "help.obsidian.md",
+    "obsidian.md",
+    "en.wikipedia.org",
     "www.youtube.com",
     "youtube.com",
     "m.youtube.com",
