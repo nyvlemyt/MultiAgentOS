@@ -11,6 +11,8 @@ import type { ExtractorRegistry, ExtractResult } from './extractor';
 import type { DeadLetterCause } from './admission';
 import { wrapUntrusted } from './anti-injection';
 import { ExtractorEmptyError } from './extractors/pdf';
+import { BlockedHostError } from './net-guard';
+import { FetchFailedError } from './extractors/url';
 import { buildFileManifest, type ManifestNode } from './manifest';
 
 type Db = ReturnType<typeof getDb>;
@@ -40,6 +42,14 @@ export interface PipelineDeps {
 
 function failed(db: Db, taskId: string | null, body: string, cause: DeadLetterCause, detail: string): Promise<CaptureResult> {
   return captureCandidates(db, taskId, [{ type: 'reference', body, captureFailed: { cause, detail } }]);
+}
+
+/** Map an extractor throw to its dead-letter cause (net-guard block / fetch failure / empty / crash). */
+function causeFor(e: unknown): DeadLetterCause {
+  if (e instanceof ExtractorEmptyError) return 'ocr_empty';
+  if (e instanceof BlockedHostError) return 'host_not_allowed';
+  if (e instanceof FetchFailedError) return 'paywall_404';
+  return 'extractor_crash';
 }
 
 /** Rules-first classify; LLM-on-abstain only when wired AND budget open. Returns the decision string. */
@@ -75,7 +85,7 @@ export async function runCapturePipeline(db: Db, src: PipelineSource, deps: Pipe
   try {
     result = await extractor(src.kind, src.source);
   } catch (e) {
-    const cause: DeadLetterCause = e instanceof ExtractorEmptyError ? 'ocr_empty' : 'extractor_crash';
+    const cause = causeFor(e);
     return failed(db, taskId, `[${cause}] ${src.source}`, cause, (e as Error).message);
   }
 
@@ -113,7 +123,7 @@ async function extractAll(deps: PipelineDeps, sources: PipelineSource[]): Promis
     try {
       ok.push({ result: await extractor(src.kind, src.source), src });
     } catch (e) {
-      const cause: DeadLetterCause = e instanceof ExtractorEmptyError ? 'ocr_empty' : 'extractor_crash';
+      const cause = causeFor(e);
       dead.push({ type: 'reference', body: `[${cause}] ${src.source}`, captureFailed: { cause, detail: (e as Error).message } });
     }
   }
