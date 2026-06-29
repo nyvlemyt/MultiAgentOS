@@ -46,4 +46,9 @@ async function main(): Promise<void> {
   console.log(formatSummary(await captureOne(db, rest[0]!, deps)));
 }
 
-main().catch((e) => { console.error(`[mas capture] ${(e as Error).message}`); process.exitCode = 1; });
+try {
+  await main();
+} catch (e) {
+  console.error(`[mas capture] ${(e as Error).message}`);
+  process.exitCode = 1;
+}

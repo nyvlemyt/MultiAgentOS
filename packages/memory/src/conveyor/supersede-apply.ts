@@ -26,6 +26,11 @@ export interface ApplyResult {
 
 interface Scanned { path: string; data: Record<string, unknown>; content: string; ef: ExistingFiche }
 
+/** Frontmatter scalar → string; non-string (object/number/missing) collapses to '' (avoids '[object Object]', S6551). */
+function asStr(v: unknown): string {
+  return typeof v === 'string' ? v : '';
+}
+
 function scan(dir: string): Scanned[] {
   if (!existsSync(dir)) return [];
   const out: Scanned[] = [];
@@ -35,7 +40,7 @@ function scan(dir: string): Scanned[] {
     const data = parsed.data as Record<string, unknown>;
     out.push({
       path, data, content: parsed.content,
-      ef: { id: String(data.id ?? ''), source_key: String(data.source_key ?? ''), lifecycle: String(data.lifecycle ?? ''), lane: data.lane as string | undefined },
+      ef: { id: asStr(data.id), source_key: asStr(data.source_key), lifecycle: asStr(data.lifecycle), lane: data.lane as string | undefined },
     });
   }
   return out;
