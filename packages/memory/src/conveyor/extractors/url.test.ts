@@ -45,11 +45,11 @@ describe('extractUrl', () => {
   });
 
   it('re-checks the guard on a redirect to an internal host (SSRF bypass blocked)', async () => {
-    const fetch = (async (url: string) => {
+    const fetchImpl = (async (url: string) => {
       if (url === 'https://help.obsidian.md/bases') return okResponse('', 302, { location: 'https://evil.internal/secret' });
       return okResponse(ARTICLE);
     }) as unknown as typeof fetch;
-    const d = deps({ fetch, resolve: async (h: string) => (h === 'evil.internal' ? ['10.0.0.5'] : ['185.199.108.153']) });
+    const d = deps({ fetch: fetchImpl, resolve: async (h: string) => (h === 'evil.internal' ? ['10.0.0.5'] : ['185.199.108.153']) });
     await expect(extractUrl('https://help.obsidian.md/bases', d)).rejects.toThrow(/private/);
   });
 
