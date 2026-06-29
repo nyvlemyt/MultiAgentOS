@@ -110,4 +110,16 @@ describe('captureCandidates (the one door — SAS + dead-letter live inside the 
     expect(row!.status).toBe('capture_failed');
     expect(row!.classifierDecision).toContain('paywall_404');
   });
+
+  it('persists classifierDecision on a pending row', async () => {
+    const db = getDb();
+    await seedTask();
+    const res = await captureCandidates(db, 'task1', [
+      { type: 'reference', body: 'A governance note about agents.', classifierDecision: 'learnings/global (rule:kw-learning)' },
+    ]);
+    expect(res.pending).toHaveLength(1);
+    const [row] = await db.select().from(memoryCandidates).where(eq(memoryCandidates.id, res.pending[0]!));
+    expect(row!.classifierDecision).toBe('learnings/global (rule:kw-learning)');
+    expect(row!.status).toBe('pending');
+  });
 });

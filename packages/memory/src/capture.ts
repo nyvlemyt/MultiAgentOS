@@ -36,6 +36,8 @@ export interface CaptureCandidate {
   signals?: string[];
   /** Dead-letter marker (capture-contract §b): extraction/processing failed → capture_failed, not silent drop. */
   captureFailed?: { cause: DeadLetterCause; detail?: string };
+  /** Classifier decision (`register/scope (rule:…)` or `abstain — …`). Persisted on pending rows. */
+  classifierDecision?: string;
 }
 
 /** Structured outcome of the one door — the data shape the cockpit Inbox (Brique 5) renders. */
@@ -102,7 +104,7 @@ export async function captureCandidates(
       continue;
     }
 
-    rows.push({ ...base, status: 'pending' });
+    rows.push({ ...base, status: 'pending', classifierDecision: it.classifierDecision });
     result.pending.push(base.id);
   }
 
