@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildManifest, isMultiPart, type ManifestInput, type SourcePart } from './manifest';
+import { buildManifest, buildFileManifest, isMultiPart, type ManifestInput, type SourcePart } from './manifest';
 
 const parts: SourcePart[] = [
   { heading: 'Lesson 1 — Intro', markdown: 'intro body' },
@@ -84,5 +84,29 @@ describe('buildManifest (parent/child — a 12-lesson course never splits into o
 
   it('throws on a non-multi-part source (caller must gate with isMultiPart)', () => {
     expect(() => buildManifest({ ...input, parts: [parts[0]!] })).toThrow(/multi-part/i);
+  });
+});
+
+describe('buildFileManifest (files-as-parts, decision A)', () => {
+  const files = [
+    { sourceKey: 'pdf:aaa', heading: 'Lesson 1', markdown: '# L1\nbody' },
+    { sourceKey: 'pdf:bbb', heading: 'Lesson 2', markdown: '# L2\nbody' },
+  ];
+
+  it('mother carries a matiere:<slug> key + a MOC; children carry per-file source_key', () => {
+    const nodes = buildFileManifest({ parentId: 'gov-course', title: 'Gov Course', trust: 'untrusted', derivedFrom: 'docs/resources/inbox/gov', files });
+    const mother = nodes.find((n) => n.role === 'manifest')!;
+    const children = nodes.filter((n) => n.role === 'child');
+    expect(mother.source_key).toBe('matiere:gov-course');
+    expect(mother.markdown).toContain('## Contents');
+    expect(children).toHaveLength(2);
+    expect(children[0]!.source_key).toBe('pdf:aaa');
+    expect(children[1]!.source_key).toBe('pdf:bbb');
+    expect(children[0]!.part_of).toBe('gov-course');
+    expect(children[0]!.order).toBe(1);
+  });
+
+  it('throws for a single file (no orphan-of-one manifest)', () => {
+    expect(() => buildFileManifest({ parentId: 'p', title: 'T', trust: 'low', derivedFrom: 'd', files: [files[0]!] })).toThrow();
   });
 });
