@@ -8,7 +8,7 @@ import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { eq } from 'drizzle-orm';
 import { getDb, closeDb, memoryCandidates } from '@mas/db';
 import { ExtractorRegistry } from './extractor';
-import { runCapturePipeline } from './pipeline';
+import { runCapturePipeline, runMatierePipeline } from './pipeline';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../../db/migrations');
@@ -90,5 +90,37 @@ describe('runCapturePipeline', () => {
     await runCapturePipeline(db, { kind: 'pdf', source: '/b2.pdf' }, { registry: reg, llm, budgetBlocked: () => false });
     expect(seen).toHaveLength(1);
     expect(seen[0]).toContain('<untrusted-source>');
+  });
+});
+
+describe('runMatierePipeline', () => {
+  it('extracts N files → 1 manifest mother + N children at the one door', async () => {
+    const db = getDb();
+    let i = 0;
+    const reg = new ExtractorRegistry();
+    reg.register('pdf', async () => { i += 1; return { markdown: `learning number ${i}`, source_key: `pdf:k${i}`, trust: 'untrusted' as const }; });
+    const res = await runMatierePipeline(db, {
+      parentId: 'matiere-1', title: 'Governance', derivedFrom: 'docs/resources/inbox/gov',
+      sources: [{ kind: 'pdf', source: '/a.pdf', title: 'A' }, { kind: 'pdf', source: '/b.pdf', title: 'B' }],
+    }, { registry: reg });
+    expect(res.pending).toHaveLength(3); // mother + 2 children
+    const rows = await db.select().from(memoryCandidates);
+    const keys = rows.map((r) => r.sourceKey).sort();
+    expect(keys).toContain('matiere:governance');
+    expect(keys).toContain('pdf:k1');
+    expect(keys).toContain('pdf:k2');
+  });
+
+  it('falls back to a single flat candidate when only one file extracts', async () => {
+    const db = getDb();
+    const reg = new ExtractorRegistry();
+    let n = 0;
+    reg.register('pdf', async () => { n += 1; if (n === 1) throw new Error('boom'); return { markdown: 'second file ok', source_key: 'pdf:ok', trust: 'untrusted' as const }; });
+    const res = await runMatierePipeline(db, {
+      parentId: 'm2', title: 'T', derivedFrom: 'd',
+      sources: [{ kind: 'pdf', source: '/x.pdf' }, { kind: 'pdf', source: '/y.pdf' }],
+    }, { registry: reg });
+    expect(res.failed).toHaveLength(1);  // the crash
+    expect(res.pending).toHaveLength(1); // single survivor, no manifest
   });
 });

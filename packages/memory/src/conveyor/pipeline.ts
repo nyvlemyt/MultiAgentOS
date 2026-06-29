@@ -11,6 +11,7 @@ import type { ExtractorRegistry, ExtractResult } from './extractor';
 import type { DeadLetterCause } from './admission';
 import { wrapUntrusted } from './anti-injection';
 import { ExtractorEmptyError } from './extractors/pdf';
+import { buildFileManifest, type ManifestNode } from './manifest';
 
 type Db = ReturnType<typeof getDb>;
 
@@ -89,4 +90,69 @@ export async function runCapturePipeline(db: Db, src: PipelineSource, deps: Pipe
     classifierDecision: await decide(result.markdown, deps),
   };
   return captureCandidates(db, taskId, [candidate]);
+}
+
+export interface MatiereInput {
+  parentId: string;
+  title: string;
+  derivedFrom: string;
+  sources: PipelineSource[];
+}
+
+interface Extracted { result: ExtractResult; src: PipelineSource }
+
+async function extractAll(deps: PipelineDeps, sources: PipelineSource[]): Promise<{ ok: Extracted[]; dead: CaptureCandidate[] }> {
+  const ok: Extracted[] = [];
+  const dead: CaptureCandidate[] = [];
+  for (const src of sources) {
+    const extractor = deps.registry.resolve(src.kind);
+    if (!extractor) {
+      dead.push({ type: 'reference', body: `[unknown kind] ${src.source}`, captureFailed: { cause: 'unknown_source_kind', detail: src.kind } });
+      continue;
+    }
+    try {
+      ok.push({ result: await extractor(src.kind, src.source), src });
+    } catch (e) {
+      const cause: DeadLetterCause = e instanceof ExtractorEmptyError ? 'ocr_empty' : 'extractor_crash';
+      dead.push({ type: 'reference', body: `[${cause}] ${src.source}`, captureFailed: { cause, detail: (e as Error).message } });
+    }
+  }
+  return { ok, dead };
+}
+
+async function manifestCandidate(node: ManifestNode, deps: PipelineDeps): Promise<CaptureCandidate> {
+  const body = node.role === 'child' ? `<!-- part_of: ${node.part_of} order: ${node.order} -->\n${node.markdown}` : node.markdown;
+  return {
+    type: 'reference', body, title: node.title, sourceKey: node.source_key, trust: node.trust,
+    sourceResolvable: true, signals: ['reference', node.role],
+    classifierDecision: await decide(node.markdown, deps),
+  };
+}
+
+/**
+ * Capture a matière (decision A: a folder = one matière). Extract each file; ≥2 survivors → 1 manifest
+ * mother + N children (keyed per-file source_key); exactly 1 → a flat candidate (no orphan-of-one);
+ * failures are dead-lettered, never dropped. All writes go through the one door.
+ */
+export async function runMatierePipeline(db: Db, input: MatiereInput, deps: PipelineDeps): Promise<CaptureResult> {
+  const taskId = deps.sourceTaskId ?? null;
+  const { ok, dead } = await extractAll(deps, input.sources);
+
+  const items: CaptureCandidate[] = [...dead];
+  if (ok.length >= 2) {
+    const nodes = buildFileManifest({
+      parentId: input.parentId, title: input.title, derivedFrom: input.derivedFrom,
+      trust: ok.every((e) => e.result.trust === 'trusted') ? 'trusted' : 'untrusted',
+      files: ok.map((e) => ({ sourceKey: e.result.source_key, heading: e.src.title ?? basename(e.src.source), markdown: e.result.markdown })),
+    });
+    for (const node of nodes) items.push(await manifestCandidate(node, deps));
+  } else if (ok.length === 1) {
+    const only = ok[0]!;
+    items.push({
+      type: 'reference', body: only.result.markdown, title: only.src.title ?? basename(only.src.source),
+      sourceKey: only.result.source_key, trust: only.result.trust, sourceResolvable: true,
+      signals: ['reference', only.src.kind], classifierDecision: await decide(only.result.markdown, deps),
+    });
+  }
+  return captureCandidates(db, taskId, items);
 }
