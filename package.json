@@ -20,6 +20,7 @@
     "mem:eval": "pnpm --filter @mas/memory mem:eval",
     "mem:doctor": "pnpm --filter @mas/memory mem:doctor",
     "qmd:setup": "bash scripts/qmd-setup.sh",
+    "mas": "pnpm --filter @mas/memory mas",
     "smoke": "pnpm --filter @mas/web smoke",
     "skills:reindex": "pnpm --filter @mas/skills reindex"
   },
