@@ -25,7 +25,7 @@ export function youtubeVideoId(rawUrl: string): string | null {
     if (host === 'youtu.be') return u.pathname.slice(1) || null;
     const v = u.searchParams.get('v');
     if (v) return v;
-    const m = u.pathname.match(/\/(?:shorts|embed|live)\/([^/?]+)/);
+    const m = /\/(?:shorts|embed|live)\/([^/?]+)/.exec(u.pathname);
     return m ? m[1]! : null;
   } catch {
     return null;
@@ -59,6 +59,24 @@ export const realYoutubeRunner: YoutubeRunner = (url) => {
   }
 };
 
+/** Strip complete `<…>` inline tags via linear scan (no regex backtracking, S8786); unmatched `<` kept verbatim. */
+function stripVttTags(line: string): string {
+  let out = '';
+  let i = 0;
+  while (i < line.length) {
+    if (line[i] === '<') {
+      const close = line.indexOf('>', i + 1);
+      if (close > i + 1) {
+        i = close + 1;
+        continue;
+      }
+    }
+    out += line[i];
+    i++;
+  }
+  return out;
+}
+
 /** Strip WEBVTT header/cue-index/timestamps/inline tags; collapse consecutive duplicate lines. */
 export function vttToText(vtt: string): string {
   const out: string[] = [];
@@ -67,8 +85,8 @@ export function vttToText(vtt: string): string {
     if (!line || line === 'WEBVTT') continue;
     if (line.startsWith('NOTE') || line.startsWith('Kind:') || line.startsWith('Language:')) continue;
     if (line.includes('-->') || /^\d+$/.test(line)) continue;
-    const text = line.replace(/<[^>]+>/g, '').trim();
-    if (text && out[out.length - 1] !== text) out.push(text);
+    const text = stripVttTags(line).trim();
+    if (text && out.at(-1) !== text) out.push(text);
   }
   return out.join(' ');
 }
@@ -93,10 +111,13 @@ function fmtTime(seconds: number): string {
 
 export function buildYoutubeMarkdown(meta: YtMeta, transcript: string): string {
   const title = meta.title ?? meta.id ?? 'YouTube video';
-  const sub = [meta.channel ?? meta.uploader, meta.upload_date, meta.duration != null ? `${meta.duration}s` : null].filter(Boolean).join(' · ');
+  const subParts = [meta.channel ?? meta.uploader, meta.upload_date];
+  if (meta.duration != null) subParts.push(`${meta.duration}s`);
+  const sub = subParts.filter(Boolean).join(' · ');
   const parts = [sub ? `# ${title}\n\n> ${sub}` : `# ${title}`];
   if (meta.chapters?.length) {
-    parts.push(`## Chapters\n\n${meta.chapters.map((c) => `- ${fmtTime(c.start_time)} ${c.title}`).join('\n')}`);
+    const chapterLines = meta.chapters.map((c) => `- ${fmtTime(c.start_time)} ${c.title}`).join('\n');
+    parts.push(`## Chapters\n\n${chapterLines}`);
   }
   if (meta.description?.trim()) parts.push(`## Description\n\n${meta.description.trim()}`);
   if (transcript.trim()) parts.push(`## Transcript\n\n${transcript.trim()}`);

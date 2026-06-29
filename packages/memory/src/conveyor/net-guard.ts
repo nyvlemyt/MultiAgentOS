@@ -20,7 +20,7 @@ export interface NetGuardDeps {
 export function isPrivateIp(ip: string): boolean {
   const addr = ip.toLowerCase().replace(/^::ffff:/, '');
   if (addr.includes('.')) {
-    const o = addr.split('.').map((n) => Number(n));
+    const o = addr.split('.').map(Number);
     if (o.length !== 4 || o.some((n) => Number.isNaN(n))) return true; // unparsable ⇒ treat as unsafe
     const [a, b] = o as [number, number, number, number];
     return a === 127 || a === 10 || a === 0 || (a === 192 && b === 168) || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31);
