@@ -20,8 +20,10 @@
   "dependencies": {
     "@mas/db": "workspace:*",
     "better-sqlite3": "^11.3.0",
+    "defuddle": "^0.19.1",
     "drizzle-orm": "0.36.4",
     "gray-matter": "^4.0.3",
+    "linkedom": "^0.18.12",
     "zod": "^3.23.8"
   },
   "devDependencies": {

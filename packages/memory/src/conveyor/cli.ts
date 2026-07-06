@@ -7,11 +7,22 @@ import { basename, join } from 'node:path';
 import type { getDb } from '@mas/db';
 import type { CaptureResult } from '../capture';
 import { runCapturePipeline, runMatierePipeline, type PipelineDeps, type PipelineSource } from './pipeline';
+import { YOUTUBE_HOSTS } from './extractors/youtube';
 
 type Db = ReturnType<typeof getDb>;
 
+const YT_BARE = new Set(YOUTUBE_HOSTS.map((h) => h.replace(/^www\./, '')));
+
 export function inferKind(pathOrUrl: string): string {
-  if (/^https?:\/\//i.test(pathOrUrl)) return 'url';
+  if (/^https?:\/\//i.test(pathOrUrl)) {
+    try {
+      const host = new URL(pathOrUrl).hostname.toLowerCase().replace(/^www\./, '');
+      if (YT_BARE.has(host)) return 'youtube';
+    } catch {
+      /* fall through to url */
+    }
+    return 'url';
+  }
   if (pathOrUrl.toLowerCase().endsWith('.pdf')) return 'pdf';
   return 'unknown';
 }
@@ -25,6 +36,11 @@ function toSource(path: string): PipelineSource {
 /** Capture a single path/URL. */
 export function captureOne(db: Db, pathOrUrl: string, deps: PipelineDeps): Promise<CaptureResult> {
   return runCapturePipeline(db, toSource(pathOrUrl), deps);
+}
+
+/** Capture a pasted blob (HTML or clean text) — the paywall escape-hatch. source = the blob itself. */
+export function captureHtmlBlob(db: Db, blob: string, title: string, deps: PipelineDeps): Promise<CaptureResult> {
+  return runCapturePipeline(db, { kind: 'html', source: blob, title, bytes: Buffer.byteLength(blob) }, deps);
 }
 
 function mergeResults(a: CaptureResult, b: CaptureResult): CaptureResult {

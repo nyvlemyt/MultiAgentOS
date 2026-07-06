@@ -9,6 +9,8 @@ import { eq } from 'drizzle-orm';
 import { getDb, closeDb, memoryCandidates } from '@mas/db';
 import { ExtractorRegistry } from './extractor';
 import { runCapturePipeline, runMatierePipeline } from './pipeline';
+import { BlockedHostError } from './net-guard';
+import { FetchFailedError } from './extractors/url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../../db/migrations');
@@ -90,6 +92,29 @@ describe('runCapturePipeline', () => {
     await runCapturePipeline(db, { kind: 'pdf', source: '/b2.pdf' }, { registry: reg, llm, budgetBlocked: () => false });
     expect(seen).toHaveLength(1);
     expect(seen[0]).toContain('<untrusted-source>');
+  });
+});
+
+describe('runCapturePipeline — fetch dead-letters', () => {
+  it('maps BlockedHostError to a host_not_allowed dead-letter', async () => {
+    const db = getDb();
+    const registry = new ExtractorRegistry();
+    registry.register('url', async () => { throw new BlockedHostError('https://evil/x', 'host evil not in allowed_hosts'); });
+    const res = await runCapturePipeline(db, { kind: 'url', source: 'https://evil/x' }, { registry });
+    expect(res.failed).toHaveLength(1);
+    const [row] = await db.select().from(memoryCandidates).where(eq(memoryCandidates.id, res.failed[0]!));
+    expect(row!.status).toBe('capture_failed');
+    expect(row!.body).toContain('host_not_allowed');
+  });
+
+  it('maps FetchFailedError to a paywall_404 dead-letter', async () => {
+    const db = getDb();
+    const registry = new ExtractorRegistry();
+    registry.register('url', async () => { throw new FetchFailedError('https://x/a', 404); });
+    const res = await runCapturePipeline(db, { kind: 'url', source: 'https://x/a' }, { registry });
+    expect(res.failed).toHaveLength(1);
+    const [row] = await db.select().from(memoryCandidates).where(eq(memoryCandidates.id, res.failed[0]!));
+    expect(row!.body).toContain('paywall_404');
   });
 });
 

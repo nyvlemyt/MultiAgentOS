@@ -35,6 +35,20 @@ describe('inferKind', () => {
   });
 });
 
+describe('inferKind (web/video)', () => {
+  it('routes YouTube hosts to the youtube leaf', () => {
+    expect(inferKind('https://www.youtube.com/watch?v=abc')).toBe('youtube');
+    expect(inferKind('https://youtu.be/abc')).toBe('youtube');
+  });
+  it('routes other http(s) to the url leaf', () => {
+    expect(inferKind('https://help.obsidian.md/bases')).toBe('url');
+  });
+  it('keeps pdf + unknown routing', () => {
+    expect(inferKind('/x/y.pdf')).toBe('pdf');
+    expect(inferKind('/x/y.docx')).toBe('unknown');
+  });
+});
+
 describe('captureOne', () => {
   it('captures a single pdf path as a pending candidate', async () => {
     const db = getDb();
