@@ -31,6 +31,23 @@ Un **artifact HTML autonome** (pas de dépendances externes), avec :
 6. Timelines pour les séquences réelles, tableaux courts pour les mappings, jamais de
    dump exhaustif.
 
+### La charte visuelle (référence : page OtakuGO « Nos données, notre base, nos règles »)
+
+Validée par l'utilisateur le 2026-07-07 après comparaison directe (un essai en thème
+sombre a été rejeté). Non négociable :
+
+- **Fond papier clair** `#FAF9F6`, encre `#26242E` — jamais de thème sombre : le cadre
+  hôte des artifacts est clair, un dashboard sombre y devient illisible (prouvé).
+- Palette : accent `#C8405F` (points chauds, décisions), structure `#55527E` (eyebrows,
+  nœuds de flux), `#2F7D4F` ok · `#A96F14` attention · `#8A8794` muted ; chips pastel
+  (fond teinté clair + texte coloré), jamais de badge sombre.
+- Cartes blanches, bord `#E6E3DC`, rayon 10-12 px ; étapes en pastilles numérotées ;
+  statuts en lignes à liseré gauche coloré.
+- **Zéro scroll horizontal de page** : les flux fléchés wrappent (`flex-wrap`), seuls
+  les tableaux scrollent, dans leur propre cadre.
+- Sommaire à ancres en tête dès que la page dépasse 3 sections.
+- Gros titre ~2.3rem/800, thèse ~1.2rem, chiffres clés en cartes dès l'en-tête.
+
 ## La règle d'or : une mission = une page vivante
 
 - On **met à jour la même page** (même URL d'artifact) à chaque jalon : statuts qui
