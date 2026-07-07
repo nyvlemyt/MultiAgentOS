@@ -75,7 +75,7 @@ describe('resolveSubLang', () => {
   });
 
   it('never selects the live_chat pseudo-track', () => {
-    expect(resolveSubLang(metaWith({ subtitles: { live_chat: [] } }))).toBe(null);
+    expect(resolveSubLang(metaWith({ subtitles: { live_chat: [] } }))).toBeNull();
   });
 
   it('picks the original-language auto caption when there are no manual subs', () => {
@@ -85,9 +85,9 @@ describe('resolveSubLang', () => {
 
   it('falls back to the en auto translation, and to null when nothing usable exists', () => {
     expect(resolveSubLang(metaWith({ automatic_captions: { en: [], ab: [] } }))).toBe('en');
-    expect(resolveSubLang(metaWith({ automatic_captions: {} }))).toBe(null);
-    expect(resolveSubLang(metaWith({}))).toBe(null);
-    expect(resolveSubLang('not json')).toBe(null);
+    expect(resolveSubLang(metaWith({ automatic_captions: {} }))).toBeNull();
+    expect(resolveSubLang(metaWith({}))).toBeNull();
+    expect(resolveSubLang('not json')).toBeNull();
   });
 
   it('returns a single concrete track, never a wildcard pattern', () => {
