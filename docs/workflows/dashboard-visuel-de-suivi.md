@@ -36,8 +36,11 @@ Un **artifact HTML autonome** (pas de dépendances externes), avec :
 Validée par l'utilisateur le 2026-07-07 après comparaison directe (un essai en thème
 sombre a été rejeté). Non négociable :
 
-- **Fond papier clair** `#FAF9F6`, encre `#26242E` — jamais de thème sombre : le cadre
-  hôte des artifacts est clair, un dashboard sombre y devient illisible (prouvé).
+- **Fond papier clair** `#FAF9F6`, encre `#26242E` — jamais de thème sombre en fond de
+  page : le cadre hôte des artifacts est clair, le texte hors panneaux devient illisible
+  (prouvé). Le sombre revient **par panneaux d'accent** (mixte validé 2026-07-07) :
+  cartes de chiffres clés, nœuds de flux et bandeau de trace en `#141B23` avec texte
+  clair `#DCE4EC` / chiffres ambre `#E8B34B` — jamais pour du texte courant.
 - Palette : accent `#C8405F` (points chauds, décisions), structure `#55527E` (eyebrows,
   nœuds de flux), `#2F7D4F` ok · `#A96F14` attention · `#8A8794` muted ; chips pastel
   (fond teinté clair + texte coloré), jamais de badge sombre.
