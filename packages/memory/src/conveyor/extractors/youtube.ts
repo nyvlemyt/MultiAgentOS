@@ -40,15 +40,40 @@ export interface YoutubeData {
 /** Subprocess seam — injected so tests run with zero child processes. */
 export type YoutubeRunner = (url: string) => YoutubeData;
 
+/**
+ * Pick ONE concrete subtitle track from the `-J` metadata already in hand. A wildcard like `.*`
+ * makes yt-dlp fetch every auto-translated track (~160 requests) and YouTube answers HTTP 429;
+ * requesting a single known-available track costs one request. Preference: manual en → manual fr
+ * → any manual (live_chat excluded) → original-language auto → en/fr auto → null (skip fetch).
+ */
+export function resolveSubLang(metadataJson: string): string | null {
+  let meta: YtMeta;
+  try {
+    meta = JSON.parse(metadataJson) as YtMeta;
+  } catch {
+    return null;
+  }
+  const manual = Object.keys(meta.subtitles ?? {}).filter((k) => k !== 'live_chat');
+  const manualPick = (lang: string) => manual.find((k) => k === lang || k.startsWith(`${lang}-`));
+  const picked = manualPick('en') ?? manualPick('fr') ?? manual[0];
+  if (picked) return picked;
+  const auto = Object.keys(meta.automatic_captions ?? {});
+  const candidates = meta.language ? [`${meta.language}-orig`, meta.language] : [];
+  candidates.push('en-orig', 'en', 'fr');
+  return candidates.find((c) => auto.includes(c)) ?? null;
+}
+
 /** The real runner: `yt-dlp -J` for metadata + a temp-dir subtitle write, then VTT read + cleanup. */
 export const realYoutubeRunner: YoutubeRunner = (url) => {
   const bin = resolveBin('yt-dlp');
   const metadataJson = execFileSync(bin, ['-J', '--skip-download', '--no-warnings', url], { encoding: 'utf8', maxBuffer: MAX_SUBPROCESS_BUFFER });
+  const subLang = resolveSubLang(metadataJson);
+  if (!subLang) return { metadataJson, vtt: null };
   const dir = mkdtempSync(join(tmpdir(), 'mas-yt-'));
   try {
     execFileSync(
       bin,
-      ['--skip-download', '--write-subs', '--write-auto-subs', '--sub-langs', 'en.*,en,fr,.*', '--sub-format', 'vtt', '--no-warnings', '-o', join(dir, '%(id)s.%(ext)s'), url],
+      ['--skip-download', '--write-subs', '--write-auto-subs', '--sub-langs', subLang, '--sub-format', 'vtt', '--no-warnings', '-o', join(dir, '%(id)s.%(ext)s'), url],
       { encoding: 'utf8', maxBuffer: MAX_SUBPROCESS_BUFFER },
     );
     const vttFile = readdirSync(dir).find((f) => f.endsWith('.vtt'));
@@ -100,6 +125,9 @@ interface YtMeta {
   duration?: number;
   description?: string;
   chapters?: { title: string; start_time: number }[];
+  language?: string;
+  subtitles?: Record<string, unknown>;
+  automatic_captions?: Record<string, unknown>;
 }
 
 function fmtTime(seconds: number): string {

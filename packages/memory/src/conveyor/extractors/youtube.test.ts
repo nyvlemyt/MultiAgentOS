@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractYoutube, makeYoutubeExtractor, vttToText, youtubeVideoId, buildYoutubeMarkdown, YOUTUBE_HOSTS, type YoutubeRunner } from './youtube';
+import { extractYoutube, makeYoutubeExtractor, resolveSubLang, vttToText, youtubeVideoId, buildYoutubeMarkdown, YOUTUBE_HOSTS, type YoutubeRunner } from './youtube';
 import { BlockedHostError, type NetGuardDeps } from '../net-guard';
 import { ExtractorEmptyError } from './pdf';
 
@@ -58,6 +58,44 @@ describe('extractYoutube', () => {
     const ex = makeYoutubeExtractor(runner(), guard);
     const r = await ex('youtube', 'https://youtu.be/abc123');
     expect(r.source_key).toBe('youtube:abc123');
+  });
+});
+
+describe('resolveSubLang', () => {
+  const metaWith = (over: object) => JSON.stringify({ id: 'abc123', title: 'T', ...over });
+
+  it('prefers a manual en track (including regional variants) over everything else', () => {
+    const json = metaWith({ subtitles: { 'en-US': [], fr: [] }, automatic_captions: { 'de-orig': [], de: [] }, language: 'de' });
+    expect(resolveSubLang(json)).toBe('en-US');
+  });
+
+  it('falls back to manual fr, then any manual track that is not live_chat', () => {
+    expect(resolveSubLang(metaWith({ subtitles: { live_chat: [], fr: [] } }))).toBe('fr');
+    expect(resolveSubLang(metaWith({ subtitles: { live_chat: [], de: [] } }))).toBe('de');
+  });
+
+  it('never selects the live_chat pseudo-track', () => {
+    expect(resolveSubLang(metaWith({ subtitles: { live_chat: [] } }))).toBe(null);
+  });
+
+  it('picks the original-language auto caption when there are no manual subs', () => {
+    const json = metaWith({ subtitles: {}, automatic_captions: { 'de-orig': [], de: [], en: [], ab: [] }, language: 'de' });
+    expect(resolveSubLang(json)).toBe('de-orig');
+  });
+
+  it('falls back to the en auto translation, and to null when nothing usable exists', () => {
+    expect(resolveSubLang(metaWith({ automatic_captions: { en: [], ab: [] } }))).toBe('en');
+    expect(resolveSubLang(metaWith({ automatic_captions: {} }))).toBe(null);
+    expect(resolveSubLang(metaWith({}))).toBe(null);
+    expect(resolveSubLang('not json')).toBe(null);
+  });
+
+  it('returns a single concrete track, never a wildcard pattern', () => {
+    const json = metaWith({ subtitles: { en: [] }, automatic_captions: { en: [], fr: [], de: [] } });
+    const lang = resolveSubLang(json);
+    expect(lang).toBe('en');
+    expect(lang).not.toContain('*');
+    expect(lang).not.toContain(',');
   });
 });
 
