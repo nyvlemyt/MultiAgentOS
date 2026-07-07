@@ -9,6 +9,7 @@ import { lookup } from 'node:dns/promises';
 import { getDb } from '@mas/db';
 import { ExtractorRegistry } from './conveyor/extractor';
 import { makePdfExtractor } from './conveyor/extractors/pdf';
+import { makeOfficeExtractor } from './conveyor/extractors/office';
 import { makeHtmlExtractor } from './conveyor/extractors/html';
 import { makeUrlExtractor } from './conveyor/extractors/url';
 import { makeYoutubeExtractor, realYoutubeRunner } from './conveyor/extractors/youtube';
@@ -44,6 +45,9 @@ function buildDeps(root: string): PipelineDeps {
   const guard: NetGuardDeps = { allowedHosts: loadAllowedHosts(root), resolve: resolveHost };
   const registry = new ExtractorRegistry();
   registry.register('pdf', makePdfExtractor());
+  const office = makeOfficeExtractor();
+  registry.register('docx', office);
+  registry.register('pptx', office);
   registry.register('html', makeHtmlExtractor());
   registry.register('url', makeUrlExtractor({ ...guard, fetch }));
   registry.register('youtube', makeYoutubeExtractor(realYoutubeRunner, guard));

@@ -31,7 +31,14 @@ describe('inferKind', () => {
   it('maps .pdf to pdf, http(s) to url, else unknown', () => {
     expect(inferKind('/a/b.pdf')).toBe('pdf');
     expect(inferKind('https://x.com/y')).toBe('url');
-    expect(inferKind('/a/b.docx')).toBe('unknown');
+    expect(inferKind('/a/b.xyz')).toBe('unknown');
+  });
+
+  it('routes office documents to the docx/pptx leaves, case-insensitive', () => {
+    expect(inferKind('/a/b.docx')).toBe('docx');
+    expect(inferKind('/a/b.pptx')).toBe('pptx');
+    expect(inferKind('/a/B.DOCX')).toBe('docx');
+    expect(inferKind('/a/B.PPTX')).toBe('pptx');
   });
 });
 
@@ -45,7 +52,7 @@ describe('inferKind (web/video)', () => {
   });
   it('keeps pdf + unknown routing', () => {
     expect(inferKind('/x/y.pdf')).toBe('pdf');
-    expect(inferKind('/x/y.docx')).toBe('unknown');
+    expect(inferKind('/x/y.xyz')).toBe('unknown');
   });
 });
 
