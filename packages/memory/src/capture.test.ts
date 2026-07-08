@@ -60,7 +60,7 @@ describe('captureCandidates (the one door — SAS + dead-letter live inside the 
     const db = getDb();
     await seedTask();
     const result = await captureCandidates(db, 'task1', []);
-    expect(result).toEqual({ pending: [], failed: [], rejected: [] });
+    expect(result).toEqual({ pending: [], failed: [], rejected: [], duplicate: [] });
   });
 
   it('persists source_key + trust on the pending row (supersede/security sockets)', async () => {
@@ -121,5 +121,81 @@ describe('captureCandidates (the one door — SAS + dead-letter live inside the 
     const [row] = await db.select().from(memoryCandidates).where(eq(memoryCandidates.id, res.pending[0]!));
     expect(row!.classifierDecision).toBe('learnings/global (rule:kw-learning)');
     expect(row!.status).toBe('pending');
+  });
+});
+
+describe('captureCandidates — anti-duplicate guard (source_key idempotence, visible skips)', () => {
+  it('skips a candidate whose source_key already exists — idempotent replay, no second row', async () => {
+    const db = getDb();
+    await seedTask();
+    const first = await captureCandidates(db, 'task1', [
+      { type: 'reference', body: 'Lecture 1 notes.', sourceKey: 'sha256:dup' },
+    ]);
+    expect(first.pending).toHaveLength(1);
+    const second = await captureCandidates(db, 'task1', [
+      { type: 'reference', body: 'Lecture 1 notes (re-captured).', sourceKey: 'sha256:dup' },
+    ]);
+    expect(second.pending).toHaveLength(0);
+    expect(second.duplicate).toEqual([first.pending[0]]); // points to the existing row — the skip is visible
+    const rows = await db.select().from(memoryCandidates).where(eq(memoryCandidates.sourceKey, 'sha256:dup'));
+    expect(rows).toHaveLength(1); // never a second row — re-capturing the datalake is replayable
+  });
+
+  it('a modified doc (different source_key) is a fresh candidate, not a duplicate', async () => {
+    const db = getDb();
+    await seedTask();
+    await captureCandidates(db, 'task1', [{ type: 'reference', body: 'v1', sourceKey: 'sha256:v1' }]);
+    const res = await captureCandidates(db, 'task1', [{ type: 'reference', body: 'v2', sourceKey: 'sha256:v2' }]);
+    expect(res.pending).toHaveLength(1);
+    expect(res.duplicate).toHaveLength(0);
+  });
+
+  it('dedups within a single batch — first inserts, the rest point to it', async () => {
+    const db = getDb();
+    await seedTask();
+    const res = await captureCandidates(db, 'task1', [
+      { type: 'reference', body: 'same', sourceKey: 'sha256:batch' },
+      { type: 'reference', body: 'same again', sourceKey: 'sha256:batch' },
+    ]);
+    expect(res.pending).toHaveLength(1);
+    expect(res.duplicate).toEqual([res.pending[0]]);
+    const rows = await db.select().from(memoryCandidates).where(eq(memoryCandidates.sourceKey, 'sha256:batch'));
+    expect(rows).toHaveLength(1);
+  });
+
+  it('a past dead-letter never blocks a retry — same source_key is still admitted to pending', async () => {
+    const db = getDb();
+    await seedTask();
+    const failed = await captureCandidates(db, 'task1', [
+      { type: 'reference', body: 'https://x', sourceKey: 'sha256:retry', captureFailed: { cause: 'paywall_404' } },
+    ]);
+    expect(failed.failed).toHaveLength(1);
+    const retry = await captureCandidates(db, 'task1', [
+      { type: 'reference', body: 'recovered content', sourceKey: 'sha256:retry' },
+    ]);
+    expect(retry.pending).toHaveLength(1); // the capture_failed row must not count as a duplicate
+    expect(retry.duplicate).toHaveLength(0);
+  });
+
+  it('candidates without a source_key are never deduped (the ritual path is key-less)', async () => {
+    const db = getDb();
+    await seedTask();
+    const res = await captureCandidates(db, 'task1', [
+      { type: 'project', body: 'identical ritual note' },
+      { type: 'project', body: 'identical ritual note' },
+    ]);
+    expect(res.pending).toHaveLength(2);
+    expect(res.duplicate).toHaveLength(0);
+  });
+
+  it('a dead-letter is always written — never skipped as a duplicate (visible + relaunchable)', async () => {
+    const db = getDb();
+    await seedTask();
+    await captureCandidates(db, 'task1', [{ type: 'reference', body: 'a', sourceKey: 'sha256:dl' }]);
+    const res = await captureCandidates(db, 'task1', [
+      { type: 'reference', body: 'b', sourceKey: 'sha256:dl', captureFailed: { cause: 'extractor_crash' } },
+    ]);
+    expect(res.failed).toHaveLength(1); // dead-letter still written despite the existing pending key
+    expect(res.duplicate).toHaveLength(0);
   });
 });

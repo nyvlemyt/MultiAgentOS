@@ -44,12 +44,17 @@ export function captureHtmlBlob(db: Db, blob: string, title: string, deps: Pipel
 }
 
 function mergeResults(a: CaptureResult, b: CaptureResult): CaptureResult {
-  return { pending: [...a.pending, ...b.pending], failed: [...a.failed, ...b.failed], rejected: [...a.rejected, ...b.rejected] };
+  return {
+    pending: [...a.pending, ...b.pending],
+    failed: [...a.failed, ...b.failed],
+    rejected: [...a.rejected, ...b.rejected],
+    duplicate: [...a.duplicate, ...b.duplicate],
+  };
 }
 
 /** Process a drop folder: subfolders → matières (manifest), loose files → singles. */
 export async function captureInbox(db: Db, dir: string, deps: PipelineDeps): Promise<CaptureResult> {
-  let acc: CaptureResult = { pending: [], failed: [], rejected: [] };
+  let acc: CaptureResult = { pending: [], failed: [], rejected: [], duplicate: [] };
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -64,5 +69,5 @@ export async function captureInbox(db: Db, dir: string, deps: PipelineDeps): Pro
 }
 
 export function formatSummary(res: CaptureResult): string {
-  return `[mas capture] ${res.pending.length} pending, ${res.failed.length} failed, ${res.rejected.length} rejected.`;
+  return `[mas capture] ${res.pending.length} pending, ${res.failed.length} failed, ${res.rejected.length} rejected, ${res.duplicate.length} duplicate.`;
 }

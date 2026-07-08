@@ -73,10 +73,11 @@ describe('captureInbox', () => {
 });
 
 describe('formatSummary', () => {
-  it('renders pending/failed/rejected counts', () => {
-    const s = formatSummary({ pending: ['a', 'b'], failed: ['c'], rejected: [{ reason: 'r', body: 'x' }] });
+  it('renders pending/failed/rejected/duplicate counts', () => {
+    const s = formatSummary({ pending: ['a', 'b'], failed: ['c'], rejected: [{ reason: 'r', body: 'x' }], duplicate: ['d'] });
     expect(s).toContain('2 pending');
     expect(s).toContain('1 failed');
     expect(s).toContain('1 rejected');
+    expect(s).toContain('1 duplicate');
   });
 });
