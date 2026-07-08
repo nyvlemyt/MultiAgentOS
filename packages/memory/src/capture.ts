@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { and, eq, ne } from 'drizzle-orm';
 import { memoryCandidates, type getDb } from '@mas/db';
 import { admit, deadLetterReason, type DeadLetterCause } from './conveyor/admission';
 import type { Trust } from './conveyor/extractor';
@@ -48,6 +49,12 @@ export interface CaptureResult {
   failed: string[];
   /** Candidates rejected at the door by the SAS (zero-signal junk — never persisted). */
   rejected: { reason: string; body: string }[];
+  /**
+   * Ids of already-known rows a candidate matched by source_key and was therefore skipped
+   * (capture-contract §idempotence). The skip is visible here, never a silent drop — re-capturing
+   * the datalake is replayable without spawning duplicate candidates.
+   */
+  duplicate: string[];
 }
 
 function deriveSignals(it: CaptureCandidate): string[] {
@@ -55,6 +62,66 @@ function deriveSignals(it: CaptureCandidate): string[] {
   const out: string[] = [it.type];
   if (it.sourceKind) out.push(it.sourceKind);
   return out;
+}
+
+/**
+ * Anti-duplicate guard (capture-contract §idempotence). A source_key already seen — in this batch or
+ * as a non-dead-lettered row — means "already captured": return the existing id so the caller records
+ * a visible skip. A `capture_failed` row is deliberately NOT a match: a past failure must never block
+ * a retry. Returns null when the key is new.
+ */
+async function findDuplicateId(
+  db: Db,
+  sourceKey: string,
+  seenInBatch: Map<string, string>,
+): Promise<string | null> {
+  const inBatch = seenInBatch.get(sourceKey);
+  if (inBatch) return inBatch;
+  const [existing] = await db
+    .select({ id: memoryCandidates.id })
+    .from(memoryCandidates)
+    .where(and(eq(memoryCandidates.sourceKey, sourceKey), ne(memoryCandidates.status, 'capture_failed')))
+    .limit(1);
+  return existing?.id ?? null;
+}
+
+type InsertRow = typeof memoryCandidates.$inferInsert;
+
+/** Where the one door sends a single candidate — a row to write, a visible skip, or a door rejection. */
+type Routed =
+  | { kind: 'row'; row: InsertRow; bucket: 'pending' | 'failed' }
+  | { kind: 'rejected'; reason: string; body: string }
+  | { kind: 'duplicate'; id: string };
+
+/**
+ * The per-candidate policy: dead-letter (always written) → SAS admission → anti-duplicate guard →
+ * pending. Order is load-bearing: a `capture_failed` row is written before the dedup check so a past
+ * failure never blocks a retry, and junk rejected at the door is never dedup-checked.
+ */
+async function routeCandidate(
+  db: Db,
+  base: InsertRow,
+  it: CaptureCandidate,
+  seenKeys: Map<string, string>,
+): Promise<Routed> {
+  if (it.captureFailed) {
+    const reason = deadLetterReason(it.captureFailed.cause, it.captureFailed.detail);
+    return { kind: 'row', row: { ...base, status: 'capture_failed', classifierDecision: reason }, bucket: 'failed' };
+  }
+  const verdict = admit({
+    body: it.body,
+    title: it.title,
+    summary: it.summary,
+    sourceResolvable: it.sourceResolvable,
+    signals: deriveSignals(it),
+  });
+  if (!verdict.ok) return { kind: 'rejected', reason: verdict.reason, body: it.body };
+  if (it.sourceKey) {
+    const dupId = await findDuplicateId(db, it.sourceKey, seenKeys);
+    if (dupId) return { kind: 'duplicate', id: dupId };
+    seenKeys.set(it.sourceKey, base.id!);
+  }
+  return { kind: 'row', row: { ...base, status: 'pending', classifierDecision: it.classifierDecision }, bucket: 'pending' };
 }
 
 /**
@@ -68,12 +135,13 @@ export async function captureCandidates(
   sourceTaskId: string | null,
   items: CaptureCandidate[],
 ): Promise<CaptureResult> {
-  const result: CaptureResult = { pending: [], failed: [], rejected: [] };
+  const result: CaptureResult = { pending: [], failed: [], rejected: [], duplicate: [] };
   if (items.length === 0) return result;
 
-  const rows: (typeof memoryCandidates.$inferInsert)[] = [];
+  const rows: InsertRow[] = [];
+  const seenKeys = new Map<string, string>(); // source_key → id of the row queued for it this batch
   for (const it of items) {
-    const base = {
+    const base: InsertRow = {
       id: `cand_${randomUUID()}`,
       sourceTaskId,
       type: it.type,
@@ -84,28 +152,13 @@ export async function captureCandidates(
       trust: it.trust,
       createdAt: new Date(),
     };
-
-    if (it.captureFailed) {
-      const reason = deadLetterReason(it.captureFailed.cause, it.captureFailed.detail);
-      rows.push({ ...base, status: 'capture_failed', classifierDecision: reason });
-      result.failed.push(base.id);
-      continue;
+    const routed = await routeCandidate(db, base, it, seenKeys);
+    if (routed.kind === 'rejected') result.rejected.push({ reason: routed.reason, body: routed.body });
+    else if (routed.kind === 'duplicate') result.duplicate.push(routed.id);
+    else {
+      rows.push(routed.row);
+      result[routed.bucket].push(base.id!);
     }
-
-    const verdict = admit({
-      body: it.body,
-      title: it.title,
-      summary: it.summary,
-      sourceResolvable: it.sourceResolvable,
-      signals: deriveSignals(it),
-    });
-    if (!verdict.ok) {
-      result.rejected.push({ reason: verdict.reason, body: it.body });
-      continue;
-    }
-
-    rows.push({ ...base, status: 'pending', classifierDecision: it.classifierDecision });
-    result.pending.push(base.id);
   }
 
   if (rows.length > 0) await db.insert(memoryCandidates).values(rows);
