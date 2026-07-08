@@ -146,9 +146,11 @@ function renderBody(title: string, out: LLMOutput): string {
   }
 }
 
-/** Diátaxis doc_type → the object shape it maps a fiche's actionability onto (STRUCTURE.md §1/§4). */
+// Diátaxis doc_type → PARA actionability (STRUCTURE.md §1/§4). Reference/tutorial/explanation land in
+// the "resource" bucket (consult-when-relevant); a howto is a "area" recipe (applied in an active flow).
+const RESOURCE: Fiche['actionability'] = 'resource';
 const ACTIONABILITY: Record<LLMOutput['doc_type'], Fiche['actionability']> = {
-  tutorial: 'resource', howto: 'area', reference: 'resource', explanation: 'resource',
+  tutorial: RESOURCE, howto: 'area', reference: RESOURCE, explanation: RESOURCE,
 };
 
 // ---- Prompt craft (docs/knowledge/prompting-anthropic.md — XML tags + explicit format) ---------
