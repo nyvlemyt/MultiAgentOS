@@ -112,6 +112,19 @@ describe('distillAll', () => {
     expect(res.remaining).toBeGreaterThan(0);
   });
 
+  it('spends the run budget CUMULATIVELY: distils until the next doc would exceed the cap', async () => {
+    // Two similar docs. Cap fits one full distill but not two → exactly one lands, one remains.
+    const a = sasDocToInput(writeSasDoc('c1.md', '# C1\n\nalpha alpha alpha content.'));
+    const b = sasDocToInput(writeSasDoc('c2.md', '# C2\n\nbeta beta beta content.'));
+    const { distillPromptEstimate } = await import('./distill');
+    const oneDoc = Math.max(distillPromptEstimate(a), distillPromptEstimate(b));
+    const cap = Math.floor(oneDoc * 1.5); // room for one, not two
+    const res = await distillAll(sasDir, { ...deps(), tokenCap: cap });
+    expect(res.distilled).toHaveLength(1);
+    expect(res.budgetStopped).toBe(true);
+    expect(res.remaining).toBe(1);
+  });
+
   it('does NOT stop the whole batch on a single malformed doc (only budget stops the batch)', async () => {
     writeSasDoc('ok.md', '# Ok\n\ngood content.');
     const d: DistillCliDeps = { ...deps(), llm: stubLLM('not json').client };

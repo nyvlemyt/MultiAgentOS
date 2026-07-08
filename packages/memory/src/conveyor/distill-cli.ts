@@ -101,30 +101,33 @@ function listSasDocs(dir: string): string[] {
 }
 
 /**
- * Distil every not-yet-distilled SAS doc in a directory. Budget is checked BEFORE each doc: if the
- * doc's estimate exceeds the remaining cap, the batch stops cleanly (budgetStopped) and `remaining`
- * counts the untouched docs — never burning past the cap (spec §5 anti quota-bomb). A single doc's
- * malformed output is recorded as a failure and the batch continues; only the budget stops the batch.
+ * Distil every not-yet-distilled SAS doc in a directory, spending a CUMULATIVE run budget. Before each
+ * doc, the estimate of the EXACT prompt distill() will send is added to the running spend; if that
+ * would exceed the run cap, the batch stops cleanly (budgetStopped) and `remaining` counts the
+ * untouched docs — never burning past the cap (spec §5 anti quota-bomb: a 50-PDF drop can't run away).
+ * A single doc's malformed output is recorded as a failure and the batch continues; only the budget
+ * stops the batch. `skipped` docs (already distilled) cost nothing.
  */
 export async function distillAll(dir: string, deps: DistillCliDeps): Promise<DistillRunResult> {
   const res = emptyResult();
   const cap = deps.tokenCap ?? DEFAULT_DISTILL_TOKEN_CAP;
   const docs = listSasDocs(dir);
+  let spent = 0;
 
   for (let i = 0; i < docs.length; i++) {
-    const path = docs[i]!;
-    const input = sasDocToInput(path);
+    const input = sasDocToInput(docs[i]!);
     if (alreadyDistilled(deps.outDir, input.id)) {
       res.skipped += 1;
       continue;
     }
-    // Pre-flight budget check on the EXACT prompt distill() will send: a doc that cannot fit under the
-    // cap stops the batch here, before the call — never burning past the cap (spec §5 anti quota-bomb).
-    if (distillPromptEstimate(input) > cap) {
+    // Cumulative pre-flight: stop here (before the call) if this doc would push the run over the cap.
+    const cost = distillPromptEstimate(input);
+    if (spent + cost > cap) {
       res.budgetStopped = true;
       res.remaining = docs.length - i;
       return res;
     }
+    spent += cost;
     await distillOne(input, deps, res);
   }
   return res;
