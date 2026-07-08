@@ -172,6 +172,11 @@ const SYSTEM_PROMPT = [
   'Do NOT include id, slug, source_key, derived_from, trust, lifecycle, or superseded_by — those are set by the system.',
 ].join('\n');
 
+/** Pre-flight token estimate for the exact prompt distill() will send (lets a batch gate before the call). */
+export function distillPromptEstimate(input: DistillInput): number {
+  return estimateTokens(SYSTEM_PROMPT) + estimateTokens(buildUserPrompt(input));
+}
+
 function buildUserPrompt(input: DistillInput): string {
   return [
     `Source title: ${input.title}`,
@@ -216,7 +221,7 @@ function extractJson(text: string): string {
 export async function distill(input: DistillInput, deps: DistillDeps): Promise<DistilledFiche> {
   const cap = deps.tokenCap ?? DEFAULT_DISTILL_TOKEN_CAP;
   const user = buildUserPrompt(input);
-  const estimate = estimateTokens(SYSTEM_PROMPT) + estimateTokens(user);
+  const estimate = distillPromptEstimate(input);
   if (estimate > cap) {
     throw new BudgetExceededError(estimate, cap, Math.max(0, cap - estimate));
   }
