@@ -18,6 +18,7 @@
     "mas": "tsx src/mas-cli.ts"
   },
   "dependencies": {
+    "@mas/core": "workspace:*",
     "@mas/db": "workspace:*",
     "better-sqlite3": "^11.3.0",
     "defuddle": "^0.19.1",
