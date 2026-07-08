@@ -3,7 +3,7 @@
 // by mas-cli.ts). Grouping decision A: an inbox SUBFOLDER = one matière (→ manifest); loose files at
 // the inbox root = single candidates. Unknown kinds dead-letter, never silently skip.
 import { readdirSync, statSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { basename, extname, join } from 'node:path';
 import type { getDb } from '@mas/db';
 import type { CaptureResult } from '../capture';
 import { runCapturePipeline, runMatierePipeline, type PipelineDeps, type PipelineSource } from './pipeline';
@@ -12,6 +12,8 @@ import { YOUTUBE_HOSTS } from './extractors/youtube';
 type Db = ReturnType<typeof getDb>;
 
 const YT_BARE = new Set(YOUTUBE_HOSTS.map((h) => h.replace(/^www\./, '')));
+
+const EXT_KINDS: Record<string, string> = { '.pdf': 'pdf', '.docx': 'docx', '.pptx': 'pptx' };
 
 export function inferKind(pathOrUrl: string): string {
   if (/^https?:\/\//i.test(pathOrUrl)) {
@@ -23,8 +25,7 @@ export function inferKind(pathOrUrl: string): string {
     }
     return 'url';
   }
-  if (pathOrUrl.toLowerCase().endsWith('.pdf')) return 'pdf';
-  return 'unknown';
+  return EXT_KINDS[extname(pathOrUrl.toLowerCase())] ?? 'unknown';
 }
 
 function toSource(path: string): PipelineSource {

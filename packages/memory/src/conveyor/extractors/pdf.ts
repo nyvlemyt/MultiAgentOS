@@ -11,12 +11,12 @@ import { resolveBin } from './bin';
 
 /** Below this many non-blank chars an extraction counts as "empty" and triggers the cross-check. */
 export const MIN_EXTRACT_CHARS = 20;
-const MAX_SUBPROCESS_BUFFER = 64 * 1024 * 1024;
+export const MAX_SUBPROCESS_BUFFER = 64 * 1024 * 1024;
 
-/** Both extractors produced no usable text — a scanned/image PDF (deferred OCR leaf). */
+/** Extraction produced no usable text — e.g. a scanned/image PDF (deferred OCR leaf). */
 export class ExtractorEmptyError extends Error {
-  constructor(path: string) {
-    super(`PDF extraction produced no text (markitdown + pdftotext both empty): ${path}`);
+  constructor(path: string, detail = 'markitdown + pdftotext both empty') {
+    super(`extraction produced no text (${detail}): ${path}`);
     this.name = 'ExtractorEmptyError';
   }
 }
