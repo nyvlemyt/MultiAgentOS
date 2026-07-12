@@ -58,6 +58,28 @@ sombre a été rejeté). Non négociable :
 - On ne crée une nouvelle page que pour une nouvelle mission.
 - La page garde une trace des fichiers/commits associés en pied de page.
 
+### Persistance de l'URL : le fichier `.url` committé
+
+L'URL d'un artifact ne vit pas que dans la mémoire par-machine (une session sur un autre
+poste la perdrait). Chaque mission à dashboard actif committe un raccourci dans
+`docs/resources/dashboards/<mission>.url` (format `[InternetShortcut]`, double-cliquable).
+
+Registre actuel :
+
+| Mission | Fichier |
+|---------|---------|
+| Ingestion cours S1→S7 | `docs/resources/dashboards/ingestion-cours.url` |
+
+### Règle de reprise (obligatoire en début de session)
+
+Au démarrage de **toute session touchant une mission à dashboard actif** :
+
+1. Lire le fichier `.url` correspondant dans `docs/resources/dashboards/`.
+2. `WebFetch` de la page pour connaître son état actuel.
+3. Calculer le delta (ce qui a changé depuis : statuts, jalons, décisions).
+4. **Redéployer la même page** (paramètre `url=` de l'outil Artifact) **avant** le
+   rapport final de session — jamais de nouvelle page, jamais de rapport sans redéploiement.
+
 ## Intégration MultiAgentOS
 
 - Le cockpit web (apps/web) applique le même principe pour ses écrans de mission :
