@@ -41,8 +41,9 @@ python 3.14 rebuildé, markitdown installé). Invérifiable depuis le poste Wind
 - **Sorbonne S1-S3 ⏸** : USB pas branché — rejouable dès qu'il l'est.
 - **Distillation ⛔ bug réel** : la 1ʳᵉ distillation échoue — le modèle renvoie des objets
   JSON là où le schéma exige des strings markdown, et le CLI avale le motif d'échec.
-  Fix TDD en cours sur `knowledge-os/distill-robustesse` (**branche locale macOS, jamais
-  poussée**) : 4 tests RED confirmés (coercition array/objet→markdown + motifs visibles).
+  Fix TDD en cours sur `knowledge-os/distill-robustesse` (**poussée sur origin le
+  2026-07-13**, commit `10d91cd`) : 4 tests RED commités (coercition array/objet→markdown
+  + motifs visibles, re-confirmés 4 failed / 25 passed avant commit).
   Reste : GREEN, gate 5/5, PR base `brique-1`. Puis re-distiller le quai + dashboard v6.
 - Le portier anti-doublons (#62) rend la capture **rejouable** : relancer ne crée pas de doublons.
 
@@ -82,7 +83,7 @@ avant de se terminer** (voir discipline ci-dessous).
   jamais été poussé ; la session macOS a dû reconstruire le fichier de mémoire, puis un
   merge de réconciliation (`d50eb7f`) a été nécessaire. En multi-machine, un commit local
   non poussé n'existe pas pour les autres. Même règle pour les branches d'incrément
-  (`distill-robustesse` a le même problème côté macOS).
+  (`distill-robustesse` corrigée : poussée sur origin le 2026-07-13).
 - Jamais coder directement sur `main` ni `brique-1` — toujours une branche d'incrément
   (`git checkout -b <nom> brique-1`), PR dans `brique-1`.
 - En début de session worktree : vérifier le socle (`git log --oneline -1` doit montrer
