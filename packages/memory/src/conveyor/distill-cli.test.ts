@@ -147,4 +147,19 @@ describe('formatDistillSummary', () => {
     expect(line).toMatch(/budget/i);
     expect(line).toContain('3 remaining');
   });
+
+  it('lists each failure path and reason — a failure is never silent', () => {
+    const line = formatDistillSummary({
+      distilled: [],
+      failed: [
+        { path: '/inbox/a.md', reason: 'malformed model output: fields' },
+        { path: '/inbox/b.md', reason: 'reply is not valid JSON' },
+      ],
+      skipped: 0, budgetStopped: false, remaining: 0,
+    });
+    expect(line).toContain('/inbox/a.md');
+    expect(line).toContain('malformed model output: fields');
+    expect(line).toContain('/inbox/b.md');
+    expect(line).toContain('reply is not valid JSON');
+  });
 });
