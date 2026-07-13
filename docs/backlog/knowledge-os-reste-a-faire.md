@@ -22,27 +22,28 @@ Le tapis roulant d'ingestion (Brique 6) est **complet et rejouable**. `brique-1`
 
 ## Tâches restantes (dans l'ordre)
 
-### 1. Fichier `.url` du dashboard + règle de reprise (≈5 min) — JAMAIS FAIT
+### 1. Fichier `.url` du dashboard + règle de reprise — ✅ FAIT (2026-07-13)
 
-Le « fix 5 minutes » promis au debrief 5 n'existe nulle part. Sans lui, les sessions
-parallèles perdent le dashboard (l'URL n'est stockée que dans des mémoires par-machine).
+Livré depuis la machine macOS (commit `286498e`) : `docs/resources/dashboards/ingestion-cours.url`
++ règle de reprise dans `docs/workflows/dashboard-visuel-de-suivi.md`. Réconcilié avec le
+poste Windows dans le merge `d50eb7f`.
 
-- Créer `docs/resources/dashboards/ingestion-cours.url` contenant :
-  `https://claude.ai/code/artifact/46beb401-3477-4a2b-a82a-f7ce7d477c53`
-- Ajouter dans `docs/workflows/dashboard-visuel-de-suivi.md` la règle :
-  *au démarrage d'une session touchant une mission à dashboard, lire le fichier `.url`
-  correspondant → WebFetch de la page → calculer le delta → redéployer (même URL, via le
-  paramètre `url` de l'outil Artifact) avant le rapport.*
-- Commit docs direct ou micro-PR base `brique-1`.
-
-### 2. Capture de masse S1→S7 + première distillation — MACHINE macOS UNIQUEMENT
+### 2. Capture de masse S1→S7 + première distillation — MACHINE macOS UNIQUEMENT — ⏳ EN COURS
 
 `data/` est local par machine ; la capture vit sur la machine macOS (USB Sorbonne monté,
 python 3.14 rebuildé, markitdown installé). Invérifiable depuis le poste Windows.
 
-- Vérifier/lancer la capture des ~879 docs de cours (S1→S7 : Sorbonne S1-S3 sur USB, EFREI S5-S7 —
-  280 PDF + 92 Office + 128 md réels, exclure le code étudiant / node_modules).
-- Puis `mas distill --all` sur les fiches en attente au quai (5 au dernier pointage).
+État 2026-07-13 (session macOS) :
+
+- **EFREI ✅** : 373 documents avalés, 35 doublons refusés par le portier (#62 vérifié en
+  live), 23 échecs visibles avec motif (PDF scannés `ocr_empty`, faux .docx). 379 candidats
+  en attente au SAS. ~25 min, rejouable.
+- **Sorbonne S1-S3 ⏸** : USB pas branché — rejouable dès qu'il l'est.
+- **Distillation ⛔ bug réel** : la 1ʳᵉ distillation échoue — le modèle renvoie des objets
+  JSON là où le schéma exige des strings markdown, et le CLI avale le motif d'échec.
+  Fix TDD en cours sur `knowledge-os/distill-robustesse` (**branche locale macOS, jamais
+  poussée**) : 4 tests RED confirmés (coercition array/objet→markdown + motifs visibles).
+  Reste : GREEN, gate 5/5, PR base `brique-1`. Puis re-distiller le quai + dashboard v6.
 - Le portier anti-doublons (#62) rend la capture **rejouable** : relancer ne crée pas de doublons.
 
 ### 3. Brique 5 — onglet cockpit Ressources/Connaissances — PAS COMMENCÉE
@@ -62,8 +63,26 @@ Après validation de la capture de masse (tâche 2) et livraison de la Brique 5 
 `brique-1` = branche d'intégration du chantier Living Knowledge OS (ADR 0008) ; elle rejoint
 `main` en un bloc cohérent, pas au fil de l'eau.
 
+## Répartition deux machines (2026-07-13)
+
+Le chantier tourne désormais sur deux postes ; le partage suit ce que chaque machine
+possède physiquement (`data/`, USB, `gh`, branches locales) :
+
+| Poste | Prend | Pourquoi |
+|-------|-------|----------|
+| **macOS (compte secondaire)** | Fix `distill-robustesse` (GREEN + 5/5 + PR) → re-distillation du quai → dashboard v6 → capture Sorbonne (USB) → Brique 5 cockpit | La branche du fix, le `data/` peuplé (373 docs EFREI), l'USB et `gh` sont là-bas |
+| **Windows (ce compte)** | File d'intake visual-effects (7 audits, pure docs) · préparation des documents/specs à transmettre · réconciliations git | Travail 100 % docs, aucune dépendance à `data/` ni à `gh` |
+
+Point de synchro : tout passe par `origin/knowledge-os/brique-1` — **chaque session pousse
+avant de se terminer** (voir discipline ci-dessous).
+
 ## Rappels de discipline (pièges vécus)
 
+- **Pousser avant de fermer une session** — le commit `83fe731` (poste Windows) n'avait
+  jamais été poussé ; la session macOS a dû reconstruire le fichier de mémoire, puis un
+  merge de réconciliation (`d50eb7f`) a été nécessaire. En multi-machine, un commit local
+  non poussé n'existe pas pour les autres. Même règle pour les branches d'incrément
+  (`distill-robustesse` a le même problème côté macOS).
 - Jamais coder directement sur `main` ni `brique-1` — toujours une branche d'incrément
   (`git checkout -b <nom> brique-1`), PR dans `brique-1`.
 - En début de session worktree : vérifier le socle (`git log --oneline -1` doit montrer
