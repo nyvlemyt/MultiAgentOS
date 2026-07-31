@@ -17,13 +17,17 @@ case "$FILE" in
   *.ts|*.tsx|*.js|*.mjs|*.cjs|*.sh|*.py) ;;
   *) exit 0 ;;
 esac
-# Generated / vendored / state — never our line budget.
+# Generated / vendored / state — never our line budget. Every pattern is anchored with
+# `*/` because the tool always hands us an ABSOLUTE path: a bare `.claude/...` glob
+# never matches and the exclusion is silently inert.
 case "$FILE" in
-  .claude/skills/*/scripts/*|*/library/*|*/.next/*|*/node_modules/*|*/data/*|*/dist/*) exit 0 ;;
+  */.claude/skills/*/scripts/*|*/library/*|*/.next/*|*/node_modules/*|*/data/*|*/dist/*) exit 0 ;;
+  *) ;;
 esac
 # Documented legacy exceptions (each one owns a backlog card that closes it).
 case "$FILE" in
   */packages/agents/src/dispatch.ts) exit 0 ;;
+  *) ;;
 esac
 
 lines() { printf '%s' "$INPUT" | jq -rj "$1" | awk 'END{print NR+0}'; }
