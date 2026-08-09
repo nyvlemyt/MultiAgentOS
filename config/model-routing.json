@@ -1,6 +1,9 @@
 {
   "$comment": "Phase 3.5 routing (ADR 0002, CLAUDE.md §11.bis). 'claude' = pooled Claude accounts (claude_accounts; empty = the single claude-login profile). Paid APIs ship OFF; domains resolve against ENABLED sources only, walking the fallback chain.",
-  "claude_accounts": [],
+  "claude_accounts": [
+    { "id": "claude-primary", "configDir": "/Users/melvyn/.claude" },
+    { "id": "claude-mpommier", "configDir": "/Users/melvyn/.claude-mpommier" }
+  ],
   "paid_apis_enabled": false,
   "providers": {
     "gemini-free": {
