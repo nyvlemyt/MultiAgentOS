@@ -93,3 +93,16 @@ Mission données OtakuGO (2026-07-06) : page « Nos données, notre base, nos r�
 6 étapes de pipeline avec statuts, armoire de stockage à 6 couches, timeline des ères
 (« DBZ ≠ DB Super »), 3 nuits avec verrous, 4 curseurs à valider. Résultat : validation
 complète en une lecture.
+
+## Widgets inline (ajout 2026-07-13)
+
+Quand l'environnement expose l'outil `visualize show_widget` (Claude Code desktop),
+le préférer à l'artifact pour les **points d'étape ponctuels** : le widget se rend
+directement dans la conversation (metric cards, barres de progression, checklists
+« fait / reste / à valider », boutons `sendPrompt` qui lancent l'action suivante).
+
+- Widget inline = photo d'un instant, dans le fil de la discussion.
+- Artifact = page vivante multi-sessions (la règle « une mission = une page » reste).
+- Les deux se combinent : widget pour le point du jour, artifact pour la mission.
+
+Validé par Melvyn le 2026-07-13 (point d'avancement pipeline AniList/Supabase).
