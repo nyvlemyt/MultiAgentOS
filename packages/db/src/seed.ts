@@ -323,6 +323,7 @@ async function seedSkillCatalog(db: SeedDb) {
     { id: 'xlsx', domain: 'writing', tags: ['xlsx', 'spreadsheet', 'data'] },
     { id: 'internal-comms', domain: 'writing', tags: ['communication', 'writing', 'internal'] },
     { id: 'doc-coauthoring', domain: 'writing', tags: ['documentation', 'writing', 'collaboration'] },
+    { id: 'explain-diff', domain: 'writing', tags: ['diff', 'pr', 'explanation', 'onboarding'] },
     { id: 'skill-creator', domain: 'planning', tags: ['skill', 'authoring', 'meta'] },
     { id: 'web-artifacts-builder', domain: 'ux', tags: ['web', 'artifacts', 'frontend'] },
     { id: 'superpowers', domain: 'planning', tags: ['methodology', 'workflow', 'tdd'] },
