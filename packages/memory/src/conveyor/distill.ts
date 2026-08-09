@@ -87,25 +87,48 @@ export interface DistilledFiche {
 // emergent taxonomy (lane/tags/domain), and the per-template body sections. It has NO say over
 // identity, provenance, trust, or lifecycle — those are forced from the trusted input below.
 
+// Real-world drift (first live run, 2026-07-13): the model returns rich JSON — objects/arrays —
+// inside section keys where the contract says markdown strings. Coerce instead of failing the
+// whole document: arrays → list lines, objects → `**key**: value` lines, never "[object Object]".
+// An empty-after-coercion section still fails min(1) below — no hollow fiche.
+function toMarkdownString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (item !== null && typeof item === 'object' ? toMarkdownString(item) : `- ${toMarkdownString(item)}`))
+      .filter((line) => line.trim().length > 0)
+      .join('\n');
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>)
+      .map(([key, val]) => `**${key}**: ${toMarkdownString(val)}`)
+      .join('\n');
+  }
+  return '';
+}
+
+const markdownSection = z.preprocess(toMarkdownString, z.string().trim().min(1));
+
 const referenceBody = z.object({
   doc_type: z.literal('reference'),
-  summary: z.string().min(1), fields: z.string().min(1),
-  constraints: z.string().min(1), examples: z.string().min(1),
+  summary: markdownSection, fields: markdownSection,
+  constraints: markdownSection, examples: markdownSection,
 });
 const howtoBody = z.object({
   doc_type: z.literal('howto'),
-  problem: z.string().min(1), solution: z.string().min(1),
-  variations: z.string().min(1), pitfalls: z.string().min(1),
+  problem: markdownSection, solution: markdownSection,
+  variations: markdownSection, pitfalls: markdownSection,
 });
 const tutorialBody = z.object({
   doc_type: z.literal('tutorial'),
-  goal: z.string().min(1), prerequisites: z.string().min(1),
-  steps: z.string().min(1), result: z.string().min(1), next: z.string().min(1),
+  goal: markdownSection, prerequisites: markdownSection,
+  steps: markdownSection, result: markdownSection, next: markdownSection,
 });
 const explanationBody = z.object({
   doc_type: z.literal('explanation'),
-  thesis: z.string().min(1), context: z.string().min(1),
-  reasoning: z.string().min(1), tradeoffs: z.string().min(1), see_also: z.string().min(1),
+  thesis: markdownSection, context: markdownSection,
+  reasoning: markdownSection, tradeoffs: markdownSection, see_also: markdownSection,
 });
 
 const emergent = z.object({

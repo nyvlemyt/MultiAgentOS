@@ -172,6 +172,55 @@ describe('distill — malformed LLM output', () => {
   });
 });
 
+// Real-world drift seen on the first live run (2026-07-13): the model returns rich JSON
+// (objects/arrays) inside section keys instead of markdown strings. The conveyor must absorb
+// that shape instead of failing the whole document — coerced to markdown, still one string.
+describe('distill — section-shape coercion', () => {
+  it('coerces an array section value into one markdown string', async () => {
+    const { client } = stubLLM(JSON.stringify({
+      doc_type: 'reference', lane: 'knowledge', tags: [],
+      summary: 'Git guide.', fields: '| cmd | rôle |\n|---|---|\n| push | envoie |',
+      constraints: 'Never force-push shared branches.',
+      examples: ['git fetch origin', 'git rebase origin/main'],
+    }));
+    const fiche = await distill(baseInput, { llm: client });
+    expect(fiche.body).toContain('git fetch origin');
+    expect(fiche.body).toContain('git rebase origin/main');
+  });
+
+  it('coerces an object section value into markdown bullet lines', async () => {
+    const { client } = stubLLM(JSON.stringify({
+      doc_type: 'reference', lane: 'knowledge', tags: [],
+      summary: 'Git guide.',
+      fields: { commit: 'record changes', push: 'send to remote' },
+      constraints: 'c', examples: 'e',
+    }));
+    const fiche = await distill(baseInput, { llm: client });
+    expect(fiche.body).toContain('**commit**: record changes');
+    expect(fiche.body).toContain('**push**: send to remote');
+  });
+
+  it('coerces nested values (array of objects) without ever producing [object Object]', async () => {
+    const { client } = stubLLM(JSON.stringify({
+      doc_type: 'howto', lane: 'workflows', tags: [],
+      problem: 'p', solution: [{ step: 'fetch', detail: 'get refs' }, { step: 'rebase', detail: 'replay' }],
+      variations: 'v', pitfalls: 'x',
+    }));
+    const fiche = await distill(baseInput, { llm: client });
+    expect(fiche.body).not.toContain('[object Object]');
+    expect(fiche.body).toContain('fetch');
+    expect(fiche.body).toContain('replay');
+  });
+
+  it('still rejects an empty-after-coercion section (no hollow fiche)', async () => {
+    const { client } = stubLLM(JSON.stringify({
+      doc_type: 'reference', lane: 'knowledge', tags: [],
+      summary: 'Git guide.', fields: [], constraints: 'c', examples: 'e',
+    }));
+    await expect(distill(baseInput, { llm: client })).rejects.toThrow(/distill/i);
+  });
+});
+
 describe('distill — budget gate', () => {
   it('refuses to call the model when the pre-flight estimate exceeds the cap', async () => {
     const { client, calls } = stubLLM(GOOD_REFERENCE);

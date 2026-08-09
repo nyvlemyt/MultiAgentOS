@@ -135,5 +135,7 @@ export async function distillAll(dir: string, deps: DistillCliDeps): Promise<Dis
 
 export function formatDistillSummary(res: DistillRunResult): string {
   const base = `[mas distill] ${res.distilled.length} distilled, ${res.failed.length} failed, ${res.skipped} skipped.`;
-  return res.budgetStopped ? `${base} Budget cap reached — paused, ${res.remaining} remaining (resume later).` : base;
+  const head = res.budgetStopped ? `${base} Budget cap reached — paused, ${res.remaining} remaining (resume later).` : base;
+  const failures = res.failed.map((f) => `  FAIL ${f.path} — ${f.reason}`);
+  return [head, ...failures].join('\n');
 }
