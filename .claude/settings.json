@@ -1,6 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/limit-file-size.sh\"",
+            "timeout": 10,
+            "statusMessage": "Plafond taille fichier (§7)"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "*",
