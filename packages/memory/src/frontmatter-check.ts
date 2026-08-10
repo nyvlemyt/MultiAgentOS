@@ -24,6 +24,21 @@ const TIER1_IDENTITY = ['id', 'slug', 'source_key', 'lifecycle', 'trust'] as con
 const RELATION_FIELDS = ['derived_from', 'part_of', 'superseded_by'] as const;
 const LIFECYCLE_STATES = new Set(Object.keys(LEGAL_TRANSITIONS));
 
+// A source_key content address (`sha256:` + 64 lowercase hex) resolves BY FORM,
+// exactly like the clause-6 "URL well-formed" rule for sources[]: the raw source
+// lives outside the tracked corpus (gitignored data/ SAS quai), so existence
+// cannot be checked — but the hash is machine-independent and rename-proof
+// (ADR 0008 clause 6, amendement 2026-08-10 provenance portable).
+const CONTENT_ADDRESS = /^sha256:[0-9a-f]{64}$/;
+
+export function isContentAddress(v: string): boolean {
+  return CONTENT_ADDRESS.test(v);
+}
+
+function resolves(target: string, known: Set<string>): boolean {
+  return known.has(target) || isContentAddress(target);
+}
+
 function isNonEmptyString(v: unknown): v is string {
   return typeof v === 'string' && v.length > 0;
 }
@@ -54,13 +69,13 @@ function checkLifecycle(fm: Frontmatter, errors: string[]): void {
 function checkRelations(fm: Frontmatter, known: Set<string>, errors: string[]): void {
   for (const field of RELATION_FIELDS) {
     const v = fm[field];
-    if (isNonEmptyString(v) && !known.has(v)) {
+    if (isNonEmptyString(v) && !resolves(v, known)) {
       errors.push(`${field}: unresolvable relation target '${v}'`);
     }
   }
   if (Array.isArray(fm.sources)) {
     for (const s of fm.sources) {
-      if (isNonEmptyString(s) && !known.has(s)) {
+      if (isNonEmptyString(s) && !resolves(s, known)) {
         errors.push(`sources: unresolvable relation target '${s}'`);
       }
     }

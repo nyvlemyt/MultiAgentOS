@@ -96,6 +96,38 @@ describe('checkFiche', () => {
   });
 });
 
+describe('content-address provenance (ADR 0008 clause 6, amendement 2026-08-10)', () => {
+  const address = `sha256:${'a'.repeat(64)}`;
+
+  it('resolves a well-formed sha256 content address by FORM, outside knownPaths', () => {
+    const fm = { ...richFiche, source_key: address, derived_from: address };
+    expect(checkFiche(fm, { knownPaths: known, tier: 'strict' }).errors).toEqual([]);
+  });
+
+  it('still flags a truncated content address as unresolvable', () => {
+    const fm = { ...richFiche, derived_from: `sha256:${'a'.repeat(40)}` };
+    const r = checkFiche(fm, { knownPaths: known, tier: 'strict' });
+    expect(r.errors.some((e) => /derived_from/.test(e))).toBe(true);
+  });
+
+  it('still flags a non-hex or uppercase content address as unresolvable', () => {
+    const fm = { ...richFiche, derived_from: `sha256:${'Z'.repeat(64)}` };
+    const r = checkFiche(fm, { knownPaths: known, tier: 'strict' });
+    expect(r.errors.some((e) => /derived_from/.test(e))).toBe(true);
+  });
+
+  it('still flags a machine-local absolute path as unresolvable (the 379-fiche trap)', () => {
+    const fm = { ...richFiche, derived_from: '/Users/someone/repo/data/sas/quai/doc.md' };
+    const r = checkFiche(fm, { knownPaths: known, tier: 'tier1' });
+    expect(r.errors.some((e) => /derived_from/.test(e))).toBe(true);
+  });
+
+  it('resolves a content-address entry in sources[] the same way', () => {
+    const fm = { ...richFiche, sources: [address, 'docs/knowledge/x.md'] };
+    expect(checkFiche(fm, { knownPaths: known, tier: 'strict' }).errors).toEqual([]);
+  });
+});
+
 describe('scanWikilinks', () => {
   it('extracts prose wikilink targets', () => {
     expect(scanWikilinks('see [[feedback_phase-gates]] and [[res-x]]')).toEqual([

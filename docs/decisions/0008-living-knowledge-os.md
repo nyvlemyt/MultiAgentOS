@@ -38,13 +38,25 @@ The relation set below is a first-class corpus contract. The CI gardian (Round 2
 
 | Relation | Direction | Required? | Resolvability rule (gardian, Round 2) |
 |---|---|---|---|
-| `derived_from` | fiche → rawResourcePath | yes, on any distillation | path must exist under docs/resources/** |
-| `sources[]` | fiche → [path\|url] | optional | each entry resolvable (path exists / URL well-formed) |
+| `derived_from` | fiche → source identity | yes, on any distillation | source_key content address well-formed (`sha256:` + 64 hex, amendement 2026-08-10) **or** path exists under docs/resources/** (legacy) |
+| `sources[]` | fiche → [path\|url] | optional | each entry resolvable (path exists / URL well-formed / content address well-formed) |
 | `part_of` | child → parentId | nullable | parentId must be an existing fiche id |
 | `order` | int, with part_of | with part_of | integer ≥ 0 |
 | `superseded_by` | fiche → fiche id | set when lifecycle=superseded | target id exists and is not itself superseded by this one (no cycle) |
 | MOC membership | fiche ↔ MOC | optional | via `[[wikilink]]` resolvable to an existing slug |
 | `[[wikilink]]` | fiche → fiche | free | resolves to an existing slug |
+
+**Amendement 2026-08-10 — provenance portable.** The original `derived_from` rule assumed the raw
+source lives under tracked `docs/resources/**`. In practice the conveyor captures into the SAS quai
+under gitignored `data/` (CLAUDE.md §8: all runtime state lives in `data/`), so a quai *path* is
+machine-local and never corpus-resolvable — the 2026-08-10 batch (379 fiches) failed the gardien
+379/379 on exactly this. The portable identity of an out-of-corpus source is its `source_key`
+content address: machine-independent, rename-proof (this table already uses it as the idempotence
+match key), and validated **by form** — the same logic as the "URL well-formed" rule for
+`sources[]`, because existence outside the corpus cannot be checked. `distill` therefore writes
+`derived_from = source_key`; the gardien accepts any well-formed `sha256:<64 hex>` target; the
+legacy path form stays valid for docs genuinely under `docs/resources/**`. Repair tool for existing
+fiches: `pnpm --filter @mas/memory mem:backfill-provenance [dir]` (idempotent, replayable).
 
 ## Consequences
 

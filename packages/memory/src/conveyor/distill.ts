@@ -55,7 +55,8 @@ export interface DistillInput {
   id: string;
   /** Idempotence/supersede match key. */
   sourceKey: string;
-  /** Raw source path/URL — fills the REQUIRED FicheSchema `derived_from` (ADR 0008 clause 6). */
+  /** Portable source identity (source_key content address, or a corpus path/URL) — fills the
+   * REQUIRED FicheSchema `derived_from` (ADR 0008 clause 6, amendement 2026-08-10). */
   derivedFrom: string;
   /** Security tag from the extractor. NEVER overridden by the model. */
   trust: Trust;
