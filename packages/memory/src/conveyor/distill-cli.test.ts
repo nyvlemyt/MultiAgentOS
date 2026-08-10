@@ -54,10 +54,11 @@ function deps(): DistillCliDeps {
 }
 
 describe('sasDocToInput', () => {
-  it('builds a DistillInput whose derived_from is the SAS doc path and id is deterministic', () => {
+  it('builds a DistillInput whose derived_from is the portable source_key, never a machine path', () => {
     const p = writeSasDoc('agent-memory.md', '# Agent Memory\n\nFive registers.');
     const input = sasDocToInput(p);
-    expect(input.derivedFrom).toBe(p);
+    expect(input.derivedFrom).toBe(input.sourceKey);
+    expect(input.derivedFrom).toMatch(/^sha256:[0-9a-f]{64}$/);
     expect(input.rawMarkdown).toContain('Five registers');
     // id is stable across two calls on the same file (immutable anchor, STRUCTURE.md §5).
     expect(sasDocToInput(p).id).toBe(input.id);
@@ -77,7 +78,8 @@ describe('distillPath', () => {
     expect(existsSync(res.distilled[0]!)).toBe(true);
     const data = matter(readFileSync(res.distilled[0]!, 'utf8')).data;
     expect(data.lifecycle).toBe('distilled');
-    expect(data.derived_from).toBe(p);
+    expect(data.derived_from).toBe(data.source_key);
+    expect(data.derived_from).toMatch(/^sha256:[0-9a-f]{64}$/);
   });
 
   it('surfaces a malformed-output failure without writing a fiche', async () => {

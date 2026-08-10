@@ -1,9 +1,11 @@
 // packages/memory/src/conveyor/distill-cli.ts
 // Testable CLI logic for `pnpm mas distill <sas-doc-path>` and `mas distill --all` (subprocess-free;
 // the real @mas/core LLMClient is injected by mas-cli.ts). A SAS doc = a captured raw-markdown file
-// under docs/resources/**; its PATH is the fiche's `derived_from`. Each doc → distill() → one fiche
-// at `distilled` written under docs/knowledge/ via writeDistilledFiche. Batch checks the budget BEFORE
-// each doc and PAUSES with budget_exceeded (never a silent quota bomb), mirroring the spec §5 rule.
+// (SAS quai under gitignored data/); its CONTENT HASH — the source_key — is the fiche's `derived_from`
+// (portable provenance, ADR 0008 clause 6 amendement 2026-08-10; a quai path is machine-local and
+// never gardien-resolvable). Each doc → distill() → one fiche at `distilled` written under
+// docs/knowledge/ via writeDistilledFiche. Batch checks the budget BEFORE each doc and PAUSES with
+// budget_exceeded (never a silent quota bomb), mirroring the spec §5 rule.
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { basename, join } from 'node:path';
@@ -57,8 +59,10 @@ function firstH1(body: string): string | null {
 }
 
 /**
- * Build a DistillInput from a captured SAS doc file. The file PATH is `derived_from`; `source_key` is
- * a content hash (idempotent across re-ingests); id/slug is `resource-<title>-<hash[:8]>` per
+ * Build a DistillInput from a captured SAS doc file. `source_key` is a content hash (idempotent
+ * across re-ingests) and ALSO fills `derived_from`: the SAS quai lives under gitignored data/, so a
+ * file path there is machine-local and never gardien-resolvable — the content address is the portable
+ * provenance (ADR 0008 clause 6, amendement 2026-08-10). id/slug is `resource-<title>-<hash[:8]>` per
  * STRUCTURE.md §5 (kebab, immutable). Untrusted by default (ingested source, ADR 0008 trust invariant).
  */
 export function sasDocToInput(path: string): DistillInput {
@@ -67,7 +71,8 @@ export function sasDocToInput(path: string): DistillInput {
   const title = firstH1(rawMarkdown) ?? basename(path).replace(/\.md$/, '');
   const stem = kebab(title) || `doc-${hash.slice(0, 8)}`;
   const id = `resource-${stem}-${hash.slice(0, 8)}`;
-  return { id, sourceKey: `sha256:${hash}`, derivedFrom: path, trust: 'untrusted', title, rawMarkdown };
+  const sourceKey = `sha256:${hash}`;
+  return { id, sourceKey, derivedFrom: sourceKey, trust: 'untrusted', title, rawMarkdown };
 }
 
 /** True when a distilled fiche for this id already exists under outDir (idempotent skip). */
@@ -75,14 +80,15 @@ function alreadyDistilled(outDir: string, id: string): boolean {
   return existsSync(join(outDir, `${id}.md`));
 }
 
-/** Distil a single already-built input; write on success, capture the failure reason on error. */
-async function distillOne(input: DistillInput, deps: DistillCliDeps, res: DistillRunResult): Promise<void> {
+/** Distil a single already-built input; write on success, capture the failure reason on error.
+ * `sasPath` is reporting-only (derived_from is now a content address, not a path). */
+async function distillOne(sasPath: string, input: DistillInput, deps: DistillCliDeps, res: DistillRunResult): Promise<void> {
   try {
     const fiche = await distill(input, { llm: deps.llm, tokenCap: deps.tokenCap });
     const { written } = writeDistilledFiche(deps.outDir, deps.logPath, fiche, { date: deps.date, keeper: deps.keeper });
     res.distilled.push(written);
   } catch (e) {
-    res.failed.push({ path: input.derivedFrom, reason: (e as Error).message });
+    res.failed.push({ path: sasPath, reason: (e as Error).message });
   }
 }
 
@@ -91,7 +97,7 @@ const emptyResult = (): DistillRunResult => ({ distilled: [], failed: [], skippe
 /** Distil one SAS doc by path. */
 export async function distillPath(path: string, deps: DistillCliDeps): Promise<DistillRunResult> {
   const res = emptyResult();
-  await distillOne(sasDocToInput(path), deps, res);
+  await distillOne(path, sasDocToInput(path), deps, res);
   return res;
 }
 
@@ -128,7 +134,7 @@ export async function distillAll(dir: string, deps: DistillCliDeps): Promise<Dis
       return res;
     }
     spent += cost;
-    await distillOne(input, deps, res);
+    await distillOne(docs[i]!, input, deps, res);
   }
   return res;
 }
