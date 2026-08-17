@@ -74,13 +74,72 @@ légitimement la mission silencieuse plusieurs minutes : un seuil à 60 s produi
   la vérité basculée), testée avec `now` injecté — pas une promesse de détection en 60 s.
 - La détection en 60 s wall-clock reste possible **en v2 avec le heartbeat**, déjà repoussé.
 
+## Durcissement post-livraison (2026-08-17) — le témoin négatif ne peut plus mentir
+
+Le 3e test de `apps/web/tests/desync.spec.ts` (« une mission saine ne porte aucun badge ») portait sur
+`mission_seed_001`. **C'était un risque de flakiness inter-specs réel** — jamais observé en run, et
+pourtant reproduit de façon déterministe (mesure ci-dessous) :
+
+- `executeNextTask` passe la mission en `executing` (`packages/agents/src/dispatch.ts:674-677`) **avant**
+  d'atteindre le gate §5, et `pauseForRiskGate` (`dispatch.ts:328-353`) ouvre la validation **sans**
+  remettre le statut en arrière. Une mission arrêtée au gate est donc durablement déclarée
+  « executing » avec une validation `pending`.
+- Or `awaiting_human ∉ COMPATIBLE['executing']` (`lib/mission-truth.ts:64`) : sur ce palier la mission
+  est **légitimement désynchronisée**, ce que verrouille déjà le test unitaire
+  `lib/mission-truth.test.ts:84`.
+- `lifecycle.spec.ts` conduit `mission_seed_001` précisément jusqu'à cette modale, et les deux specs
+  partagent la base de smoke sur des workers Playwright distincts (5 workers sur 11 cœurs). Un
+  `toHaveCount(0)` pouvait donc échouer **sans aucun bug**.
+
+Reproduction déterministe (base jetable + `plan` puis `run` sur `mission_seed_001`, sans approuver la
+validation, donc figée dans l'état exact où `lifecycle.spec.ts` la tient) :
+
+```
+mission_seed_001      → status=executing · validations pending=1
+  rendu : 1 × <span data-testid="mission-desync-badge" data-severity="danger">
+          « Désynchronisé — 1 validation(s) en attente alors que la mission est déclarée « executing ». »
+mission_seed_healthy  → même serveur, même instant : 0 badge
+```
+
+Correctif : le témoin porte sur une mission **qu'aucune spec ne pilote** — fixture
+`mission_seed_healthy` (`packages/db/src/seed.ts`, `seedHealthyMissionFixture`). Trois propriétés la
+rendent inerte par construction : (1) aucune autre spec ne la touche ; (2) déclarée `archived`, statut
+compatible avec les vérités `active` **comme** `stalled`, donc la durée du run ne peut pas la faire
+basculer ; (3) tâches `done`, zéro validation, budget sous plafond ⇒ la page de détail n'expose aucun
+bouton d'action actif, donc aucune spec ne peut la piloter par accident. Le test gagne aussi un
+**ancrage positif** (`mission-status` = `archived`) : sans lui, un 404 ferait passer l'assertion
+négative pour la mauvaise raison — zéro badge parce que zéro page.
+
+Pistes écartées : épingler les deux specs en `serial` (sérialise deux specs lentes pour un couplage
+qui reviendrait à la 3e spec touchant `mission_seed_001`) et re-naviguer avec retry (sur une assertion
+**négative**, retenter jusqu'à disparition du badge masquerait un vrai désync — exactement le contraire
+de ce que C1 protège).
+
+### Suite — à décider (Melvyn)
+
+Le badge sur une mission arrêtée au gate §5 est **conforme** au contrat : le statut déclaré ment, la
+vérité est « une décision t'attend ». Reste une question de produit, indépendante du correctif ci-dessus :
+
+- **Option A (statu quo)** — chaque pause de validation lève un badge `danger` « Désynchronisé ». Le
+  fait est déjà porté par la famille 2 (`pendingValidationsAlert`) sur le Centre de commande : le même
+  fait est donc annoncé deux fois, dont une comme anomalie alors que la pause est le système qui
+  fonctionne. Risque d'usure du badge — précisément ce que C12 existe pour éviter.
+- **Option B (recommandée)** — ajouter `awaiting_human` à `COMPATIBLE['executing']` (et `['dispatched']`) :
+  une pause de gate n'est plus un désync, et la famille 2 reste seule propriétaire du fait, enrichie de
+  **l'âge** de la plus vieille validation en attente (« en attente depuis 3 j » = le vrai signal
+  d'anomalie). Coût : une ligne de machine à états + l'âge dans la famille 2.
+
+Écarté d'office : basculer la mission en `blocked` à la pause — `BoardStatus` n'a pas de colonne
+`blocked` (`components/MissionsBoardClient.tsx:30-38`), la mission disparaîtrait du board.
+
 ## Critère de sortie (binaire)
 
 - [x] Test unitaire : `declared = 'executing'` + dernier event vieux de 11 min ⇒ `desynced = true`
       avec sa raison (`now` injecté, aucune I/O). — `lib/mission-truth.test.ts` (16 tests).
 - [x] Test e2e : une mission semée `executing` avec un event vieux de 2 h affiche le badge
       désynchronisé **et sa raison** sur `/missions` et `/missions/<id>`, sans édition manuelle de la DB.
-      — `tests/desync.spec.ts` (3 specs) + fixture `mission_seed_stale` dans `packages/db/src/seed.ts`.
+      — `tests/desync.spec.ts` (3 specs) + fixtures `mission_seed_stale` (cas positif) et
+      `mission_seed_healthy` (témoin négatif inerte) dans `packages/db/src/seed.ts`.
 - [x] Le validateur refuse une alerte à champ vide (test). — `lib/alerts.test.ts`, `makeAlert` jette
       `alerte invalide (contrat C12)` sur champ vide, route sans `/`, sévérité hors contrat.
 - [x] Le test `null ≠ zéro` passe sur chaque famille d'alertes (y compris `budgetUsedPct = null`
