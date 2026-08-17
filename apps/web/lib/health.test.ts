@@ -56,8 +56,19 @@ describe('computeProjectHealth — server-computed aggregation, no LLM', () => {
 
   it('empty project yields zeroed health', async () => {
     const h = await computeProjectHealth(getDb(), 'p1');
-    expect(h).toMatchObject({ missionsTotal: 0, missionsDone: 0, missionsBlocked: 0, openIdeas: 0, pendingValidations: 0, budgetUsedPct: 0 });
+    expect(h).toMatchObject({ missionsTotal: 0, missionsDone: 0, missionsBlocked: 0, openIdeas: 0, pendingValidations: 0 });
+    expect(h.budgetUsedPct).toBeNull();
     expect(h.nextDeadline).toBeNull();
     expect(h.lastActivity).toBeNull();
+  });
+
+  it('budgetUsedPct est null quand aucun plafond n’est déclaré (null ≠ zéro)', async () => {
+    const db = getDb();
+    await db.insert(missions).values({
+      id: 'm9', projectId: 'p1', title: 'sans plafond', objective: 'o', status: 'draft',
+      budgetTokens: 0, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+    });
+    const h = await computeProjectHealth(db, 'p1');
+    expect(h.budgetUsedPct).toBeNull();
   });
 });

@@ -11,7 +11,8 @@ export interface ProjectHealth {
   missionsDone: number;
   missionsBlocked: number;
   lastActivity: Date | null;
-  budgetUsedPct: number;
+  /** null = aucun plafond déclaré (fait ABSENT). Jamais 0 par défaut — C12, null ≠ zéro. */
+  budgetUsedPct: number | null;
   nextDeadline: Date | null;
   openIdeas: number;
   pendingValidations: number;
@@ -59,7 +60,7 @@ export async function computeProjectHealth(db: Db, projectId: string, now: Date 
     missionsDone: done,
     missionsBlocked: blocked,
     lastActivity,
-    budgetUsedPct: budgetSum > 0 ? Math.round((spentSum / budgetSum) * 100) : 0,
+    budgetUsedPct: budgetSum > 0 ? Math.round((spentSum / budgetSum) * 100) : null,
     nextDeadline,
     openIdeas,
     pendingValidations,
