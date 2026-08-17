@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { BudgetPause } from './autopilot';
+import type { BudgetPause, PendingValidation } from './autopilot';
 
 // C12 — contrat d'alertes du cockpit (docs/backlog/statut-verite-reconciliation.md,
 // pattern P15 de docs/audits/otakugo/A2-patterns-cockpit.md).
@@ -52,7 +52,7 @@ export function budgetPauseAlert(pause: BudgetPause | null): Alert | null {
 }
 
 /** Famille 2 — validations humaines en attente (§5 : le gate ne se contourne pas). */
-export function pendingValidationsAlert(pending: readonly { risk: string }[]): Alert | null {
+export function pendingValidationsAlert(pending: readonly Pick<PendingValidation, 'risk'>[]): Alert | null {
   if (pending.length === 0) return null; // zéro réel : la requête a tourné, rien n'attend
   const blocking = pending.filter((p) => p.risk === 'high' || p.risk === 'blocking').length;
   return makeAlert({

@@ -55,6 +55,12 @@ describe('familles d’alertes — null ≠ zéro', () => {
     expect(a?.what).toContain('2');
     expect(a?.action).not.toBe('');
     expect(a?.route).toBe('/');
+    expect(a?.severity).toBe('danger');
+  });
+
+  it('validations : aucun risque élevé ⇒ alerte warning', () => {
+    const a = pendingValidationsAlert([{ risk: 'low' }, { risk: 'medium' }]);
+    expect(a?.severity).toBe('warning');
   });
 
   it('budget projet : aucun plafond déclaré (null) ⇒ aucune alerte, PAS une alerte à 0 %', () => {
@@ -63,6 +69,11 @@ describe('familles d’alertes — null ≠ zéro', () => {
 
   it('budget projet : 40 % consommés ⇒ sous le seuil, aucune alerte', () => {
     expect(projectBudgetAlert(40, '/projects/otakugo')).toBeNull();
+  });
+
+  it('budget projet : 90 % consommés ⇒ seuil inclus, alerte warning', () => {
+    const a = projectBudgetAlert(90, '/projects/otakugo');
+    expect(a?.severity).toBe('warning');
   });
 
   it('budget projet : 92 % consommés ⇒ alerte warning', () => {
