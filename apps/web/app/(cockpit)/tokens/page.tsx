@@ -4,7 +4,8 @@ import { ModePill } from '@/components/ModePill';
 import { dailyTokens, monthlySpend } from '@/lib/fixtures';
 import { getTokenSnapshot, getRemainingCapacity } from '@/lib/tokens';
 import { getBudgetPause } from '@/lib/autopilot';
-import { BudgetPauseBanner } from '@/components/BudgetPauseBanner';
+import { AlertBanner } from '@/components/AlertSurface';
+import { budgetPauseAlert } from '@/lib/alerts';
 import { getDb } from '@mas/db';
 
 // Reads the DB directly (server component) — no HTTP self-fetch, which would be
@@ -24,7 +25,7 @@ export default async function TokenManager() {
 
   return (
     <div className="flex flex-col gap-6">
-      <BudgetPauseBanner pause={budgetPause} />
+      <AlertBanner alert={budgetPauseAlert(budgetPause)} testId="budget-pause-banner" />
       <header className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Quota & Cache</h1>
