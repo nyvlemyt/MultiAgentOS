@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { makeAlert } from './alerts';
+import { budgetPauseAlert, pendingValidationsAlert, projectBudgetAlert, makeAlert } from './alerts';
 
 describe('makeAlert — contrat C12 (P15)', () => {
   it('accepte une alerte dont les trois phrases + la route sont remplies', () => {
@@ -31,5 +31,43 @@ describe('makeAlert — contrat C12 (P15)', () => {
     expect(() => makeAlert({
       what: 'x', why: 'y', action: 'z', route: '/tokens', severity: 'catastrophe',
     })).toThrow(/contrat C12/);
+  });
+});
+
+describe('familles d’alertes — null ≠ zéro', () => {
+  it('budget pause : aucun fait (null) ⇒ aucune alerte', () => {
+    expect(budgetPauseAlert(null)).toBeNull();
+  });
+
+  it('budget pause : fait présent ⇒ alerte danger routée vers /tokens', () => {
+    const a = budgetPauseAlert({ window: 'day', at: new Date('2026-08-14T10:00:00Z') });
+    expect(a?.severity).toBe('danger');
+    expect(a?.route).toBe('/tokens');
+    expect(a?.what).toContain('journalier');
+  });
+
+  it('validations : liste vide = zéro RÉEL ⇒ aucune alerte', () => {
+    expect(pendingValidationsAlert([])).toBeNull();
+  });
+
+  it('validations : 2 en attente ⇒ une alerte qui dit quoi faire', () => {
+    const a = pendingValidationsAlert([{ risk: 'high' }, { risk: 'low' }]);
+    expect(a?.what).toContain('2');
+    expect(a?.action).not.toBe('');
+    expect(a?.route).toBe('/');
+  });
+
+  it('budget projet : aucun plafond déclaré (null) ⇒ aucune alerte, PAS une alerte à 0 %', () => {
+    expect(projectBudgetAlert(null, '/projects/otakugo')).toBeNull();
+  });
+
+  it('budget projet : 40 % consommés ⇒ sous le seuil, aucune alerte', () => {
+    expect(projectBudgetAlert(40, '/projects/otakugo')).toBeNull();
+  });
+
+  it('budget projet : 92 % consommés ⇒ alerte warning', () => {
+    const a = projectBudgetAlert(92, '/projects/otakugo');
+    expect(a?.severity).toBe('warning');
+    expect(a?.what).toContain('92');
   });
 });
