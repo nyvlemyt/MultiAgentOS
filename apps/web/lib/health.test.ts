@@ -71,4 +71,23 @@ describe('computeProjectHealth — server-computed aggregation, no LLM', () => {
     const h = await computeProjectHealth(db, 'p1');
     expect(h.budgetUsedPct).toBeNull();
   });
+
+  it('budgetUsedPct est un vrai 0 quand un plafond existe mais rien n’a été dépensé', async () => {
+    const db = getDb();
+    await db.insert(missions).values({
+      id: 'm10', projectId: 'p1', title: 'plafond non entamé', objective: 'o', status: 'draft',
+      budgetTokens: 5000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+    });
+    expect((await computeProjectHealth(db, 'p1')).budgetUsedPct).toBe(0);
+  });
+
+  it('une mission sans plafond ne gonfle pas le % du projet (exclue des deux sommes)', async () => {
+    const db = getDb();
+    await db.insert(missions).values([
+      { id: 'm11', projectId: 'p1', title: 'plafonnée', objective: 'o', status: 'draft', budgetTokens: 1000, spentTokens: 250, createdAt: new Date(), updatedAt: new Date() },
+      { id: 'm12', projectId: 'p1', title: 'sans plafond', objective: 'o', status: 'draft', budgetTokens: 0, spentTokens: 5000, createdAt: new Date(), updatedAt: new Date() },
+    ]);
+    // 250/1000 = 25 % : la dépense de la mission sans plafond est ignorée, pas ajoutée.
+    expect((await computeProjectHealth(db, 'p1')).budgetUsedPct).toBe(25);
+  });
 });

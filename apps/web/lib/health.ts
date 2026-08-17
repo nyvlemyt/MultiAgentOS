@@ -31,8 +31,13 @@ export async function computeProjectHealth(db: Db, projectId: string, now: Date 
   let done = 0;
   let blocked = 0;
   for (const m of ms) {
-    budgetSum += m.budgetTokens;
-    spentSum += m.spentTokens;
+    // C12, null ≠ zéro : une mission sans plafond déclaré ne pèse dans AUCUNE des
+    // deux sommes. La compter côté dépense seulement gonflerait le pourcentage
+    // au-delà de 100 % — un chiffre inventé.
+    if (m.budgetTokens > 0) {
+      budgetSum += m.budgetTokens;
+      spentSum += m.spentTokens;
+    }
     if (DONE_STATUSES.has(m.status)) done += 1;
     if (m.status === 'blocked') blocked += 1;
     if (!lastActivity || m.updatedAt > lastActivity) lastActivity = m.updatedAt;
