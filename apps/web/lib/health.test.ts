@@ -90,4 +90,40 @@ describe('computeProjectHealth — server-computed aggregation, no LLM', () => {
     // 250/1000 = 25 % : la dépense de la mission sans plafond est ignorée, pas ajoutée.
     expect((await computeProjectHealth(db, 'p1')).budgetUsedPct).toBe(25);
   });
+
+  // Les trois cas ci-dessous épinglent la règle « prochaine échéance » avec `now`
+  // injecté : c'est la seule logique de health.ts qui dépend du temps, donc la
+  // seule qui peut dériver en silence lors d'un refactor.
+  const mission = (id: string, deadline: Date | null) => ({
+    id, projectId: 'p1', title: id, objective: 'o', status: 'draft' as const,
+    budgetTokens: 0, spentTokens: 0, ...(deadline ? { deadline } : {}),
+    createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-01-01'),
+  });
+
+  it('une échéance déjà passée n’est plus « prochaine »', async () => {
+    const db = getDb();
+    const now = new Date('2026-06-15T00:00:00Z');
+    await db.insert(missions).values(mission('m13', new Date('2026-06-01T00:00:00Z')));
+    expect((await computeProjectHealth(db, 'p1', now)).nextDeadline).toBeNull();
+  });
+
+  it('parmi plusieurs échéances, garde la plus proche à venir et ignore les passées', async () => {
+    const db = getDb();
+    const now = new Date('2026-06-15T00:00:00Z');
+    const soon = new Date('2026-07-01T00:00:00Z');
+    await db.insert(missions).values([
+      mission('m14', new Date('2026-09-01T00:00:00Z')),
+      mission('m15', new Date('2026-06-01T00:00:00Z')),
+      mission('m16', soon),
+      mission('m17', null),
+    ]);
+    expect((await computeProjectHealth(db, 'p1', now)).nextDeadline?.getTime()).toBe(soon.getTime());
+  });
+
+  it('une échéance tombant exactement à `now` compte encore comme à venir', async () => {
+    const db = getDb();
+    const now = new Date('2026-06-15T00:00:00Z');
+    await db.insert(missions).values(mission('m18', now));
+    expect((await computeProjectHealth(db, 'p1', now)).nextDeadline?.getTime()).toBe(now.getTime());
+  });
 });

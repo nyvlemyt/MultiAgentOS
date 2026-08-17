@@ -21,6 +21,17 @@ export interface ProjectHealth {
 const DONE_STATUSES = new Set(['validated', 'archived']);
 const OPEN_IDEA_STATUSES = new Set(['inbox', 'to_clarify', 'prioritized']);
 
+/** Dernière activité : la plus récente des deux dates. */
+function mostRecent(current: Date | null, candidate: Date): Date {
+  return current === null || candidate > current ? candidate : current;
+}
+
+/** Prochaine échéance : la plus proche des deux, en ignorant celles déjà passées. */
+function soonestUpcoming(current: Date | null, candidate: Date | null, now: Date): Date | null {
+  if (candidate === null || candidate.getTime() < now.getTime()) return current;
+  return current === null || candidate < current ? candidate : current;
+}
+
 export async function computeProjectHealth(db: Db, projectId: string, now: Date = new Date()): Promise<ProjectHealth> {
   const ms = await db.select().from(missions).where(eq(missions.projectId, projectId));
 
@@ -40,10 +51,8 @@ export async function computeProjectHealth(db: Db, projectId: string, now: Date 
     }
     if (DONE_STATUSES.has(m.status)) done += 1;
     if (m.status === 'blocked') blocked += 1;
-    if (!lastActivity || m.updatedAt > lastActivity) lastActivity = m.updatedAt;
-    if (m.deadline && m.deadline.getTime() >= now.getTime()) {
-      if (!nextDeadline || m.deadline < nextDeadline) nextDeadline = m.deadline;
-    }
+    lastActivity = mostRecent(lastActivity, m.updatedAt);
+    nextDeadline = soonestUpcoming(nextDeadline, m.deadline, now);
   }
 
   const projectIdeas = await db.select().from(ideas).where(eq(ideas.projectId, projectId));
