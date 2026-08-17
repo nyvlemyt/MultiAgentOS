@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Portique C12 (docs/backlog/statut-verite-reconciliation.md) :
 # le seul rendu d'alerte autorisé est apps/web/components/AlertSurface.tsx.
-# Toute autre définition de composant *Alert*/*Banner* dans apps/web est un
-# rendu hors contrat (trois phrases non garanties, null != zero non garanti).
+# Toute autre definition de composant dont le nom contient Alert ou Banner
+# dans apps/web est un rendu hors contrat (trois phrases non garanties,
+# null != zero non garanti). Le nom doit CONTENIR, pas seulement finir par :
+# un AlertBadge fait main est exactement le contournement a attraper.
 set -euo pipefail
 
 ROOT="${1:-apps/web}"
 ALLOWED="components/AlertSurface.tsx"
 
-HITS=$(grep -rlnE "^export function [A-Za-z]*(Alert|Banner)\(" "$ROOT" \
+HITS=$(grep -rlnE "^export function [A-Za-z]*(Alert|Banner)[A-Za-z]*\(" "$ROOT" \
   --include="*.tsx" 2>/dev/null \
   | grep -v "node_modules" \
   | grep -v "$ALLOWED" \
