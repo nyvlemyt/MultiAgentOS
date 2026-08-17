@@ -1,6 +1,6 @@
 # Backlog — statut vérité + contrat d'alertes (C1 + C12)
 
-**Statut** : LIVRÉ (2026-08-17, branche `phase9/statut-verite-alertes`, 13 commits) — noyau lot 1, Phase 9.
+**Statut** : LIVRÉ (2026-08-17, branche `phase9/statut-verite-alertes`, 14 commits) — noyau lot 1, Phase 9.
 **Source** : `docs/audits/otakugo/A2-patterns-cockpit.md` (P1, P15).
 **Décision d'intake** : `implement_now` · T1 — `docs/intake/2026-08-14-cartes-a2-otakugo.md` §3.
 **Précurseur** : `docs/backlog/mission-dashboard-branch-closed.md` (le besoin y était déjà tracé).
@@ -87,9 +87,16 @@ légitimement la mission silencieuse plusieurs minutes : un seuil à 60 s produi
       quand aucun plafond n'est déclaré). — 4 familles + `computeProjectHealth`, qui exclut désormais
       les missions sans plafond des deux sommes (sinon le % dépassait 100).
 - [x] Portique binaire : `bash scripts/lint-alert-render.sh` sort 0 — aucun rendu d'alerte hors du
-      composant contractuel, vérifié par `pnpm lint`. Test négatif prouvé sur `FakeAlert` **et**
-      `CustomAlertBadge`.
+      composant contractuel, vérifié par `pnpm lint`. Le portique refuse de **lier un nom**
+      (PascalCase contenant `Alert`/`Banner`) et non d'appeler une fonction : `function`,
+      `const`/`let`/`var`, `class`, `export default <Nom>` et les listes de re-export sont couverts,
+      signature multi-lignes comprise — la majuscule initiale sépare un rendu (`AlertBanner`) d'un
+      constructeur de fait (`budgetPauseAlert`), ce qui tient le zéro faux positif. Le contre-exemple
+      était une fixture jetable créée à la main (`printf` dans un `.tsx` temporaire, plan §portique) :
+      il est désormais **commité et rejoué par la CI** — `apps/web/alert-render-guard.test.ts`,
+      20 tests, un contre-exemple par forme + les non-régressions (`RiskBadge`, icônes lucide,
+      import/JSX, constructeurs camelCase même re-exportés).
 - [ ] 5 checks verts (`pnpm -r test` · lint · build · smoke · Sonar exit 0). — 4/5 verts en local
-      (889 tests unitaires · lint exit 0 · build OK · smoke 35/35). Sonar reste à valider sur la PR.
+      (909 tests unitaires · lint exit 0 · build OK · smoke 35/35). Sonar reste à valider sur la PR.
 
 **Plan d'implémentation** : `docs/superpowers/plans/2026-08-14-statut-verite-contrat-alertes.md`.
