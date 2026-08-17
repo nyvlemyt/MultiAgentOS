@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { BudgetPause, PendingValidation } from './autopilot';
+import type { MissionTruth, Reconciliation } from './mission-truth';
 
 // C12 — contrat d'alertes du cockpit (docs/backlog/statut-verite-reconciliation.md,
 // pattern P15 de docs/audits/otakugo/A2-patterns-cockpit.md).
@@ -77,5 +78,51 @@ export function projectBudgetAlert(usedPct: number | null, route: string): Alert
     action: 'Relève le plafond du projet ou archive les missions terminées.',
     route,
     severity: 'warning',
+  });
+}
+
+const DESYNC_COPY: Record<Exclude<MissionTruth, 'unknown'>, { why: string; action: string; severity: AlertSeverity }> = {
+  active: {
+    why: 'La mission tourne alors que le cockpit la dit à l’arrêt.',
+    action: 'Ouvre la mission et remets son statut au vrai.',
+    severity: 'warning',
+  },
+  stalled: {
+    why: 'Le cockpit affiche un avancement qui n’existe plus (worker arrêté ou tâche perdue).',
+    action: 'Relance le worker, ou repasse la mission en « planned » pour la redispatcher.',
+    severity: 'warning',
+  },
+  awaiting_human: {
+    why: 'Une décision t’attend sans que le statut le dise — personne n’avance.',
+    action: 'Traite la validation en attente sur le Centre de commande.',
+    severity: 'danger',
+  },
+  blocked: {
+    why: 'Du travail est bloqué alors que la mission se dit en bonne voie.',
+    action: 'Ouvre la mission, débloque la tâche ou passe la mission en « blocked ».',
+    severity: 'danger',
+  },
+  needs_attention: {
+    why: 'Le dernier rapport demande une reprise ; le statut ne le reflète pas.',
+    action: 'Relis le rapport de mission et relance la boucle de revue.',
+    severity: 'warning',
+  },
+  halted_budget: {
+    why: 'La mission a mangé son budget : rien ne repartira tout seul (CLAUDE.md §6).',
+    action: 'Relève le budget de la mission ou clôture-la.',
+    severity: 'danger',
+  },
+};
+
+/** Famille 4 — écart entre statut déclaré et faits observés (C1). */
+export function missionDesyncAlert(missionId: string, r: Reconciliation): Alert | null {
+  if (!r.desynced || r.computed === 'unknown' || r.reason === null) return null;
+  const copy = DESYNC_COPY[r.computed];
+  return makeAlert({
+    what: `Désynchronisé — ${r.reason}.`,
+    why: copy.why,
+    action: copy.action,
+    route: `/missions/${missionId}`,
+    severity: copy.severity,
   });
 }

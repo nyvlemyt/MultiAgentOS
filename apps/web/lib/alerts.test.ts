@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { budgetPauseAlert, pendingValidationsAlert, projectBudgetAlert, makeAlert } from './alerts';
+import { budgetPauseAlert, pendingValidationsAlert, projectBudgetAlert, makeAlert, missionDesyncAlert } from './alerts';
+import type { Reconciliation } from './mission-truth';
 
 describe('makeAlert — contrat C12 (P15)', () => {
   it('accepte une alerte dont les trois phrases + la route sont remplies', () => {
@@ -80,5 +81,32 @@ describe('familles d’alertes — null ≠ zéro', () => {
     const a = projectBudgetAlert(92, '/projects/otakugo');
     expect(a?.severity).toBe('warning');
     expect(a?.what).toContain('92');
+  });
+});
+
+describe('famille désync (C1 × C12)', () => {
+  it('mission synchronisée ⇒ aucune alerte', () => {
+    const r: Reconciliation = { declared: 'executing', computed: 'active', desynced: false, reason: null };
+    expect(missionDesyncAlert('m1', r)).toBeNull();
+  });
+
+  it('mission périmée ⇒ alerte qui porte la raison, la route et le geste', () => {
+    const r: Reconciliation = {
+      declared: 'executing',
+      computed: 'stalled',
+      desynced: true,
+      reason: 'aucune activité depuis 120 min alors que la mission est déclarée « executing »',
+    };
+    const a = missionDesyncAlert('m1', r);
+    expect(a?.what).toContain('Désynchronisé');
+    expect(a?.what).toContain('120 min');
+    expect(a?.route).toBe('/missions/m1');
+    expect(a?.severity).toBe('warning');
+    expect(a?.action).not.toBe('');
+  });
+
+  it('désync bloquante ⇒ sévérité danger', () => {
+    const r: Reconciliation = { declared: 'executing', computed: 'blocked', desynced: true, reason: '1 tâche(s) bloquée(s)' };
+    expect(missionDesyncAlert('m1', r)?.severity).toBe('danger');
   });
 });
