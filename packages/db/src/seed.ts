@@ -55,6 +55,7 @@ type SeedDb = ReturnType<typeof getDb>;
 
 const PROJECT_ID = 'proj_otakugo';
 const MISSION_ID = 'mission_seed_001';
+const STALE_MISSION_ID = 'mission_seed_stale';
 
 const TIER_A = [
   { id: 'mission-planner', name: 'Mission Planner', emoji: '🗺️', avatar: 'mission-planner.svg' },
@@ -177,6 +178,36 @@ async function seedMissionRow(db: SeedDb) {
       priorityScore: 72,
       createdAt: minutesAgo(30),
       updatedAt: minutesAgo(5),
+    })
+    .onConflictDoNothing();
+
+  // C1 — fixture du statut vérité : déclarée `executing`, dernier signe de vie il
+  // y a 2 h ⇒ le cockpit doit la badger « désynchronisé » sans édition manuelle.
+  await db
+    .insert(missions)
+    .values({
+      id: STALE_MISSION_ID,
+      projectId: PROJECT_ID,
+      title: 'Mission zombie (fixture statut vérité)',
+      objective: 'Fixture C1 : worker mort en plein executing, statut jamais réconcilié.',
+      status: 'executing',
+      risk: 'low',
+      budgetTokens: 20000,
+      spentTokens: 4200,
+      priorityScore: 10,
+      createdAt: minutesAgo(300),
+      updatedAt: minutesAgo(120),
+    })
+    .onConflictDoNothing();
+
+  await db
+    .insert(events)
+    .values({
+      id: 'evt_seed_stale_1',
+      missionId: STALE_MISSION_ID,
+      type: 'task_start',
+      payloadJson: '{}',
+      createdAt: minutesAgo(120),
     })
     .onConflictDoNothing();
 }
