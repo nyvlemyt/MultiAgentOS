@@ -60,8 +60,14 @@ const COMPATIBLE: Record<MissionStatus, ReadonlySet<MissionTruth>> = {
   draft: new Set(['unknown', 'active', 'stalled']),
   clarified: new Set(['unknown', 'active', 'stalled']),
   planned: new Set(['unknown', 'active', 'stalled']),
-  dispatched: new Set(['unknown', 'active']),
-  executing: new Set(['unknown', 'active']),
+  // `awaiting_human` est tolérée en vol : le gate §5 met la tâche en pause SANS
+  // changer le statut de la mission (`pauseForRiskGate`, dispatch.ts:328), donc
+  // une validation en attente y est le système qui fonctionne — pas un cockpit
+  // qui ment. Le vrai signal d'anomalie est l'ÂGE de l'attente, porté par la
+  // famille 2 (`pendingValidationsAlert`), seule propriétaire du fait.
+  // Décision : docs/backlog/statut-verite-reconciliation.md §Suite (option B).
+  dispatched: new Set(['unknown', 'active', 'awaiting_human']),
+  executing: new Set(['unknown', 'active', 'awaiting_human']),
   review: new Set(['unknown', 'active', 'awaiting_human']),
   validated: new Set(['unknown', 'active', 'stalled']),
   archived: new Set(['unknown', 'active', 'stalled']),

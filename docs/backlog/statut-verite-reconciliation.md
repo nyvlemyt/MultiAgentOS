@@ -115,10 +115,19 @@ qui reviendrait à la 3e spec touchant `mission_seed_001`) et re-naviguer avec r
 **négative**, retenter jusqu'à disparition du badge masquerait un vrai désync — exactement le contraire
 de ce que C1 protège).
 
-### Suite — à décider (Melvyn)
+### Suite — décidé : option B (2026-08-17, livrée 2026-08-25)
+
+Décision : **option B**. `awaiting_human` est compatible avec `executing`/`dispatched`
+(`lib/mission-truth.ts` COMPATIBLE) — une pause au gate §5 n'est plus un désync. La famille 2
+(`pendingValidationsAlert`) reste seule propriétaire du fait, enrichie de l'**âge** de la plus
+vieille validation (`requestedAt` lu sur les events `validation_requested`, sans migration ;
+seuil `VALIDATION_STALE_AFTER_MS` = 60 min, injectable ; au-delà → `danger` « mission gelée »).
+Une validation ouverte sur une mission `planned` reste un désync (test épinglé).
+
+Contexte d'origine de la décision :
 
 Le badge sur une mission arrêtée au gate §5 est **conforme** au contrat : le statut déclaré ment, la
-vérité est « une décision t'attend ». Reste une question de produit, indépendante du correctif ci-dessus :
+vérité est « une décision t'attend ». Restait une question de produit, indépendante du correctif ci-dessus :
 
 - **Option A (statu quo)** — chaque pause de validation lève un badge `danger` « Désynchronisé ». Le
   fait est déjà porté par la famille 2 (`pendingValidationsAlert`) sur le Centre de commande : le même

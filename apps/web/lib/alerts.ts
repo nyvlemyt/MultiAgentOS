@@ -52,16 +52,54 @@ export function budgetPauseAlert(pause: BudgetPause | null): Alert | null {
   });
 }
 
+/**
+ * Au-delà de cette attente, une validation en pause n'est plus une latence
+ * humaine normale (café, réunion) : c'est un oubli, et la mission est gelée sans
+ * que personne le sache. Depuis l'option B (`mission-truth.ts` COMPATIBLE), une
+ * pause au gate §5 n'est plus un « désynchronisé » — l'âge est donc LE signal, et
+ * la famille 2 en est seule propriétaire.
+ */
+export const VALIDATION_STALE_AFTER_MS = 60 * 60_000;
+
+type PendingWait = Pick<PendingValidation, 'risk' | 'requestedAt'>;
+
+/** Plus longue attente mesurable. `null` = aucun `requestedAt` connu (fait absent). */
+function oldestWaitMs(pending: readonly PendingWait[], now: Date): number | null {
+  const waits = pending
+    .map((p) => p.requestedAt)
+    .filter((d): d is Date => d !== null)
+    .map((d) => Math.max(0, now.getTime() - d.getTime()));
+  return waits.length === 0 ? null : Math.max(...waits);
+}
+
+/** « 45 min », « 3 h », « 2 j » — la maille juste suffisante pour décider. */
+function waitLabel(ms: number): string {
+  const minutes = Math.floor(ms / 60_000);
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  return hours < 24 ? `${hours} h` : `${Math.floor(hours / 24)} j`;
+}
+
 /** Famille 2 — validations humaines en attente (§5 : le gate ne se contourne pas). */
-export function pendingValidationsAlert(pending: readonly Pick<PendingValidation, 'risk'>[]): Alert | null {
+export function pendingValidationsAlert(
+  pending: readonly PendingWait[],
+  now: Date = new Date(),
+  staleAfterMs: number = VALIDATION_STALE_AFTER_MS,
+): Alert | null {
   if (pending.length === 0) return null; // zéro réel : la requête a tourné, rien n'attend
   const blocking = pending.filter((p) => p.risk === 'high' || p.risk === 'blocking').length;
+  const oldest = oldestWaitMs(pending, now);
+  const stale = oldest !== null && oldest > staleAfterMs;
+  // Sous la minute, la durée est du bruit : on tait le libellé, pas le fait.
+  const waited = oldest !== null && oldest >= 60_000 ? ` La plus ancienne attend depuis ${waitLabel(oldest)}.` : '';
   return makeAlert({
-    what: `${pending.length} validation(s) en attente, dont ${blocking} à risque élevé.`,
-    why: 'Les tâches concernées sont arrêtées tant que tu ne tranches pas.',
+    what: `${pending.length} validation(s) en attente, dont ${blocking} à risque élevé.${waited}`,
+    why: stale
+      ? 'La mission est gelée depuis un moment : rien n’avance tant que tu ne tranches pas.'
+      : 'Les tâches concernées sont arrêtées tant que tu ne tranches pas.',
     action: 'Ouvre « À traiter » sur le Centre de commande et approuve ou rejette.',
     route: '/',
-    severity: blocking > 0 ? 'danger' : 'warning',
+    severity: blocking > 0 || stale ? 'danger' : 'warning',
   });
 }
 

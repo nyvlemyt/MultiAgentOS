@@ -81,16 +81,31 @@ describe('reconcileMissionStatus — ordre strict des règles (P1)', () => {
     expect(r.reason).toContain('1');
   });
 
-  it('validation en attente ⇒ awaiting_human, désync en executing…', () => {
+  // Option B (carte §Suite) : une pause au gate §5 laisse la mission déclarée
+  // « executing » par construction — c'est le système qui marche, pas un
+  // mensonge. L'âge de l'attente est porté par la famille 2, pas par un désync.
+  it('validation en attente en executing ⇒ awaiting_human, PAS un désync', () => {
     const r = reconcileMissionStatus(facts({ pendingValidationCount: 2 }), NOW);
     expect(r.computed).toBe('awaiting_human');
-    expect(r.desynced).toBe(true);
+    expect(r.desynced).toBe(false);
   });
 
-  it('…mais PAS en review, où l’attente humaine est normale', () => {
+  it('idem en dispatched, l’autre palier où le gate peut mordre', () => {
+    const r = reconcileMissionStatus(facts({ declared: 'dispatched', pendingValidationCount: 1 }), NOW);
+    expect(r.desynced).toBe(false);
+  });
+
+  it('ni en review, où l’attente humaine est le sens même du statut', () => {
     const r = reconcileMissionStatus(facts({ declared: 'review', pendingValidationCount: 2 }), NOW);
     expect(r.computed).toBe('awaiting_human');
     expect(r.desynced).toBe(false);
+  });
+
+  it('mais une validation ouverte sur une mission déclarée planned ⇒ désync', () => {
+    const r = reconcileMissionStatus(facts({ declared: 'planned', pendingValidationCount: 1 }), NOW);
+    expect(r.computed).toBe('awaiting_human');
+    expect(r.desynced).toBe(true);
+    expect(r.reason).toContain('planned');
   });
 
   it('mission déclarée blocked mais qui produit des events ⇒ désynchronisée', () => {

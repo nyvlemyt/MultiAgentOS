@@ -52,7 +52,10 @@ describe('familles d’alertes — null ≠ zéro', () => {
   });
 
   it('validations : 2 en attente ⇒ une alerte qui dit quoi faire', () => {
-    const a = pendingValidationsAlert([{ risk: 'high' }, { risk: 'low' }]);
+    const a = pendingValidationsAlert([
+      { risk: 'high', requestedAt: null },
+      { risk: 'low', requestedAt: null },
+    ]);
     expect(a?.what).toContain('2');
     expect(a?.action).not.toBe('');
     expect(a?.route).toBe('/');
@@ -60,7 +63,10 @@ describe('familles d’alertes — null ≠ zéro', () => {
   });
 
   it('validations : aucun risque élevé ⇒ alerte warning', () => {
-    const a = pendingValidationsAlert([{ risk: 'low' }, { risk: 'medium' }]);
+    const a = pendingValidationsAlert([
+      { risk: 'low', requestedAt: null },
+      { risk: 'medium', requestedAt: null },
+    ]);
     expect(a?.severity).toBe('warning');
   });
 
@@ -81,6 +87,50 @@ describe('familles d’alertes — null ≠ zéro', () => {
     const a = projectBudgetAlert(92, '/projects/otakugo');
     expect(a?.severity).toBe('warning');
     expect(a?.what).toContain('92');
+  });
+});
+
+describe('âge des validations en attente (option B — la famille 2 est seule propriétaire du fait)', () => {
+  const NOW = new Date('2026-08-25T12:00:00Z');
+  const ago = (minutes: number) => new Date(NOW.getTime() - minutes * 60_000);
+
+  it('fait absent (requestedAt null) ⇒ aucune mention d’attente, aucune escalade', () => {
+    const a = pendingValidationsAlert([{ risk: 'low', requestedAt: null }], NOW);
+    expect(a?.what).not.toContain('attend');
+    expect(a?.severity).toBe('warning');
+  });
+
+  it('20 min d’attente ⇒ libellé « 20 min », toujours warning sous le seuil', () => {
+    const a = pendingValidationsAlert([{ risk: 'low', requestedAt: ago(20) }], NOW);
+    expect(a?.what).toContain('20 min');
+    expect(a?.severity).toBe('warning');
+  });
+
+  it('3 h d’attente ⇒ danger : la mission est gelée, pas en latence humaine', () => {
+    const a = pendingValidationsAlert([{ risk: 'low', requestedAt: ago(180) }], NOW);
+    expect(a?.what).toContain('3 h');
+    expect(a?.severity).toBe('danger');
+    expect(a?.why).toContain('gelée');
+  });
+
+  it('la plus ancienne gagne : 5 min et 3 h ⇒ le libellé porte « 3 h »', () => {
+    const a = pendingValidationsAlert(
+      [{ risk: 'low', requestedAt: ago(5) }, { risk: 'low', requestedAt: ago(180) }],
+      NOW,
+    );
+    expect(a?.what).toContain('3 h');
+    expect(a?.severity).toBe('danger');
+  });
+
+  it('seuil injectable : 20 min avec un seuil à 10 min ⇒ danger', () => {
+    const a = pendingValidationsAlert([{ risk: 'low', requestedAt: ago(20) }], NOW, 10 * 60_000);
+    expect(a?.severity).toBe('danger');
+  });
+
+  it('sous la minute, le fait est compté mais la durée se tait (bruit)', () => {
+    const a = pendingValidationsAlert([{ risk: 'low', requestedAt: ago(0.5) }], NOW);
+    expect(a?.what).toContain('1 validation');
+    expect(a?.what).not.toContain('attend');
   });
 });
 
