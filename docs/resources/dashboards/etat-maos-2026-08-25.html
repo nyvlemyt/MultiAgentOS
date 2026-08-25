@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAOS — état de reprise · 25 août 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0e11; --panel:#12161b; --panel2:#171c22; --line:#232b33;
+    --ink:#e8ecef; --ink2:#9aa7b1; --ink3:#5d6b76;
+    --amber:#e8b13c; --green:#3ddc97; --red:#ff6b6b; --blue:#5aa9e6;
+    --mono:'JetBrains Mono',monospace; --disp:'Unbounded',sans-serif; --body:'Instrument Sans',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;
+    background-image:radial-gradient(ellipse 900px 400px at 70% -100px,rgba(232,177,60,.07),transparent),
+    repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(255,255,255,.015) 48px);}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 28px 120px}
+  a{color:var(--amber);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,.mono{font-family:var(--mono);font-size:.85em}
+
+  header{padding:64px 0 40px;border-bottom:1px solid var(--line);position:relative}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.25em;color:var(--amber);text-transform:uppercase}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(28px,5vw,52px);line-height:1.1;margin:14px 0 18px;max-width:14ch}
+  h1 em{font-style:normal;color:var(--amber)}
+  .verdict{max-width:760px;color:var(--ink2);font-size:17px}
+  .verdict strong{color:var(--ink)}
+  .stamp{position:absolute;top:64px;right:0;text-align:right;font-family:var(--mono);font-size:12px;color:var(--ink3);line-height:1.9}
+  .stamp b{color:var(--ink2);font-weight:600}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:36px 0 8px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden}
+  .kpi::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:var(--kc,var(--amber))}
+  .kpi .n{font-family:var(--disp);font-size:34px;font-weight:700;letter-spacing:-.02em}
+  .kpi .l{font-family:var(--mono);font-size:11.5px;color:var(--ink2);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+  .kpi .s{font-size:13px;color:var(--ink3);margin-top:6px}
+
+  nav.toc{display:flex;flex-wrap:wrap;gap:10px;margin:34px 0 0;font-family:var(--mono);font-size:12.5px}
+  nav.toc a{border:1px solid var(--line);border-radius:999px;padding:7px 16px;color:var(--ink2);transition:.18s}
+  nav.toc a:hover{border-color:var(--amber);color:var(--amber);text-decoration:none;transform:translateY(-1px)}
+
+  section{margin-top:72px}
+  h2{font-family:var(--disp);font-size:22px;font-weight:500;display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  h2 .idx{font-family:var(--mono);font-size:13px;color:var(--amber);border:1px solid rgba(232,177,60,.35);border-radius:6px;padding:3px 9px}
+  .sub{color:var(--ink2);max-width:760px;margin-bottom:26px}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:800px){.cols{grid-template-columns:1fr}.stamp{position:static;text-align:left;margin-top:12px}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .card h3{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;gap:10px;align-items:center}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  ul.flat{list-style:none}
+  ul.flat li{padding:7px 0 7px 24px;position:relative;font-size:14.5px;color:var(--ink2);border-top:1px dashed rgba(255,255,255,.05)}
+  ul.flat li:first-child{border-top:none}
+  ul.flat li::before{position:absolute;left:0;font-family:var(--mono);font-weight:600}
+  ul.flat li b{color:var(--ink);font-weight:600}
+  .done li::before{content:'✓';color:var(--green)}
+  .stuck li::before{content:'▲';color:var(--amber);font-size:11px;top:10px}
+  .todo li::before{content:'○';color:var(--ink3)}
+  .decide li::before{content:'?';color:var(--blue)}
+
+  .chantiers{display:flex;flex-direction:column;gap:12px}
+  .ch{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;display:grid;grid-template-columns:1fr 220px;gap:20px;align-items:center}
+  @media(max-width:800px){.ch{grid-template-columns:1fr}}
+  .ch h3{font-size:15.5px;font-weight:600}
+  .ch p{font-size:13.5px;color:var(--ink2);margin-top:4px}
+  .meter{height:8px;background:#0e1216;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+  .meter i{display:block;height:100%;background:var(--mc,var(--amber));border-radius:99px}
+  .mlab{font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-top:6px;display:flex;justify-content:space-between}
+
+  .steps{counter-reset:st;display:flex;flex-direction:column;gap:0;border-left:1px solid var(--line);margin-left:10px}
+  .step{position:relative;padding:14px 0 14px 34px}
+  .step::before{counter-increment:st;content:counter(st,decimal-leading-zero);position:absolute;left:-16px;top:16px;
+    background:var(--bg);border:1px solid var(--line);color:var(--amber);font-family:var(--mono);font-size:11px;
+    width:32px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+  .step h4{font-size:15px;font-weight:600}
+  .step p{font-size:13.5px;color:var(--ink2);margin-top:3px}
+  .step .tag{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:5px;margin-left:8px;vertical-align:2px}
+  .t-s{background:rgba(61,220,151,.12);color:var(--green)}
+  .t-m{background:rgba(232,177,60,.12);color:var(--amber)}
+  .t-l{background:rgba(255,107,107,.12);color:var(--red)}
+  .t-you{background:rgba(90,169,230,.15);color:var(--blue)}
+
+  pre{background:#0e1216;border:1px solid var(--line);border-radius:10px;padding:14px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:13px;line-height:1.8;color:#c7d3dc;margin:10px 0}
+  pre b{color:var(--green);font-weight:400}
+  .rule{background:linear-gradient(90deg,rgba(232,177,60,.08),transparent);border:1px solid rgba(232,177,60,.25);
+    border-radius:12px;padding:18px 22px;margin-top:14px}
+  .rule h3{color:var(--amber);font-size:14px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .rule li{color:var(--ink2);font-size:14.5px;margin-left:20px;padding:3px 0}
+  .rule li b{color:var(--ink)}
+  footer{margin-top:90px;border-top:1px solid var(--line);padding-top:22px;font-family:var(--mono);font-size:12px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">MultiAgentOS · Mission Control</div>
+  <h1>Où en est <em>MAOS</em>, et par où reprendre</h1>
+  <p class="verdict"><strong>Verdict : le socle est solide et vivant</strong> — 843 tests verts, cockpit + worker + agents opérationnels, pipeline d'ingestion mémoire éprouvé sur 373 documents réels. <strong>Ce qui manque pour t'en servir vraiment tient en trois chantiers</strong> : déboucher la sortie de la mémoire, livrer les 4 cartes « exploitation » (rapport, reprise, écritures, prompt), et brancher la couche live.</p>
+  <div class="stamp">audit du <b>2026-08-25</b><br>branche <b>knowledge-os/brique-1</b><br>main <b>67486ab</b> (PR #69 mergée)</div>
+
+  <div class="kpis">
+    <div class="kpi" style="--kc:var(--green)"><div class="n">843</div><div class="l">tests verts</div><div class="s">0 échec, 7 modules, 120 fichiers</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="n">9<span style="font-size:18px;color:var(--ink3)">/12</span></div><div class="l">phases roadmap livrées</div><div class="s">0→7 + cœur de la 9 ; reste étapes 1·3 + packaging</div></div>
+    <div class="kpi" style="--kc:var(--amber)"><div class="n">379</div><div class="l">fiches en attente</div><div class="s">distillées, ni promues ni indexées ni commitées</div></div>
+    <div class="kpi" style="--kc:var(--red)"><div class="n">74</div><div class="l">branches à purger</div><div class="s">déjà dans main — ménage proposé §6</div></div>
+  </div>
+
+  <nav class="toc">
+    <a href="#fait">01 · Fait</a><a href="#bouche">02 · Bouché / en cours</a><a href="#reste">03 · Pas fait</a>
+    <a href="#enjeux">04 · Les 3 enjeux</a><a href="#lancer">05 · Lancer la pile</a><a href="#menage">06 · Ménage git</a><a href="#methode">07 · Méthode</a>
+  </nav>
+</header>
+
+<section id="fait">
+  <h2><span class="idx">01</span>Fait — et vérifié dans le code</h2>
+  <p class="sub">Tout ce qui suit a été contrôlé le 25/08 dans le code réel, pas sur parole de session.</p>
+  <div class="cols">
+    <div class="card"><h3><span class="dot" style="background:var(--green)"></span>Le socle (phases 0 → 7)</h3>
+      <ul class="flat done">
+        <li><b>Cockpit Next.js</b> — 17 pages, 22 routes API, 42 composants (missions, agents, projets, mémoire, jetons, trace…)</li>
+        <li><b>Worker</b> — boucle 1,5 s : dispatch → autopilot → rapport quotidien ; refuse de démarrer si une clé API PAYG traîne (§11)</li>
+        <li><b>Cycle de mission complet</b> — planner → DAG de tâches → dispatch risqué/gaté → revue (4 critiques réels) → archivage</li>
+        <li><b>21 tables SQLite</b>, 13 migrations, seed ; autonomie 4 niveaux par projet ; budgets + gates §5</li>
+        <li><b>Arsenal froid</b> — 877 skills + 32 agents Tier B indexés, routage par résumé L1 (jamais les corps)</li>
+      </ul>
+    </div>
+    <div class="card"><h3><span class="dot" style="background:var(--green)"></span>Le récent (juin → août)</h3>
+      <ul class="flat done">
+        <li><b>Ingestion mémoire (briques 1+6)</b> — 6 extracteurs (pdf, docx/pptx, html, url, youtube), sas d'admission, anti-injection, anti-doublon, distillation robuste</li>
+        <li><b>Preuve réelle</b> — 373 docs EFREI avalés en 25 min, 35 doublons refusés, 23 échecs motivés ; 379 fiches distillées le 10/08</li>
+        <li><b>C1+C12 statut vérité + alertes</b> — mergé dans main aujourd'hui (PR #69) : le statut mission est recalculé depuis les faits, alertes contractuelles, âge des validations</li>
+        <li><b>Audit OtakuGO</b> — pipeline A0→A4 PASS, 13 patterns distillés en 8 cartes backlog priorisées</li>
+        <li><b>Hygiène restaurée ce jour</b> — brique-1 réconciliée origin, dette docs commitée, option B finie</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="bouche">
+  <h2><span class="idx">02</span>Bouché ou en cours — là où ça coince</h2>
+  <p class="sub">L'usine avale bien, mais personne ne range en bout de tapis : rien de ce qui a été ingéré n'est encore <em>consultable</em> par les agents.</p>
+  <div class="chantiers">
+    <div class="ch"><div><h3>Sortie de la mémoire — le goulot n°1</h3><p>379 fiches figées en « distilled » : la promotion vers le corpus actif n'a <b>aucun code appelant</b>, l'index sémantique QMD date du 22 juin (il voit 21 fiches sur 396), et 281 fiches ont un titre dégénéré à retraiter.</p></div>
+      <div><div class="meter"><i style="width:55%;--mc:var(--amber)"></i></div><div class="mlab"><span>pipeline 55 %</span><span>P1-2…P1-6</span></div></div></div>
+    <div class="ch"><div><h3>Registres du second cerveau</h3><p>Les 5 registres (décisions, apprentissages, blocages, journal, évals) sont codés et verrouillés… mais <b>aucun n'a jamais été écrit</b>. 51 candidats déjà classés attendent une promotion en 1 clic.</p></div>
+      <div><div class="meter"><i style="width:30%;--mc:var(--amber)"></i></div><div class="mlab"><span>codé, jamais nourri</span><span>P1-8</span></div></div></div>
+    <div class="ch"><div><h3>Brique 5 — l'onglet Ressources du cockpit</h3><p>La surface de triage humain (328 candidats en abstention l'attendent). Contrat de données gelé, <b>zéro ligne écrite</b>.</p></div>
+      <div><div class="meter"><i style="width:5%;--mc:var(--red)"></i></div><div class="mlab"><span>spec prête</span><span>P1-10</span></div></div></div>
+    <div class="ch"><div><h3>Worktrees en attente</h3><p>3 chantiers annexes portent du travail non committé (roster de seed, gate de couverture, accès mobile) — triés, rien de perdu, à finir ou fusionner.</p></div>
+      <div><div class="meter"><i style="width:70%;--mc:var(--blue)"></i></div><div class="mlab"><span>trié le 25/08</span><span>P0-6</span></div></div></div>
+  </div>
+</section>
+
+<section id="reste">
+  <h2><span class="idx">03</span>Décidé mais pas commencé</h2>
+  <p class="sub">Tout est déjà spécifié dans des fiches backlog — l'ordre vient de ton intake du 14/08.</p>
+  <div class="cols">
+    <div class="card"><h3><span class="dot" style="background:var(--ink3)"></span>Cartes « exploitation » (lot 1 puis 2)</h3>
+      <ul class="flat todo">
+        <li><b>C3 rapport de mission réel</b> — remplace le mock, ajoute le verdict en base (débloque tout le reste)</li>
+        <li><b>C10 reprise universelle</b> — <code>nextAction</code> sur chaque tâche + bouton « Reprendre » après un crash</li>
+        <li><b>C9 écritures externes</b> — panneau des diffs en attente + interdiction CI de committer chez un projet client</li>
+        <li><b>C4 prompt à coller</b> — l'issue de secours : relancer n'importe quelle mission dans une session Claude vierge</li>
+        <li><b>C8 rapport réveil</b> · <b>C11 vérif ternaire</b> (verrou avant merge externe) · <b>C5+C13 routage par nature</b></li>
+      </ul>
+    </div>
+    <div class="card"><h3><span class="dot" style="background:var(--ink3)"></span>Roadmap officielle</h3>
+      <ul class="flat todo">
+        <li><b>Étape 1 — couche live</b> : le chat du cockpit parle encore par scripts mockés ; le brancher sur le vrai pipeline</li>
+        <li><b>Étape 3 — surfaces de la vision</b> : console arsenal, pages projet enrichies, MAOS piloté depuis MAOS</li>
+        <li><b>Phase 8 — packaging Tauri</b> + notifications (plus tard, assumé)</li>
+        <li><b>Vault de notes externe</b> — spec d'intégration écrite ce jour → <code>docs/MEMOIRE-CENTRALISEE-ETAT.md</code> §5</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="enjeux">
+  <h2><span class="idx">04</span>Les 3 enjeux pour utiliser MAOS pour de vrai</h2>
+  <p class="sub">Ta frustration exacte — « je ne peux toujours pas m'en servir » — se résout dans cet ordre :</p>
+  <div class="steps">
+    <div class="step"><h4>Finir la mémoire centralisée <span class="tag t-l">L</span></h4>
+      <p>Réparer le pont → ré-indexer → trier/re-distiller les 281 fiches → brancher la promotion. À la fin : tout ce que tu ingères (cours, notes, repos) devient trouvable par chaque agent, dans chaque mission. C'est la « grosse base bien finie » que tu demandes — et le prérequis du vault de notes.</p></div>
+    <div class="step"><h4>Livrer les 4 cartes du lot 1 (C3 → C10 → C9 → C4) <span class="tag t-m">4 × M</span></h4>
+      <p>Ensemble, elles transforment MAOS en outil de confiance : un rapport honnête par mission, une reprise en 1 clic après un crash, la preuve de ce qu'un agent a écrit chez un projet externe, et un prompt de secours copiable. Sans elles, piloter un vrai projet reste de l'artisanat.</p></div>
+    <div class="step"><h4>Brancher la couche live (Étape 1) <span class="tag t-l">L</span></h4>
+      <p>Le jour où le chat du cockpit parle au vrai moteur, MAOS cesse d'être une maquette pilotée depuis le terminal : tu lances une mission depuis l'interface, tu regardes les agents travailler, tu valides les gates. C'est le moment « je m'en sers ».</p></div>
+  </div>
+</section>
+
+<section id="lancer">
+  <h2><span class="idx">05</span>Lancer la pile — 3 commandes</h2>
+  <p class="sub">Depuis la racine du repo (<code>Node ≥ 20</code>, <code>pnpm</code>). Le cockpit s'ouvre sur <a href="http://localhost:3000">localhost:3000</a>, le worker tourne à côté.</p>
+<pre><b># 1. base (première fois ou après un pull avec migrations)</b>
+pnpm db:migrate && pnpm db:seed
+
+<b># 2. tout démarrer (cockpit + worker en parallèle)</b>
+pnpm dev
+
+<b># 3. santé de la mémoire (retrieval + binaires d'extraction)</b>
+pnpm mem:doctor</pre>
+  <p class="sub" style="margin-top:14px">Vérifier que tout va bien : <code>pnpm -r test</code> (843 verts attendus) · <code>pnpm lint</code> (4 portiques) · <code>pnpm smoke</code> (35 parcours navigateur).</p>
+</section>
+
+<section id="menage">
+  <h2><span class="idx">06</span>Ménage git proposé <span class="tag t-you" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:6px">à valider par toi</span></h2>
+  <p class="sub">Constat : 116 branches locales, dont <b>74 déjà intégralement contenues dans main</b> — les supprimer ne perd rien (vérifiable : <code>git branch --merged origin/main</code>). Les 42 restantes portent un delta réel et seront triées carte par carte.</p>
+  <div class="cols">
+    <div class="card"><h3><span class="dot" style="background:var(--green)"></span>Sans risque (proposé maintenant)</h3>
+      <ul class="flat done">
+        <li>Supprimer les <b>74 branches mergées</b> (hors celles tenues par un worktree)</li>
+        <li>Retirer les <b>3 worktrees propres</b> (gallant-lamport, frosty-bardeen, festive-germain)</li>
+        <li><b>Rebaser brique-1 sur main</b> (3 commits : C1+C12, garde 800 lignes, explain-diff)</li>
+      </ul>
+    </div>
+    <div class="card"><h3><span class="dot" style="background:var(--amber)"></span>À garder (travail vivant)</h3>
+      <ul class="flat stuck">
+        <li><b>knowledge-os/brique-1</b> — chantier mémoire, merge en un bloc à la fin</li>
+        <li><b>3 worktrees porteurs</b> — roster seed (M), coverage-gate (P2-10), scripts mobile (S)</li>
+        <li><b>maos-ecc</b> (arsenal) et <b>maos-statut-verite</b> (à retirer après confirmation du merge #69)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="methode">
+  <h2><span class="idx">07</span>La méthode de travail (pour ne plus s'égarer)</h2>
+  <div class="rule"><h3>Règles de reprise — gravées après l'audit</h3>
+    <ul>
+      <li><b>Une session = un projet.</b> MAOS se construit dans MAOS ; find_location_Paris et les autres se pilotent dans leurs propres sessions. Jamais les deux dans la même conversation.</li>
+      <li><b>Une branche = un worktree = un sujet.</b> La collision du 17/08 (2 sessions, même worktree) a coûté un commit. Le travail mémoire vit sur <code>brique-1</code> ; tout le reste part de <code>main</code>.</li>
+      <li><b>Pousser avant de fermer</b> — un commit local non poussé n'existe pas pour les autres machines.</li>
+      <li><b>PR en draft, 5 checks verts, merge = Melvyn.</b> Sonar se vérifie <em>après</em> la pose de l'analyse du bon sha.</li>
+      <li><b>Suivi</b> : ce fichier (mis à jour à chaque jalon) + <code>docs/BACKLOG.md</code> (priorités) + <code>docs/MEMOIRE-CENTRALISEE-ETAT.md</code> (spec mémoire). Une même page, jamais une nouvelle par étape.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <span>MAOS · audit &amp; reprise orchestrés le 2026-08-25</span>
+  <span>sources : docs/BACKLOG.md · docs/MEMOIRE-CENTRALISEE-ETAT.md · 4 agents d'audit</span>
+</footer>
+</div>
+</body>
+</html>
