@@ -6,7 +6,8 @@ import { AgentAvatar } from '@/components/AgentAvatar';
 import { allAgents } from '@/lib/fixtures';
 import { isDeadlineSoon } from '@/lib/prioritize';
 import { listPendingValidations, latestDailyReport, getBudgetPause } from '@/lib/autopilot';
-import { BudgetPauseBanner } from '@/components/BudgetPauseBanner';
+import { AlertBanner } from '@/components/AlertSurface';
+import { budgetPauseAlert, pendingValidationsAlert } from '@/lib/alerts';
 import { ensureConversation, listConversations, getConversation, listMessages } from '@/lib/conversations';
 import { newManagerConversation } from '@/app/(cockpit)/conversation-actions';
 import { ConversationThreads } from '@/components/manager/ConversationThreads';
@@ -35,7 +36,8 @@ export default async function CommandCenter({ searchParams }: Readonly<{ searchP
 
   return (
     <div className="flex flex-col gap-5">
-      <BudgetPauseBanner pause={budgetPause} />
+      <AlertBanner alert={budgetPauseAlert(budgetPause)} testId="budget-pause-banner" />
+      <AlertBanner alert={pendingValidationsAlert(pendingValidations)} testId="pending-validations-banner" />
       <header>
         <h1 className="text-2xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>Command Center</h1>
         <p className="mono text-xs" style={{ color: 'var(--text-muted)' }}>

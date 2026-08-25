@@ -11,7 +11,8 @@ export interface ProjectHealth {
   missionsDone: number;
   missionsBlocked: number;
   lastActivity: Date | null;
-  budgetUsedPct: number;
+  /** null = aucun plafond déclaré (fait ABSENT). Jamais 0 par défaut — C12, null ≠ zéro. */
+  budgetUsedPct: number | null;
   nextDeadline: Date | null;
   openIdeas: number;
   pendingValidations: number;
@@ -19,6 +20,17 @@ export interface ProjectHealth {
 
 const DONE_STATUSES = new Set(['validated', 'archived']);
 const OPEN_IDEA_STATUSES = new Set(['inbox', 'to_clarify', 'prioritized']);
+
+/** Dernière activité : la plus récente des deux dates. */
+function mostRecent(current: Date | null, candidate: Date): Date {
+  return current === null || candidate > current ? candidate : current;
+}
+
+/** Prochaine échéance : la plus proche des deux, en ignorant celles déjà passées. */
+function soonestUpcoming(current: Date | null, candidate: Date | null, now: Date): Date | null {
+  if (candidate === null || candidate.getTime() < now.getTime()) return current;
+  return current === null || candidate < current ? candidate : current;
+}
 
 export async function computeProjectHealth(db: Db, projectId: string, now: Date = new Date()): Promise<ProjectHealth> {
   const ms = await db.select().from(missions).where(eq(missions.projectId, projectId));
@@ -30,14 +42,17 @@ export async function computeProjectHealth(db: Db, projectId: string, now: Date 
   let done = 0;
   let blocked = 0;
   for (const m of ms) {
-    budgetSum += m.budgetTokens;
-    spentSum += m.spentTokens;
+    // C12, null ≠ zéro : une mission sans plafond déclaré ne pèse dans AUCUNE des
+    // deux sommes. La compter côté dépense seulement gonflerait le pourcentage
+    // au-delà de 100 % — un chiffre inventé.
+    if (m.budgetTokens > 0) {
+      budgetSum += m.budgetTokens;
+      spentSum += m.spentTokens;
+    }
     if (DONE_STATUSES.has(m.status)) done += 1;
     if (m.status === 'blocked') blocked += 1;
-    if (!lastActivity || m.updatedAt > lastActivity) lastActivity = m.updatedAt;
-    if (m.deadline && m.deadline.getTime() >= now.getTime()) {
-      if (!nextDeadline || m.deadline < nextDeadline) nextDeadline = m.deadline;
-    }
+    lastActivity = mostRecent(lastActivity, m.updatedAt);
+    nextDeadline = soonestUpcoming(nextDeadline, m.deadline, now);
   }
 
   const projectIdeas = await db.select().from(ideas).where(eq(ideas.projectId, projectId));
@@ -59,7 +74,7 @@ export async function computeProjectHealth(db: Db, projectId: string, now: Date 
     missionsDone: done,
     missionsBlocked: blocked,
     lastActivity,
-    budgetUsedPct: budgetSum > 0 ? Math.round((spentSum / budgetSum) * 100) : 0,
+    budgetUsedPct: budgetSum > 0 ? Math.round((spentSum / budgetSum) * 100) : null,
     nextDeadline,
     openIdeas,
     pendingValidations,

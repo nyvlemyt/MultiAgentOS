@@ -19,7 +19,7 @@ export function ProjectHealthBar({ health }: Readonly<{ health: ProjectHealth }>
       <Stat label="blocked" value={String(health.missionsBlocked)} accent={health.missionsBlocked > 0 ? 'var(--danger)' : undefined} />
       <Stat label="open ideas" value={String(health.openIdeas)} />
       <Stat label="validations" value={String(health.pendingValidations)} accent={health.pendingValidations > 0 ? 'var(--warning)' : undefined} />
-      <Stat label="budget used" value={`${health.budgetUsedPct}%`} />
+      <Stat label="budget used" value={health.budgetUsedPct === null ? '—' : `${health.budgetUsedPct}%`} />
       <Stat label="next deadline" value={deadline} />
     </div>
   );
