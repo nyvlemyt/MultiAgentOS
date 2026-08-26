@@ -55,6 +55,8 @@ type SeedDb = ReturnType<typeof getDb>;
 
 const PROJECT_ID = 'proj_otakugo';
 const MISSION_ID = 'mission_seed_001';
+const STALE_MISSION_ID = 'mission_seed_stale';
+const HEALTHY_MISSION_ID = 'mission_seed_healthy';
 
 const TIER_A = [
   { id: 'mission-planner', name: 'Mission Planner', emoji: '🗺️', avatar: 'mission-planner.svg' },
@@ -177,6 +179,105 @@ async function seedMissionRow(db: SeedDb) {
       priorityScore: 72,
       createdAt: minutesAgo(30),
       updatedAt: minutesAgo(5),
+    })
+    .onConflictDoNothing();
+
+  // C1 — fixture du statut vérité : déclarée `executing`, dernier signe de vie il
+  // y a 2 h ⇒ le cockpit doit la badger « désynchronisé » sans édition manuelle.
+  await db
+    .insert(missions)
+    .values({
+      id: STALE_MISSION_ID,
+      projectId: PROJECT_ID,
+      title: 'Mission zombie (fixture statut vérité)',
+      objective: 'Fixture C1 : worker mort en plein executing, statut jamais réconcilié.',
+      status: 'executing',
+      risk: 'low',
+      budgetTokens: 20000,
+      spentTokens: 4200,
+      priorityScore: 10,
+      createdAt: minutesAgo(300),
+      updatedAt: minutesAgo(120),
+    })
+    .onConflictDoNothing();
+
+  await db
+    .insert(events)
+    .values({
+      id: 'evt_seed_stale_1',
+      missionId: STALE_MISSION_ID,
+      type: 'task_start',
+      payloadJson: '{}',
+      createdAt: minutesAgo(120),
+    })
+    .onConflictDoNothing();
+}
+
+// C1 — témoin NÉGATIF du statut vérité : déclaré == faits ⇒ aucun badge, jamais.
+// Trois choix de fixture, tous là pour que l'assertion « aucun badge » ne puisse
+// pas échouer sans bug réel :
+//   1. Mission dédiée, pilotée par AUCUNE spec. `mission_seed_001` ne peut pas
+//      tenir ce rôle : lifecycle.spec.ts la conduit jusqu'au gate §5, où elle
+//      reste déclarée « executing » avec une validation pending — donc
+//      légitimement désynchronisée (voir apps/web/tests/desync.spec.ts).
+//   2. `archived` : la vérité calculée y est compatible qu'elle vaille `active`
+//      ou `stalled` (mission-truth.ts COMPATIBLE), donc la durée du run smoke ne
+//      peut pas faire basculer le témoin en désync.
+//   3. Tâches `done`, zéro validation, budget sous plafond : la page de détail
+//      n'expose aucun bouton d'action actif → aucune spec ne peut la piloter par
+//      accident.
+async function seedHealthyMissionFixture(db: SeedDb) {
+  await db
+    .insert(missions)
+    .values({
+      id: HEALTHY_MISSION_ID,
+      projectId: PROJECT_ID,
+      title: 'Mission saine (témoin statut vérité)',
+      objective: 'Fixture C1 : statut déclaré conforme aux faits — aucun badge désynchronisé attendu.',
+      status: 'archived',
+      risk: 'low',
+      budgetTokens: 20000,
+      spentTokens: 6400,
+      priorityScore: 20,
+      createdAt: minutesAgo(240),
+      updatedAt: minutesAgo(4),
+    })
+    .onConflictDoNothing();
+
+  const healthyTasks = [
+    { id: 'task_healthy_1', title: 'Cadrer le besoin', agentId: 'mission-planner' },
+    { id: 'task_healthy_2', title: 'Livrer le correctif', agentId: 'engineering-frontend-developer' },
+  ] as const;
+  for (const [i, t] of healthyTasks.entries()) {
+    await db
+      .insert(tasks)
+      .values({
+        id: t.id,
+        missionId: HEALTHY_MISSION_ID,
+        title: t.title,
+        description: '',
+        status: 'done',
+        risk: 'low',
+        agentId: t.agentId,
+        skillsJson: '[]',
+        dependsOnJson: i === 0 ? '[]' : `["${healthyTasks[0].id}"]`,
+        budgetTokens: 3000,
+        spentTokens: 2800,
+        createdAt: minutesAgo(240 - i * 10),
+        updatedAt: minutesAgo(10 - i * 3),
+      })
+      .onConflictDoNothing();
+  }
+
+  await db
+    .insert(events)
+    .values({
+      id: 'evt_seed_healthy_1',
+      missionId: HEALTHY_MISSION_ID,
+      taskId: 'task_healthy_2',
+      type: 'task_done',
+      payloadJson: '{}',
+      createdAt: minutesAgo(4),
     })
     .onConflictDoNothing();
 }
@@ -323,6 +424,7 @@ async function seedSkillCatalog(db: SeedDb) {
     { id: 'xlsx', domain: 'writing', tags: ['xlsx', 'spreadsheet', 'data'] },
     { id: 'internal-comms', domain: 'writing', tags: ['communication', 'writing', 'internal'] },
     { id: 'doc-coauthoring', domain: 'writing', tags: ['documentation', 'writing', 'collaboration'] },
+    { id: 'explain-diff', domain: 'writing', tags: ['diff', 'pr', 'explanation', 'onboarding'] },
     { id: 'skill-creator', domain: 'planning', tags: ['skill', 'authoring', 'meta'] },
     { id: 'web-artifacts-builder', domain: 'ux', tags: ['web', 'artifacts', 'frontend'] },
     { id: 'superpowers', domain: 'planning', tags: ['methodology', 'workflow', 'tdd'] },
@@ -429,6 +531,7 @@ async function main() {
   await seedProjectRow(db);
   await seedAgentRoster(db);
   await seedMissionRow(db);
+  await seedHealthyMissionFixture(db);
   await seedTaskRows(db);
   await seedReportRows(db);
   await seedEventLog(db);

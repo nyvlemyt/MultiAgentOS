@@ -2,20 +2,27 @@ import { getDb, missions as missionsTable } from '@mas/db';
 import { desc } from 'drizzle-orm';
 import { MissionsBoardClient, type BoardMission, type BoardStatus } from '@/components/MissionsBoardClient';
 import { EmptyState } from '@/components/EmptyState';
+import { missionReconciliations } from '@/lib/mission-facts';
+import { missionDesyncAlert } from '@/lib/alerts';
 
 export const dynamic = 'force-dynamic';
 
 export default async function MissionsBoardPage() {
   const db = getDb();
   const rows = await db.select().from(missionsTable).orderBy(desc(missionsTable.updatedAt));
-  const data: BoardMission[] = rows.map((r) => ({
-    id: r.id,
-    title: r.title,
-    status: r.status as BoardStatus,
-    risk: r.risk,
-    budgetSpent: r.spentTokens,
-    budgetCap: r.budgetTokens,
-  }));
+  const recs = await missionReconciliations(db, rows.map((r) => r.id));
+  const data: BoardMission[] = rows.map((r) => {
+    const rec = recs.get(r.id);
+    return {
+      id: r.id,
+      title: r.title,
+      status: r.status as BoardStatus,
+      risk: r.risk,
+      budgetSpent: r.spentTokens,
+      budgetCap: r.budgetTokens,
+      desync: rec ? missionDesyncAlert(r.id, rec) : null,
+    };
+  });
 
   return (
     <div className="flex h-full flex-col gap-4">

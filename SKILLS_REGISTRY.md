@@ -58,6 +58,7 @@ The runtime auto-discovers skills from `.claude/skills/*` (and nested `superpowe
 | `pdf` / `docx` / `pptx` / `xlsx`                 | On-demand                                   | file extension or "spreadsheet/deck/word/pdf"       |
 | `internal-comms`                                 | On-demand                                   | "status update", "newsletter", "incident report"    |
 | `doc-coauthoring`                                | On-demand                                   | "write doc", "spec", "decision"                     |
+| `explain-diff`                                   | On-demand                                   | "explain this PR/diff/branch", `/explain-diff`       |
 | `skill-creator`                                  | On-demand                                   | only the Skill Router calls it                      |
 | `web-artifacts-builder`                          | On-demand                                   | multi-component HTML artifact (not repo changes)    |
 | `superpowers:using-superpowers`                  | Pinned                                      | always                                              |

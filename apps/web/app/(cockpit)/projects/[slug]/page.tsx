@@ -8,6 +8,8 @@ import { OpenButtons } from '@/components/OpenButtons';
 import { listDecisions } from '@/lib/decisions';
 import { computeProjectHealth } from '@/lib/health';
 import { ProjectHealthBar } from '@/components/ProjectHealthBar';
+import { AlertBanner } from '@/components/AlertSurface';
+import { projectBudgetAlert } from '@/lib/alerts';
 import { listProjectReports } from '@/lib/reports';
 import { getDb, projects as projectsTable } from '@mas/db';
 import { eq } from 'drizzle-orm';
@@ -55,6 +57,7 @@ export default async function ProjectDetail({ params }: Readonly<{ params: Promi
             ))}
           </div>
         )}
+        <AlertBanner alert={projectBudgetAlert(health.budgetUsedPct, `/projects/${project.slug}`)} testId="project-budget-banner" />
         {health && (
           <div className="border-t pt-3" style={{ borderColor: 'var(--border-subtle)' }}>
             <ProjectHealthBar health={health} />

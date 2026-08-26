@@ -6,12 +6,15 @@ import { RiskBadge } from '@/components/RiskBadge';
 import { BudgetBar } from '@/components/BudgetBar';
 import { Timeline, type TimelineRow } from '@/components/Timeline';
 import { MissionActions } from '@/components/MissionActions';
+import { AlertBadge } from '@/components/AlertSurface';
 import { ValidationModal, type PendingValidation } from '@/components/ValidationModal';
 import { DecisionLog } from '@/components/DecisionLog';
 import { listDecisions } from '@/lib/decisions';
 import { MissionDeadlineEditor } from '@/components/MissionDeadlineEditor';
 import { isDeadlineSoon } from '@/lib/prioritize';
 import { listMissionReports } from '@/lib/reports';
+import { missionDesyncAlert } from '@/lib/alerts';
+import { missionReconciliations } from '@/lib/mission-facts';
 import { allAgents } from '@/lib/fixtures';
 import { FileText } from 'lucide-react';
 import { ConversationPanel } from '@/components/manager/ConversationPanel';
@@ -72,6 +75,8 @@ export default async function MissionDetail({
   const [proj] = await db.select().from(projectsTable).where(eq(projectsTable.id, m.projectId));
   const slug = proj?.slug ?? '';
   const missionReports = await listMissionReports(db, id);
+  const rec = (await missionReconciliations(db, [m.id])).get(m.id);
+  const desync = rec ? missionDesyncAlert(m.id, rec) : null;
 
   const ts = await db.select().from(tasksTable).where(eq(tasksTable.missionId, id)).orderBy(asc(tasksTable.createdAt));
 
@@ -135,6 +140,7 @@ export default async function MissionDetail({
           <RiskBadge risk={m.risk} />
         </div>
         <MissionActions id={m.id} status={m.status} />
+        <AlertBadge alert={desync} testId="mission-desync-badge" />
         <div className="flex items-center gap-3">
           <MissionDeadlineEditor
             id={m.id}

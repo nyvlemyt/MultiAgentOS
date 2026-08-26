@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { RiskBadge } from './RiskBadge';
 import { BudgetBar } from './BudgetBar';
+import { AlertBadge } from './AlertSurface';
+import type { Alert } from '@/lib/alerts';
 
 export type BoardStatus =
   | 'draft'
@@ -22,6 +24,7 @@ export interface BoardMission {
   risk: 'low' | 'medium' | 'high' | 'blocking';
   budgetSpent: number;
   budgetCap: number;
+  desync: Alert | null;
 }
 
 const COLUMNS: { key: string; title: string; statuses: BoardStatus[]; dragTo?: BoardStatus }[] = [
@@ -101,6 +104,7 @@ export function MissionsBoardClient({ missions }: Readonly<{ missions: BoardMiss
                     <span className="text-xs font-medium leading-tight" style={{ color: 'var(--text-primary)' }}>{m.title}</span>
                     <RiskBadge risk={m.risk} />
                   </div>
+                  <AlertBadge alert={m.desync} testId="mission-desync-badge" />
                   <BudgetBar spent={m.budgetSpent} cap={m.budgetCap} />
                 </Link>
               ))}

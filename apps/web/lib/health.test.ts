@@ -56,8 +56,74 @@ describe('computeProjectHealth — server-computed aggregation, no LLM', () => {
 
   it('empty project yields zeroed health', async () => {
     const h = await computeProjectHealth(getDb(), 'p1');
-    expect(h).toMatchObject({ missionsTotal: 0, missionsDone: 0, missionsBlocked: 0, openIdeas: 0, pendingValidations: 0, budgetUsedPct: 0 });
+    expect(h).toMatchObject({ missionsTotal: 0, missionsDone: 0, missionsBlocked: 0, openIdeas: 0, pendingValidations: 0 });
+    expect(h.budgetUsedPct).toBeNull();
     expect(h.nextDeadline).toBeNull();
     expect(h.lastActivity).toBeNull();
+  });
+
+  it('budgetUsedPct est null quand aucun plafond n’est déclaré (null ≠ zéro)', async () => {
+    const db = getDb();
+    await db.insert(missions).values({
+      id: 'm9', projectId: 'p1', title: 'sans plafond', objective: 'o', status: 'draft',
+      budgetTokens: 0, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+    });
+    const h = await computeProjectHealth(db, 'p1');
+    expect(h.budgetUsedPct).toBeNull();
+  });
+
+  it('budgetUsedPct est un vrai 0 quand un plafond existe mais rien n’a été dépensé', async () => {
+    const db = getDb();
+    await db.insert(missions).values({
+      id: 'm10', projectId: 'p1', title: 'plafond non entamé', objective: 'o', status: 'draft',
+      budgetTokens: 5000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
+    });
+    expect((await computeProjectHealth(db, 'p1')).budgetUsedPct).toBe(0);
+  });
+
+  it('une mission sans plafond ne gonfle pas le % du projet (exclue des deux sommes)', async () => {
+    const db = getDb();
+    await db.insert(missions).values([
+      { id: 'm11', projectId: 'p1', title: 'plafonnée', objective: 'o', status: 'draft', budgetTokens: 1000, spentTokens: 250, createdAt: new Date(), updatedAt: new Date() },
+      { id: 'm12', projectId: 'p1', title: 'sans plafond', objective: 'o', status: 'draft', budgetTokens: 0, spentTokens: 5000, createdAt: new Date(), updatedAt: new Date() },
+    ]);
+    // 250/1000 = 25 % : la dépense de la mission sans plafond est ignorée, pas ajoutée.
+    expect((await computeProjectHealth(db, 'p1')).budgetUsedPct).toBe(25);
+  });
+
+  // Les trois cas ci-dessous épinglent la règle « prochaine échéance » avec `now`
+  // injecté : c'est la seule logique de health.ts qui dépend du temps, donc la
+  // seule qui peut dériver en silence lors d'un refactor.
+  const mission = (id: string, deadline: Date | null) => ({
+    id, projectId: 'p1', title: id, objective: 'o', status: 'draft' as const,
+    budgetTokens: 0, spentTokens: 0, ...(deadline ? { deadline } : {}),
+    createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-01-01'),
+  });
+
+  it('une échéance déjà passée n’est plus « prochaine »', async () => {
+    const db = getDb();
+    const now = new Date('2026-06-15T00:00:00Z');
+    await db.insert(missions).values(mission('m13', new Date('2026-06-01T00:00:00Z')));
+    expect((await computeProjectHealth(db, 'p1', now)).nextDeadline).toBeNull();
+  });
+
+  it('parmi plusieurs échéances, garde la plus proche à venir et ignore les passées', async () => {
+    const db = getDb();
+    const now = new Date('2026-06-15T00:00:00Z');
+    const soon = new Date('2026-07-01T00:00:00Z');
+    await db.insert(missions).values([
+      mission('m14', new Date('2026-09-01T00:00:00Z')),
+      mission('m15', new Date('2026-06-01T00:00:00Z')),
+      mission('m16', soon),
+      mission('m17', null),
+    ]);
+    expect((await computeProjectHealth(db, 'p1', now)).nextDeadline?.getTime()).toBe(soon.getTime());
+  });
+
+  it('une échéance tombant exactement à `now` compte encore comme à venir', async () => {
+    const db = getDb();
+    const now = new Date('2026-06-15T00:00:00Z');
+    await db.insert(missions).values(mission('m18', now));
+    expect((await computeProjectHealth(db, 'p1', now)).nextDeadline?.getTime()).toBe(now.getTime());
   });
 });
