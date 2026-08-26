@@ -48,6 +48,15 @@ function mothersIn(dir: string): Map<string, string> {
   return map;
 }
 
+/** First plausible text line of a doc (≥ 3 letters once control chars are stripped), ≤ 80 chars. */
+function firstTextLine(body: string): string | null {
+  for (const line of body.split('\n')) {
+    const clean = line.split('').filter((c) => c >= ' ').join('').trim();
+    if ((clean.match(/\p{L}/gu) ?? []).length >= 3) return clean.slice(0, 80);
+  }
+  return null;
+}
+
 /** Title of child `order` as listed in the mother manifest of `partOf`, when both exist. */
 function manifestTitle(dir: string, partOf: string, order: number): string | null {
   const raw = mothersIn(dir).get(nfc(partOf));
@@ -128,6 +137,8 @@ export function sasDocToInput(path: string): DistillInput {
     const inherited = manifestTitle(dirname(path), partOf, order);
     title = `${partOf} — ${inherited ?? `document ${order}`}`;
   }
+  // Flat captures (no H1, no matière marker): the first text line beats the quai filename.
+  title ??= firstTextLine(sasBody(rawMarkdown));
   title ??= basename(path).replace(/\.md$/, '');
   const stem = kebab(title) || `doc-${hash.slice(0, 8)}`;
   const id = `resource-${stem}-${hash.slice(0, 8)}`;

@@ -214,3 +214,12 @@ describe('fragments sans valeur → rejected-kept (P1-2)', () => {
     expect(calls).toHaveLength(1);
   });
 });
+
+describe('fallback première ligne (docs à plat, sans H1 ni part_of)', () => {
+  it('prend la première ligne de texte comme titre plutôt que le nom de fichier', () => {
+    const child = writeSasDoc('cand-flat-aaaa9999.md', `Développement & Automatisation pour la Gestion\nd'Actifs chez BDF-Gestion\n${'x'.repeat(300)}`);
+    const input = sasDocToInput(child);
+    expect(input.title).toBe('Développement & Automatisation pour la Gestion');
+    expect(input.id.startsWith('resource-developpement-automatisation-')).toBe(true);
+  });
+});
