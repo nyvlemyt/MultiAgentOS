@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-architecture-des-ordinateurs-chapter-4-1-systemes-embarques-language-assembly-pdf-0b61cd8d
 source_key: 'sha256:0b61cd8daa9f05e9e42c409fae3f1301557913e368c87d0f8d703c3fd61bcf83'
-part_of: S6 - Architecture des ordinateurs
+part_of: resource-s6-architecture-des-ordinateurs-971ace76
 order: 1
 manifest: null
 derived_from: 'sha256:0b61cd8daa9f05e9e42c409fae3f1301557913e368c87d0f8d703c3fd61bcf83'

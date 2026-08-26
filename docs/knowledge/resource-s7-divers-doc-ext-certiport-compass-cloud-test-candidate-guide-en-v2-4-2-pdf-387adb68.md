@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-divers-doc-ext-certiport-compass-cloud-test-candidate-guide-en-v2-4-2-pdf-387adb68
 source_key: 'sha256:387adb6855a098a27fd54894998cfda5a52f6af98a1fbcc1911b7bba4dc6270e'
-part_of: S7 - Divers
+part_of: resource-s7-divers-344e8e59
 order: 1
 manifest: null
 derived_from: 'sha256:387adb6855a098a27fd54894998cfda5a52f6af98a1fbcc1911b7bba4dc6270e'

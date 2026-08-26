@@ -2,7 +2,7 @@
 id: resource-s5-probabilite-et-statistique-devoir-a-la-maison-pdf-79f41f6f
 slug: resource-s5-probabilite-et-statistique-devoir-a-la-maison-pdf-79f41f6f
 source_key: 'sha256:79f41f6fddf1f50ee00af6cefed3712000d3080d38239da35bb033bda6bfd385'
-part_of: S5 - Probabilité et statistique
+part_of: resource-s5-probabilite-et-statistique-491ffea1
 order: 3
 manifest: null
 derived_from: 'sha256:79f41f6fddf1f50ee00af6cefed3712000d3080d38239da35bb033bda6bfd385'

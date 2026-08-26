@@ -2,7 +2,7 @@
 id: resource-s7-api-et-webservices-cours-api-securite-pdf-18b69130
 slug: resource-s7-api-et-webservices-cours-api-securite-pdf-18b69130
 source_key: 'sha256:18b691306d8d9b115d04dc7e0e596e52a58f71174458f93dbe0f57904e80f662'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 9
 manifest: null
 derived_from: 'sha256:18b691306d8d9b115d04dc7e0e596e52a58f71174458f93dbe0f57904e80f662'

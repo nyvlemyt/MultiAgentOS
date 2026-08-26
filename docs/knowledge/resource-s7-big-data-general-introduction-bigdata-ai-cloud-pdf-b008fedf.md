@@ -2,7 +2,7 @@
 id: resource-s7-big-data-general-introduction-bigdata-ai-cloud-pdf-b008fedf
 slug: resource-s7-big-data-general-introduction-bigdata-ai-cloud-pdf-b008fedf
 source_key: 'sha256:b008fedf22a3fec6ab2ad2208058f5614419a286d26e858b664726444977c973'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 5
 manifest: null
 derived_from: 'sha256:b008fedf22a3fec6ab2ad2208058f5614419a286d26e858b664726444977c973'

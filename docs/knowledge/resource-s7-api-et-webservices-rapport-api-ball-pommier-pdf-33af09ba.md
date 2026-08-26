@@ -2,7 +2,7 @@
 id: resource-s7-api-et-webservices-rapport-api-ball-pommier-pdf-33af09ba
 slug: resource-s7-api-et-webservices-rapport-api-ball-pommier-pdf-33af09ba
 source_key: 'sha256:33af09baedb9eb787781d6366e4b426ed5044512222b018e6efd20a413ea31c9'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 10
 manifest: null
 derived_from: 'sha256:33af09baedb9eb787781d6366e4b426ed5044512222b018e6efd20a413ea31c9'

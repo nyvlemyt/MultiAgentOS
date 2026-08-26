@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-chap-0-nombres-complexes-pdf-ff120c57
 slug: resource-s5-theorie-du-signal-chap-0-nombres-complexes-pdf-ff120c57
 source_key: 'sha256:ff120c57ad592f35cbc9fe5fa61050d08970117a7a849e614f65f49dcb5e6858'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 1
 manifest: null
 derived_from: 'sha256:ff120c57ad592f35cbc9fe5fa61050d08970117a7a849e614f65f49dcb5e6858'

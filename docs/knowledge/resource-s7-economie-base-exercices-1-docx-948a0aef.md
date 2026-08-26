@@ -2,7 +2,7 @@
 id: resource-s7-economie-base-exercices-1-docx-948a0aef
 slug: resource-s7-economie-base-exercices-1-docx-948a0aef
 source_key: 'sha256:948a0aef6b75ec17c5af6b757e5654ffa586db3fced1f63dea80c1bc1d86fbb8'
-part_of: S7 - economie
+part_of: resource-s7-economie-186d2142
 order: 2
 manifest: null
 derived_from: 'sha256:948a0aef6b75ec17c5af6b757e5654ffa586db3fced1f63dea80c1bc1d86fbb8'

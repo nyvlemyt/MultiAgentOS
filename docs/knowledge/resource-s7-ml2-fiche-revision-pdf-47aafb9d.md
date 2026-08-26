@@ -2,7 +2,7 @@
 id: resource-s7-ml2-fiche-revision-pdf-47aafb9d
 slug: resource-s7-ml2-fiche-revision-pdf-47aafb9d
 source_key: 'sha256:47aafb9d8a99c56c597136a6b9693878e5297b370b26ccbddd8a1f4ce89312dd'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 19
 manifest: null
 derived_from: 'sha256:47aafb9d8a99c56c597136a6b9693878e5297b370b26ccbddd8a1f4ce89312dd'

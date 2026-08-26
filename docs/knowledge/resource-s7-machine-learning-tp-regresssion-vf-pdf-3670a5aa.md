@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-tp-regresssion-vf-pdf-3670a5aa
 slug: resource-s7-machine-learning-tp-regresssion-vf-pdf-3670a5aa
 source_key: 'sha256:3670a5aa65944ca7acfad0b7257e47a68d6add0d8d1c6da270b46d7ac74f18aa'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 6
 manifest: null
 derived_from: 'sha256:3670a5aa65944ca7acfad0b7257e47a68d6add0d8d1c6da270b46d7ac74f18aa'

@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-datalakes-and-data-integration-unite-denseignement-90-22-24-pdf-caf5541a
 source_key: 'sha256:caf5541a9657ad3cb1de7d571b7b85d9043f42207cb2ebc8d0871d8e31c26784'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 20
 manifest: null
 derived_from: 'sha256:caf5541a9657ad3cb1de7d571b7b85d9043f42207cb2ebc8d0871d8e31c26784'

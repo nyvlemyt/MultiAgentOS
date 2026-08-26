@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-td1-optimisation-pdf-833d163d
 slug: resource-s6-optimisation-et-complexite-td1-optimisation-pdf-833d163d
 source_key: 'sha256:833d163d761863a3fcae3736982ca473263c7d3b408e7e1864fa5a0b9667b865'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 11
 manifest: null
 derived_from: 'sha256:833d163d761863a3fcae3736982ca473263c7d3b408e7e1864fa5a0b9667b865'

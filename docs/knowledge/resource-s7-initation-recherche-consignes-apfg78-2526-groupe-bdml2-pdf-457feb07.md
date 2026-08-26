@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-initation-recherche-consignes-apfg78-2526-groupe-bdml2-pdf-457feb07
 source_key: 'sha256:457feb07b122cd4db70fdf88d52e72b33ea8fca69975fe878677d0a14c440496'
-part_of: S7 - initation recherche
+part_of: resource-s7-initation-recherche-73bf3bd7
 order: 1
 manifest: null
 derived_from: 'sha256:457feb07b122cd4db70fdf88d52e72b33ea8fca69975fe878677d0a14c440496'

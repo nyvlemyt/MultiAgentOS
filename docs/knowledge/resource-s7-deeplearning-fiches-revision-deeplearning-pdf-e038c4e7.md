@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-fiches-revision-deeplearning-pdf-e038c4e7
 slug: resource-s7-deeplearning-fiches-revision-deeplearning-pdf-e038c4e7
 source_key: 'sha256:e038c4e764ea07fdd7721aaa5aa2c2ecdf609a616f5e084fd440e4e285ea1b8b'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 6
 manifest: null
 derived_from: 'sha256:e038c4e764ea07fdd7721aaa5aa2c2ecdf609a616f5e084fd440e4e285ea1b8b'

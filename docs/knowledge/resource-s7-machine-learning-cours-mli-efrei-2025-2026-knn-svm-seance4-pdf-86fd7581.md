@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-machine-learning-cours-mli-efrei-2025-2026-knn-svm-seance4-pdf-86fd7581
 source_key: 'sha256:86fd758179f185110f99773a05788ccc0c73a57335ddd5686d3508b85f31e1c0'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 10
 manifest: null
 derived_from: 'sha256:86fd758179f185110f99773a05788ccc0c73a57335ddd5686d3508b85f31e1c0'

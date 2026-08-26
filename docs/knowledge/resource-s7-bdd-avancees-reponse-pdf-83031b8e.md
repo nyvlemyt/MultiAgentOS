@@ -2,7 +2,7 @@
 id: resource-s7-bdd-avancees-reponse-pdf-83031b8e
 slug: resource-s7-bdd-avancees-reponse-pdf-83031b8e
 source_key: 'sha256:83031b8ec4aa24c7741b84867c6d50fa5570f73bdf080025cb700f9b9b105eb7'
-part_of: S7 - BDD Avancées
+part_of: resource-s7-bdd-avancees-03c845ab
 order: 10
 manifest: null
 derived_from: 'sha256:83031b8ec4aa24c7741b84867c6d50fa5570f73bdf080025cb700f9b9b105eb7'

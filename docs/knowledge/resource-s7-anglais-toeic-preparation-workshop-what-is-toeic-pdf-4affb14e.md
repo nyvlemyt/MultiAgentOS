@@ -2,7 +2,7 @@
 id: resource-s7-anglais-toeic-preparation-workshop-what-is-toeic-pdf-4affb14e
 slug: resource-s7-anglais-toeic-preparation-workshop-what-is-toeic-pdf-4affb14e
 source_key: 'sha256:4affb14e13e6386913bb82fdd8e27b591a30f2cad2f79ef503b041ac19d43ac8'
-part_of: S7 - anglais
+part_of: resource-s7-anglais-b9c1914b
 order: 3
 manifest: null
 derived_from: 'sha256:4affb14e13e6386913bb82fdd8e27b591a30f2cad2f79ef503b041ac19d43ac8'

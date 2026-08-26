@@ -2,7 +2,7 @@
 id: resource-s7-nosql-lab1-mongodb-pdf-2f219995
 slug: resource-s7-nosql-lab1-mongodb-pdf-2f219995
 source_key: 'sha256:2f219995c8dbfda4e7a271b465459a69eb2f4ea7232823288969c5a8ac3091bb'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 5
 manifest: null
 derived_from: 'sha256:2f219995c8dbfda4e7a271b465459a69eb2f4ea7232823288969c5a8ac3091bb'

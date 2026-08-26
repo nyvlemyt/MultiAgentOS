@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-l3-2025-gestion-fi-td-n-1-zkn-pdf-c0e4284d
 source_key: 'sha256:c0e4284da0332451e57d5dddacfc2bf0673cf5c16fa919f41bca6b77e653aa21'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 4
 manifest: null
 derived_from: 'sha256:c0e4284da0332451e57d5dddacfc2bf0673cf5c16fa919f41bca6b77e653aa21'

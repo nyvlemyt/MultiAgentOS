@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-mathematics-for-data-science-gxbd54-exercices-td-tp-students-2-pdf-357d5e12
 source_key: 'sha256:357d5e12be9ab851f0c6656fb7f1f1e2e8bb39b78289818062378e0eccf85b79'
-part_of: S7 - Mathematics for Data Science
+part_of: resource-s7-mathematics-for-data-science-1bb2da35
 order: 1
 manifest: null
 derived_from: 'sha256:357d5e12be9ab851f0c6656fb7f1f1e2e8bb39b78289818062378e0eccf85b79'

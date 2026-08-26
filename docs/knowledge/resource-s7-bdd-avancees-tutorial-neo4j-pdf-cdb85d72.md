@@ -2,7 +2,7 @@
 id: resource-s7-bdd-avancees-tutorial-neo4j-pdf-cdb85d72
 slug: resource-s7-bdd-avancees-tutorial-neo4j-pdf-cdb85d72
 source_key: 'sha256:cdb85d727cf6147cd84747322f8a8288ac58446c41ddc9ef14c255db9fbe3afd'
-part_of: S7 - BDD Avancées
+part_of: resource-s7-bdd-avancees-03c845ab
 order: 9
 manifest: null
 derived_from: 'sha256:cdb85d727cf6147cd84747322f8a8288ac58446c41ddc9ef14c255db9fbe3afd'

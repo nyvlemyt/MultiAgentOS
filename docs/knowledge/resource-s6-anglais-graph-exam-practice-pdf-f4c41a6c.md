@@ -2,7 +2,7 @@
 id: resource-s6-anglais-graph-exam-practice-pdf-f4c41a6c
 slug: resource-s6-anglais-graph-exam-practice-pdf-f4c41a6c
 source_key: 'sha256:f4c41a6c5cf8c2d9f65de16e6756a349dbd8bfcb75dbe356c8183ddf5e13d368'
-part_of: S6 - Anglais
+part_of: resource-s6-anglais-18c7add0
 order: 3
 manifest: null
 derived_from: 'sha256:f4c41a6c5cf8c2d9f65de16e6756a349dbd8bfcb75dbe356c8183ddf5e13d368'

@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-api-et-webservices-tp-5-b-utiliser-node-js-pour-appeler-une-api-et-visualiser-le-resultat-sur-une-page-web-pdf-b700f3db
 source_key: 'sha256:b700f3db0519565212146f77c9574427e4c8487965e35faaa780c02f43e110dc'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 8
 manifest: null
 derived_from: 'sha256:b700f3db0519565212146f77c9574427e4c8487965e35faaa780c02f43e110dc'

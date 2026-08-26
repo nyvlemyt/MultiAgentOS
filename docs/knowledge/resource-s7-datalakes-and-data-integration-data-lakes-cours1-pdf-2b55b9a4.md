@@ -2,7 +2,7 @@
 id: resource-s7-datalakes-and-data-integration-data-lakes-cours1-pdf-2b55b9a4
 slug: resource-s7-datalakes-and-data-integration-data-lakes-cours1-pdf-2b55b9a4
 source_key: 'sha256:2b55b9a42cd06d7f786d3743a9380b4d7a1a1b603c78f3f14014099580c25502'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 2
 manifest: null
 derived_from: 'sha256:2b55b9a42cd06d7f786d3743a9380b4d7a1a1b603c78f3f14014099580c25502'

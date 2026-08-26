@@ -2,7 +2,7 @@
 id: resource-s6-culture-economique-financiere-rappel-docx-4a1d5f05
 slug: resource-s6-culture-economique-financiere-rappel-docx-4a1d5f05
 source_key: 'sha256:4a1d5f05682b7c30d93a9863d86ebae6195b68465e6aae468a754a75d5abc145'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 9
 manifest: null
 derived_from: 'sha256:4a1d5f05682b7c30d93a9863d86ebae6195b68465e6aae468a754a75d5abc145'

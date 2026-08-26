@@ -2,7 +2,7 @@
 id: resource-s6-l-art-de-disserter-exercice-1-seance-1-2-docx-cd0b6ee4
 slug: resource-s6-l-art-de-disserter-exercice-1-seance-1-2-docx-cd0b6ee4
 source_key: 'sha256:cd0b6ee40fe3fedf75245d8deeded760706a0740240f9026040e24f223ee7378'
-part_of: S6 - L'art de disserter
+part_of: resource-s6-l-art-de-disserter-555e5aac
 order: 2
 manifest: null
 derived_from: 'sha256:cd0b6ee40fe3fedf75245d8deeded760706a0740240f9026040e24f223ee7378'

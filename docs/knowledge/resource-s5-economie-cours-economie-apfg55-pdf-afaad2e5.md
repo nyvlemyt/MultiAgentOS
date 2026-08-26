@@ -2,7 +2,7 @@
 id: resource-s5-economie-cours-economie-apfg55-pdf-afaad2e5
 slug: resource-s5-economie-cours-economie-apfg55-pdf-afaad2e5
 source_key: 'sha256:afaad2e541f753650491d9c3b45e3c7c031b50d33dc1b7dd1e5a8d68d6eed6dc'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 10
 manifest: null
 derived_from: 'sha256:afaad2e541f753650491d9c3b45e3c7c031b50d33dc1b7dd1e5a8d68d6eed6dc'

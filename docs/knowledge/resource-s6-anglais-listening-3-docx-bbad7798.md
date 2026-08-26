@@ -2,7 +2,7 @@
 id: resource-s6-anglais-listening-3-docx-bbad7798
 slug: resource-s6-anglais-listening-3-docx-bbad7798
 source_key: 'sha256:bbad779843e45df8ac9f7fc8ed0677dcfe7efc231389f2bc3b5974b298ac3006'
-part_of: S6 - Anglais
+part_of: resource-s6-anglais-18c7add0
 order: 5
 manifest: null
 derived_from: 'sha256:bbad779843e45df8ac9f7fc8ed0677dcfe7efc231389f2bc3b5974b298ac3006'

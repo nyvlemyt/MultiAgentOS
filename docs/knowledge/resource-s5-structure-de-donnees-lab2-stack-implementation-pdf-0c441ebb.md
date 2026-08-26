@@ -2,7 +2,7 @@
 id: resource-s5-structure-de-donnees-lab2-stack-implementation-pdf-0c441ebb
 slug: resource-s5-structure-de-donnees-lab2-stack-implementation-pdf-0c441ebb
 source_key: 'sha256:0c441ebb88b333cabc47a07777a41114a2d224cf0bf0d1b762a32aa167fc0532'
-part_of: S5 - Structure de données
+part_of: resource-s5-structure-de-donnees-333ec2f4
 order: 8
 manifest: null
 derived_from: 'sha256:0c441ebb88b333cabc47a07777a41114a2d224cf0bf0d1b762a32aa167fc0532'

@@ -2,7 +2,7 @@
 id: resource-s6-architecture-des-ordinateurs-tp3-docx-db2cd4de
 slug: resource-s6-architecture-des-ordinateurs-tp3-docx-db2cd4de
 source_key: 'sha256:db2cd4de682854085e8a5115a45b26f2d6946498093ed75484b7f1e3c1bcd5e4'
-part_of: S6 - Architecture des ordinateurs
+part_of: resource-s6-architecture-des-ordinateurs-971ace76
 order: 5
 manifest: null
 derived_from: 'sha256:db2cd4de682854085e8a5115a45b26f2d6946498093ed75484b7f1e3c1bcd5e4'

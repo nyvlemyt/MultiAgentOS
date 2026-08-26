@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-ch3-regularisation-for-deep-learning-pdf-28df398d
 slug: resource-s7-deeplearning-ch3-regularisation-for-deep-learning-pdf-28df398d
 source_key: 'sha256:28df398d2199f28a40b75d00009d9ff6049301808727d5db0a522379fb8f783f'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 2
 manifest: null
 derived_from: 'sha256:28df398d2199f28a40b75d00009d9ff6049301808727d5db0a522379fb8f783f'

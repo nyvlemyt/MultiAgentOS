@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-gestion-de-projet-2-exercice-l-essentiel-pour-demarrer-un-projet-docx-a09d2889
 source_key: 'sha256:a09d2889e4d81fcf14e5b48a099abb2fc58a18f83c7aecb9fd8c01fda8b15829'
-part_of: S6 - Gestion de projet
+part_of: resource-s6-gestion-de-projet-20404db8
 order: 1
 manifest: null
 derived_from: 'sha256:a09d2889e4d81fcf14e5b48a099abb2fc58a18f83c7aecb9fd8c01fda8b15829'

@@ -2,7 +2,7 @@
 id: resource-s5-programmation-en-java-tp-3-java-efrei-pdf-9bc3310f
 slug: resource-s5-programmation-en-java-tp-3-java-efrei-pdf-9bc3310f
 source_key: 'sha256:9bc3310f4bc44247b2172fa8d3fb073e3ea981867b6052e42049a4f7ddcb8a50'
-part_of: S5 - Programmation en Java
+part_of: resource-s5-programmation-en-java-6afe3d81
 order: 4
 manifest: null
 derived_from: 'sha256:9bc3310f4bc44247b2172fa8d3fb073e3ea981867b6052e42049a4f7ddcb8a50'

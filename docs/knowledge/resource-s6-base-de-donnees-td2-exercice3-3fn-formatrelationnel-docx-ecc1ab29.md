@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-td2-exercice3-3fn-formatrelationnel-docx-ecc1ab29
 slug: resource-s6-base-de-donnees-td2-exercice3-3fn-formatrelationnel-docx-ecc1ab29
 source_key: 'sha256:ecc1ab2968411405b75831e6c792db6a8c25f0b3991f68f5a693694c011aabf7'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 6
 manifest: null
 derived_from: 'sha256:ecc1ab2968411405b75831e6c792db6a8c25f0b3991f68f5a693694c011aabf7'

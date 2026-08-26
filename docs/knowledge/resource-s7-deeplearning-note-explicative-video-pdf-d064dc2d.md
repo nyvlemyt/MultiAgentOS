@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-note-explicative-video-pdf-d064dc2d
 slug: resource-s7-deeplearning-note-explicative-video-pdf-d064dc2d
 source_key: 'sha256:d064dc2d501692a0b6f0259b41ebd65842d3e8b0e65dbeb40d62d129fe222284'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 9
 manifest: null
 derived_from: 'sha256:d064dc2d501692a0b6f0259b41ebd65842d3e8b0e65dbeb40d62d129fe222284'

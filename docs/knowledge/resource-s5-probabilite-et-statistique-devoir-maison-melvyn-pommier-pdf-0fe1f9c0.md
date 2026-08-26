@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-probabilite-et-statistique-devoir-maison-melvyn-pommier-pdf-0fe1f9c0
 source_key: 'sha256:0fe1f9c0cac48d738a262ec9aeef7274888c08b98925c39a91fba6d3ca6496c8'
-part_of: S5 - Probabilité et statistique
+part_of: resource-s5-probabilite-et-statistique-491ffea1
 order: 4
 manifest: null
 derived_from: 'sha256:0fe1f9c0cac48d738a262ec9aeef7274888c08b98925c39a91fba6d3ca6496c8'

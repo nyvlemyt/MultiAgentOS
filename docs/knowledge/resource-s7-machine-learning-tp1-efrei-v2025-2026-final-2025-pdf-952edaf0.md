@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-tp1-efrei-v2025-2026-final-2025-pdf-952edaf0
 slug: resource-s7-machine-learning-tp1-efrei-v2025-2026-final-2025-pdf-952edaf0
 source_key: 'sha256:952edaf0a7b5551c9219b397db2205ce337d67896085e909080d29ce1ab5d066'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 7
 manifest: null
 derived_from: 'sha256:952edaf0a7b5551c9219b397db2205ce337d67896085e909080d29ce1ab5d066'

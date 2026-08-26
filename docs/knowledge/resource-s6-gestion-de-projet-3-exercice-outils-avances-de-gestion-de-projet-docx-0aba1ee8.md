@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-gestion-de-projet-3-exercice-outils-avances-de-gestion-de-projet-docx-0aba1ee8
 source_key: 'sha256:0aba1ee80e42f3e7cc13bcf928d624f07ce9475dd244d9743bfd67c7030b3e40'
-part_of: S6 - Gestion de projet
+part_of: resource-s6-gestion-de-projet-20404db8
 order: 2
 manifest: null
 derived_from: 'sha256:0aba1ee80e42f3e7cc13bcf928d624f07ce9475dd244d9743bfd67c7030b3e40'

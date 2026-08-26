@@ -2,7 +2,7 @@
 id: resource-s7-economie-tp-relation-couts-marge-pdf-cd672538
 slug: resource-s7-economie-tp-relation-couts-marge-pdf-cd672538
 source_key: 'sha256:cd67253826ed797146b7b37739e681fb08799abdd9017244f8e4e20d5810f74e'
-part_of: S7 - economie
+part_of: resource-s7-economie-186d2142
 order: 4
 manifest: null
 derived_from: 'sha256:cd67253826ed797146b7b37739e681fb08799abdd9017244f8e4e20d5810f74e'

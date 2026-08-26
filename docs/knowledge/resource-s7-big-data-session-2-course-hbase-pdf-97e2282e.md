@@ -2,7 +2,7 @@
 id: resource-s7-big-data-session-2-course-hbase-pdf-97e2282e
 slug: resource-s7-big-data-session-2-course-hbase-pdf-97e2282e
 source_key: 'sha256:97e2282e5fa7a16a7bde551864e6642c260428cfa51162a5a65b9a39de774b1c'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 10
 manifest: null
 derived_from: 'sha256:97e2282e5fa7a16a7bde551864e6642c260428cfa51162a5a65b9a39de774b1c'

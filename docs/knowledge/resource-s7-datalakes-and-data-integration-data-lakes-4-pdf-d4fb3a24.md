@@ -2,7 +2,7 @@
 id: resource-s7-datalakes-and-data-integration-data-lakes-4-pdf-d4fb3a24
 slug: resource-s7-datalakes-and-data-integration-data-lakes-4-pdf-d4fb3a24
 source_key: 'sha256:d4fb3a24c26fba9e3cf1c39415947808eb39011f3fa41b720716d0e5b98f0acc'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 5
 manifest: null
 derived_from: 'sha256:d4fb3a24c26fba9e3cf1c39415947808eb39011f3fa41b720716d0e5b98f0acc'

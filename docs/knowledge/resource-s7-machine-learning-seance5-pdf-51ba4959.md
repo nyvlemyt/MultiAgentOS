@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-seance5-pdf-51ba4959
 slug: resource-s7-machine-learning-seance5-pdf-51ba4959
 source_key: 'sha256:51ba49597e1014bbb6c20716f57dc5303b3c6a90021a366d769ea8b010d8aeda'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 22
 manifest: null
 derived_from: 'sha256:51ba49597e1014bbb6c20716f57dc5303b3c6a90021a366d769ea8b010d8aeda'

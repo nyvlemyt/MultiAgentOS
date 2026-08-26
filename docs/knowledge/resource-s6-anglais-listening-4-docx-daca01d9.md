@@ -2,7 +2,7 @@
 id: resource-s6-anglais-listening-4-docx-daca01d9
 slug: resource-s6-anglais-listening-4-docx-daca01d9
 source_key: 'sha256:daca01d99723134f4b8a35d07fe2d9a0a78ece96863da346158d2d284d75f0cb'
-part_of: S6 - Anglais
+part_of: resource-s6-anglais-18c7add0
 order: 6
 manifest: null
 derived_from: 'sha256:daca01d99723134f4b8a35d07fe2d9a0a78ece96863da346158d2d284d75f0cb'

@@ -2,7 +2,7 @@
 id: resource-s7-big-data-session-1-intro-big-data-hdfs-yarn-pdf-9ecd788d
 slug: resource-s7-big-data-session-1-intro-big-data-hdfs-yarn-pdf-9ecd788d
 source_key: 'sha256:9ecd788d058fa0ee49442f21b96d01150e2c943cb950718cc1ea1a55376240bf'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 9
 manifest: null
 derived_from: 'sha256:9ecd788d058fa0ee49442f21b96d01150e2c943cb950718cc1ea1a55376240bf'

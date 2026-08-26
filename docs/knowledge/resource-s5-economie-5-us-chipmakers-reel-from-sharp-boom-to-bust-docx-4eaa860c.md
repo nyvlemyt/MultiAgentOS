@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-economie-5-us-chipmakers-reel-from-sharp-boom-to-bust-docx-4eaa860c
 source_key: 'sha256:4eaa860c85ff18e3e93b74cccd1dba274b96fc20e6df1bbc1904825f5cd3a2a8'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 5
 manifest: null
 derived_from: 'sha256:4eaa860c85ff18e3e93b74cccd1dba274b96fc20e6df1bbc1904825f5cd3a2a8'

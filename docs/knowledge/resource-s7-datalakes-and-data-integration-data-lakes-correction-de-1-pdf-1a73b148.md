@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-datalakes-and-data-integration-data-lakes-correction-de-1-pdf-1a73b148
 source_key: 'sha256:1a73b148fb207bdea8c4b0e4006fd140dd7a28e6a578af4dc1b2c3fe0c63ad1c'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 8
 manifest: null
 derived_from: 'sha256:1a73b148fb207bdea8c4b0e4006fd140dd7a28e6a578af4dc1b2c3fe0c63ad1c'

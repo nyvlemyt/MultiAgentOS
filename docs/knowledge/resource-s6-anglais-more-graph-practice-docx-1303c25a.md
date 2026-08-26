@@ -2,7 +2,7 @@
 id: resource-s6-anglais-more-graph-practice-docx-1303c25a
 slug: resource-s6-anglais-more-graph-practice-docx-1303c25a
 source_key: 'sha256:1303c25aa78e58336fbc977d78a870dd3e0900f0b81e012365fad79011818db6'
-part_of: S6 - Anglais
+part_of: resource-s6-anglais-18c7add0
 order: 7
 manifest: null
 derived_from: 'sha256:1303c25aa78e58336fbc977d78a870dd3e0900f0b81e012365fad79011818db6'

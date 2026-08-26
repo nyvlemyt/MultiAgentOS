@@ -2,7 +2,7 @@
 id: resource-s7-devops-tp-part-03-ansible-devops-pdf-a975b472
 slug: resource-s7-devops-tp-part-03-ansible-devops-pdf-a975b472
 source_key: 'sha256:a975b47222f255c727e55c773bcf6147db3a00525ccc2aaa4899720de6311c9a'
-part_of: S7 - DevOps
+part_of: resource-s7-devops-17c280d9
 order: 9
 manifest: null
 derived_from: 'sha256:a975b47222f255c727e55c773bcf6147db3a00525ccc2aaa4899720de6311c9a'

@@ -2,7 +2,7 @@
 id: resource-s5-economie-cours-apfg55-concurrence-pdf-569a12fa
 slug: resource-s5-economie-cours-apfg55-concurrence-pdf-569a12fa
 source_key: 'sha256:569a12fa7914334e1f05a3a6d3568b76da64498e629019306b37a2205d06eece'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 9
 manifest: null
 derived_from: 'sha256:569a12fa7914334e1f05a3a6d3568b76da64498e629019306b37a2205d06eece'

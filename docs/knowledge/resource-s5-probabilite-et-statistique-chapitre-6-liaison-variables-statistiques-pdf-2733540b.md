@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-probabilite-et-statistique-chapitre-6-liaison-variables-statistiques-pdf-2733540b
 source_key: 'sha256:2733540ba44b34d8c637615582430d52ddb1a682544420fdcdc5c8ec49ee4ee7'
-part_of: S5 - Probabilité et statistique
+part_of: resource-s5-probabilite-et-statistique-491ffea1
 order: 2
 manifest: null
 derived_from: 'sha256:2733540ba44b34d8c637615582430d52ddb1a682544420fdcdc5c8ec49ee4ee7'

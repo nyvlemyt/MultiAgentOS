@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-projet-pdf-0bde2458
 slug: resource-s6-optimisation-et-complexite-projet-pdf-0bde2458
 source_key: 'sha256:0bde24585e02c20d5f493eac4ad3ab8d880692074168765a085a97684ac1dcd0'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 8
 manifest: null
 derived_from: 'sha256:0bde24585e02c20d5f493eac4ad3ab8d880692074168765a085a97684ac1dcd0'

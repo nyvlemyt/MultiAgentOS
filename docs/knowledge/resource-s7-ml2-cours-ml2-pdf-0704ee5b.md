@@ -2,7 +2,7 @@
 id: resource-s7-ml2-cours-ml2-pdf-0704ee5b
 slug: resource-s7-ml2-cours-ml2-pdf-0704ee5b
 source_key: 'sha256:0704ee5bc1f5e4c02ca6c66be725fb5a3bfcb6798b13223da5c316f0263c8a9a'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 15
 manifest: null
 derived_from: 'sha256:0704ee5bc1f5e4c02ca6c66be725fb5a3bfcb6798b13223da5c316f0263c8a9a'

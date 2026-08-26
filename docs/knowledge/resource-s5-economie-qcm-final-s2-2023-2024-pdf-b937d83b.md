@@ -2,7 +2,7 @@
 id: resource-s5-economie-qcm-final-s2-2023-2024-pdf-b937d83b
 slug: resource-s5-economie-qcm-final-s2-2023-2024-pdf-b937d83b
 source_key: 'sha256:b937d83b7bb040309e94a22ad2fc3331c5b7b710463f58df95deecc2ff2e73a7'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 13
 manifest: null
 derived_from: 'sha256:b937d83b7bb040309e94a22ad2fc3331c5b7b710463f58df95deecc2ff2e73a7'

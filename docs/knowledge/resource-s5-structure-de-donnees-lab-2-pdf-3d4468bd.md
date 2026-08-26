@@ -2,7 +2,7 @@
 id: resource-s5-structure-de-donnees-lab-2-pdf-3d4468bd
 slug: resource-s5-structure-de-donnees-lab-2-pdf-3d4468bd
 source_key: 'sha256:3d4468bd7df7b066563bfae770be417927dd7d37c8b91322afd2dfba614f6228'
-part_of: S5 - Structure de données
+part_of: resource-s5-structure-de-donnees-333ec2f4
 order: 2
 manifest: null
 derived_from: 'sha256:3d4468bd7df7b066563bfae770be417927dd7d37c8b91322afd2dfba614f6228'

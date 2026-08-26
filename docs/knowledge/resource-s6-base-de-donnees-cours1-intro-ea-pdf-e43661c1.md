@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-cours1-intro-ea-pdf-e43661c1
 slug: resource-s6-base-de-donnees-cours1-intro-ea-pdf-e43661c1
 source_key: 'sha256:e43661c11f2114e3a2c35e9cb1dd3239e4f58009f111b69f51069fe898b2c7a4'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 1
 manifest: null
 derived_from: 'sha256:e43661c11f2114e3a2c35e9cb1dd3239e4f58009f111b69f51069fe898b2c7a4'

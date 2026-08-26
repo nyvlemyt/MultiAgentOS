@@ -2,7 +2,7 @@
 id: resource-s7-bdd-avancees-cm3-nosql-pdf-93537dce
 slug: resource-s7-bdd-avancees-cm3-nosql-pdf-93537dce
 source_key: 'sha256:93537dce4b3197c4c46d77303bb18a7715ca509eae2efb05d0d7e309e076418c'
-part_of: S7 - BDD Avancées
+part_of: resource-s7-bdd-avancees-03c845ab
 order: 6
 manifest: null
 derived_from: 'sha256:93537dce4b3197c4c46d77303bb18a7715ca509eae2efb05d0d7e309e076418c'

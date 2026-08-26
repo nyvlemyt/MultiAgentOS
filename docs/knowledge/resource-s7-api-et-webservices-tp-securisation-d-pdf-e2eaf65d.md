@@ -2,7 +2,7 @@
 id: resource-s7-api-et-webservices-tp-securisation-d-pdf-e2eaf65d
 slug: resource-s7-api-et-webservices-tp-securisation-d-pdf-e2eaf65d
 source_key: 'sha256:e2eaf65d814504c23eb233b0e8aa7ec464d6e5c25932fbb0c4106e8b60d0579a'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 6
 manifest: null
 derived_from: 'sha256:e2eaf65d814504c23eb233b0e8aa7ec464d6e5c25932fbb0c4106e8b60d0579a'

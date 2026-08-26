@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-ch4-rnn-and-attention-pdf-ae34b4da
 slug: resource-s7-deeplearning-ch4-rnn-and-attention-pdf-ae34b4da
 source_key: 'sha256:ae34b4daed381ce9cd10257435fd3ed06b33c8b76781eea3660b74c5370bc452'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 3
 manifest: null
 derived_from: 'sha256:ae34b4daed381ce9cd10257435fd3ed06b33c8b76781eea3660b74c5370bc452'

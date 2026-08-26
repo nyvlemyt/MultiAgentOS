@@ -2,7 +2,7 @@
 id: resource-s7-convex-optimisation-cours-complet-convex-optimization-pdf-aa37251f
 slug: resource-s7-convex-optimisation-cours-complet-convex-optimization-pdf-aa37251f
 source_key: 'sha256:aa37251f0e33628578053bcac46464687b231006f2940760def1fc53b4572e56'
-part_of: S7 - convex optimisation
+part_of: resource-s7-convex-optimisation-b4dcec0f
 order: 9
 manifest: null
 derived_from: 'sha256:aa37251f0e33628578053bcac46464687b231006f2940760def1fc53b4572e56'

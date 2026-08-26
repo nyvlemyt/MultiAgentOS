@@ -2,7 +2,7 @@
 id: resource-s7-anglais-toeic-part-i-pictures-pdf-0dbc8ea8
 slug: resource-s7-anglais-toeic-part-i-pictures-pdf-0dbc8ea8
 source_key: 'sha256:0dbc8ea850819a0be8d4b201e2e2a9beb8b8c806a6438bf9d38962beb6616ab7'
-part_of: S7 - anglais
+part_of: resource-s7-anglais-b9c1914b
 order: 2
 manifest: null
 derived_from: 'sha256:0dbc8ea850819a0be8d4b201e2e2a9beb8b8c806a6438bf9d38962beb6616ab7'

@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-presentation-universe-pdf-10a15be8
 slug: resource-s5-theorie-du-signal-presentation-universe-pdf-10a15be8
 source_key: 'sha256:10a15be818771bf3d963c16d23a03b00592b6336692bebaf8d5bd0da133001dd'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 6
 manifest: null
 derived_from: 'sha256:10a15be818771bf3d963c16d23a03b00592b6336692bebaf8d5bd0da133001dd'

@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-chap-4-la-transformation-de-fourier-pdf-6aab02dd
 slug: resource-s5-theorie-du-signal-chap-4-la-transformation-de-fourier-pdf-6aab02dd
 source_key: 'sha256:6aab02dd04d6379c6c5c3609dd29394e297149810821756e009b26306db18616'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 4
 manifest: null
 derived_from: 'sha256:6aab02dd04d6379c6c5c3609dd29394e297149810821756e009b26306db18616'

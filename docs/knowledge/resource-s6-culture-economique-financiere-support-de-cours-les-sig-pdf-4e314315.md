@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-support-de-cours-les-sig-pdf-4e314315
 source_key: 'sha256:4e3143153af43370ccb32250e39352d06380726c6a46b73f6b9587494d3a7d76'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 7
 manifest: null
 derived_from: 'sha256:4e3143153af43370ccb32250e39352d06380726c6a46b73f6b9587494d3a7d76'

@@ -2,7 +2,7 @@
 id: resource-s7-ml2-controle-blanc-pdf-380f2c6b
 slug: resource-s7-ml2-controle-blanc-pdf-380f2c6b
 source_key: 'sha256:380f2c6b1d735b1c6656b858306337494d51188c448e548c9e19ae533f3d0af2'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 13
 manifest: null
 derived_from: 'sha256:380f2c6b1d735b1c6656b858306337494d51188c448e548c9e19ae533f3d0af2'

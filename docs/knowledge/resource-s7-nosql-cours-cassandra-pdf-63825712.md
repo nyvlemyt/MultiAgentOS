@@ -2,7 +2,7 @@
 id: resource-s7-nosql-cours-cassandra-pdf-63825712
 slug: resource-s7-nosql-cours-cassandra-pdf-63825712
 source_key: 'sha256:63825712916700f9cc8c201d725606d1ed18f7bf6ae253597b0b3035f7502cf3'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 1
 manifest: null
 derived_from: 'sha256:63825712916700f9cc8c201d725606d1ed18f7bf6ae253597b0b3035f7502cf3'

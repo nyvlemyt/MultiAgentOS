@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-python-pour-la-data-science-projet-python-data-science-pdf-16c37068
 source_key: 'sha256:16c37068cfead27efb4e56b341d62521ba1f4bfba70230ae6dea0b3285a00323'
-part_of: S5 - Python pour la Data Science
+part_of: resource-s5-python-pour-la-data-science-f152995e
 order: 2
 manifest: null
 derived_from: 'sha256:16c37068cfead27efb4e56b341d62521ba1f4bfba70230ae6dea0b3285a00323'

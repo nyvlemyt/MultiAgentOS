@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-rapport-pdf-b64c09b2
 slug: resource-s6-optimisation-et-complexite-rapport-pdf-b64c09b2
 source_key: 'sha256:b64c09b25054a142684111a924b787df94274fb7cd81e4d3795a04c9de98fd5b'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 9
 manifest: null
 derived_from: 'sha256:b64c09b25054a142684111a924b787df94274fb7cd81e4d3795a04c9de98fd5b'

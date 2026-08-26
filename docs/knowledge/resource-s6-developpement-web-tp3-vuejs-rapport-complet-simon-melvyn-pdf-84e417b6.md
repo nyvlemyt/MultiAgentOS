@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-developpement-web-tp3-vuejs-rapport-complet-simon-melvyn-pdf-84e417b6
 source_key: 'sha256:84e417b628b70ac1670df76c90aa4b454469a7d1dba63dafc9b599a5ad169fd6'
-part_of: S6 - Développement Web
+part_of: resource-s6-developpement-web-c60d8c4a
 order: 3
 manifest: null
 derived_from: 'sha256:84e417b628b70ac1670df76c90aa4b454469a7d1dba63dafc9b599a5ad169fd6'

@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-intro-to-deep-learning-pdf-3b78b102
 slug: resource-s7-deeplearning-intro-to-deep-learning-pdf-3b78b102
 source_key: 'sha256:3b78b10231b382038b3147d71f3629202df4f6392d4c813ce96127470898eeb1'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 7
 manifest: null
 derived_from: 'sha256:3b78b10231b382038b3147d71f3629202df4f6392d4c813ce96127470898eeb1'

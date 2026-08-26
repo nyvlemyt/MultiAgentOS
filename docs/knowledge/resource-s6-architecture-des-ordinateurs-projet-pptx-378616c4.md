@@ -2,7 +2,7 @@
 id: resource-s6-architecture-des-ordinateurs-projet-pptx-378616c4
 slug: resource-s6-architecture-des-ordinateurs-projet-pptx-378616c4
 source_key: 'sha256:378616c427b1dda14c6cbbe7e0b014227d6d4d328f9df3188e64801dbd58173f'
-part_of: S6 - Architecture des ordinateurs
+part_of: resource-s6-architecture-des-ordinateurs-971ace76
 order: 2
 manifest: null
 derived_from: 'sha256:378616c427b1dda14c6cbbe7e0b014227d6d4d328f9df3188e64801dbd58173f'

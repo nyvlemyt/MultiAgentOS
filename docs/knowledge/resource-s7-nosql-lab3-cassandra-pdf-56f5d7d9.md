@@ -2,7 +2,7 @@
 id: resource-s7-nosql-lab3-cassandra-pdf-56f5d7d9
 slug: resource-s7-nosql-lab3-cassandra-pdf-56f5d7d9
 source_key: 'sha256:56f5d7d976312cb812adb34ad1e5f615821d6c624e7c6974ad7ef2b347ac8134'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 6
 manifest: null
 derived_from: 'sha256:56f5d7d976312cb812adb34ad1e5f615821d6c624e7c6974ad7ef2b347ac8134'

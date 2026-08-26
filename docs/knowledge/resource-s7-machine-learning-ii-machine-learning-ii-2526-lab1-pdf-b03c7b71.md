@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-ii-machine-learning-ii-2526-lab1-pdf-b03c7b71
 slug: resource-s7-machine-learning-ii-machine-learning-ii-2526-lab1-pdf-b03c7b71
 source_key: 'sha256:b03c7b711f12953166bab7407f7dc5bab9041db66b4123d8c678e4351eb06363'
-part_of: S7 - Machine Learning II
+part_of: resource-s7-machine-learning-ii-0632fee9
 order: 3
 manifest: null
 derived_from: 'sha256:b03c7b711f12953166bab7407f7dc5bab9041db66b4123d8c678e4351eb06363'

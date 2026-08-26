@@ -2,7 +2,7 @@
 id: resource-s7-big-data-tp2-hbase-part-1-docx-9b08ea56
 slug: resource-s7-big-data-tp2-hbase-part-1-docx-9b08ea56
 source_key: 'sha256:9b08ea5602e3d8f08ddf93001ceeeb68c69ca6d67019bd64084ad8c6645dd650'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 28
 manifest: null
 derived_from: 'sha256:9b08ea5602e3d8f08ddf93001ceeeb68c69ca6d67019bd64084ad8c6645dd650'

@@ -2,7 +2,7 @@
 id: resource-s5-economie-7-7-l-economie-numerique-2-pdf-fff8eac0
 slug: resource-s5-economie-7-7-l-economie-numerique-2-pdf-fff8eac0
 source_key: 'sha256:fff8eac049d527d96fc00d67c242aed8f8dfb24ac243f4d77b8733b113244d9c'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 8
 manifest: null
 derived_from: 'sha256:fff8eac049d527d96fc00d67c242aed8f8dfb24ac243f4d77b8733b113244d9c'

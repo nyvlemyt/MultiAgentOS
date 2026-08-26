@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-chapitre3-opti-pdf-6296bc71
 slug: resource-s6-optimisation-et-complexite-chapitre3-opti-pdf-6296bc71
 source_key: 'sha256:6296bc710e3d5b4b9b2f0b846d9b4cecbfab50b14e3a92112bbedbde2df67c2e'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 1
 manifest: null
 derived_from: 'sha256:6296bc710e3d5b4b9b2f0b846d9b4cecbfab50b14e3a92112bbedbde2df67c2e'

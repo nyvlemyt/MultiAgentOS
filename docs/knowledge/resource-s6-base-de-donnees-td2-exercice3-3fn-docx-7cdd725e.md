@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-td2-exercice3-3fn-docx-7cdd725e
 slug: resource-s6-base-de-donnees-td2-exercice3-3fn-docx-7cdd725e
 source_key: 'sha256:7cdd725e8ad9931cf09668395ad1d63bf14c2dcbfcf6525716244e1dc325e636'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 5
 manifest: null
 derived_from: 'sha256:7cdd725e8ad9931cf09668395ad1d63bf14c2dcbfcf6525716244e1dc325e636'

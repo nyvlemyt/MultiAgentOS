@@ -2,7 +2,7 @@
 id: resource-s7-bdd-avancees-cm2-plsql-pdf-54fa5f57
 slug: resource-s7-bdd-avancees-cm2-plsql-pdf-54fa5f57
 source_key: 'sha256:54fa5f579054954ca3ce13c764db5b1a379be183599e73ec0cac89718a12a52b'
-part_of: S7 - BDD Avancées
+part_of: resource-s7-bdd-avancees-03c845ab
 order: 5
 manifest: null
 derived_from: 'sha256:54fa5f579054954ca3ce13c764db5b1a379be183599e73ec0cac89718a12a52b'

@@ -2,7 +2,7 @@
 id: resource-s7-big-data-project-movielens-bdml-2025-pdf-e5e373a2
 slug: resource-s7-big-data-project-movielens-bdml-2025-pdf-e5e373a2
 source_key: 'sha256:e5e373a24c7d70a3ab670df88608e9f691bfe9700e54bdabca27d21d063b6d89'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 18
 manifest: null
 derived_from: 'sha256:e5e373a24c7d70a3ab670df88608e9f691bfe9700e54bdabca27d21d063b6d89'

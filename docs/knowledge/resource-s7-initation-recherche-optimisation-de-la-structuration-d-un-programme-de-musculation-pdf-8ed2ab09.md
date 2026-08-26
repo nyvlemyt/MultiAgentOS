@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-initation-recherche-optimisation-de-la-structuration-d-un-programme-de-musculation-pdf-8ed2ab09
 source_key: 'sha256:8ed2ab09606616b903daa233c7e9059a4198d3df710e3b03675e736333f2de03'
-part_of: S7 - initation recherche
+part_of: resource-s7-initation-recherche-73bf3bd7
 order: 2
 manifest: null
 derived_from: 'sha256:8ed2ab09606616b903daa233c7e9059a4198d3df710e3b03675e736333f2de03'

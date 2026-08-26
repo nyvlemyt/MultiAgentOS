@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-maitrise-4-notions-examen-pdf-7d180269
 slug: resource-s7-deeplearning-maitrise-4-notions-examen-pdf-7d180269
 source_key: 'sha256:7d180269c5aaa0091ef28c885d3c299ec49e76b87fba0d9aeda08ccaa0c13946'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 8
 manifest: null
 derived_from: 'sha256:7d180269c5aaa0091ef28c885d3c299ec49e76b87fba0d9aeda08ccaa0c13946'

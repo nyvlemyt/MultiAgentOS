@@ -2,7 +2,7 @@
 id: resource-s7-anglais-part-5-practice-exercises-pdf-88eb5f5d
 slug: resource-s7-anglais-part-5-practice-exercises-pdf-88eb5f5d
 source_key: 'sha256:88eb5f5db1c5b46d966d886af78a705dec1be299b7ee4a5041b9d7ebbaed6f29'
-part_of: S7 - anglais
+part_of: resource-s7-anglais-b9c1914b
 order: 1
 manifest: null
 derived_from: 'sha256:88eb5f5db1c5b46d966d886af78a705dec1be299b7ee4a5041b9d7ebbaed6f29'

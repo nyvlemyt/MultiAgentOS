@@ -2,7 +2,7 @@
 id: resource-s7-ml2-root-machine-learning-ii-2526-lab2-pdf-3a931a92
 slug: resource-s7-ml2-root-machine-learning-ii-2526-lab2-pdf-3a931a92
 source_key: 'sha256:3a931a92b853e556125be45b97511f7f4ff828ea4c78012b9795a7d3d375642b'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 23
 manifest: null
 derived_from: 'sha256:3a931a92b853e556125be45b97511f7f4ff828ea4c78012b9795a7d3d375642b'

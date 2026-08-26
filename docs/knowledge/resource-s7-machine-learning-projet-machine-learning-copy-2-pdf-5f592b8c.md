@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-projet-machine-learning-copy-2-pdf-5f592b8c
 slug: resource-s7-machine-learning-projet-machine-learning-copy-2-pdf-5f592b8c
 source_key: 'sha256:5f592b8cc2aac1ade42f92d6f2138baf19232b26976affbce8dc71bd2e737dd2'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 16
 manifest: null
 derived_from: 'sha256:5f592b8cc2aac1ade42f92d6f2138baf19232b26976affbce8dc71bd2e737dd2'

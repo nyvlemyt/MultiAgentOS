@@ -2,7 +2,7 @@
 id: resource-s7-nosql-information-pdf-d925d8db
 slug: resource-s7-nosql-information-pdf-d925d8db
 source_key: 'sha256:d925d8db7cb1ac29c80aed9f23d0df036aa5db593ee32af240d72b1f5a40204b'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 4
 manifest: null
 derived_from: 'sha256:d925d8db7cb1ac29c80aed9f23d0df036aa5db593ee32af240d72b1f5a40204b'

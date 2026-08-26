@@ -2,7 +2,7 @@
 id: resource-s7-bdd-avancees-td4-bdd-ens-pdf-77d85dc3
 slug: resource-s7-bdd-avancees-td4-bdd-ens-pdf-77d85dc3
 source_key: 'sha256:77d85dc3476c941d2f4f0a3f749bdf080b20ab2fdd6d37863989f1a0d2d2f087'
-part_of: S7 - BDD Avancées
+part_of: resource-s7-bdd-avancees-03c845ab
 order: 7
 manifest: null
 derived_from: 'sha256:77d85dc3476c941d2f4f0a3f749bdf080b20ab2fdd6d37863989f1a0d2d2f087'

@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-machine-learning-cours-mli-efrei-2025-2026-23-10-19h35-seance5-1-pdf-0794439e
 source_key: 'sha256:0794439edea6e52d12fc61269a7534b2aaea0d2031cbe6eca964333ce0979680'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 9
 manifest: null
 derived_from: 'sha256:0794439edea6e52d12fc61269a7534b2aaea0d2031cbe6eca964333ce0979680'

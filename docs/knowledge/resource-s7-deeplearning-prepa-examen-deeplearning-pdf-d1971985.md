@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-prepa-examen-deeplearning-pdf-d1971985
 slug: resource-s7-deeplearning-prepa-examen-deeplearning-pdf-d1971985
 source_key: 'sha256:d1971985a1148a66f5824a8bc6782b222aa828eceb82d9ddaa6c3e374d6a739b'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 12
 manifest: null
 derived_from: 'sha256:d1971985a1148a66f5824a8bc6782b222aa828eceb82d9ddaa6c3e374d6a739b'

@@ -2,7 +2,7 @@
 id: resource-s7-convex-optimisation-convex-optimization-ex1-pdf-31295628
 slug: resource-s7-convex-optimisation-convex-optimization-ex1-pdf-31295628
 source_key: 'sha256:31295628cd67a50d75c053f07c9ed069bee35d4cb7b0793f36ed011516431681'
-part_of: S7 - convex optimisation
+part_of: resource-s7-convex-optimisation-b4dcec0f
 order: 3
 manifest: null
 derived_from: 'sha256:31295628cd67a50d75c053f07c9ed069bee35d4cb7b0793f36ed011516431681'

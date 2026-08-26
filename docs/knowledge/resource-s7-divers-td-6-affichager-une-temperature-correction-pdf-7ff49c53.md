@@ -2,7 +2,7 @@
 id: resource-s7-divers-td-6-affichager-une-temperature-correction-pdf-7ff49c53
 slug: resource-s7-divers-td-6-affichager-une-temperature-correction-pdf-7ff49c53
 source_key: 'sha256:7ff49c53f09321c150bccd4e099754109c4d4437c9be6d024c61146fd0445f68'
-part_of: S7 - Divers
+part_of: resource-s7-divers-344e8e59
 order: 2
 manifest: null
 derived_from: 'sha256:7ff49c53f09321c150bccd4e099754109c4d4437c9be6d024c61146fd0445f68'

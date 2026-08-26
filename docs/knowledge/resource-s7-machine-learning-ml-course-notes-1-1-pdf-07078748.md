@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-ml-course-notes-1-1-pdf-07078748
 slug: resource-s7-machine-learning-ml-course-notes-1-1-pdf-07078748
 source_key: 'sha256:07078748681a7ed7dbb1ae42e22b8d6066c9e6595f8bfa794987c481bdeedabb'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 13
 manifest: null
 derived_from: 'sha256:07078748681a7ed7dbb1ae42e22b8d6066c9e6595f8bfa794987c481bdeedabb'

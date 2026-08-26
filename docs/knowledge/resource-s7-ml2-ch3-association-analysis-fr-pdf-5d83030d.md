@@ -2,7 +2,7 @@
 id: resource-s7-ml2-ch3-association-analysis-fr-pdf-5d83030d
 slug: resource-s7-ml2-ch3-association-analysis-fr-pdf-5d83030d
 source_key: 'sha256:5d83030da867b25f4dbe0bc0b012a99a8c7f1cde6ca1679f200afc457b87db86'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 11
 manifest: null
 derived_from: 'sha256:5d83030da867b25f4dbe0bc0b012a99a8c7f1cde6ca1679f200afc457b87db86'

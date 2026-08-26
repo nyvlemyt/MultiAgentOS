@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-big-data-technical-note-dataset-electric-school-bus-adoption-united-states-pdf-f8bc55b6
 source_key: 'sha256:f8bc55b6ca63e1e53ed2dcd9734b70edc6dbf4a6aa1aa7e3e218bc2f7e9d18d2'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 25
 manifest: null
 derived_from: 'sha256:f8bc55b6ca63e1e53ed2dcd9734b70edc6dbf4a6aa1aa7e3e218bc2f7e9d18d2'

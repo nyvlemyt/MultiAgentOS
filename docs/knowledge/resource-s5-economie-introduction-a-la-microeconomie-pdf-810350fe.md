@@ -2,7 +2,7 @@
 id: resource-s5-economie-introduction-a-la-microeconomie-pdf-810350fe
 slug: resource-s5-economie-introduction-a-la-microeconomie-pdf-810350fe
 source_key: 'sha256:810350fea3310152548c40b4cbfd35a64a6d7825a9af9ede5c9ddba779fb8a66'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 12
 manifest: null
 derived_from: 'sha256:810350fea3310152548c40b4cbfd35a64a6d7825a9af9ede5c9ddba779fb8a66'

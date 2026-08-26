@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-q08-pdf-c009a7a2
 slug: resource-s5-theorie-du-signal-q08-pdf-c009a7a2
 source_key: 'sha256:c009a7a21a5c93f955c2d74d7cb60522ce1b069c9f334bf79ecbcd367ee01ea1'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 15
 manifest: null
 derived_from: 'sha256:c009a7a21a5c93f955c2d74d7cb60522ce1b069c9f334bf79ecbcd367ee01ea1'

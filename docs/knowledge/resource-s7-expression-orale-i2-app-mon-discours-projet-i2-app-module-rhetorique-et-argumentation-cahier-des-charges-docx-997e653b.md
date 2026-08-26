@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-expression-orale-i2-app-mon-discours-projet-i2-app-module-rhetorique-et-argumentation-cahier-des-charges-docx-997e653b
 source_key: 'sha256:997e653b9adfd1f9e3cdbe02442e3506e44c4c6bd41f9d56caf73ce6b2dc1846'
-part_of: S7 - Expression orale I2-APP
+part_of: resource-s7-expression-orale-i2-app-cd36374d
 order: 4
 manifest: null
 derived_from: 'sha256:997e653b9adfd1f9e3cdbe02442e3506e44c4c6bd41f9d56caf73ce6b2dc1846'

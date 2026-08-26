@@ -2,7 +2,7 @@
 id: resource-s5-structure-de-donnees-lab-5-melvyn-pommier-pdf-0750ae47
 slug: resource-s5-structure-de-donnees-lab-5-melvyn-pommier-pdf-0750ae47
 source_key: 'sha256:0750ae472feb4a40bd9c74f45c2a484ddf785c714e07b73fec341ba21d28a944'
-part_of: S5 - Structure de données
+part_of: resource-s5-structure-de-donnees-333ec2f4
 order: 6
 manifest: null
 derived_from: 'sha256:0750ae472feb4a40bd9c74f45c2a484ddf785c714e07b73fec341ba21d28a944'

@@ -2,7 +2,7 @@
 id: resource-s7-ml2-tp4-analyse-d-associations-pptx-6224667c
 slug: resource-s7-ml2-tp4-analyse-d-associations-pptx-6224667c
 source_key: 'sha256:6224667c9b29feb5a9a2a370aeea92cbbc1428f2cb94b235554ab414205e827e'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 6
 manifest: null
 derived_from: 'sha256:6224667c9b29feb5a9a2a370aeea92cbbc1428f2cb94b235554ab414205e827e'

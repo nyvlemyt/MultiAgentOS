@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-chap-1-optimisation-pdf-d8005d8b
 slug: resource-s6-optimisation-et-complexite-chap-1-optimisation-pdf-d8005d8b
 source_key: 'sha256:d8005d8b785950847dd69ba3556d1561c8311cf266ab31ad48afe0f662fcf2ea'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 13
 manifest: null
 derived_from: 'sha256:d8005d8b785950847dd69ba3556d1561c8311cf266ab31ad48afe0f662fcf2ea'

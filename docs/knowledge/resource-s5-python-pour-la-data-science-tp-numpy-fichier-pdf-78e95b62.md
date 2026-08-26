@@ -2,7 +2,7 @@
 id: resource-s5-python-pour-la-data-science-tp-numpy-fichier-pdf-78e95b62
 slug: resource-s5-python-pour-la-data-science-tp-numpy-fichier-pdf-78e95b62
 source_key: 'sha256:78e95b62542c4bd680ad7dc11abfaab141e8f94ff3e9beba8216901283caca3c'
-part_of: S5 - Python pour la Data Science
+part_of: resource-s5-python-pour-la-data-science-f152995e
 order: 5
 manifest: null
 derived_from: 'sha256:78e95b62542c4bd680ad7dc11abfaab141e8f94ff3e9beba8216901283caca3c'

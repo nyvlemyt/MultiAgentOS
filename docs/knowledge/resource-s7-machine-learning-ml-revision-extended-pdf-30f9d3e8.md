@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-ml-revision-extended-pdf-30f9d3e8
 slug: resource-s7-machine-learning-ml-revision-extended-pdf-30f9d3e8
 source_key: 'sha256:30f9d3e891f4abfe65a8943157603af587674139d3036f9a195dfcd6856ce02c'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 14
 manifest: null
 derived_from: 'sha256:30f9d3e891f4abfe65a8943157603af587674139d3036f9a195dfcd6856ce02c'

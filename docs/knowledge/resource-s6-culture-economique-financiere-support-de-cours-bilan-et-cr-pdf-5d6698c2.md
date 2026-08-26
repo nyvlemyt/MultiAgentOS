@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-support-de-cours-bilan-et-cr-pdf-5d6698c2
 source_key: 'sha256:5d6698c2ef71d75de985fd4d61747d84ac2ab3f06e34d4fabcb238b89d6067d5'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 6
 manifest: null
 derived_from: 'sha256:5d6698c2ef71d75de985fd4d61747d84ac2ab3f06e34d4fabcb238b89d6067d5'

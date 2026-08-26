@@ -2,7 +2,7 @@
 id: resource-s6-gestion-de-projet-pdca-projet-glimpse-pdf-63d72112
 slug: resource-s6-gestion-de-projet-pdca-projet-glimpse-pdf-63d72112
 source_key: 'sha256:63d7211292029398d83e3f937488376232f8e45c2e3f83e2624db638a7e110cf'
-part_of: S6 - Gestion de projet
+part_of: resource-s6-gestion-de-projet-20404db8
 order: 4
 manifest: null
 derived_from: 'sha256:63d7211292029398d83e3f937488376232f8e45c2e3f83e2624db638a7e110cf'

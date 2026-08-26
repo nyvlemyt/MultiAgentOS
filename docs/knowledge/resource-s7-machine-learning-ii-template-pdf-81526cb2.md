@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-ii-template-pdf-81526cb2
 slug: resource-s7-machine-learning-ii-template-pdf-81526cb2
 source_key: 'sha256:81526cb2df4eefccf66ae2666d17b01f725d3ec68e16e2f5f8df8363344e0c2a'
-part_of: S7 - Machine Learning II
+part_of: resource-s7-machine-learning-ii-0632fee9
 order: 7
 manifest: null
 derived_from: 'sha256:81526cb2df4eefccf66ae2666d17b01f725d3ec68e16e2f5f8df8363344e0c2a'

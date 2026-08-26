@@ -2,7 +2,7 @@
 id: resource-s7-ml2-presentation-tp3-pptx-fa038e7f
 slug: resource-s7-ml2-presentation-tp3-pptx-fa038e7f
 source_key: 'sha256:fa038e7f1525aed518241ed4236ff92ff7ef2693af5ff7ba474cba72c74b9c29'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 21
 manifest: null
 derived_from: 'sha256:fa038e7f1525aed518241ed4236ff92ff7ef2693af5ff7ba474cba72c74b9c29'

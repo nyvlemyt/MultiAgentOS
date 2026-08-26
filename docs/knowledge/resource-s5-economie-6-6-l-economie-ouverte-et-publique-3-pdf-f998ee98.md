@@ -2,7 +2,7 @@
 id: resource-s5-economie-6-6-l-economie-ouverte-et-publique-3-pdf-f998ee98
 slug: resource-s5-economie-6-6-l-economie-ouverte-et-publique-3-pdf-f998ee98
 source_key: 'sha256:f998ee9883761381eb08a99589e11ff6fb724c71e97f5b7f7952056cc7839643'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 6
 manifest: null
 derived_from: 'sha256:f998ee9883761381eb08a99589e11ff6fb724c71e97f5b7f7952056cc7839643'

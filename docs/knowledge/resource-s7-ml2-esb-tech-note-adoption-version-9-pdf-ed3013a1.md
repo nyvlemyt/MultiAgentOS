@@ -2,7 +2,7 @@
 id: resource-s7-ml2-esb-tech-note-adoption-version-9-pdf-ed3013a1
 slug: resource-s7-ml2-esb-tech-note-adoption-version-9-pdf-ed3013a1
 source_key: 'sha256:ed3013a1278920939a0738c33eff0712ebc8d246a4eef04b052bf80917bdd388'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 17
 manifest: null
 derived_from: 'sha256:ed3013a1278920939a0738c33eff0712ebc8d246a4eef04b052bf80917bdd388'

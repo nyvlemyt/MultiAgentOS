@@ -2,7 +2,7 @@
 id: resource-s7-nosql-cours-mongodb-pdf-17d8b048
 slug: resource-s7-nosql-cours-mongodb-pdf-17d8b048
 source_key: 'sha256:17d8b048d3cdae238eec724904baf083ad292c3b60eeb16e79e7d9017ac2aa8e'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 2
 manifest: null
 derived_from: 'sha256:17d8b048d3cdae238eec724904baf083ad292c3b60eeb16e79e7d9017ac2aa8e'

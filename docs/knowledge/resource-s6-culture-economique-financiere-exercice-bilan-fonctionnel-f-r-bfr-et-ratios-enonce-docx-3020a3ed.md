@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-exercice-bilan-fonctionnel-f-r-bfr-et-ratios-enonce-docx-3020a3ed
 source_key: 'sha256:3020a3edca24c8206fb9ca1a797458681717362f608d57e06f9ff6719baf05d7'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 1
 manifest: null
 derived_from: 'sha256:3020a3edca24c8206fb9ca1a797458681717362f608d57e06f9ff6719baf05d7'

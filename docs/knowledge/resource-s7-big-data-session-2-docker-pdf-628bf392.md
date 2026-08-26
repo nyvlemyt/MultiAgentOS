@@ -2,7 +2,7 @@
 id: resource-s7-big-data-session-2-docker-pdf-628bf392
 slug: resource-s7-big-data-session-2-docker-pdf-628bf392
 source_key: 'sha256:628bf392b737df38492e38d7eaa73bb66385befd6949ca00f44156d7b5b7c9ff'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 11
 manifest: null
 derived_from: 'sha256:628bf392b737df38492e38d7eaa73bb66385befd6949ca00f44156d7b5b7c9ff'

@@ -2,7 +2,7 @@
 id: resource-s5-economie-5-5-la-monnaie-2-pdf-af8e00eb
 slug: resource-s5-economie-5-5-la-monnaie-2-pdf-af8e00eb
 source_key: 'sha256:af8e00eb0dfc068ca4b78ee3d4f2115f03baa8db94f363ab6e4b2b808aba89df'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 4
 manifest: null
 derived_from: 'sha256:af8e00eb0dfc068ca4b78ee3d4f2115f03baa8db94f363ab6e4b2b808aba89df'

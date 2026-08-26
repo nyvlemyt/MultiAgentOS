@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-cours4-lesvues-pdf-145fec91
 slug: resource-s6-base-de-donnees-cours4-lesvues-pdf-145fec91
 source_key: 'sha256:145fec9106ac675f36064a1f2f95fff415e91362e1b5cfa6534453d9b4c70fe0'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 3
 manifest: null
 derived_from: 'sha256:145fec9106ac675f36064a1f2f95fff415e91362e1b5cfa6534453d9b4c70fe0'

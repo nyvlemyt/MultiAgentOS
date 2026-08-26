@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-chap-1-classification-et-mesures-pdf-a72c7f43
 slug: resource-s5-theorie-du-signal-chap-1-classification-et-mesures-pdf-a72c7f43
 source_key: 'sha256:a72c7f435ce0dd08430e5f7bd0643f06798bbf969d986063f87e0105e00153c7'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 2
 manifest: null
 derived_from: 'sha256:a72c7f435ce0dd08430e5f7bd0643f06798bbf969d986063f87e0105e00153c7'

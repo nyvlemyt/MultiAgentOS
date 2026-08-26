@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-ml-revision-sheets-1-pdf-54a33d40
 slug: resource-s7-machine-learning-ml-revision-sheets-1-pdf-54a33d40
 source_key: 'sha256:54a33d40bbd9a284f14a2da3fc2f9d43b15cd9ed67bc3d9657221a2ac1688a0e'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 15
 manifest: null
 derived_from: 'sha256:54a33d40bbd9a284f14a2da3fc2f9d43b15cd9ed67bc3d9657221a2ac1688a0e'

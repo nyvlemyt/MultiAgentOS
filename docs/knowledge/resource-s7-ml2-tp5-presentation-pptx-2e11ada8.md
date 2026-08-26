@@ -2,7 +2,7 @@
 id: resource-s7-ml2-tp5-presentation-pptx-2e11ada8
 slug: resource-s7-ml2-tp5-presentation-pptx-2e11ada8
 source_key: 'sha256:2e11ada834235bbcc4cc7807122517a4d45f209bf0b21b807eae8547e93312f5'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 7
 manifest: null
 derived_from: 'sha256:2e11ada834235bbcc4cc7807122517a4d45f209bf0b21b807eae8547e93312f5'

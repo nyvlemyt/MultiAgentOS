@@ -2,7 +2,7 @@
 id: resource-s6-gestion-de-projet-analyse-swot-glimpse-pdf-9a2bc434
 slug: resource-s6-gestion-de-projet-analyse-swot-glimpse-pdf-9a2bc434
 source_key: 'sha256:9a2bc4349a8ff0eeb2a8fd62557b2bfe902a55302db14648a78146e44c63caf2'
-part_of: S6 - Gestion de projet
+part_of: resource-s6-gestion-de-projet-20404db8
 order: 3
 manifest: null
 derived_from: 'sha256:9a2bc4349a8ff0eeb2a8fd62557b2bfe902a55302db14648a78146e44c63caf2'

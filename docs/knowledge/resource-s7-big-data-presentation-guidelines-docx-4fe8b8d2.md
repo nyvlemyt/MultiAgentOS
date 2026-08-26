@@ -2,7 +2,7 @@
 id: resource-s7-big-data-presentation-guidelines-docx-4fe8b8d2
 slug: resource-s7-big-data-presentation-guidelines-docx-4fe8b8d2
 source_key: 'sha256:4fe8b8d2a936acf1bcf5b08482e9a4d9a8bab9e863de461a207c7f9d2639654a'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 17
 manifest: null
 derived_from: 'sha256:4fe8b8d2a936acf1bcf5b08482e9a4d9a8bab9e863de461a207c7f9d2639654a'

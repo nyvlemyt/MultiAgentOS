@@ -2,7 +2,7 @@
 id: resource-s7-big-data-1-bigdata-questions-docx-92f52549
 slug: resource-s7-big-data-1-bigdata-questions-docx-92f52549
 source_key: 'sha256:92f525494adc8e50a99d99ab08425c45401f133ccd666d8d4c4c563e88de56b5'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 1
 manifest: null
 derived_from: 'sha256:92f525494adc8e50a99d99ab08425c45401f133ccd666d8d4c4c563e88de56b5'

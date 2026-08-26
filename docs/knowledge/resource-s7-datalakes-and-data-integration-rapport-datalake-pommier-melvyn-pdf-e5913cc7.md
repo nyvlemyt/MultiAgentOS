@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-datalakes-and-data-integration-rapport-datalake-pommier-melvyn-pdf-e5913cc7
 source_key: 'sha256:e5913cc7992810644f5ee6a0a9ec7de719688978502706334cdc24a679c31353'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 18
 manifest: null
 derived_from: 'sha256:e5913cc7992810644f5ee6a0a9ec7de719688978502706334cdc24a679c31353'

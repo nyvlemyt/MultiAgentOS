@@ -2,7 +2,7 @@
 id: resource-s7-base-de-donnees-lab2-pommier-zeriri-ren-pdf-d0278c55
 slug: resource-s7-base-de-donnees-lab2-pommier-zeriri-ren-pdf-d0278c55
 source_key: 'sha256:d0278c55aa00062d65322c0d48e4bbf7c0b8cf70df7ed52bc980088db158bae7'
-part_of: S7 - base de données
+part_of: resource-s7-base-de-donnees-d1856687
 order: 4
 manifest: null
 derived_from: 'sha256:d0278c55aa00062d65322c0d48e4bbf7c0b8cf70df7ed52bc980088db158bae7'

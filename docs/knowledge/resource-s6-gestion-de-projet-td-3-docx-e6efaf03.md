@@ -2,7 +2,7 @@
 id: resource-s6-gestion-de-projet-td-3-docx-e6efaf03
 slug: resource-s6-gestion-de-projet-td-3-docx-e6efaf03
 source_key: 'sha256:e6efaf0318df575eafa70e697f37ba95aab240285e6c35bed5386c98494a930e'
-part_of: S6 - Gestion de projet
+part_of: resource-s6-gestion-de-projet-20404db8
 order: 5
 manifest: null
 derived_from: 'sha256:e6efaf0318df575eafa70e697f37ba95aab240285e6c35bed5386c98494a930e'

@@ -2,7 +2,7 @@
 id: resource-s7-divers-td-6-affichager-une-temperature-correction-pptx-10ecb1cb
 slug: resource-s7-divers-td-6-affichager-une-temperature-correction-pptx-10ecb1cb
 source_key: 'sha256:10ecb1cbce02f82ca7095e3b7a277460bc17a3c4a2f7a98fd635d45b59580830'
-part_of: S7 - Divers
+part_of: resource-s7-divers-344e8e59
 order: 3
 manifest: null
 derived_from: 'sha256:10ecb1cbce02f82ca7095e3b7a277460bc17a3c4a2f7a98fd635d45b59580830'

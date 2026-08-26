@@ -2,7 +2,7 @@
 id: resource-s7-base-de-donnees-lab2-plsql-pdf-bdaf5871
 slug: resource-s7-base-de-donnees-lab2-plsql-pdf-bdaf5871
 source_key: 'sha256:bdaf58710b1fb742bd9a13f0f3eaae2a0bdb6aa62382ba66e4ff046e4561ae80'
-part_of: S7 - base de données
+part_of: resource-s7-base-de-donnees-d1856687
 order: 2
 manifest: null
 derived_from: 'sha256:bdaf58710b1fb742bd9a13f0f3eaae2a0bdb6aa62382ba66e4ff046e4561ae80'

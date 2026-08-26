@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-datalakes-and-data-integration-data-lakes-controle-final-pdf-61fe842e
 source_key: 'sha256:61fe842e9b70613bbabb1e834a1a6f27ca042027e21b2d28867a381748d4820d'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 7
 manifest: null
 derived_from: 'sha256:61fe842e9b70613bbabb1e834a1a6f27ca042027e21b2d28867a381748d4820d'

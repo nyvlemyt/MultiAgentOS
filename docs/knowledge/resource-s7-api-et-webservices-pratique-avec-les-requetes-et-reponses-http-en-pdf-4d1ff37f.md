@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-api-et-webservices-pratique-avec-les-requetes-et-reponses-http-en-pdf-4d1ff37f
 source_key: 'sha256:4d1ff37f5b7a0473a27bb6fc3df7797fa41e4dda7db550c9510669a1ab7ecd01'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 3
 manifest: null
 derived_from: 'sha256:4d1ff37f5b7a0473a27bb6fc3df7797fa41e4dda7db550c9510669a1ab7ecd01'

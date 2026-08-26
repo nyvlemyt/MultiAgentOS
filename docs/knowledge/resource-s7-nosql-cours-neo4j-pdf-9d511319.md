@@ -2,7 +2,7 @@
 id: resource-s7-nosql-cours-neo4j-pdf-9d511319
 slug: resource-s7-nosql-cours-neo4j-pdf-9d511319
 source_key: 'sha256:9d511319a3e79a047107a619c586c007accd53835cd44f37f18e7bdde6f87f0c'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 3
 manifest: null
 derived_from: 'sha256:9d511319a3e79a047107a619c586c007accd53835cd44f37f18e7bdde6f87f0c'

@@ -2,7 +2,7 @@
 id: resource-s5-l-art-d-argumenter-final-eloquence-pdf-0435bb38
 slug: resource-s5-l-art-d-argumenter-final-eloquence-pdf-0435bb38
 source_key: 'sha256:0435bb381d0fbfa3206f7e0e2954b0b59ddd9090971c6ebb9d442ae5931cb65a'
-part_of: S5 - L'art d'argumenter
+part_of: resource-s5-l-art-d-argumenter-039240ee
 order: 2
 manifest: null
 derived_from: 'sha256:0435bb381d0fbfa3206f7e0e2954b0b59ddd9090971c6ebb9d442ae5931cb65a'

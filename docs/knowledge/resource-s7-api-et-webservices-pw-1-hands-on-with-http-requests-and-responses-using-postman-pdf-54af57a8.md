@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-api-et-webservices-pw-1-hands-on-with-http-requests-and-responses-using-postman-pdf-54af57a8
 source_key: 'sha256:54af57a85fd488753af6914bfee91688d6bd18bf012c3b3adfbc504405c7ca17'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 1
 manifest: null
 derived_from: 'sha256:54af57a85fd488753af6914bfee91688d6bd18bf012c3b3adfbc504405c7ca17'

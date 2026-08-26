@@ -2,7 +2,7 @@
 id: resource-s5-structure-de-donnees-lab-4-recursion-pdf-8477eeb9
 slug: resource-s5-structure-de-donnees-lab-4-recursion-pdf-8477eeb9
 source_key: 'sha256:8477eeb9f9f729f83c3209ffb58f6640f4d6a9ac064e65034ba59beff528533d'
-part_of: S5 - Structure de données
+part_of: resource-s5-structure-de-donnees-333ec2f4
 order: 5
 manifest: null
 derived_from: 'sha256:8477eeb9f9f729f83c3209ffb58f6640f4d6a9ac064e65034ba59beff528533d'

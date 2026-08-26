@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-expression-apfg84-black-and-white-minimalist-classic-travel-blogger-newspaper-document-a4-pdf-aa11ca89
 source_key: 'sha256:aa11ca894cb35071e6aaec0b91111a570b718adee7561edaf51c7c59490f3d31'
-part_of: S7 - Expression APFG84
+part_of: resource-s7-expression-apfg84-b9c6f71a
 order: 3
 manifest: null
 derived_from: 'sha256:aa11ca894cb35071e6aaec0b91111a570b718adee7561edaf51c7c59490f3d31'

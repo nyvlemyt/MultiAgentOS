@@ -2,7 +2,7 @@
 id: resource-s7-data-visualisation-dataproject-ren-vengadesan-pommier-pdf-d03f8a54
 slug: resource-s7-data-visualisation-dataproject-ren-vengadesan-pommier-pdf-d03f8a54
 source_key: 'sha256:d03f8a54b99a7e47a14c21046f90ff19c717b0432b19568f913ee60dc1b7db77'
-part_of: S7 - data visualisation
+part_of: resource-s7-data-visualisation-0f395360
 order: 2
 manifest: null
 derived_from: 'sha256:d03f8a54b99a7e47a14c21046f90ff19c717b0432b19568f913ee60dc1b7db77'

@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-seance4-pdf-132dbc44
 slug: resource-s7-machine-learning-seance4-pdf-132dbc44
 source_key: 'sha256:132dbc44e16156bc5040c6d5fbe69f4c6f22cb447e16c245452b36219bddfcab'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 21
 manifest: null
 derived_from: 'sha256:132dbc44e16156bc5040c6d5fbe69f4c6f22cb447e16c245452b36219bddfcab'

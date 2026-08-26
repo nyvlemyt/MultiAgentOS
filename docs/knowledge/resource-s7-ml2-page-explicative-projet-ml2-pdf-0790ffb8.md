@@ -2,7 +2,7 @@
 id: resource-s7-ml2-page-explicative-projet-ml2-pdf-0790ffb8
 slug: resource-s7-ml2-page-explicative-projet-ml2-pdf-0790ffb8
 source_key: 'sha256:0790ffb8b2490c9d26335ce191972b6a8bcf7dd89a8aedce4b8a8f8f67d6f7f3'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 4
 manifest: null
 derived_from: 'sha256:0790ffb8b2490c9d26335ce191972b6a8bcf7dd89a8aedce4b8a8f8f67d6f7f3'

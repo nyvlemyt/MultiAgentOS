@@ -2,7 +2,7 @@
 id: resource-s7-ml2-bus-scolaires-electriques-aux-usa-pptx-8833df78
 slug: resource-s7-ml2-bus-scolaires-electriques-aux-usa-pptx-8833df78
 source_key: 'sha256:8833df784f3bc4e100d6fa82bcc0ec87e776fff4e17367ecc20ff75cdf141f68'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 1
 manifest: null
 derived_from: 'sha256:8833df784f3bc4e100d6fa82bcc0ec87e776fff4e17367ecc20ff75cdf141f68'

@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-l3-bn-support-comptabilite-pdf-cb5395f6
 source_key: 'sha256:cb5395f6bc141c8e534ee14493875f4d84219eff2cf429f7705ca4806f1447d3'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 5
 manifest: null
 derived_from: 'sha256:cb5395f6bc141c8e534ee14493875f4d84219eff2cf429f7705ca4806f1447d3'

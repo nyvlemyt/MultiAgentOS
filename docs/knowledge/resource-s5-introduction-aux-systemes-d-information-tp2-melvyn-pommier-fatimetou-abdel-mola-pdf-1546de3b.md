@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-introduction-aux-systemes-d-information-tp2-melvyn-pommier-fatimetou-abdel-mola-pdf-1546de3b
 source_key: 'sha256:1546de3beb5f24f1d06099b34e2ac73ceefec90a9909e72ee0a08ccb6e7f3376'
-part_of: S5 - Introduction aux systèmes d'information
+part_of: resource-s5-introduction-aux-systemes-d-information-11016ded
 order: 3
 manifest: null
 derived_from: 'sha256:1546de3beb5f24f1d06099b34e2ac73ceefec90a9909e72ee0a08ccb6e7f3376'

@@ -2,7 +2,7 @@
 id: resource-s7-big-data-introduction-hadoop-hdfs-yarn-pdf-c2cf6012
 slug: resource-s7-big-data-introduction-hadoop-hdfs-yarn-pdf-c2cf6012
 source_key: 'sha256:c2cf6012580bd18826f3e1262006597eb93d24b80effdae9d3fd738599ae4b4f'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 8
 manifest: null
 derived_from: 'sha256:c2cf6012580bd18826f3e1262006597eb93d24b80effdae9d3fd738599ae4b4f'

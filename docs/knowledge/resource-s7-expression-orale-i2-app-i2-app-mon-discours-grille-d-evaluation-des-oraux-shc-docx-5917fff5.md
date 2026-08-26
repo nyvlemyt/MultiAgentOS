@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-expression-orale-i2-app-i2-app-mon-discours-grille-d-evaluation-des-oraux-shc-docx-5917fff5
 source_key: 'sha256:5917fff5fa0bfd62909c2ff83a078e42cea185dd25e18e9ee7107840b4b7d089'
-part_of: S7 - Expression orale I2-APP
+part_of: resource-s7-expression-orale-i2-app-cd36374d
 order: 3
 manifest: null
 derived_from: 'sha256:5917fff5fa0bfd62909c2ff83a078e42cea185dd25e18e9ee7107840b4b7d089'

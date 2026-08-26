@@ -2,7 +2,7 @@
 id: resource-s5-programmation-en-java-rapport-pdf-55e0f1d7
 slug: resource-s5-programmation-en-java-rapport-pdf-55e0f1d7
 source_key: 'sha256:55e0f1d720e1a4b2f8726e7acf31b2d308f1d9a4f52968124fb33a33030a6b29'
-part_of: S5 - Programmation en Java
+part_of: resource-s5-programmation-en-java-6afe3d81
 order: 3
 manifest: null
 derived_from: 'sha256:55e0f1d720e1a4b2f8726e7acf31b2d308f1d9a4f52968124fb33a33030a6b29'

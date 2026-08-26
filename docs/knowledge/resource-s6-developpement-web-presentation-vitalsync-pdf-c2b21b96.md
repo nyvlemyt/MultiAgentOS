@@ -2,7 +2,7 @@
 id: resource-s6-developpement-web-presentation-vitalsync-pdf-c2b21b96
 slug: resource-s6-developpement-web-presentation-vitalsync-pdf-c2b21b96
 source_key: 'sha256:c2b21b9637f76afa88d32ba4ff5563129c422069616cf29f0156b514359dd386'
-part_of: S6 - Développement Web
+part_of: resource-s6-developpement-web-c60d8c4a
 order: 1
 manifest: null
 derived_from: 'sha256:c2b21b9637f76afa88d32ba4ff5563129c422069616cf29f0156b514359dd386'

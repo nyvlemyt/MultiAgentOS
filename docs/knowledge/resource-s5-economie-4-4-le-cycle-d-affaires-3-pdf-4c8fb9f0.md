@@ -2,7 +2,7 @@
 id: resource-s5-economie-4-4-le-cycle-d-affaires-3-pdf-4c8fb9f0
 slug: resource-s5-economie-4-4-le-cycle-d-affaires-3-pdf-4c8fb9f0
 source_key: 'sha256:4c8fb9f00e1aa4a6b3a427d27356e994d0b410ec3de552ba2953a3ac71649841'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 3
 manifest: null
 derived_from: 'sha256:4c8fb9f00e1aa4a6b3a427d27356e994d0b410ec3de552ba2953a3ac71649841'

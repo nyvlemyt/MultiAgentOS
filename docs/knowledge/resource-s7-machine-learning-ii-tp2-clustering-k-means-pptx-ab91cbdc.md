@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-ii-tp2-clustering-k-means-pptx-ab91cbdc
 slug: resource-s7-machine-learning-ii-tp2-clustering-k-means-pptx-ab91cbdc
 source_key: 'sha256:ab91cbdc76f01d463328b7d43dfda2617d6a9eed3e25fe036ab1e93c8de6aeb8'
-part_of: S7 - Machine Learning II
+part_of: resource-s7-machine-learning-ii-0632fee9
 order: 5
 manifest: null
 derived_from: 'sha256:ab91cbdc76f01d463328b7d43dfda2617d6a9eed3e25fe036ab1e93c8de6aeb8'

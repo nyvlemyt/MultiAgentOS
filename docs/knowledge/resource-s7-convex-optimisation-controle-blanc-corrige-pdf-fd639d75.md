@@ -2,7 +2,7 @@
 id: resource-s7-convex-optimisation-controle-blanc-corrige-pdf-fd639d75
 slug: resource-s7-convex-optimisation-controle-blanc-corrige-pdf-fd639d75
 source_key: 'sha256:fd639d7548dfc62c1c1125e847c5326c3ef5e0dcbd978f4fe432f90c63c41059'
-part_of: S7 - convex optimisation
+part_of: resource-s7-convex-optimisation-b4dcec0f
 order: 1
 manifest: null
 derived_from: 'sha256:fd639d7548dfc62c1c1125e847c5326c3ef5e0dcbd978f4fe432f90c63c41059'

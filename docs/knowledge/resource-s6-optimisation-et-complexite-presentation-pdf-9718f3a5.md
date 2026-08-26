@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-presentation-pdf-9718f3a5
 slug: resource-s6-optimisation-et-complexite-presentation-pdf-9718f3a5
 source_key: 'sha256:9718f3a548be11c91d0395d86492221f025e6642cdc00c71cd1ce144e5e26404'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 7
 manifest: null
 derived_from: 'sha256:9718f3a548be11c91d0395d86492221f025e6642cdc00c71cd1ce144e5e26404'

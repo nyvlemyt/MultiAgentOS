@@ -2,7 +2,7 @@
 id: resource-s7-expression-orale-i2-app-final-eloquence-pdf-0bfa0c97
 slug: resource-s7-expression-orale-i2-app-final-eloquence-pdf-0bfa0c97
 source_key: 'sha256:0bfa0c973276591b507e93ebcf25e5d46c360abb3786e11fad5fa2b86f43ffdc'
-part_of: S7 - Expression orale I2-APP
+part_of: resource-s7-expression-orale-i2-app-cd36374d
 order: 1
 manifest: null
 derived_from: 'sha256:0bfa0c973276591b507e93ebcf25e5d46c360abb3786e11fad5fa2b86f43ffdc'

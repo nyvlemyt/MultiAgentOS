@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-probabilite-et-statistique-chapitre-4-variable-aleatoire-continue-pdf-03f845fd
 source_key: 'sha256:03f845fdae2bbe9b5db86b2ce17aa4e613adf41ff0747210aa14ad3d3de0f62f'
-part_of: S5 - Probabilité et statistique
+part_of: resource-s5-probabilite-et-statistique-491ffea1
 order: 1
 manifest: null
 derived_from: 'sha256:03f845fdae2bbe9b5db86b2ce17aa4e613adf41ff0747210aa14ad3d3de0f62f'

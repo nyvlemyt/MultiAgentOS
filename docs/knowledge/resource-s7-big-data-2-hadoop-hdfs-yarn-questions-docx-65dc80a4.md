@@ -2,7 +2,7 @@
 id: resource-s7-big-data-2-hadoop-hdfs-yarn-questions-docx-65dc80a4
 slug: resource-s7-big-data-2-hadoop-hdfs-yarn-questions-docx-65dc80a4
 source_key: 'sha256:65dc80a4dcca30ec2e4e2f0866612793c3124f7653a5896ab408cbe5d000dc46'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 2
 manifest: null
 derived_from: 'sha256:65dc80a4dcca30ec2e4e2f0866612793c3124f7653a5896ab408cbe5d000dc46'

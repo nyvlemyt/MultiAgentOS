@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-architecture-des-ordinateurs-td-6-affichager-une-temperature-correction-pptx-eb4a2b63
 source_key: 'sha256:eb4a2b63fdc048f8add801e9910dfd7971ce9cef63891406c0e84e5a27650f00'
-part_of: S6 - Architecture des ordinateurs
+part_of: resource-s6-architecture-des-ordinateurs-971ace76
 order: 4
 manifest: null
 derived_from: 'sha256:eb4a2b63fdc048f8add801e9910dfd7971ce9cef63891406c0e84e5a27650f00'

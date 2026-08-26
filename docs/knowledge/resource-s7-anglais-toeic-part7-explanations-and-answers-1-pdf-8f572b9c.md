@@ -2,7 +2,7 @@
 id: resource-s7-anglais-toeic-part7-explanations-and-answers-1-pdf-8f572b9c
 slug: resource-s7-anglais-toeic-part7-explanations-and-answers-1-pdf-8f572b9c
 source_key: 'sha256:8f572b9c4aa0a750e24ce2be23811f9c2bf5a94fa42393bd692f38e0876005aa'
-part_of: S7 - anglais
+part_of: resource-s7-anglais-b9c1914b
 order: 5
 manifest: null
 derived_from: 'sha256:8f572b9c4aa0a750e24ce2be23811f9c2bf5a94fa42393bd692f38e0876005aa'

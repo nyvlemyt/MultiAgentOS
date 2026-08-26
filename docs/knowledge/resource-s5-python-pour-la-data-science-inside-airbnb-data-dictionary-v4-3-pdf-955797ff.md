@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-python-pour-la-data-science-inside-airbnb-data-dictionary-v4-3-pdf-955797ff
 source_key: 'sha256:955797ff44a7154619af7be06291777c24f9c110a5c9dc613013e8ab4f3fc33a'
-part_of: S5 - Python pour la Data Science
+part_of: resource-s5-python-pour-la-data-science-f152995e
 order: 1
 manifest: null
 derived_from: 'sha256:955797ff44a7154619af7be06291777c24f9c110a5c9dc613013e8ab4f3fc33a'

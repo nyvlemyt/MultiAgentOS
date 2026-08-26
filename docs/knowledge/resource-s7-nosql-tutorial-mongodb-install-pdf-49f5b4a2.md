@@ -2,7 +2,7 @@
 id: resource-s7-nosql-tutorial-mongodb-install-pdf-49f5b4a2
 slug: resource-s7-nosql-tutorial-mongodb-install-pdf-49f5b4a2
 source_key: 'sha256:49f5b4a2e4ff5a17601d987aa2c5afdb72483b5fdeeedf302c078e2514449f11'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 12
 manifest: null
 derived_from: 'sha256:49f5b4a2e4ff5a17601d987aa2c5afdb72483b5fdeeedf302c078e2514449f11'

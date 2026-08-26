@@ -2,7 +2,7 @@
 id: resource-s7-nosql-lab3-neo4j-pdf-c45ccf70
 slug: resource-s7-nosql-lab3-neo4j-pdf-c45ccf70
 source_key: 'sha256:c45ccf70deb8224e5ce1b0eb292a4862abb5b93c3453e0d5fbfc431a3b7baddb'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 7
 manifest: null
 derived_from: 'sha256:c45ccf70deb8224e5ce1b0eb292a4862abb5b93c3453e0d5fbfc431a3b7baddb'

@@ -2,7 +2,7 @@
 id: resource-s7-big-data-spark-fundamentals-and-rdd-pdf-43e47576
 slug: resource-s7-big-data-spark-fundamentals-and-rdd-pdf-43e47576
 source_key: 'sha256:43e47576d379d32de18b0027ed723ac1bf5fc91a411fed96b7ce4496f7311f69'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 13
 manifest: null
 derived_from: 'sha256:43e47576d379d32de18b0027ed723ac1bf5fc91a411fed96b7ce4496f7311f69'

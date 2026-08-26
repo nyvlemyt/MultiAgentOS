@@ -2,7 +2,7 @@
 id: resource-s7-devops-td-part-02-github-actions-devops-pdf-b00f542d
 slug: resource-s7-devops-td-part-02-github-actions-devops-pdf-b00f542d
 source_key: 'sha256:b00f542d602ca84d037d39b397f3aceccbd665eb2db92287ab6221052397b144'
-part_of: S7 - DevOps
+part_of: resource-s7-devops-17c280d9
 order: 5
 manifest: null
 derived_from: 'sha256:b00f542d602ca84d037d39b397f3aceccbd665eb2db92287ab6221052397b144'

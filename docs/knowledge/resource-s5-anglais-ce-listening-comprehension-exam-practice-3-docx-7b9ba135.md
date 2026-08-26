@@ -2,7 +2,7 @@
 id: resource-s5-anglais-ce-listening-comprehension-exam-practice-3-docx-7b9ba135
 slug: resource-s5-anglais-ce-listening-comprehension-exam-practice-3-docx-7b9ba135
 source_key: 'sha256:7b9ba135b33085da802b001d141308a0cd24c25676bd43ac0f02e430aaecd014'
-part_of: S5 - Anglais
+part_of: resource-s5-anglais-75cbde20
 order: 2
 manifest: null
 derived_from: 'sha256:7b9ba135b33085da802b001d141308a0cd24c25676bd43ac0f02e430aaecd014'

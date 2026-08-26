@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-convex-optimisation-controle-blanc-convex-optimization-pdf-8ae7306e
 source_key: 'sha256:8ae7306ee68960f89616a290d3a76804b0584c78f4e5d97aeadee77f367b7879'
-part_of: S7 - convex optimisation
+part_of: resource-s7-convex-optimisation-b4dcec0f
 order: 2
 manifest: null
 derived_from: 'sha256:8ae7306ee68960f89616a290d3a76804b0584c78f4e5d97aeadee77f367b7879'

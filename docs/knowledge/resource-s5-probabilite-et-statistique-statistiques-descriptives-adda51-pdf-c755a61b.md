@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-probabilite-et-statistique-statistiques-descriptives-adda51-pdf-c755a61b
 source_key: 'sha256:c755a61b6b33da555dbb200604f730ad516a241a4e5520545d3ae2752cc0de62'
-part_of: S5 - Probabilité et statistique
+part_of: resource-s5-probabilite-et-statistique-491ffea1
 order: 5
 manifest: null
 derived_from: 'sha256:c755a61b6b33da555dbb200604f730ad516a241a4e5520545d3ae2752cc0de62'

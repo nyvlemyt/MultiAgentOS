@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-expression-apfg84-apfg84-projet-grand-portrait-note-de-cadrage-25-26-docx-bb57482e
 source_key: 'sha256:bb57482e04500860bab89edc94dfa0e8daa101da7e1a6371bfa319290762b7df'
-part_of: S7 - Expression APFG84
+part_of: resource-s7-expression-apfg84-b9c6f71a
 order: 2
 manifest: null
 derived_from: 'sha256:bb57482e04500860bab89edc94dfa0e8daa101da7e1a6371bfa319290762b7df'

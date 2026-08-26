@@ -2,7 +2,7 @@
 id: resource-s5-python-pour-la-data-science-tp1-pandas-pdf-20d57b79
 slug: resource-s5-python-pour-la-data-science-tp1-pandas-pdf-20d57b79
 source_key: 'sha256:20d57b79cb1d88904db2f7efdf789bef5ad74f1b251c89539e268d521e393f20'
-part_of: S5 - Python pour la Data Science
+part_of: resource-s5-python-pour-la-data-science-f152995e
 order: 6
 manifest: null
 derived_from: 'sha256:20d57b79cb1d88904db2f7efdf789bef5ad74f1b251c89539e268d521e393f20'

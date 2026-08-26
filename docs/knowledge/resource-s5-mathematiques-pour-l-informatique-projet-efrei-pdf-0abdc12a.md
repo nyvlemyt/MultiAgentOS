@@ -2,7 +2,7 @@
 id: resource-s5-mathematiques-pour-l-informatique-projet-efrei-pdf-0abdc12a
 slug: resource-s5-mathematiques-pour-l-informatique-projet-efrei-pdf-0abdc12a
 source_key: 'sha256:0abdc12acdfb704800d0a0400827868f437a0d9ab42eb461cfcc3e9253834cd7'
-part_of: S5 - Mathématiques pour l'informatique
+part_of: resource-s5-mathematiques-pour-l-informatique-d61fc23a
 order: 1
 manifest: null
 derived_from: 'sha256:0abdc12acdfb704800d0a0400827868f437a0d9ab42eb461cfcc3e9253834cd7'

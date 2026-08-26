@@ -2,7 +2,7 @@
 id: resource-s7-ml2-ch4-anomaly-detection-fr-pdf-b7ab0b41
 slug: resource-s7-ml2-ch4-anomaly-detection-fr-pdf-b7ab0b41
 source_key: 'sha256:b7ab0b41e474aac072d4840b79b1a530598a5aace590788efc02b7457b4d7712'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 12
 manifest: null
 derived_from: 'sha256:b7ab0b41e474aac072d4840b79b1a530598a5aace590788efc02b7457b4d7712'

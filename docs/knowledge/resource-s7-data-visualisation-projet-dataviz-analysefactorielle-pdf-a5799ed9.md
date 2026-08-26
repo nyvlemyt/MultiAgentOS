@@ -2,7 +2,7 @@
 id: resource-s7-data-visualisation-projet-dataviz-analysefactorielle-pdf-a5799ed9
 slug: resource-s7-data-visualisation-projet-dataviz-analysefactorielle-pdf-a5799ed9
 source_key: 'sha256:a5799ed93aa636589971fa4fdfe7594417f8dd20bf583be48a0f8ebfc958f03f'
-part_of: S7 - data visualisation
+part_of: resource-s7-data-visualisation-0f395360
 order: 4
 manifest: null
 derived_from: 'sha256:a5799ed93aa636589971fa4fdfe7594417f8dd20bf583be48a0f8ebfc958f03f'

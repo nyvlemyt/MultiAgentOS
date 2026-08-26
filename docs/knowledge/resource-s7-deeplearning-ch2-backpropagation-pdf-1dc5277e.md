@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-ch2-backpropagation-pdf-1dc5277e
 slug: resource-s7-deeplearning-ch2-backpropagation-pdf-1dc5277e
 source_key: 'sha256:1dc5277e831dbc15c77eac50cc206956d535e20000a726dfa994bd1add3232f8'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 1
 manifest: null
 derived_from: 'sha256:1dc5277e831dbc15c77eac50cc206956d535e20000a726dfa994bd1add3232f8'

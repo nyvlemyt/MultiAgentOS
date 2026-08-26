@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-api-et-webservices-pw-1-pratique-avec-les-requetes-et-reponses-http-en-utilisant-postman-pdf-b1c45386
 source_key: 'sha256:b1c45386a88cadfae92926f88141d719fbcae6f73f2823cb2a191c2869193dff'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 2
 manifest: null
 derived_from: 'sha256:b1c45386a88cadfae92926f88141d719fbcae6f73f2823cb2a191c2869193dff'

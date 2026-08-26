@@ -2,7 +2,7 @@
 id: resource-s7-big-data-hbase-questions-docx-717ee080
 slug: resource-s7-big-data-hbase-questions-docx-717ee080
 source_key: 'sha256:717ee080380d6a5dae5fc980b1d0a0f274fd3a93e6b1b00158cec4254bab5e4f'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 6
 manifest: null
 derived_from: 'sha256:717ee080380d6a5dae5fc980b1d0a0f274fd3a93e6b1b00158cec4254bab5e4f'

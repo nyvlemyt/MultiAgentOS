@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-introduction-aux-systemes-d-information-support-alsi64-projet-pdf-0889583f
 source_key: 'sha256:0889583fc35099b5dd2931d7062bb529d55ad78bcbfb14a7c86bbe085d5a33e4'
-part_of: S5 - Introduction aux systèmes d'information
+part_of: resource-s5-introduction-aux-systemes-d-information-11016ded
 order: 2
 manifest: null
 derived_from: 'sha256:0889583fc35099b5dd2931d7062bb529d55ad78bcbfb14a7c86bbe085d5a33e4'

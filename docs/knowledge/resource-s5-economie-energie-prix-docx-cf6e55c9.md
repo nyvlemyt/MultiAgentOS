@@ -2,7 +2,7 @@
 id: resource-s5-economie-energie-prix-docx-cf6e55c9
 slug: resource-s5-economie-energie-prix-docx-cf6e55c9
 source_key: 'sha256:cf6e55c90a9fe49693216deeab2e9e11549f13fe3cd9b487fa2cc212858ceefd'
-part_of: S5 - Economie
+part_of: resource-s5-economie-02fa3ee1
 order: 11
 manifest: null
 derived_from: 'sha256:cf6e55c90a9fe49693216deeab2e9e11549f13fe3cd9b487fa2cc212858ceefd'

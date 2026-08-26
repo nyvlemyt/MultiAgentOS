@@ -2,7 +2,7 @@
 id: resource-s7-bdd-avancees-advanced-db-project-pdf-844a45d6
 slug: resource-s7-bdd-avancees-advanced-db-project-pdf-844a45d6
 source_key: 'sha256:844a45d66e9242382ffc286a9ce04295526252cfef134b472b05aeba3425dd28'
-part_of: S7 - BDD Avancées
+part_of: resource-s7-bdd-avancees-03c845ab
 order: 3
 manifest: null
 derived_from: 'sha256:844a45d66e9242382ffc286a9ce04295526252cfef134b472b05aeba3425dd28'

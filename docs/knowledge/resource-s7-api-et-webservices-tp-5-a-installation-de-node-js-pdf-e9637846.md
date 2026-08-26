@@ -2,7 +2,7 @@
 id: resource-s7-api-et-webservices-tp-5-a-installation-de-node-js-pdf-e9637846
 slug: resource-s7-api-et-webservices-tp-5-a-installation-de-node-js-pdf-e9637846
 source_key: 'sha256:e96378460238c1f407b4d3406ba73c4c1f4a2286e79d581cd88787e03f1aa2c7'
-part_of: S7 - api et webservices
+part_of: resource-s7-api-et-webservices-db2dc739
 order: 7
 manifest: null
 derived_from: 'sha256:e96378460238c1f407b4d3406ba73c4c1f4a2286e79d581cd88787e03f1aa2c7'

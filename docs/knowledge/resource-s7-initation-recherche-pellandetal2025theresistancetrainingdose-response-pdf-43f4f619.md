@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-initation-recherche-pellandetal2025theresistancetrainingdose-response-pdf-43f4f619
 source_key: 'sha256:43f4f61987b1c0ca93cff7aaadd86a4be8894c79cbf016ac931a74a59f0a39fa'
-part_of: S7 - initation recherche
+part_of: resource-s7-initation-recherche-73bf3bd7
 order: 4
 manifest: null
 derived_from: 'sha256:43f4f61987b1c0ca93cff7aaadd86a4be8894c79cbf016ac931a74a59f0a39fa'

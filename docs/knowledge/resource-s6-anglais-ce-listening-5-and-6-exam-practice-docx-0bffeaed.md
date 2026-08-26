@@ -2,7 +2,7 @@
 id: resource-s6-anglais-ce-listening-5-and-6-exam-practice-docx-0bffeaed
 slug: resource-s6-anglais-ce-listening-5-and-6-exam-practice-docx-0bffeaed
 source_key: 'sha256:0bffeaed1df76e2a3bd9e654cb17cc94d9bdae2f9e614e8e437f2aa0399dec85'
-part_of: S6 - Anglais
+part_of: resource-s6-anglais-18c7add0
 order: 1
 manifest: null
 derived_from: 'sha256:0bffeaed1df76e2a3bd9e654cb17cc94d9bdae2f9e614e8e437f2aa0399dec85'

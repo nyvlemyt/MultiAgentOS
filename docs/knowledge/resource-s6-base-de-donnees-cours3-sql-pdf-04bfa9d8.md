@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-cours3-sql-pdf-04bfa9d8
 slug: resource-s6-base-de-donnees-cours3-sql-pdf-04bfa9d8
 source_key: 'sha256:04bfa9d87f1121c3cf9cce740109ac46b2d5eb466af450b9bdfab621348f4aec'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 2
 manifest: null
 derived_from: 'sha256:04bfa9d87f1121c3cf9cce740109ac46b2d5eb466af450b9bdfab621348f4aec'

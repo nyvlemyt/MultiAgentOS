@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-exo-3-2-pdf-72ba95af
 slug: resource-s6-optimisation-et-complexite-exo-3-2-pdf-72ba95af
 source_key: 'sha256:72ba95af858763fdefbbba48ae810b74f07bb626873914c1093b33e0bcd69423'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 2
 manifest: null
 derived_from: 'sha256:72ba95af858763fdefbbba48ae810b74f07bb626873914c1093b33e0bcd69423'

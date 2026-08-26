@@ -2,7 +2,7 @@
 id: resource-anglais-action-verbs-cover-letter-pdf-79d06f1f
 slug: resource-anglais-action-verbs-cover-letter-pdf-79d06f1f
 source_key: 'sha256:79d06f1f24afd7cbf01e97a515404b7383cad73eb826035d528dc8a71598ff8e'
-part_of: Anglais
+part_of: resource-anglais-ab40e543
 order: 1
 manifest: null
 derived_from: 'sha256:79d06f1f24afd7cbf01e97a515404b7383cad73eb826035d528dc8a71598ff8e'

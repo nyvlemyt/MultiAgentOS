@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-datalakes-and-data-integration-rapport-datalake-senechal-morgan-logerot-jules-costa-thomas-i3appbdml-pdf-b91ad963
 source_key: 'sha256:b91ad963a4794e5ac650b26403aad133aedd1aef9fada84ddbdf5b6708926459'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 19
 manifest: null
 derived_from: 'sha256:b91ad963a4794e5ac650b26403aad133aedd1aef9fada84ddbdf5b6708926459'

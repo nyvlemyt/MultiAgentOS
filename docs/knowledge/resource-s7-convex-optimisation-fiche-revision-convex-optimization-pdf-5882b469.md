@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-convex-optimisation-fiche-revision-convex-optimization-pdf-5882b469
 source_key: 'sha256:5882b4692a44d171bd7ba43b66a73a26d9b6c02d21d9c8cbe4794c39b3becb16'
-part_of: S7 - convex optimisation
+part_of: resource-s7-convex-optimisation-b4dcec0f
 order: 10
 manifest: null
 derived_from: 'sha256:5882b4692a44d171bd7ba43b66a73a26d9b6c02d21d9c8cbe4794c39b3becb16'

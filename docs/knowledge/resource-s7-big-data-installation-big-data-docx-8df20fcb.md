@@ -2,7 +2,7 @@
 id: resource-s7-big-data-installation-big-data-docx-8df20fcb
 slug: resource-s7-big-data-installation-big-data-docx-8df20fcb
 source_key: 'sha256:8df20fcbc1495295cbfb2cdd54323e4708c2d106950b7499c5d810ccbbada14a'
-part_of: S7 - big data
+part_of: resource-s7-big-data-70f04b2b
 order: 15
 manifest: null
 derived_from: 'sha256:8df20fcbc1495295cbfb2cdd54323e4708c2d106950b7499c5d810ccbbada14a'

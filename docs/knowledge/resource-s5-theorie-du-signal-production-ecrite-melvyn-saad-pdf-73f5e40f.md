@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-production-ecrite-melvyn-saad-pdf-73f5e40f
 slug: resource-s5-theorie-du-signal-production-ecrite-melvyn-saad-pdf-73f5e40f
 source_key: 'sha256:73f5e40fd0cd3c50235fdba0b847a374e026689b086b4b833407f7579dc36560'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 7
 manifest: null
 derived_from: 'sha256:73f5e40fd0cd3c50235fdba0b847a374e026689b086b4b833407f7579dc36560'

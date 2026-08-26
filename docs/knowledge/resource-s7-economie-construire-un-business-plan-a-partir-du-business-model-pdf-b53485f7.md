@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-economie-construire-un-business-plan-a-partir-du-business-model-pdf-b53485f7
 source_key: 'sha256:b53485f754e85859026fad2d4ae7d1e39e49444ba9b91eaa6120bf51c621b73b'
-part_of: S7 - economie
+part_of: resource-s7-economie-186d2142
 order: 3
 manifest: null
 derived_from: 'sha256:b53485f754e85859026fad2d4ae7d1e39e49444ba9b91eaa6120bf51c621b73b'

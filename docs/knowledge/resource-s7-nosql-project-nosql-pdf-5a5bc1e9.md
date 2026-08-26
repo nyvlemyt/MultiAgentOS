@@ -2,7 +2,7 @@
 id: resource-s7-nosql-project-nosql-pdf-5a5bc1e9
 slug: resource-s7-nosql-project-nosql-pdf-5a5bc1e9
 source_key: 'sha256:5a5bc1e974633a60c82d50d765b9d878fe47931d51c15389db3cf4e9dbe17935'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 9
 manifest: null
 derived_from: 'sha256:5a5bc1e974633a60c82d50d765b9d878fe47931d51c15389db3cf4e9dbe17935'

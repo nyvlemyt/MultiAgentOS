@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-optimisation-et-complexite-optimisation-et-complexite-cours-pdf-853d5954
 source_key: 'sha256:853d595492b35f1893a41e70bd64653348a692da373acd00378a13a24d9e6d36'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 6
 manifest: null
 derived_from: 'sha256:853d595492b35f1893a41e70bd64653348a692da373acd00378a13a24d9e6d36'

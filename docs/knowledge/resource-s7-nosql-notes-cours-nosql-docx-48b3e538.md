@@ -2,7 +2,7 @@
 id: resource-s7-nosql-notes-cours-nosql-docx-48b3e538
 slug: resource-s7-nosql-notes-cours-nosql-docx-48b3e538
 source_key: 'sha256:48b3e5380bbab4ba1274dce65cb318270c6c5b93a7aec9d95591cf6349f2ac4b'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 8
 manifest: null
 derived_from: 'sha256:48b3e5380bbab4ba1274dce65cb318270c6c5b93a7aec9d95591cf6349f2ac4b'

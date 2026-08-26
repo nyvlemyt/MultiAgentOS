@@ -2,7 +2,7 @@
 id: resource-s7-bdd-avancees-cm1-ord-pdf-da4470a6
 slug: resource-s7-bdd-avancees-cm1-ord-pdf-da4470a6
 source_key: 'sha256:da4470a69b7c22ba621da09feb243899027427b33791ca3b6a4ace9cc36ef705'
-part_of: S7 - BDD Avancées
+part_of: resource-s7-bdd-avancees-03c845ab
 order: 4
 manifest: null
 derived_from: 'sha256:da4470a69b7c22ba621da09feb243899027427b33791ca3b6a4ace9cc36ef705'

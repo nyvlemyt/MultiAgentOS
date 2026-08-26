@@ -2,7 +2,7 @@
 id: resource-s7-datalakes-and-data-integration-data-lakes-rattrapage-pdf-15d31a99
 slug: resource-s7-datalakes-and-data-integration-data-lakes-rattrapage-pdf-15d31a99
 source_key: 'sha256:15d31a99c78c0511e7b20cae7eeb499a0bbc839cdcd8344b07f594bd8940a965'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 10
 manifest: null
 derived_from: 'sha256:15d31a99c78c0511e7b20cae7eeb499a0bbc839cdcd8344b07f594bd8940a965'

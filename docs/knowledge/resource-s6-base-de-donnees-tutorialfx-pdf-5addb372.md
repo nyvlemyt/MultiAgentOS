@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-tutorialfx-pdf-5addb372
 slug: resource-s6-base-de-donnees-tutorialfx-pdf-5addb372
 source_key: 'sha256:5addb37224bab6b4c87451ae5bff61a84c66456fd8e202bd0a259eb162d87490'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 7
 manifest: null
 derived_from: 'sha256:5addb37224bab6b4c87451ae5bff61a84c66456fd8e202bd0a259eb162d87490'

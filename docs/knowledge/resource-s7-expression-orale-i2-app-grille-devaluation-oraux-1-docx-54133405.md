@@ -2,7 +2,7 @@
 id: resource-s7-expression-orale-i2-app-grille-devaluation-oraux-1-docx-54133405
 slug: resource-s7-expression-orale-i2-app-grille-devaluation-oraux-1-docx-54133405
 source_key: 'sha256:54133405304b8f2e84b5bdd6c12a7b7d8e696be4c60ec3934ad43571c101bb4d'
-part_of: S7 - Expression orale I2-APP
+part_of: resource-s7-expression-orale-i2-app-cd36374d
 order: 2
 manifest: null
 derived_from: 'sha256:54133405304b8f2e84b5bdd6c12a7b7d8e696be4c60ec3934ad43571c101bb4d'

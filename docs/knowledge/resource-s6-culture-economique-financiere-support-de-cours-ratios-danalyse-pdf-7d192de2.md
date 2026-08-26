@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-support-de-cours-ratios-danalyse-pdf-7d192de2
 source_key: 'sha256:7d192de27884f16d35a15c1648121b0393e8ef244211e75bbfdfc249033f868b'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 8
 manifest: null
 derived_from: 'sha256:7d192de27884f16d35a15c1648121b0393e8ef244211e75bbfdfc249033f868b'

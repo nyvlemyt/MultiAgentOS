@@ -2,7 +2,7 @@
 id: resource-s7-datalakes-and-data-integration-data-lakes-projet-pdf-30fa49f8
 slug: resource-s7-datalakes-and-data-integration-data-lakes-projet-pdf-30fa49f8
 source_key: 'sha256:30fa49f83105dcefc207003a6d8d8b593ce2ea87e01814dee6a3501d82ccd985'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 9
 manifest: null
 derived_from: 'sha256:30fa49f83105dcefc207003a6d8d8b593ce2ea87e01814dee6a3501d82ccd985'

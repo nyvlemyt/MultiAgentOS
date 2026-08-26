@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-td4-svm-efrei-f-pdf-ef430282
 slug: resource-s7-machine-learning-td4-svm-efrei-f-pdf-ef430282
 source_key: 'sha256:ef4302824a4a0eeca42cdf80262af9e7f8c23b83d93a16a149b6e858d3d3209a'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 5
 manifest: null
 derived_from: 'sha256:ef4302824a4a0eeca42cdf80262af9e7f8c23b83d93a16a149b6e858d3d3209a'

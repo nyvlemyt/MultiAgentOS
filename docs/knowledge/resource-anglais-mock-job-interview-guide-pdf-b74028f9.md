@@ -2,7 +2,7 @@
 id: resource-anglais-mock-job-interview-guide-pdf-b74028f9
 slug: resource-anglais-mock-job-interview-guide-pdf-b74028f9
 source_key: 'sha256:b74028f9cb3548c991bd271236a1e6d218359d824514dc0ea6ca1d5cd1d8162f'
-part_of: Anglais
+part_of: resource-anglais-ab40e543
 order: 3
 manifest: null
 derived_from: 'sha256:b74028f9cb3548c991bd271236a1e6d218359d824514dc0ea6ca1d5cd1d8162f'

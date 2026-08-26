@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-de-annee-derniere-pdf-d2278f7d
 slug: resource-s7-deeplearning-de-annee-derniere-pdf-d2278f7d
 source_key: 'sha256:d2278f7d9cf5769f31719897132ca5e19f5a953f78122ff856dedf9b297c0ca7'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 5
 manifest: null
 derived_from: 'sha256:d2278f7d9cf5769f31719897132ca5e19f5a953f78122ff856dedf9b297c0ca7'

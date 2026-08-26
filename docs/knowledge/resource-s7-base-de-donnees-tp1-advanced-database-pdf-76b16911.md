@@ -2,7 +2,7 @@
 id: resource-s7-base-de-donnees-tp1-advanced-database-pdf-76b16911
 slug: resource-s7-base-de-donnees-tp1-advanced-database-pdf-76b16911
 source_key: 'sha256:76b169119e48f8de7fc55c743255b6b491681fecc7e58872e2fca2a39a4209f1'
-part_of: S7 - base de données
+part_of: resource-s7-base-de-donnees-d1856687
 order: 6
 manifest: null
 derived_from: 'sha256:76b169119e48f8de7fc55c743255b6b491681fecc7e58872e2fca2a39a4209f1'

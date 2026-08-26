@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-theorie-du-signal-chap-2-developpement-en-serie-de-fourier-pdf-2deb1ae3
 source_key: 'sha256:2deb1ae35d1fa60238f3da1ec10f0e40f1bbcd6c87ab43247eee5775195f145a'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 3
 manifest: null
 derived_from: 'sha256:2deb1ae35d1fa60238f3da1ec10f0e40f1bbcd6c87ab43247eee5775195f145a'

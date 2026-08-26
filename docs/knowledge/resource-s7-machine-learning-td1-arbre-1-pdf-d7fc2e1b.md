@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-td1-arbre-1-pdf-d7fc2e1b
 slug: resource-s7-machine-learning-td1-arbre-1-pdf-d7fc2e1b
 source_key: 'sha256:d7fc2e1b1de83a5d9ecde9c1ddf4318d89654af52c328ce4a1df9b7fc2815295'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 1
 manifest: null
 derived_from: 'sha256:d7fc2e1b1de83a5d9ecde9c1ddf4318d89654af52c328ce4a1df9b7fc2815295'

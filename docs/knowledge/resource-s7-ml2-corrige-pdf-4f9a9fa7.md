@@ -2,7 +2,7 @@
 id: resource-s7-ml2-corrige-pdf-4f9a9fa7
 slug: resource-s7-ml2-corrige-pdf-4f9a9fa7
 source_key: 'sha256:4f9a9fa7ae33bbf0e8f178d865e32237e5669ce894b15fda3be6b07e2d3b4c1e'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 14
 manifest: null
 derived_from: 'sha256:4f9a9fa7ae33bbf0e8f178d865e32237e5669ce894b15fda3be6b07e2d3b4c1e'

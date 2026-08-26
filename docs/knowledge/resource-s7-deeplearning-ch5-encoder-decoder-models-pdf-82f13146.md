@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-ch5-encoder-decoder-models-pdf-82f13146
 slug: resource-s7-deeplearning-ch5-encoder-decoder-models-pdf-82f13146
 source_key: 'sha256:82f131463b17b1805ec9e3eeb18de3dd39f689f2a8ccea9ff0f02e132bfa997f'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 4
 manifest: null
 derived_from: 'sha256:82f131463b17b1805ec9e3eeb18de3dd39f689f2a8ccea9ff0f02e132bfa997f'

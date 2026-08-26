@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s5-python-pour-la-data-science-python-data-science-seance-1-pdf-9b72ef7b
 source_key: 'sha256:9b72ef7b0b4bfe3f6dbb2c2137534649bb98c765a8ebd2799fe41f23d6c68949'
-part_of: S5 - Python pour la Data Science
+part_of: resource-s5-python-pour-la-data-science-f152995e
 order: 3
 manifest: null
 derived_from: 'sha256:9b72ef7b0b4bfe3f6dbb2c2137534649bb98c765a8ebd2799fe41f23d6c68949'

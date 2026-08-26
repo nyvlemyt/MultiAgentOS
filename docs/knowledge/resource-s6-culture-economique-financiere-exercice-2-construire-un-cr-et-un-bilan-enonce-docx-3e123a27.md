@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-exercice-2-construire-un-cr-et-un-bilan-enonce-docx-3e123a27
 source_key: 'sha256:3e123a27e34446f2a5c401a51f9103443b753df25a968316f0af4f80885eaee3'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 3
 manifest: null
 derived_from: 'sha256:3e123a27e34446f2a5c401a51f9103443b753df25a968316f0af4f80885eaee3'

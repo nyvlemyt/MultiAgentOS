@@ -2,7 +2,7 @@
 id: resource-s7-machine-learning-td3-knn-efrei-1-pdf-80ae228e
 slug: resource-s7-machine-learning-td3-knn-efrei-1-pdf-80ae228e
 source_key: 'sha256:80ae228e1b3cd97a31e0fabd1c98c923e0ff3bf91aa37d3a81ad193e042712f8'
-part_of: S7 - machine learning
+part_of: resource-s7-machine-learning-f79ea225
 order: 3
 manifest: null
 derived_from: 'sha256:80ae228e1b3cd97a31e0fabd1c98c923e0ff3bf91aa37d3a81ad193e042712f8'

@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-datalakes-and-data-integration-documentation-technique-projet-datalakes-chang-breton-pdf-081ca8f5
 source_key: 'sha256:081ca8f5f7b144af31d0f4fedd3e62144ca68ca97e2c6702eb33efaf21cef34b'
-part_of: S7 - Datalakes and Data Integration
+part_of: resource-s7-datalakes-and-data-integration-013c4eca
 order: 16
 manifest: null
 derived_from: 'sha256:081ca8f5f7b144af31d0f4fedd3e62144ca68ca97e2c6702eb33efaf21cef34b'

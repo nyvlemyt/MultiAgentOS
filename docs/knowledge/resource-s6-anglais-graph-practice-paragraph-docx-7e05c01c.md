@@ -2,7 +2,7 @@
 id: resource-s6-anglais-graph-practice-paragraph-docx-7e05c01c
 slug: resource-s6-anglais-graph-practice-paragraph-docx-7e05c01c
 source_key: 'sha256:7e05c01cfc91ab29660eb80ee2bb3b67849c8375e65672ba0c9ec8af1a3040c7'
-part_of: S6 - Anglais
+part_of: resource-s6-anglais-18c7add0
 order: 4
 manifest: null
 derived_from: 'sha256:7e05c01cfc91ab29660eb80ee2bb3b67849c8375e65672ba0c9ec8af1a3040c7'

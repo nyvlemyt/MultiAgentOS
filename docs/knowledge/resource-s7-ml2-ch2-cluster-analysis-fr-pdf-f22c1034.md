@@ -2,7 +2,7 @@
 id: resource-s7-ml2-ch2-cluster-analysis-fr-pdf-f22c1034
 slug: resource-s7-ml2-ch2-cluster-analysis-fr-pdf-f22c1034
 source_key: 'sha256:f22c103409fa7126ba5236c4246f084e9aae1bc0c11bd4e999618a40c9a6a45c'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 10
 manifest: null
 derived_from: 'sha256:f22c103409fa7126ba5236c4246f084e9aae1bc0c11bd4e999618a40c9a6a45c'

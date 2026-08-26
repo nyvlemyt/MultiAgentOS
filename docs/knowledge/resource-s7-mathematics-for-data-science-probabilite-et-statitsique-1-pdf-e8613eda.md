@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-mathematics-for-data-science-probabilite-et-statitsique-1-pdf-e8613eda
 source_key: 'sha256:e8613edafa79879b6d87b17740cd4290c6c1ce6c1331c98d222658c0d14656ea'
-part_of: S7 - Mathematics for Data Science
+part_of: resource-s7-mathematics-for-data-science-1bb2da35
 order: 3
 manifest: null
 derived_from: 'sha256:e8613edafa79879b6d87b17740cd4290c6c1ce6c1331c98d222658c0d14656ea'

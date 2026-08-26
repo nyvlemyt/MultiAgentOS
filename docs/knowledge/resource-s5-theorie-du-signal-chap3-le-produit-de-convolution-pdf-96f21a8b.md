@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-chap3-le-produit-de-convolution-pdf-96f21a8b
 slug: resource-s5-theorie-du-signal-chap3-le-produit-de-convolution-pdf-96f21a8b
 source_key: 'sha256:96f21a8b74c5428cf7219ec058dc036a625b80b66eb753297ecbbbc6c660a1ec'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 5
 manifest: null
 derived_from: 'sha256:96f21a8b74c5428cf7219ec058dc036a625b80b66eb753297ecbbbc6c660a1ec'

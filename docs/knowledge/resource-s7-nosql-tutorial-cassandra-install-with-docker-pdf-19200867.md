@@ -2,7 +2,7 @@
 id: resource-s7-nosql-tutorial-cassandra-install-with-docker-pdf-19200867
 slug: resource-s7-nosql-tutorial-cassandra-install-with-docker-pdf-19200867
 source_key: 'sha256:192008674a9bbbdfdb2e09c0afa9bacf7ba6898c3aecd2c72324ce00d3cc77dc'
-part_of: S7 - nosql
+part_of: resource-s7-nosql-a014403d
 order: 11
 manifest: null
 derived_from: 'sha256:192008674a9bbbdfdb2e09c0afa9bacf7ba6898c3aecd2c72324ce00d3cc77dc'

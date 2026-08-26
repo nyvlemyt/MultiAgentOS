@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-expression-apfg84-apfg84-grille-devaluation-grand-portrait-et-petit-portrait-de-docx-56af673e
 source_key: 'sha256:56af673e504e17ff0ebb504d17f7d35a2124662d57c9bdcdbf74bb94bc567e3c'
-part_of: S7 - Expression APFG84
+part_of: resource-s7-expression-apfg84-b9c6f71a
 order: 1
 manifest: null
 derived_from: 'sha256:56af673e504e17ff0ebb504d17f7d35a2124662d57c9bdcdbf74bb94bc567e3c'

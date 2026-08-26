@@ -2,7 +2,7 @@
 id: resource-s7-ml2-machine-learning-ii-2526-lab3-pdf-8132c42b
 slug: resource-s7-ml2-machine-learning-ii-2526-lab3-pdf-8132c42b
 source_key: 'sha256:8132c42b72e7a0057567bf5da21063dccdeca2fafc7582aee1bc5f578d3bf2a7'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 2
 manifest: null
 derived_from: 'sha256:8132c42b72e7a0057567bf5da21063dccdeca2fafc7582aee1bc5f578d3bf2a7'

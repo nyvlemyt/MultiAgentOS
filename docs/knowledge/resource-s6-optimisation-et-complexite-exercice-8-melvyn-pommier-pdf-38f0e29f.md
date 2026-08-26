@@ -2,7 +2,7 @@
 id: resource-s6-optimisation-et-complexite-exercice-8-melvyn-pommier-pdf-38f0e29f
 slug: resource-s6-optimisation-et-complexite-exercice-8-melvyn-pommier-pdf-38f0e29f
 source_key: 'sha256:38f0e29f17d6a9955415f77af193d2f8d0c43be82050407032ee13fdb3b867c3'
-part_of: S6 - Optimisation et complexité
+part_of: resource-s6-optimisation-et-complexite-7bceb175
 order: 5
 manifest: null
 derived_from: 'sha256:38f0e29f17d6a9955415f77af193d2f8d0c43be82050407032ee13fdb3b867c3'

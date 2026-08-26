@@ -2,7 +2,7 @@
 id: resource-s7-deeplearning-pw-cnn-pdf-3ce77bde
 slug: resource-s7-deeplearning-pw-cnn-pdf-3ce77bde
 source_key: 'sha256:3ce77bde37ce7772852722d48231e24fc72a3db070bd5e8ccbf55f9e2b7de5ed'
-part_of: S7 - deepLearning
+part_of: resource-s7-deeplearning-062b2dc8
 order: 10
 manifest: null
 derived_from: 'sha256:3ce77bde37ce7772852722d48231e24fc72a3db070bd5e8ccbf55f9e2b7de5ed'

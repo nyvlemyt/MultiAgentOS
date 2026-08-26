@@ -2,7 +2,7 @@
 id: resource-s7-ml2-esb-dataset-change-log-version-9-pdf-7033d1c4
 slug: resource-s7-ml2-esb-dataset-change-log-version-9-pdf-7033d1c4
 source_key: 'sha256:7033d1c4f6831fdf0cb77e5fed3a9cded9bcd2d4432d13938ad7ffccfca0c6b4'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 16
 manifest: null
 derived_from: 'sha256:7033d1c4f6831fdf0cb77e5fed3a9cded9bcd2d4432d13938ad7ffccfca0c6b4'

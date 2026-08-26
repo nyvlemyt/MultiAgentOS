@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-tp4-bd-pdf-21367d9c
 slug: resource-s6-base-de-donnees-tp4-bd-pdf-21367d9c
 source_key: 'sha256:21367d9c20427f7b4ecec2b01cd16d5aa278a07b7c66f66b986e9a278424fdfb'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 8
 manifest: null
 derived_from: 'sha256:21367d9c20427f7b4ecec2b01cd16d5aa278a07b7c66f66b986e9a278424fdfb'

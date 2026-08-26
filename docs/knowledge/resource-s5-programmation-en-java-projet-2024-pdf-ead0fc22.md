@@ -2,7 +2,7 @@
 id: resource-s5-programmation-en-java-projet-2024-pdf-ead0fc22
 slug: resource-s5-programmation-en-java-projet-2024-pdf-ead0fc22
 source_key: 'sha256:ead0fc229259c7954d3f1fec840e527bca7758e19a4152bbaeeff9a79bbc351c'
-part_of: S5 - Programmation en Java
+part_of: resource-s5-programmation-en-java-6afe3d81
 order: 1
 manifest: null
 derived_from: 'sha256:ead0fc229259c7954d3f1fec840e527bca7758e19a4152bbaeeff9a79bbc351c'

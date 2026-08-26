@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-expression-apfg84-dossier-lecriture-journalistique-i1-app-apfg84-docx-b2e28f5d
 source_key: 'sha256:b2e28f5d35eee77617a1c53401050ee56e03726db3dc7bc9537719de4719b56a'
-part_of: S7 - Expression APFG84
+part_of: resource-s7-expression-apfg84-b9c6f71a
 order: 4
 manifest: null
 derived_from: 'sha256:b2e28f5d35eee77617a1c53401050ee56e03726db3dc7bc9537719de4719b56a'

@@ -2,7 +2,7 @@
 id: resource-s7-ml2-exercice-cah-apriori-pdf-15b89237
 slug: resource-s7-ml2-exercice-cah-apriori-pdf-15b89237
 source_key: 'sha256:15b892372ab9aece798da96eb183c0ab1f63a173496ef05dce0813e016cfc73c'
-part_of: S7 - ml2
+part_of: resource-s7-ml2-fa640f29
 order: 18
 manifest: null
 derived_from: 'sha256:15b892372ab9aece798da96eb183c0ab1f63a173496ef05dce0813e016cfc73c'

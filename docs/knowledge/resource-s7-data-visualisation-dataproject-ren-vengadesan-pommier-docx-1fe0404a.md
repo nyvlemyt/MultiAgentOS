@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s7-data-visualisation-dataproject-ren-vengadesan-pommier-docx-1fe0404a
 source_key: 'sha256:1fe0404a5a4dbb4bb92592efc2caf06b17744ef03da33d422a76e9e82a6c36ae'
-part_of: S7 - data visualisation
+part_of: resource-s7-data-visualisation-0f395360
 order: 1
 manifest: null
 derived_from: 'sha256:1fe0404a5a4dbb4bb92592efc2caf06b17744ef03da33d422a76e9e82a6c36ae'

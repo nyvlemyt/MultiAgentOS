@@ -2,7 +2,7 @@
 id: resource-s6-base-de-donnees-td2-bdd-pdf-72456bb9
 slug: resource-s6-base-de-donnees-td2-bdd-pdf-72456bb9
 source_key: 'sha256:72456bb9981ab0700dfbf48a191e5cd689945aebd08ebbacd1fb7cdafe3bf61e'
-part_of: S6 - Base de données
+part_of: resource-s6-base-de-donnees-fb2fe2f1
 order: 4
 manifest: null
 derived_from: 'sha256:72456bb9981ab0700dfbf48a191e5cd689945aebd08ebbacd1fb7cdafe3bf61e'

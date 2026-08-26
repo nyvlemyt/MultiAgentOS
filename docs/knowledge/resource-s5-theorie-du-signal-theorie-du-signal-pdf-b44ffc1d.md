@@ -2,7 +2,7 @@
 id: resource-s5-theorie-du-signal-theorie-du-signal-pdf-b44ffc1d
 slug: resource-s5-theorie-du-signal-theorie-du-signal-pdf-b44ffc1d
 source_key: 'sha256:b44ffc1d3d5fbbd3ef815f3cdd659f4289a61a06e576b2bb05f6c7d7f3e7d9d0'
-part_of: S5 - Théorie du signal
+part_of: resource-s5-theorie-du-signal-9d97f2d3
 order: 21
 manifest: null
 derived_from: 'sha256:b44ffc1d3d5fbbd3ef815f3cdd659f4289a61a06e576b2bb05f6c7d7f3e7d9d0'

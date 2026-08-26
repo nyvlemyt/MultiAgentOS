@@ -4,7 +4,7 @@ id: >-
 slug: >-
   resource-s6-culture-economique-financiere-exercice-1-le-fonctionnement-du-bilan-enonce-docx-c0bc76f8
 source_key: 'sha256:c0bc76f8e35eff14517b05a0979d890580defade07c5a5f644c4397783391aa6'
-part_of: S6 - Culture économique & financière
+part_of: resource-s6-culture-economique-financiere-e643c91c
 order: 2
 manifest: null
 derived_from: 'sha256:c0bc76f8e35eff14517b05a0979d890580defade07c5a5f644c4397783391aa6'
