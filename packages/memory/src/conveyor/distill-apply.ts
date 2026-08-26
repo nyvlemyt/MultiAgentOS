@@ -10,7 +10,8 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, write
 import { join } from 'node:path';
 import matter from 'gray-matter';
 import { planSupersede, type ExistingFiche, type SupersedePlan } from './supersede';
-import type { DistilledFiche } from './distill';
+import type { DistilledFiche, DistillInput } from './distill';
+import { FicheSchema } from '../fiche';
 
 export interface WriteDistilledResult {
   /** Absolute path of the distilled fiche written. */
@@ -58,4 +59,49 @@ export function writeDistilledFiche(
   const written = join(dir, `${id}.md`);
   writeFileSync(written, matter.stringify(fiche.body, { ...fiche.frontmatter, lifecycle: 'distilled' }), 'utf8');
   return plan ? { written, supersedePending: plan } : { written };
+}
+
+/**
+ * Archive an extraction husk as a `rejected-kept` fiche WITHOUT a distillation call
+ * (archive-never-delete, ADR 0008 §5: an id-bearing entry is kept, never dropped).
+ * The original content rides along in a fence so the rejection stays auditable.
+ */
+export function writeRejectedKeptFiche(
+  dir: string,
+  logPath: string,
+  input: DistillInput,
+  opts: { date: string; keeper: string },
+): { written: string } {
+  mkdirSync(dir, { recursive: true });
+  const frontmatter = FicheSchema.parse({
+    id: input.id,
+    slug: input.id,
+    source_key: input.sourceKey,
+    part_of: input.partOf ?? null,
+    order: input.order ?? null,
+    derived_from: input.derivedFrom,
+    lifecycle: 'rejected-kept',
+    trust: input.trust,
+    kind: 'resource',
+    register: 'learnings',
+    scope: 'global',
+    doc_type: 'reference',
+    actionability: 'archive',
+    lane: 'resources',
+    tags: [],
+  });
+  const body = [
+    `# ${input.title}`,
+    '',
+    `Écarté à l'ingestion : fragment sans valeur documentaire (< ${200} caractères utiles).`,
+    '',
+    '```text',
+    input.rawMarkdown.trim(),
+    '```',
+    '',
+  ].join('\n');
+  const written = join(dir, `${input.id}.md`);
+  writeFileSync(written, matter.stringify(body, frontmatter), 'utf8');
+  appendFileSync(logPath, `${opts.date} | reject-kept | ids=${input.id} | lane=resources | keeper=${opts.keeper} | note=fragment at ingest\n`, 'utf8');
+  return { written };
 }
