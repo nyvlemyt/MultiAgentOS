@@ -109,8 +109,8 @@
   <div class="kpis">
     <div class="kpi" style="--kc:var(--green)"><div class="n">843</div><div class="l">tests verts</div><div class="s">0 échec, 7 modules, 120 fichiers</div></div>
     <div class="kpi" style="--kc:var(--green)"><div class="n">9<span style="font-size:18px;color:var(--ink3)">/12</span></div><div class="l">phases roadmap livrées</div><div class="s">0→7 + cœur de la 9 ; reste étapes 1·3 + packaging</div></div>
-    <div class="kpi" style="--kc:var(--amber)"><div class="n">379</div><div class="l">fiches en attente</div><div class="s">distillées, ni promues ni indexées ni commitées</div></div>
-    <div class="kpi" style="--kc:var(--red)"><div class="n">74</div><div class="l">branches à purger</div><div class="s">déjà dans main — ménage proposé §6</div></div>
+    <div class="kpi" style="--kc:var(--amber)"><div class="n">379</div><div class="l">fiches distillées</div><div class="s">indexées ✅ (QMD 401 docs, golden 11/11) — tri et promotion restants</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="n">76</div><div class="l">branches purgées</div><div class="s">ménage fait le 25/08 — reste 40, tri fin plus tard</div></div>
   </div>
 
   <nav class="toc">
@@ -148,8 +148,8 @@
   <h2><span class="idx">02</span>Bouché ou en cours — là où ça coince</h2>
   <p class="sub">L'usine avale bien, mais personne ne range en bout de tapis : rien de ce qui a été ingéré n'est encore <em>consultable</em> par les agents.</p>
   <div class="chantiers">
-    <div class="ch"><div><h3>Sortie de la mémoire — le goulot n°1</h3><p>379 fiches figées en « distilled » : la promotion vers le corpus actif n'a <b>aucun code appelant</b>, l'index sémantique QMD date du 22 juin (il voit 21 fiches sur 396), et 281 fiches ont un titre dégénéré à retraiter.</p></div>
-      <div><div class="meter"><i style="width:55%;--mc:var(--amber)"></i></div><div class="mlab"><span>pipeline 55 %</span><span>P1-2…P1-6</span></div></div></div>
+    <div class="ch"><div><h3>Sortie de la mémoire — en cours de débouchage</h3><p>25/08 : pont miroir réparé (PR #70, TDD) + index QMD reconstruit — <b>401 fiches trouvables, golden set 11/11</b>. Reste : trier/re-distiller les 281 fiches à titre dégénéré, puis brancher la promotion vers le corpus actif (aucun code appelant).</p></div>
+      <div><div class="meter"><i style="width:70%;--mc:var(--amber)"></i></div><div class="mlab"><span>pipeline 70 %</span><span>reste P1-2 · P1-6</span></div></div></div>
     <div class="ch"><div><h3>Registres du second cerveau</h3><p>Les 5 registres (décisions, apprentissages, blocages, journal, évals) sont codés et verrouillés… mais <b>aucun n'a jamais été écrit</b>. 51 candidats déjà classés attendent une promotion en 1 clic.</p></div>
       <div><div class="meter"><i style="width:30%;--mc:var(--amber)"></i></div><div class="mlab"><span>codé, jamais nourri</span><span>P1-8</span></div></div></div>
     <div class="ch"><div><h3>Brique 5 — l'onglet Ressources du cockpit</h3><p>La surface de triage humain (328 candidats en abstention l'attendent). Contrat de données gelé, <b>zéro ligne écrite</b>.</p></div>
@@ -211,8 +211,8 @@ pnpm mem:doctor</pre>
 </section>
 
 <section id="menage">
-  <h2><span class="idx">06</span>Ménage git proposé <span class="tag t-you" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:6px">à valider par toi</span></h2>
-  <p class="sub">Constat : 116 branches locales, dont <b>74 déjà intégralement contenues dans main</b> — les supprimer ne perd rien (vérifiable : <code>git branch --merged origin/main</code>). Les 42 restantes portent un delta réel et seront triées carte par carte.</p>
+  <h2><span class="idx">06</span>Ménage git <span class="tag t-s" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:6px">fait le 25/08</span></h2>
+  <p class="sub">Exécuté : <b>76 branches supprimées</b> (contenu prouvé dans main/brique-1), <b>5 worktrees retirés</b> (2 contenus sauvés avant), <b>main re-fusionnée dans brique-1</b> (checks verts). Restent 40 branches à delta squashé — tri fin carte par carte, sans urgence.</p>
   <div class="cols">
     <div class="card"><h3><span class="dot" style="background:var(--green)"></span>Sans risque (proposé maintenant)</h3>
       <ul class="flat done">
