@@ -30,22 +30,36 @@ function sasBody(rawMarkdown: string): string {
   return m ? rawMarkdown.slice(0, m.index) + rawMarkdown.slice(m.index + m[0].length) : rawMarkdown;
 }
 
+interface MotherRef {
+  raw: string;
+  /** The mother manifest's own fiche id — the only gardien-resolvable `part_of` target. */
+  ficheId: string;
+}
+
 // One directory scan per quai dir (not per doc): mother manifests keyed by their NFC H1 title.
-const motherCache = new Map<string, Map<string, string>>();
-function mothersIn(dir: string): Map<string, string> {
+const motherCache = new Map<string, Map<string, MotherRef>>();
+function mothersIn(dir: string): Map<string, MotherRef> {
   const cached = motherCache.get(dir);
   if (cached) return cached;
-  const map = new Map<string, string>();
+  const map = new Map<string, MotherRef>();
   if (existsSync(dir)) {
     for (const f of readdirSync(dir).filter((n) => n.endsWith('.md') && !n.startsWith('.'))) {
       const raw = readFileSync(join(dir, f), 'utf8');
       if (!raw.includes('## Contents')) continue;
       const h1 = firstH1(raw);
-      if (h1) map.set(nfc(h1), raw);
+      if (!h1) continue;
+      const hash = createHash('sha256').update(raw).digest('hex');
+      const stem = kebab(h1) || `doc-${hash.slice(0, 8)}`;
+      map.set(nfc(h1), { raw, ficheId: `resource-${stem}-${hash.slice(0, 8)}` });
     }
   }
   motherCache.set(dir, map);
   return map;
+}
+
+/** Mother manifest of a matière title in this dir, when one exists. */
+function motherFor(dir: string, matiere: string): MotherRef | null {
+  return mothersIn(dir).get(nfc(matiere)) ?? null;
 }
 
 /** First plausible text line of a doc (≥ 3 letters once control chars are stripped), ≤ 80 chars. */
@@ -57,11 +71,9 @@ function firstTextLine(body: string): string | null {
   return null;
 }
 
-/** Title of child `order` as listed in the mother manifest of `partOf`, when both exist. */
-function manifestTitle(dir: string, partOf: string, order: number): string | null {
-  const raw = mothersIn(dir).get(nfc(partOf));
-  if (!raw) return null;
-  for (const line of raw.split('\n')) {
+/** Title of child `order` as listed in a mother manifest. */
+function manifestTitle(mother: MotherRef, order: number): string | null {
+  for (const line of mother.raw.split('\n')) {
     if (!line.startsWith(`${order}. `)) continue;
     const dash = line.indexOf('—');
     if (dash !== -1) return line.slice(dash + 1).trim();
@@ -128,14 +140,15 @@ export function sasDocToInput(path: string): DistillInput {
   const rawMarkdown = readFileSync(path, 'utf8');
   const hash = createHash('sha256').update(rawMarkdown).digest('hex');
   const pm = PART_OF_RE.exec(rawMarkdown);
-  const partOf = pm ? pm[1]! : undefined;
+  const matiere = pm ? pm[1]! : undefined;
   const order = pm ? Number(pm[2]) : undefined;
+  const mother = matiere !== undefined ? motherFor(dirname(path), matiere) : null;
   // Title chain: own H1 → mother-manifest line (children of a matière have no H1 — the 281
-  // degenerate resource-cand-* ids all came from this gap) → "part_of — document N" → filename.
+  // degenerate resource-cand-* ids all came from this gap) → "matière — document N" → filename.
   let title = firstH1(sasBody(rawMarkdown));
-  if (!title && partOf !== undefined && order !== undefined) {
-    const inherited = manifestTitle(dirname(path), partOf, order);
-    title = `${partOf} — ${inherited ?? `document ${order}`}`;
+  if (!title && matiere !== undefined && order !== undefined) {
+    const inherited = mother ? manifestTitle(mother, order) : null;
+    title = `${matiere} — ${inherited ?? `document ${order}`}`;
   }
   // Flat captures (no H1, no matière marker): the first text line beats the quai filename.
   title ??= firstTextLine(sasBody(rawMarkdown));
@@ -143,10 +156,12 @@ export function sasDocToInput(path: string): DistillInput {
   const stem = kebab(title) || `doc-${hash.slice(0, 8)}`;
   const id = `resource-${stem}-${hash.slice(0, 8)}`;
   const sourceKey = `sha256:${hash}`;
+  // part_of must be a gardien-RESOLVABLE relation target — the mother's fiche id, never the
+  // matière title (an unresolvable title broke the frontmatter guard on 268 fiches, 2026-08-27).
   return {
     id, sourceKey, derivedFrom: sourceKey, trust: 'untrusted', title, rawMarkdown,
-    ...(partOf !== undefined ? { partOf } : {}),
-    ...(order !== undefined ? { order } : {}),
+    ...(mother ? { partOf: mother.ficheId } : {}),
+    ...(mother && order !== undefined ? { order } : {}),
   };
 }
 

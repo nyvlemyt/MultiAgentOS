@@ -174,7 +174,8 @@ describe('titres hérités du manifeste (P1-2 / P1-7)', () => {
     const child = writeSasDoc('cand-x-bbbb2222.md', `<!-- part_of: S7 - eco order: 2 -->\n${LONG}`);
     const input = sasDocToInput(child);
     expect(input.title).toBe('S7 - eco — Cours2.pdf');
-    expect(input.partOf).toBe('S7 - eco');
+    // part_of doit être une cible RÉSOLVABLE par le gardien : l'id de la fiche mère, pas le titre.
+    expect(input.partOf).toMatch(/^resource-s7-eco-[0-9a-f]{8}$/);
     expect(input.order).toBe(2);
     expect(input.id.startsWith('resource-s7-eco-cours2-pdf-')).toBe(true);
   });
@@ -201,7 +202,8 @@ describe('fragments sans valeur → rejected-kept (P1-2)', () => {
     expect(calls).toHaveLength(0);
     const fm = matter(readFileSync(res.rejectedKept![0]!, 'utf8'));
     expect(fm.data.lifecycle).toBe('rejected-kept');
-    expect(fm.data.part_of).toBe('S7 - ml2');
+    // pas de manifeste mère dans ce dossier → part_of reste null (jamais un titre irrésolvable)
+    expect(fm.data.part_of).toBeNull();
     expect(readFileSync(logPath, 'utf8')).toContain('reject-kept');
   });
 
