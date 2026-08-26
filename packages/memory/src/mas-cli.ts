@@ -103,7 +103,7 @@ async function runDistill(root: string, rest: string[]): Promise<void> {
     console.log(formatDistillSummary(await distillAll(dir, deps)));
     return;
   }
-  console.log(formatDistillSummary(await distillPath(resolve(rest[0]!), deps)));
+  console.log(formatDistillSummary(await distillPath(resolve(root, rest[0]!), deps)));
 }
 
 async function main(): Promise<void> {
