@@ -37,6 +37,7 @@
 | P1-11 | `mas distill --candidate <id>` : distiller depuis une ligne `memory_candidates` (supprime le maillon manuel du quai `data/sas/`) | M | P1-7 | carte `distill-from-db-candidate.md` |
 | P1-12 | Capture Sorbonne S1–S3 (USB à brancher) puis re-distillation du quai restant | S (opération) | matériel + P1-5 | carte `knowledge-os-reste-a-faire.md` §2 |
 | P1-13 | Merge `brique-1` → `main` d'un bloc (fin du chantier Knowledge OS) | M | P1-2, P1-10, P1-12 | carte `knowledge-os-reste-a-faire.md` §4 |
+| P1-14 | Retrieval : isoler les fiches de cours du savoir produit (le golden `sem-token-cost` régresse — les 283 fiches de cours noient les requêtes d'ingénierie ; décision : collection/lane dédiée vs scope projet) | M · décision Melvyn | P1-2 fait | constat S2 2026-08-27, `mem:eval` 10/11 |
 
 ## P2 — Le reste
 
