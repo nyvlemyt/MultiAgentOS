@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -66,5 +66,57 @@ describe('runSeed (bridge runner — builds the Keeper store internally)', () =>
     expect(res2.imported).toHaveLength(0);
     expect(res2.skipped.length).toBeGreaterThan(0);
     expect(keeperStore().knowledgeDocs()).toHaveLength(count);
+  });
+});
+
+describe('routage études vs savoir mission (P1-14, décision 2026-08-31)', () => {
+  const CURATED = '---\nid: fiche-pattern\nlifecycle: active\ntrust: trusted\n---\n\n# Patterns agents\n';
+  const COURS = '---\nid: fiche-cours\nlifecycle: distilled\ntrust: untrusted\n---\n\n# S5 - Théorie du signal — Fourier\n';
+
+  function makeDirs() {
+    const kn = join(root, 'kn');
+    const etudes = join(root, 'etudes');
+    mkdirSync(kn, { recursive: true });
+    writeFileSync(join(kn, 'pattern.md'), CURATED, 'utf8');
+    writeFileSync(join(kn, 'cours.md'), COURS, 'utf8');
+    return { kn, etudes };
+  }
+
+  it('une fiche untrusted non promue part dans le miroir études, pas dans la mémoire mission', () => {
+    const { kn, etudes } = makeDirs();
+    const res = seedGlobalKnowledge(keeperStore(), kn, etudes);
+    expect(res.imported).toHaveLength(1);
+    expect(res.etudes).toHaveLength(1);
+    const missionDocs = keeperStore().knowledgeDocs();
+    expect(missionDocs).toHaveLength(1);
+    expect(missionDocs[0]!.body).toContain('Patterns agents');
+    expect(existsSync(join(etudes, 'docs__knowledge__cours.md'))).toBe(true);
+  });
+
+  it('le miroir études garde un frontmatter lisible (provenance après le bloc ---)', () => {
+    const { kn, etudes } = makeDirs();
+    seedGlobalKnowledge(keeperStore(), kn, etudes);
+    const f = readdirSync(etudes).find((n) => n.endsWith('cours.md'))!;
+    const raw = readFileSync(join(etudes, f), 'utf8');
+    expect(raw.startsWith('---\n')).toBe(true);
+    expect(raw).toContain('<!-- source: ');
+  });
+
+  it('routage idempotent — un second seed ne duplique rien', () => {
+    const { kn, etudes } = makeDirs();
+    seedGlobalKnowledge(keeperStore(), kn, etudes);
+    const res2 = seedGlobalKnowledge(keeperStore(), kn, etudes);
+    expect(res2.imported).toHaveLength(0);
+    expect(res2.etudes).toHaveLength(0);
+    expect(readdirSync(etudes)).toHaveLength(1);
+  });
+
+  it('sans frontmatter (fichier curé historique) → mémoire mission', () => {
+    const kn = join(root, 'kn2');
+    mkdirSync(kn, { recursive: true });
+    writeFileSync(join(kn, 'legacy.md'), '# Doctrine projet\n\nfait durable.', 'utf8');
+    const res = seedGlobalKnowledge(keeperStore(), kn, join(root, 'etudes2'));
+    expect(res.imported).toHaveLength(1);
+    expect(res.etudes).toHaveLength(0);
   });
 });

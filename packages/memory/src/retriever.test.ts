@@ -371,3 +371,18 @@ describe('QMD collection constants (Brique 4 — mas-resources scope)', () => {
     expect(QMD_MEMORY_COLLECTIONS).not.toContain(QMD_RESOURCES);
   });
 });
+
+describe('mapQmdHit — miroir mémoire slugifié par qmd (bug 2026-08-31)', () => {
+  it('un hit mas-memory/global/... est GLOBAL (qmd avale l’underscore de _global)', () => {
+    const fixture = JSON.stringify([
+      { docid: '#9', score: 0.9, file: 'qmd://mas-memory/global/knowledge/docs-knowledge-anthropic-ecosystem.md', line: 1, title: 'Anthropic ecosystem', snippet: 'prompt caching réduit le coût' },
+    ]);
+    const dir = mkdtempSync(join(tmpdir(), 'mas-qmd-slug-'));
+    const bin = writeFakeQmd(dir, fixture);
+    const r = new QmdRetriever({ cwd: dir, bin });
+    const hits = r.query('coût des appels', { scope: 'global', limit: 5 });
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.scope).toBe('global');
+    rmSync(dir, { recursive: true, force: true });
+  });
+});
