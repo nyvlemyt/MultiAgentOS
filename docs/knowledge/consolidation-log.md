@@ -14,3 +14,7 @@ EVENTS: supersede | lane-promote(L1→L2|L2→L3) | archive | reject-kept | merg
 (First real lines land in Round 2 when the supersede write-path goes live.)
 
 ---
+2026-08-26 | reject-kept | ids=resource-s7-ml2-tp3-livrables-lock-presentation-tp3-pptx-a860d645 | lane=resources | keeper=memory-keeper | note=fragment at ingest
+2026-08-26 | reject-kept | ids=resource-s7-nosql-cours-neo4j-pdf-9d511319 | lane=resources | keeper=memory-keeper | note=fragment at ingest
+2026-08-26 | reject-kept | ids=resource-s7-nosql-lab3-neo4j-pdf-c45ccf70 | lane=resources | keeper=memory-keeper | note=fragment at ingest
+2026-08-26 | reject-kept | ids=resource-s6-developpement-web-3-vuejs-rapport-complet-exo10-q8-docx-f65b5721 | lane=resources | keeper=memory-keeper | note=fragment at ingest
