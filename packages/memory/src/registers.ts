@@ -63,6 +63,25 @@ export function linkifyIds(text: string): string {
   return text.replace(/(?<!\[\[)(BDR|LRN|BLK|EVAL)-\d{3,}(?!\]\])/g, '[[$&]]');
 }
 
+
+/**
+ * Prefix a provenance comment, AFTER the YAML frontmatter block when one is present —
+ * a leading comment would make the frontmatter invisible to any `---`-first parser.
+ * Shared by the mission mirror (writeKnowledge) and the études mirror (seed).
+ */
+export function withProvenance(source: string, body: string): string {
+  const provenance = `<!-- source: ${source} -->`;
+  if (body.startsWith('---\n') || body.startsWith('---\r\n')) {
+    const close = body.indexOf('\n---', 3);
+    if (close !== -1) {
+      const lineEnd = body.indexOf('\n', close + 1);
+      const cut = lineEnd === -1 ? body.length : lineEnd + 1;
+      return `${body.slice(0, cut)}${provenance}\n${body.slice(cut)}`;
+    }
+  }
+  return `${provenance}\n${body}`;
+}
+
 export interface MemoryStoreOpts {
   /** Root of the memory store, e.g. data/memory. */
   root: string;
@@ -192,17 +211,7 @@ export class MemoryStore {
   writeKnowledge(source: string, body: string): void {
     this.assertWriter();
     mkdirSync(this.knowledgeDir(), { recursive: true });
-    const provenance = `<!-- source: ${source} -->`;
-    let out = `${provenance}\n${body}`;
-    if (body.startsWith('---\n') || body.startsWith('---\r\n')) {
-      const close = body.indexOf('\n---', 3);
-      if (close !== -1) {
-        const lineEnd = body.indexOf('\n', close + 1);
-        const cut = lineEnd === -1 ? body.length : lineEnd + 1;
-        out = `${body.slice(0, cut)}${provenance}\n${body.slice(cut)}`;
-      }
-    }
-    writeFileSync(this.knowledgeFile(source), out, 'utf8');
+    writeFileSync(this.knowledgeFile(source), withProvenance(source, body), 'utf8');
   }
 
   /** Seeded knowledge as retriever docs (one per file, scope=global). */
