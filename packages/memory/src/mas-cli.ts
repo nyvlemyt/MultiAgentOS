@@ -96,12 +96,14 @@ function buildDistillDeps(root: string): DistillCliDeps {
 async function runDistill(root: string, rest: string[]): Promise<void> {
   const deps = buildDistillDeps(root);
   if (rest[0] === '--all') {
-    const dir = rest[1] ?? resolve(root, 'docs/resources/inbox');
+    // resolve(root, …) : pnpm --filter runs this CLI with cwd=packages/memory — a raw relative
+    // arg would silently point inside the package (empty dir created, 0 docs distilled).
+    const dir = rest[1] ? resolve(root, rest[1]) : resolve(root, 'docs/resources/inbox');
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
     console.log(formatDistillSummary(await distillAll(dir, deps)));
     return;
   }
-  console.log(formatDistillSummary(await distillPath(resolve(rest[0]!), deps)));
+  console.log(formatDistillSummary(await distillPath(resolve(root, rest[0]!), deps)));
 }
 
 async function main(): Promise<void> {

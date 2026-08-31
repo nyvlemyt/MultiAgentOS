@@ -165,3 +165,63 @@ describe('formatDistillSummary', () => {
     expect(line).toContain('reply is not valid JSON');
   });
 });
+
+describe('titres hérités du manifeste (P1-2 / P1-7)', () => {
+  const LONG = 'Contenu de cours suffisamment long pour dépasser le seuil de fragment. '.repeat(5);
+
+  it('hérite « part_of — titre du manifeste » quand le doc n’a pas de H1', () => {
+    writeSasDoc('s7-eco-aaaa1111.md', '# S7 - eco\n\n## Contents\n1. [[S7 - eco-1]] — TP_Marge.pdf\n2. [[S7 - eco-2]] — Cours2.pdf\n');
+    const child = writeSasDoc('cand-x-bbbb2222.md', `<!-- part_of: S7 - eco order: 2 -->\n${LONG}`);
+    const input = sasDocToInput(child);
+    expect(input.title).toBe('S7 - eco — Cours2.pdf');
+    // part_of doit être une cible RÉSOLVABLE par le gardien : l'id de la fiche mère, pas le titre.
+    expect(input.partOf).toMatch(/^resource-s7-eco-[0-9a-f]{8}$/);
+    expect(input.order).toBe(2);
+    expect(input.id.startsWith('resource-s7-eco-cours2-pdf-')).toBe(true);
+  });
+
+  it('retombe sur « part_of — document N » quand la ligne de manifeste manque', () => {
+    const child = writeSasDoc('cand-y-cccc3333.md', `<!-- part_of: S9 - inconnu order: 4 -->\n${LONG}`);
+    const input = sasDocToInput(child);
+    expect(input.title).toBe('S9 - inconnu — document 4');
+  });
+
+  it('un H1 présent garde la priorité sur le manifeste', () => {
+    writeSasDoc('s7-eco-dddd4444.md', '# S7 - eco\n\n## Contents\n1. [[S7 - eco-1]] — X.pdf\n');
+    const child = writeSasDoc('cand-z-eeee5555.md', `<!-- part_of: S7 - eco order: 1 -->\n# Mon vrai titre\n${LONG}`);
+    expect(sasDocToInput(child).title).toBe('Mon vrai titre');
+  });
+});
+
+describe('fragments sans valeur → rejected-kept (P1-2)', () => {
+  it('écarte un doc < 200 caractères utiles sans appel LLM, fiche rejected-kept sur disque', async () => {
+    const { client, calls } = stubLLM();
+    writeSasDoc('cand-frag-ffff6666.md', '<!-- part_of: S7 - ml2 order: 29 -->\n\x0eMelvyn POMMIER\x00');
+    const res = await distillAll(sasDir, { llm: client, outDir, logPath, date: '2026-08-25', keeper: 'memory-keeper' });
+    expect(res.rejectedKept).toHaveLength(1);
+    expect(calls).toHaveLength(0);
+    const fm = matter(readFileSync(res.rejectedKept![0]!, 'utf8'));
+    expect(fm.data.lifecycle).toBe('rejected-kept');
+    // pas de manifeste mère dans ce dossier → part_of reste null (jamais un titre irrésolvable)
+    expect(fm.data.part_of).toBeNull();
+    expect(readFileSync(logPath, 'utf8')).toContain('reject-kept');
+  });
+
+  it('un doc au-dessus du seuil part bien en distillation (régression)', async () => {
+    const { client, calls } = stubLLM();
+    writeSasDoc('cand-ok-gggg7777.md', `<!-- part_of: S7 - ml2 order: 1 -->\n${'x'.repeat(400)}`);
+    const res = await distillAll(sasDir, { llm: client, outDir, logPath, date: '2026-08-25', keeper: 'memory-keeper' });
+    expect(res.distilled).toHaveLength(1);
+    expect(res.rejectedKept).toHaveLength(0);
+    expect(calls).toHaveLength(1);
+  });
+});
+
+describe('fallback première ligne (docs à plat, sans H1 ni part_of)', () => {
+  it('prend la première ligne de texte comme titre plutôt que le nom de fichier', () => {
+    const child = writeSasDoc('cand-flat-aaaa9999.md', `Développement & Automatisation pour la Gestion\nd'Actifs chez BDF-Gestion\n${'x'.repeat(300)}`);
+    const input = sasDocToInput(child);
+    expect(input.title).toBe('Développement & Automatisation pour la Gestion');
+    expect(input.id.startsWith('resource-developpement-automatisation-')).toBe(true);
+  });
+});
