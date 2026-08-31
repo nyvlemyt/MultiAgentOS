@@ -175,18 +175,34 @@ export class MemoryStore {
   }
 
   private knowledgeFile(source: string): string {
-    return join(this.knowledgeDir(), `${source.replace(/[/\\]/g, '__')}.md`);
+    const flat = source.replace(/[/\\]/g, '__');
+    return join(this.knowledgeDir(), flat.endsWith('.md') ? flat : `${flat}.md`);
   }
 
   hasKnowledge(source: string): boolean {
     return existsSync(this.knowledgeFile(source));
   }
 
-  /** Persist one knowledge file under _global/knowledge/ with source provenance. */
+  /**
+   * Persist one knowledge file under _global/knowledge/ with source provenance.
+   * The provenance comment lands AFTER a YAML frontmatter block when one is
+   * present — a leading comment would make the frontmatter invisible to any
+   * `---`-first parser (gray-matter), which is exactly the bug this fixes.
+   */
   writeKnowledge(source: string, body: string): void {
     this.assertWriter();
     mkdirSync(this.knowledgeDir(), { recursive: true });
-    writeFileSync(this.knowledgeFile(source), `<!-- source: ${source} -->\n${body}`, 'utf8');
+    const provenance = `<!-- source: ${source} -->`;
+    let out = `${provenance}\n${body}`;
+    if (body.startsWith('---\n') || body.startsWith('---\r\n')) {
+      const close = body.indexOf('\n---', 3);
+      if (close !== -1) {
+        const lineEnd = body.indexOf('\n', close + 1);
+        const cut = lineEnd === -1 ? body.length : lineEnd + 1;
+        out = `${body.slice(0, cut)}${provenance}\n${body.slice(cut)}`;
+      }
+    }
+    writeFileSync(this.knowledgeFile(source), out, 'utf8');
   }
 
   /** Seeded knowledge as retriever docs (one per file, scope=global). */
@@ -197,9 +213,25 @@ export class MemoryStore {
       .filter((f) => f.endsWith('.md'))
       .map((f) => {
         const raw = readFileSync(join(dir, f), 'utf8');
-        const m = /^<!-- source: (.+?) -->\n?/.exec(raw);
-        const source = m ? m[1]! : f;
-        const body = m ? raw.slice(m[0].length) : raw;
+        let source = f;
+        let body = raw;
+        const lead = /^<!-- source: (.+?) -->\n?/.exec(raw);
+        if (lead) {
+          source = lead[1]!;
+          body = raw.slice(lead[0].length);
+        } else if (raw.startsWith('---')) {
+          // provenance sits after the frontmatter block (new format)
+          const close = raw.indexOf('\n---', 3);
+          if (close !== -1) {
+            const lineEnd = raw.indexOf('\n', close + 1);
+            const after = lineEnd === -1 ? raw.length : lineEnd + 1;
+            const m = /^<!-- source: (.+?) -->\n?/.exec(raw.slice(after));
+            if (m) {
+              source = m[1]!;
+              body = raw.slice(0, after) + raw.slice(after + m[0].length);
+            }
+          }
+        }
         return {
           id: `knowledge/${source}`,
           scope: 'global' as MemoryScope,

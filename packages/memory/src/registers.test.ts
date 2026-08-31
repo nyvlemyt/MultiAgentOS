@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, unlinkSync } from 'node:fs';
+import { mkdtempSync, rmSync, unlinkSync, existsSync, readFileSync } from 'node:fs';
+import matter from 'gray-matter';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -214,5 +215,43 @@ describe('promoteCandidate (memory_candidates → register)', () => {
       promoteCandidate(db, 'c2', { projectId: 'proj', kind: 'decisions' }, keeperStore()),
     ).rejects.toThrow();
     expect(keeperStore().read('proj', 'decisions')).toHaveLength(1);
+  });
+});
+
+describe('pont miroir — frontmatter intact et nommage (P1-3)', () => {
+  const FICHE = '---\nid: fiche-test\nlifecycle: distilled\n---\n\n# Corps de la fiche\n';
+
+  it('ne double pas le suffixe .md du fichier miroir', () => {
+    const s = keeperStore();
+    s.writeKnowledge('docs/knowledge/foo.md', FICHE);
+    expect(existsSync(join(root, '_global', 'knowledge', 'docs__knowledge__foo.md'))).toBe(true);
+    expect(existsSync(join(root, '_global', 'knowledge', 'docs__knowledge__foo.md.md'))).toBe(false);
+    expect(s.hasKnowledge('docs/knowledge/foo.md')).toBe(true);
+  });
+
+  it('garde le frontmatter YAML lisible — la provenance vient après le bloc ---', () => {
+    const s = keeperStore();
+    s.writeKnowledge('docs/knowledge/foo.md', FICHE);
+    const raw = readFileSync(join(root, '_global', 'knowledge', 'docs__knowledge__foo.md'), 'utf8');
+    expect(raw.startsWith('---\n')).toBe(true);
+    expect(matter(raw).data.id).toBe('fiche-test');
+    expect(raw).toContain('<!-- source: docs/knowledge/foo.md -->');
+  });
+
+  it('knowledgeDocs retrouve la provenance quand elle suit le frontmatter', () => {
+    const s = keeperStore();
+    s.writeKnowledge('docs/knowledge/foo.md', FICHE);
+    const docs = s.knowledgeDocs();
+    expect(docs).toHaveLength(1);
+    expect(docs[0]!.source).toBe('docs/knowledge/foo.md');
+    expect(docs[0]!.body).toContain('# Corps de la fiche');
+  });
+
+  it('un corps sans frontmatter garde la provenance en tête (compat ancien format)', () => {
+    const s = keeperStore();
+    s.writeKnowledge('note-libre', 'juste du texte sans yaml');
+    const docs = s.knowledgeDocs();
+    expect(docs[0]!.source).toBe('note-libre');
+    expect(docs[0]!.body).toContain('juste du texte sans yaml');
   });
 });
