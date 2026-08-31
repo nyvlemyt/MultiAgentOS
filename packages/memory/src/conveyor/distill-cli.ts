@@ -148,7 +148,8 @@ export function sasDocToInput(path: string): DistillInput {
   let title = firstH1(sasBody(rawMarkdown));
   if (!title && matiere !== undefined && order !== undefined) {
     const inherited = mother ? manifestTitle(mother, order) : null;
-    title = `${matiere} — ${inherited ?? `document ${order}`}`;
+    const childName = inherited ?? `document ${order}`;
+    title = `${matiere} — ${childName}`;
   }
   // Flat captures (no H1, no matière marker): the first text line beats the quai filename.
   title ??= firstTextLine(sasBody(rawMarkdown));
@@ -221,7 +222,8 @@ export async function distillAll(dir: string, deps: DistillCliDeps): Promise<Dis
     const gateBody = sasBody(input.rawMarkdown);
     if (!firstH1(gateBody) && gateBody.trim().length < FRAGMENT_MIN_CHARS) {
       const { written } = writeRejectedKeptFiche(deps.outDir, deps.logPath, input, { date: deps.date, keeper: deps.keeper });
-      (res.rejectedKept ??= []).push(written);
+      res.rejectedKept ??= [];
+      res.rejectedKept.push(written);
       continue;
     }
     // Cumulative pre-flight: stop here (before the call) if this doc would push the run over the cap.
