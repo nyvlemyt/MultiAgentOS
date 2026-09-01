@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { getDb, closeDb } from './client';
 import { assertSafeToWipe } from './seed-safety';
+import { SEED_TIER_A as TIER_A, SEED_TIER_B as TIER_B } from './seed-roster';
 import {
   projects,
   agents,
@@ -57,26 +58,6 @@ const PROJECT_ID = 'proj_otakugo';
 const MISSION_ID = 'mission_seed_001';
 const STALE_MISSION_ID = 'mission_seed_stale';
 const HEALTHY_MISSION_ID = 'mission_seed_healthy';
-
-const TIER_A = [
-  { id: 'mission-planner', name: 'Mission Planner', emoji: '🗺️', avatar: 'mission-planner.svg' },
-  { id: 'orchestrator', name: 'Orchestrator', emoji: '🎛️', avatar: 'orchestrator.svg' },
-  { id: 'skill-router', name: 'Skill Router', emoji: '🧭', avatar: 'skill-router.svg' },
-  { id: 'context-manager', name: 'Context Manager', emoji: '🧠', avatar: 'context-manager.svg' },
-  { id: 'memory-keeper', name: 'Memory Keeper', emoji: '📚', avatar: 'memory-keeper.svg' },
-  { id: 'quality-controller', name: 'Quality Controller', emoji: '🎯', avatar: 'quality-controller.svg' },
-  { id: 'reviewer', name: 'Code Reviewer', emoji: '🔍', avatar: 'reviewer.svg' },
-  { id: 'sec-reviewer', name: 'Security Reviewer', emoji: '🛡️', avatar: 'sec-reviewer.svg' },
-  { id: 'agent-evaluator', name: 'Agent Evaluator', emoji: '📊', avatar: 'agent-evaluator.svg' },
-  { id: 'architect', name: 'Architect', emoji: '🏛️', avatar: 'architect.svg' },
-];
-
-const TIER_B = [
-  { id: 'engineering-frontend-developer', name: 'Frontend Developer', emoji: '🎨' },
-  { id: 'engineering-backend-architect', name: 'Backend Architect', emoji: '🛠️' },
-  { id: 'design-ux-architect', name: 'UX Architect', emoji: '✨' },
-  { id: 'testing-reality-checker', name: 'Reality Checker', emoji: '🧪' },
-];
 
 // Deterministic reset: every table the seed owns gets wiped, then rewritten.
 // FK cascades cover most of the chain but we wipe explicitly so reseeds are
