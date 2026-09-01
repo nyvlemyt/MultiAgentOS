@@ -21,7 +21,9 @@
     "mem:doctor": "pnpm --filter @mas/memory mem:doctor",
     "qmd:setup": "bash scripts/qmd-setup.sh",
     "smoke": "pnpm --filter @mas/web smoke",
-    "skills:reindex": "pnpm --filter @mas/skills reindex"
+    "skills:reindex": "pnpm --filter @mas/skills reindex",
+    "mobile:up": "bash scripts/mobile-serve.sh",
+    "mobile:down": "bash scripts/mobile-down.sh"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "2",
