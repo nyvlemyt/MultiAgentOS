@@ -7,6 +7,7 @@ import {
   copyFileSync,
 } from 'node:fs';
 import { join } from 'node:path';
+import matter from 'gray-matter';
 import type { SkillMeta, Domain } from './types.js';
 
 export const ORCHESTRATOR_SKILL_IDS = [
@@ -42,23 +43,61 @@ function str(v: unknown, fallback = ''): string {
   return fallback;
 }
 
-/** Parse YAML frontmatter between --- markers without external deps. */
-function parseFrontmatter(raw: string): Record<string, unknown> {
-  const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw);
-  if (!match?.[1]) return {};
-  const fm: Record<string, unknown> = {};
-  for (const line of match[1].split('\n')) {
-    const colon = line.indexOf(':');
-    if (colon === -1) continue;
-    const key = line.slice(0, colon).trim();
-    const val = line.slice(colon + 1).trim();
-    if (val.startsWith('[')) {
-      try { fm[key] = JSON.parse(val); } catch { fm[key] = val; }
-    } else {
-      fm[key] = val.replace(/^["']|["']$/g, '');
+/**
+ * Parse SKILL.md YAML frontmatter with a real YAML engine (gray-matter → js-yaml),
+ * so block scalars (`description: |`, `summary: >-`), nested maps (`metadata:`) and
+ * flow arrays resolve to their values. The former line-based parser stored the bare
+ * indicator ("|", ">-") for 820 of 877 library skills (2026-09-02), blinding the
+ * router. Malformed YAML → {} + warning: one bad file degrades to a degenerate
+ * entry (caught by findDegenerateEntries) instead of aborting the whole scan.
+ */
+export function parseSkillFrontmatter(raw: string, id = '?'): Record<string, unknown> {
+  try {
+    // gray-matter memoizes by full file content when called WITHOUT options — an
+    // empty options object opts out (877 files × body = pointless retention).
+    const data: Record<string, unknown> = matter(raw, {}).data;
+    return data;
+  } catch (e) {
+    const reason = e instanceof Error ? (e.message.split('\n')[0] ?? e.message) : String(e);
+    console.warn(`[scanner] ${id}: unparseable frontmatter — ${reason}`);
+    return {};
+  }
+}
+
+/** L1 summaries are prompt-injected one per line: fold newlines + indentation into single spaces. */
+function oneLine(s: string): string {
+  return s.replaceAll(/\s+/g, ' ').trim();
+}
+
+const YAML_BLOCK_INDICATORS = new Set(['|', '|-', '|+', '>', '>-', '>+']);
+
+export interface DegenerateEntry {
+  id: string;
+  field: 'description' | 'summary';
+  value: string;
+}
+
+/**
+ * An L1 entry is degenerate when its description or summary is blank or a bare YAML
+ * block-scalar indicator — the exact symptom of the 2026-09-02 index bug. The router
+ * reads only these two fields, so a degenerate entry is an invisible skill.
+ */
+export function findDegenerateEntries(metas: readonly SkillMeta[]): DegenerateEntry[] {
+  const out: DegenerateEntry[] = [];
+  for (const m of metas) {
+    for (const field of ['description', 'summary'] as const) {
+      const value = m[field].trim();
+      if (value === '' || YAML_BLOCK_INDICATORS.has(value)) out.push({ id: m.id, field, value: m[field] });
     }
   }
-  return fm;
+  return out;
+}
+
+/** One-line report for guard/CLI messages: `id.field="value"`, capped at 10 entries. */
+export function describeDegenerateEntries(entries: readonly DegenerateEntry[]): string {
+  const shown = entries.slice(0, 10).map((d) => `${d.id}.${d.field}=${JSON.stringify(d.value)}`);
+  if (entries.length > 10) shown.push(`… +${entries.length - 10} more`);
+  return `${entries.length} degenerate L1 field(s): ${shown.join(', ')}`;
 }
 
 export function scanOrchestratorSkills(repoRoot: string): SkillMeta[] {
@@ -69,14 +108,14 @@ export function scanOrchestratorSkills(repoRoot: string): SkillMeta[] {
       console.warn(`[scanner] SKILL.md not found: ${skillPath}`);
       continue;
     }
-    const raw = readFileSync(skillPath, 'utf8');
-    const fm = parseFrontmatter(raw);
+    const fm = parseSkillFrontmatter(readFileSync(skillPath, 'utf8'), id);
+    const description = str(fm['description']).trim();
     results.push({
       id,
       name: str(fm['name'], id),
-      description: str(fm['description']),
+      description,
       domain: coerceDomain(fm['domain'], id),
-      summary: (str(fm['summary']) || str(fm['description'])).slice(0, SUMMARY_MAX_CHARS),
+      summary: oneLine(str(fm['summary']) || description).slice(0, SUMMARY_MAX_CHARS),
       tags: Array.isArray(fm['tags']) ? fm['tags'].map(String) : [],
       path: skillPath,
     });
@@ -131,21 +170,36 @@ export function clusterToDomain(cluster: string | undefined): Domain {
   return 'planning';
 }
 
+/**
+ * Harvest provenance (origin / cluster / tier) lives under a nested `metadata:` map
+ * in every library SKILL.md; a top-level key is accepted as a legacy fallback.
+ */
+function libraryField(fm: Record<string, unknown>, key: string): string | undefined {
+  const meta = fm['metadata'];
+  const nested = isRecord(meta) ? meta[key] : undefined;
+  return str(nested) || str(fm[key]) || undefined;
+}
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null;
+}
+
 /** Parse one library SKILL.md into a SkillMeta (L1 — frontmatter only). */
 function parseLibrarySkill(slug: string, skillPath: string): SkillMeta {
-  const fm = parseFrontmatter(readFileSync(skillPath, 'utf8'));
-  const cluster = str(fm['cluster']) || undefined;
+  const fm = parseSkillFrontmatter(readFileSync(skillPath, 'utf8'), slug);
+  const cluster = libraryField(fm, 'cluster');
+  const description = str(fm['description']).trim();
   return {
     id: slug,
     name: str(fm['name'], slug),
-    description: str(fm['description']),
+    description,
     domain: clusterToDomain(cluster),
-    summary: (str(fm['summary']) || str(fm['description'])).slice(0, SUMMARY_MAX_CHARS),
+    summary: oneLine(str(fm['summary']) || description).slice(0, SUMMARY_MAX_CHARS),
     tags: cluster ? [cluster] : [],
     path: skillPath,
-    origin: str(fm['origin']) || undefined,
+    origin: libraryField(fm, 'origin'),
     cluster,
-    tier: str(fm['tier']) || undefined,
+    tier: libraryField(fm, 'tier'),
   };
 }
 
@@ -163,9 +217,17 @@ export function scanLibrarySkills(repoRoot: string): SkillMeta[] {
   return results.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** Generate packages/skills/library/index.json from the scanned library. */
+/**
+ * Generate packages/skills/library/index.json from the scanned library. Refuses to
+ * write when any entry is degenerate (blank / bare YAML indicator): a broken index
+ * silently blinds mas-skill-router, a loud build failure gets fixed.
+ */
 export function buildLibraryIndex(repoRoot: string): SkillMeta[] {
   const metas = scanLibrarySkills(repoRoot);
+  const degenerate = findDegenerateEntries(metas);
+  if (degenerate.length > 0) {
+    throw new Error(`[buildLibraryIndex] refusing to write index.json — ${describeDegenerateEntries(degenerate)}`);
+  }
   writeFileSync(
     join(repoRoot, LIBRARY_INDEX_REL),
     JSON.stringify(metas, null, 2) + '\n',
