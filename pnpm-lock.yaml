@@ -240,6 +240,9 @@ importers:
       drizzle-orm:
         specifier: 0.36.4
         version: 0.36.4(@types/better-sqlite3@7.6.13)(@types/react@19.2.15)(better-sqlite3@12.10.0)(react@19.2.6)
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
     devDependencies:
       tsx:
         specifier: ^4.19.0

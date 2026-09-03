@@ -63,6 +63,14 @@ describe('parseFrontmatter', () => {
   it('returns {} when there is no frontmatter', () => {
     expect(parseFrontmatter('# just a heading')).toEqual({});
   });
+
+  it('resolves YAML block scalars (description: | / summary: >-) instead of the bare indicator', () => {
+    const fm = parseFrontmatter(
+      ['---', 'name: acc', 'description: |', '  Line one.', '  Line two.', 'summary: >-', '  Folded one', '  Folded two', '---', 'body'].join('\n'),
+    );
+    expect(fm['description']).toBe('Line one.\nLine two.\n');
+    expect(fm['summary']).toBe('Folded one Folded two');
+  });
 });
 
 describe('serializeStub', () => {
@@ -92,6 +100,17 @@ describe('buildArsenalStubs', () => {
     const stub = readFileSync(join(outDir, 'skill', 'my-skill.md'), 'utf8');
     expect(stub).toContain('audits pull requests for security issues');
     expect(stub).not.toContain('must NOT be indexed verbatim');
+  });
+
+  it('indexes the resolved folded summary of a block-scalar skill (never ">-")', () => {
+    write(
+      'packages/skills/library/folded/SKILL.md',
+      ['---', 'name: folded', 'description: |', '  Long description.', 'summary: >-', '  Folded L1', '  summary text.', 'metadata:', '  cluster: skill:core-eval', '---', '', '# Folded'].join('\n'),
+    );
+    buildArsenalStubs(root, outDir);
+    const stub = readFileSync(join(outDir, 'skill', 'folded.md'), 'utf8');
+    expect(stub).toContain('Folded L1 summary text.');
+    expect(stub).not.toContain('>-');
   });
 
   it('skips README/index shells', () => {
