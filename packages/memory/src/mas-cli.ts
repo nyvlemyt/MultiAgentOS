@@ -1,9 +1,11 @@
-// `pnpm mas capture <path|url>`, `mas capture --html [file|-]`, `mas capture --inbox [dir]`, and
-// `mas distill <sas-doc-path> | --all [dir]`. Builds the real registry (markitdown + pdftotext +
-// Defuddle + yt-dlp) and the temp-free DB; the testable logic lives in conveyor/cli.ts +
-// conveyor/distill-cli.ts. Capture's default path is zero-LLM (rules-only) → §11-safe; distill calls
-// the ONE injected @mas/core claudeCodeLLM (Sonnet, subscription — never PAYG, §11). The url/youtube
-// egress leaves only through net-guard, seeded from config/permissions.json#allowed_hosts (§5).
+// `pnpm mas capture <path|url>`, `mas capture --html [file|-]`, `mas capture --inbox [dir]`,
+// `mas distill <sas-doc-path> | --all [dir]`, and `mas promote <fiche-id|path> | --all | --candidates`.
+// Builds the real registry (markitdown + pdftotext + Defuddle + yt-dlp) and the temp-free DB; the
+// testable logic lives in conveyor/cli.ts + conveyor/distill-cli.ts + conveyor/promote-cli.ts +
+// promote-candidates.ts. Capture's default path is zero-LLM (rules-only) → §11-safe; distill calls
+// the ONE injected @mas/core claudeCodeLLM (Sonnet) and promote the same client at the promotion
+// tier (Opus, ADR 0008 clause 11) — subscription, never PAYG (§11). The url/youtube egress leaves
+// only through net-guard, seeded from config/permissions.json#allowed_hosts (§5).
 // Pattern from packages/memory/src/doctor-cli.ts.
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
@@ -18,12 +20,18 @@ import { makeUrlExtractor } from './conveyor/extractors/url';
 import { makeYoutubeExtractor, realYoutubeRunner } from './conveyor/extractors/youtube';
 import { captureHtmlBlob, captureInbox, captureOne, formatSummary } from './conveyor/cli';
 import { distillAll, distillPath, formatDistillSummary, type DistillCliDeps } from './conveyor/distill-cli';
+import { formatPromoteSummary, parsePromoteArgs, promoteAll, promoteTarget } from './conveyor/promote-cli';
+import type { PromoteApplyDeps } from './conveyor/promote-apply';
+import { formatCandidatesSummary, promoteClassifiedCandidates } from './promote-candidates';
+import { MEMORY_KEEPER_AGENT, MemoryStore } from './registers';
 import type { PipelineDeps } from './conveyor/pipeline';
 import type { NetGuardDeps } from './conveyor/net-guard';
 
 const USAGE =
   'usage: mas capture <path|url> | mas capture --html [file|-] | mas capture --inbox [dir]\n' +
-  '       mas distill <sas-doc-path> | mas distill --all [dir]';
+  '       mas distill <sas-doc-path> | mas distill --all [dir]\n' +
+  '       mas promote <fiche-id|path> | mas promote --all [dir] [--limit N] [--approve-untrusted]\n' +
+  '       mas promote --candidates [--dry-run] [--limit N] [--project <id>]';
 
 function findRepoRoot(): string {
   let dir = process.cwd();
@@ -106,11 +114,62 @@ async function runDistill(root: string, rest: string[]): Promise<void> {
   console.log(formatDistillSummary(await distillPath(resolve(root, rest[0]!), deps)));
 }
 
+/** Promote deps wiring the ONE @mas/core LLM client at the promotion tier (Opus, subscription — §11). */
+function buildPromoteDeps(root: string, dir: string | undefined, approveUntrusted: boolean): PromoteApplyDeps {
+  const store = dir ? resolve(root, dir) : resolve(root, 'docs/knowledge');
+  mkdirSync(store, { recursive: true });
+  return {
+    llm: claudeCodeLLM(), // throws if ANTHROPIC_API_KEY is set (§11 guard) — a smell, not a feature
+    dir: store,
+    logPath: resolve(store, 'consolidation-log.md'),
+    date: new Date().toISOString().slice(0, 10),
+    keeper: MEMORY_KEEPER_AGENT,
+    approveUntrusted,
+  };
+}
+
+/** Memory Keeper-identity register store — CLAUDE.md §8 forbids any other writer. */
+function buildMemoryStore(root: string): MemoryStore {
+  return new MemoryStore({
+    root: process.env.MAS_MEMORY_ROOT ?? resolve(root, 'data/memory'),
+    writerAgent: MEMORY_KEEPER_AGENT,
+  });
+}
+
+async function runPromote(root: string, rest: string[]): Promise<void> {
+  const args = parsePromoteArgs(rest);
+  if (args.error) {
+    console.error(`[mas promote] ${args.error}`);
+    process.exitCode = 1;
+    return;
+  }
+  if (args.mode === 'candidates') {
+    const res = await promoteClassifiedCandidates(getDb(), buildMemoryStore(root), {
+      ...(args.dryRun ? { dryRun: true } : {}),
+      ...(args.limit !== undefined ? { limit: args.limit } : {}),
+      ...(args.projectId ? { projectId: args.projectId } : {}),
+    });
+    console.log(formatCandidatesSummary(res));
+    return;
+  }
+  if (args.mode === 'usage') {
+    console.error(USAGE);
+    process.exitCode = 1;
+    return;
+  }
+  const deps = buildPromoteDeps(root, args.dir, args.approveUntrusted === true);
+  const res = args.mode === 'all'
+    ? await promoteAll(deps, args.limit !== undefined ? { limit: args.limit } : {})
+    : await promoteTarget(args.target!, deps);
+  console.log(formatPromoteSummary(res));
+}
+
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   const root = findRepoRoot();
   if (cmd === 'capture' && rest.length > 0) return runCapture(root, rest);
   if (cmd === 'distill' && rest.length > 0) return runDistill(root, rest);
+  if (cmd === 'promote') return runPromote(root, rest);
   console.error(USAGE);
   process.exitCode = 1;
 }
