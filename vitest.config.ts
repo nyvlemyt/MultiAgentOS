@@ -3,7 +3,6 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['packages/**/*.test.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary', 'html'],
@@ -26,15 +25,15 @@ export default defineConfig({
         '**/reindex.ts', // skills QMD reindex helper
       ],
       // Hard §7 gate — the 6th verification check. Global floor ratcheted above the
-      // 2026-06-26 post-exclusion baseline (lines 94.9 / branches 84.2 / fn 94.6) with
+      // 2026-09-04 measured baseline (lines 95.59 / branches 86.28 / fn 95.28) with
       // margin: locks in current quality, prevents silent erosion, leaves slack for
       // small PRs. `pnpm test:coverage` exits non-zero below these. See
       // docs/backlog/test-coverage-measurement-gap.md.
       thresholds: {
-        lines: 85,
-        statements: 85,
-        functions: 80,
-        branches: 80,
+        lines: 92,
+        statements: 92,
+        functions: 92,
+        branches: 84,
       },
     },
   },
