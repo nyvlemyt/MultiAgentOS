@@ -18,7 +18,7 @@ import matter from 'gray-matter';
 import { FicheSchema } from '../fiche';
 import { applySupersede, asStr } from './supersede-apply';
 import {
-  judgeFiche, planPromotion, promotePromptEstimate,
+  formatIssues, judgeFiche, planPromotion, promotePromptEstimate,
   type PromoteDeps, type PromotionOutcome, type QualityVerdict,
 } from './promote';
 
@@ -110,7 +110,7 @@ export async function promoteFile(path: string, deps: PromoteApplyDeps): Promise
   // agents, and the CI gardien would RED the repo on it.
   const fiche = FicheSchema.safeParse(raw);
   if (!fiche.success) {
-    return failed(path, id, onDisk, `frontmatter is not FicheSchema-valid: ${fiche.error.issues.map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`).join('; ')}`);
+    return failed(path, id, onDisk, `frontmatter is not FicheSchema-valid: ${formatIssues(fiche.error.issues)}`);
   }
 
   const judgment = await judgeFiche({

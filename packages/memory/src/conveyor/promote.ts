@@ -147,6 +147,12 @@ function extractJson(text: string): string {
   return text.slice(start, end + 1);
 }
 
+/** Zod issues → one readable line. Shared with promote-apply.ts so neither has to nest a template
+ * literal inside a `.map()` inside a template literal (S4624). */
+export function formatIssues(issues: readonly z.ZodIssue[]): string {
+  return issues.map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`).join('; ');
+}
+
 /** FAIL-SAFE: anything that is not a well-formed in-enum verdict becomes NEEDS_WORK, with the
  * reason surfaced as a finding. An unreadable judge must never be able to promote a fiche. */
 export function parseJudgment(text: string): QualityJudgment {
@@ -158,7 +164,7 @@ export function parseJudgment(text: string): QualityJudgment {
   }
   const parsed = JudgeOutput.safeParse(raw);
   if (!parsed.success) {
-    const detail = parsed.error.issues.map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`).join('; ');
+    const detail = formatIssues(parsed.error.issues);
     return { verdict: 'NEEDS_WORK', findings: [`judge: malformed verdict (${detail}) — held, not promoted`] };
   }
   return parsed.data;
