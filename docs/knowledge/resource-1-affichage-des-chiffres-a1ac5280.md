@@ -12,7 +12,7 @@ superseded_by: null
 trust: untrusted
 ocr_confidence: null
 retrieval_context: null
-quality_score: null
+quality_score: NEEDS_WORK
 kind: resource
 register: learnings
 scope: global

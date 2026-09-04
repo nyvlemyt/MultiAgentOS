@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import matter from 'gray-matter';
 import { MemoryStore, MEMORY_KEEPER_AGENT, withProvenance } from './registers';
@@ -8,6 +8,14 @@ export interface SeedResult {
   skipped: string[];
   /** Fiches routées vers le miroir études (P1-14) — hors contexte mission. */
   etudes: string[];
+  /**
+   * Fiches PROMUES qui viennent de quitter le miroir études pour la mémoire mission (P1-6).
+   * Le miroir est une projection dérivée de docs/knowledge, pas une entrée de corpus : y laisser
+   * le jumeau `distilled` d'une fiche devenue `active` en ferait une copie périmée indexée par
+   * QMD à côté de la vraie — donc la promotion la retire. Rien n'est supprimé dans le corpus
+   * lui-même (archive-never-delete, ADR 0008 §5 ne vise que les entrées porteuses d'id).
+   */
+  migrated: string[];
 }
 
 function walkMd(dir: string): string[] {
@@ -56,6 +64,7 @@ export function seedGlobalKnowledge(store: MemoryStore, knowledgeDir: string, et
   const imported: string[] = [];
   const skipped: string[] = [];
   const etudes: string[] = [];
+  const migrated: string[] = [];
   for (const file of walkMd(knowledgeDir).sort((a, b) => a.localeCompare(b))) {
     const rel = relative(knowledgeDir, file).replaceAll(/[/\\]/g, '/');
     const source = `docs/knowledge/${rel}`;
@@ -71,6 +80,15 @@ export function seedGlobalKnowledge(store: MemoryStore, knowledgeDir: string, et
       etudes.push(source);
       continue;
     }
+    // La fiche est de grade mission. Si le miroir études en garde encore un exemplaire, c'est le
+    // jumeau périmé d'avant sa promotion : on le retire pour que la migration soit une migration.
+    if (etudesRoot !== undefined) {
+      const stale = etudeFile(etudesRoot, source);
+      if (existsSync(stale)) {
+        rmSync(stale);
+        migrated.push(source);
+      }
+    }
     if (store.hasKnowledge(source)) {
       skipped.push(source);
       continue;
@@ -78,7 +96,7 @@ export function seedGlobalKnowledge(store: MemoryStore, knowledgeDir: string, et
     store.writeKnowledge(source, content);
     imported.push(source);
   }
-  return { imported, skipped, etudes };
+  return { imported, skipped, etudes, migrated };
 }
 
 export interface RunSeedOpts {

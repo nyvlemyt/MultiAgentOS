@@ -18,3 +18,6 @@ EVENTS: supersede | lane-promote(L1→L2|L2→L3) | archive | reject-kept | merg
 2026-08-26 | reject-kept | ids=resource-s7-nosql-cours-neo4j-pdf-9d511319 | lane=resources | keeper=memory-keeper | note=fragment at ingest
 2026-08-26 | reject-kept | ids=resource-s7-nosql-lab3-neo4j-pdf-c45ccf70 | lane=resources | keeper=memory-keeper | note=fragment at ingest
 2026-08-26 | reject-kept | ids=resource-s6-developpement-web-3-vuejs-rapport-complet-exo10-q8-docx-f65b5721 | lane=resources | keeper=memory-keeper | note=fragment at ingest
+2026-09-03 | promote-hold | ids=resource-1-affichage-des-chiffres-a1ac5280 | lane=knowledge | keeper=memory-keeper | note=NEEDS_WORK · judge verdict NEEDS_WORK — held for re-distillation
+2026-09-03 | promote-hold | ids=resource-1-caf5541a-caf5541a | lane=knowledge | keeper=memory-keeper | note=NEEDS_WORK · judge verdict NEEDS_WORK — held for re-distillation
+2026-09-03 | promote | ids=resource-1-lancer-la-pile-f089e1de | lane=knowledge | keeper=memory-keeper | note=PASS · distilled→audited→active · human-approved-untrusted

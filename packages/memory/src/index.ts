@@ -76,6 +76,17 @@ export {
 } from './classifier';
 export { seedGlobalKnowledge, runSeed, type SeedResult, type RunSeedOpts } from './seed';
 export {
+  promoteClassifiedCandidates,
+  parseClassifierDecision,
+  candidateTitle,
+  formatCandidatesSummary,
+  type ParsedDecision,
+  type CandidatePromotion,
+  type CandidateSkip,
+  type CandidatesRunResult,
+  type PromoteCandidatesOpts,
+} from './promote-candidates';
+export {
   buildMemoryContext,
   MAX_GLOBAL_ITEMS,
   MAX_PROJECT_ITEMS,
