@@ -198,4 +198,24 @@ describe('formatCandidatesSummary', () => {
     const out = formatCandidatesSummary({ promoted: [], skipped: [], failed: [], remaining: 0, dryRun: true });
     expect(out).toMatch(/dry-run/i);
   });
+
+  it('lists every routing in a dry run, so the preview is actually inspectable', () => {
+    const out = formatCandidatesSummary({
+      promoted: [
+        { id: 'c1', register: 'learnings', projectId: '_global', entryId: '(dry-run)', title: 'Docker TD part 01' },
+        { id: 'c2', register: 'blockers', projectId: '_global', entryId: '(dry-run)', title: 'Ansible checkpoint' },
+      ],
+      skipped: [], failed: [], remaining: 0, dryRun: true,
+    });
+    expect(out).toContain('_global/learnings  Docker TD part 01');
+    expect(out).toContain('_global/blockers  Ansible checkpoint');
+  });
+
+  it('does NOT list the routings on a real run (the register files are the record)', () => {
+    const out = formatCandidatesSummary({
+      promoted: [{ id: 'c1', register: 'learnings', projectId: '_global', entryId: 'LRN-001', title: 'T' }],
+      skipped: [], failed: [], remaining: 0, dryRun: false,
+    });
+    expect(out).not.toContain('_global/learnings  T');
+  });
 });

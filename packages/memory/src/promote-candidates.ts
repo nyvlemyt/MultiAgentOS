@@ -159,5 +159,10 @@ export function formatCandidatesSummary(res: CandidatesRunResult): string {
     `${prefix} ${res.promoted.length} promoted${spread}, ` +
     `${res.skipped.length} skipped, ${res.failed.length} failed.` +
     (res.remaining > 0 ? ` Stopped on --limit, ${res.remaining} remaining.` : '');
-  return [head, ...res.failed.map((f) => `  FAIL ${f.id} — ${f.reason}`)].join('\n');
+  // A dry run that only prints counts cannot be reviewed, so it lists each routing. A real run
+  // stays quiet: the register files themselves are the record.
+  const preview = res.dryRun
+    ? res.promoted.map((p) => `  ${p.projectId}/${p.register}  ${p.title}`)
+    : [];
+  return [head, ...preview, ...res.failed.map((f) => `  FAIL ${f.id} — ${f.reason}`)].join('\n');
 }
