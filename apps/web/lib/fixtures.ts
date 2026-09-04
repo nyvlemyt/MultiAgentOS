@@ -13,6 +13,7 @@ export const tierAFixture: AgentCardData[] = [
   { id: 'quality-controller', name: 'Quality Controller', emoji: '✅', avatarPath: '/avatars/quality-controller.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.93, totalTokens: 16000, spark: [1, 2, 1, 2, 3, 2, 3, 4] },
   { id: 'orchestrator', name: 'Orchestrator', emoji: '🎛️', avatarPath: '/avatars/orchestrator.svg', tier: 'A', status: 'running', currentTask: 'Steering dispatch loop', model: 'claude-sonnet-4-6', successRate: 0.95, totalTokens: 28000, spark: [3, 5, 4, 6, 5, 7, 6, 8] },
   { id: 'agent-evaluator', name: 'Agent Evaluator', emoji: '⚖️', avatarPath: '/avatars/agent-evaluator.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-sonnet-4-6', successRate: 0.9, totalTokens: 6000, spark: [0, 1, 1, 2, 1, 2, 2, 3] },
+  { id: 'architect', name: 'Architect', emoji: '🏛️', avatarPath: '/avatars/architect.svg', tier: 'A', status: 'idle', currentTask: undefined, model: 'claude-haiku-4-5', successRate: 0.92, totalTokens: 8000, spark: [1, 1, 2, 1, 2, 3, 2, 3] },
 ];
 
 export const tierBFixture: AgentCardData[] = [
