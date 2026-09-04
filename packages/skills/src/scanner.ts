@@ -3,6 +3,7 @@ import {
   existsSync,
   mkdirSync,
   writeFileSync,
+  renameSync,
   readdirSync,
   copyFileSync,
 } from 'node:fs';
@@ -228,11 +229,13 @@ export function buildLibraryIndex(repoRoot: string): SkillMeta[] {
   if (degenerate.length > 0) {
     throw new Error(`[buildLibraryIndex] refusing to write index.json — ${describeDegenerateEntries(degenerate)}`);
   }
-  writeFileSync(
-    join(repoRoot, LIBRARY_INDEX_REL),
-    JSON.stringify(metas, null, 2) + '\n',
-    'utf8',
-  );
+  // Write atomically: index.json is a shared generated artifact that other
+  // packages read at runtime (and concurrently, under the root test runner).
+  // A plain write exposes readers to a truncated file; tmp + rename never does.
+  const indexOut = join(repoRoot, LIBRARY_INDEX_REL);
+  const tmpOut = `${indexOut}.tmp-${process.pid}`;
+  writeFileSync(tmpOut, JSON.stringify(metas, null, 2) + '\n', 'utf8');
+  renameSync(tmpOut, indexOut);
   return metas;
 }
 

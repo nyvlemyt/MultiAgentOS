@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, rmSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import {
   scanLibrarySkills,
   buildLibraryIndex,
@@ -66,7 +66,10 @@ describe('scanLibrarySkills', () => {
 
 describe('buildLibraryIndex + loadLibraryIndex round-trip', () => {
   beforeAll(() => {
-    if (existsSync(INDEX_PATH)) rmSync(INDEX_PATH);
+    // Rebuild in place — never rmSync() first. index.json is a shared generated
+    // artifact and @mas/agents reads it concurrently under the root runner
+    // (`pnpm test:coverage`); deleting it made dispatch-arsenal fail as a race.
+    // buildLibraryIndex writes atomically, so readers always see a complete file.
     buildLibraryIndex(REPO_ROOT);
   });
 
