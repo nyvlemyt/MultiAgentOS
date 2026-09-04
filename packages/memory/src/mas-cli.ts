@@ -158,8 +158,9 @@ async function runPromote(root: string, rest: string[]): Promise<void> {
     return;
   }
   const deps = buildPromoteDeps(root, args.dir, args.approveUntrusted === true);
+  const batchOpts = args.limit !== undefined ? { limit: args.limit } : {};
   const res = args.mode === 'all'
-    ? await promoteAll(deps, args.limit !== undefined ? { limit: args.limit } : {})
+    ? await promoteAll(deps, batchOpts)
     : await promoteTarget(args.target!, deps);
   console.log(formatPromoteSummary(res));
 }

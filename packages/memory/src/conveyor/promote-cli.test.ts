@@ -113,7 +113,7 @@ describe('promoteAll', () => {
     expect(res.budgetStopped).toBe(true);
     expect(res.promoted.length).toBeLessThan(3);
     expect(res.remaining).toBeGreaterThan(0);
-    expect(calls.length).toBe(res.promoted.length + res.held.length + res.rejected.length);
+    expect(calls).toHaveLength(res.promoted.length + res.held.length + res.rejected.length);
   });
 
   it('honours an explicit limit (promote a handful, verify, then widen)', async () => {

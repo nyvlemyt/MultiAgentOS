@@ -16,7 +16,7 @@ import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs
 import { basename, join } from 'node:path';
 import matter from 'gray-matter';
 import { FicheSchema } from '../fiche';
-import { applySupersede } from './supersede-apply';
+import { applySupersede, asStr } from './supersede-apply';
 import {
   judgeFiche, planPromotion, promotePromptEstimate,
   type PromoteDeps, type PromotionOutcome, type QualityVerdict,
@@ -57,9 +57,9 @@ export function fichePath(dir: string, id: string): string {
 export function promoteFileEstimate(path: string): number {
   const parsed = matter(readFileSync(path, 'utf8'));
   const data = parsed.data as Record<string, unknown>;
+  const id = asStr(data.id) || basename(path);
   return promotePromptEstimate({
-    id: String(data.id ?? basename(path)), title: String(data.id ?? ''),
-    docType: String(data.doc_type ?? 'reference'), trust: 'untrusted', body: parsed.content,
+    id, title: id, docType: asStr(data.doc_type) || 'reference', trust: 'untrusted', body: parsed.content,
   });
 }
 
@@ -90,8 +90,8 @@ const failed = (path: string, id: string, lifecycle: string, reason: string): Pr
 export async function promoteFile(path: string, deps: PromoteApplyDeps): Promise<PromoteFileResult> {
   const parsed = matter(readFileSync(path, 'utf8'));
   const raw = parsed.data as Record<string, unknown>;
-  const id = typeof raw.id === 'string' ? raw.id : basename(path).replace(/\.md$/, '');
-  const onDisk = typeof raw.lifecycle === 'string' ? raw.lifecycle : '';
+  const id = asStr(raw.id) || basename(path).replace(/\.md$/, '');
+  const onDisk = asStr(raw.lifecycle);
 
   // Guard 1 — the store is keyed by id: a file whose name diverges from its id would make
   // applySupersede write a SECOND file at `<id>.md` and orphan this one.
@@ -129,7 +129,10 @@ export async function promoteFile(path: string, deps: PromoteApplyDeps): Promise
       id, source_key: fiche.data.source_key, lane,
       frontmatter: scored, body: parsed.content,
     }, { date: deps.date, keeper: deps.keeper });
-    const note = `${judgment.verdict} · ${plan.path.join('→')}${deps.approveUntrusted && fiche.data.trust !== 'trusted' ? ' · human-approved-untrusted' : ''}`;
+    // The approval is recorded in the log, not just honoured: an untrusted fiche that went active
+    // must say WHO let it through when the trail is read back months later.
+    const approval = deps.approveUntrusted && fiche.data.trust !== 'trusted' ? ' · human-approved-untrusted' : '';
+    const note = `${judgment.verdict} · ${plan.path.join('→')}${approval}`;
     appendFileSync(deps.logPath, logLine(LOG_EVENT.promoted, id, lane, deps, note), 'utf8');
     return { ...base, outcome: 'promoted', lifecycle: plan.target, ...(applied.superseded ? { superseded: applied.superseded } : {}) };
   }

@@ -9,6 +9,7 @@ import { basename, join } from 'node:path';
 import matter from 'gray-matter';
 import { DEFAULT_PROMOTE_TOKEN_CAP, promotePromptEstimate, PROMOTE_ENTRY_STATE } from './promote';
 import { promoteFile, type PromoteApplyDeps, type PromoteFileResult } from './promote-apply';
+import { asStr } from './supersede-apply';
 
 export interface PromoteFailure {
   id: string;
@@ -82,13 +83,13 @@ interface Head {
 function head(path: string): Head {
   const parsed = matter(readFileSync(path, 'utf8'));
   const data = parsed.data as Record<string, unknown>;
-  const lifecycle = typeof data.lifecycle === 'string' ? data.lifecycle : '';
+  const lifecycle = asStr(data.lifecycle);
   if (lifecycle !== PROMOTE_ENTRY_STATE) return { path, lifecycle, cost: 0 };
+  const id = asStr(data.id);
   return {
     path, lifecycle,
     cost: promotePromptEstimate({
-      id: String(data.id ?? ''), title: String(data.id ?? ''),
-      docType: String(data.doc_type ?? 'reference'), trust: 'untrusted', body: parsed.content,
+      id, title: id, docType: asStr(data.doc_type) || 'reference', trust: 'untrusted', body: parsed.content,
     }),
   };
 }
@@ -155,9 +156,9 @@ export function formatPromoteSummary(res: PromoteRunResult): string {
     `[mas promote] ${res.promoted.length} promoted, ${res.held.length} held, ` +
     `${res.rejected.length} rejected, ${res.superseded.length} superseded, ` +
     `${res.failed.length} failed, ${res.skipped} skipped.`;
-  const head = res.budgetStopped
-    ? `${base} Budget cap reached — paused, ${res.remaining} remaining (resume later).`
-    : (res.remaining > 0 ? `${base} Stopped on --limit, ${res.remaining} remaining.` : base);
+  let head = base;
+  if (res.budgetStopped) head = `${base} Budget cap reached — paused, ${res.remaining} remaining (resume later).`;
+  else if (res.remaining > 0) head = `${base} Stopped on --limit, ${res.remaining} remaining.`;
   return [head, ...res.failed.map((f) => `  FAIL ${f.id} — ${f.reason}`)].join('\n');
 }
 
@@ -177,11 +178,33 @@ export interface PromoteArgs {
   error?: string;
 }
 
-/** Read the value that follows a flag, or record why it is unusable. */
-function valueAfter(rest: string[], i: number, flag: string): { value?: string; error?: string } {
-  const value = rest[i + 1];
-  if (value === undefined || value.startsWith('--')) return { error: `${flag} needs a value` };
-  return { value };
+// Flags that only set a field — kept as DATA so parsePromoteArgs stays a flat dispatch.
+const MODE_FLAGS: Record<string, PromoteArgs['mode']> = { '--all': 'all', '--candidates': 'candidates' };
+const BOOL_FLAGS: Record<string, 'approveUntrusted' | 'dryRun'> = {
+  '--approve-untrusted': 'approveUntrusted',
+  '--dry-run': 'dryRun',
+};
+
+/** Apply a `--limit`/`--project` pair onto `args`, or return why the value is unusable. */
+function applyValueFlag(args: PromoteArgs, flag: string, value: string | undefined): string | null {
+  if (value === undefined || value.startsWith('--')) return `${flag} needs a value`;
+  if (flag === '--project') {
+    args.projectId = value;
+    return null;
+  }
+  const n = Number(value);
+  if (!Number.isInteger(n) || n <= 0) return `--limit needs a positive integer, got '${value}'`;
+  args.limit = n;
+  return null;
+}
+
+/** A bare positional: the store dir in `--all` mode, otherwise the fiche id/path. */
+function applyPositional(args: PromoteArgs, arg: string): void {
+  if (args.mode === 'all') args.dir = arg;
+  else if (args.mode === 'usage') {
+    args.mode = 'one';
+    args.target = arg;
+  }
 }
 
 /**
@@ -193,26 +216,24 @@ export function parsePromoteArgs(rest: string[]): PromoteArgs {
   const args: PromoteArgs = { mode: 'usage' };
   for (let i = 0; i < rest.length; i++) {
     const arg = rest[i]!;
-    if (arg === '--all') { args.mode = 'all'; continue; }
-    if (arg === '--candidates') { args.mode = 'candidates'; continue; }
-    if (arg === '--approve-untrusted') { args.approveUntrusted = true; continue; }
-    if (arg === '--dry-run') { args.dryRun = true; continue; }
+    const mode = MODE_FLAGS[arg];
+    if (mode) {
+      args.mode = mode;
+      continue;
+    }
+    const bool = BOOL_FLAGS[arg];
+    if (bool) {
+      args[bool] = true;
+      continue;
+    }
     if (arg === '--limit' || arg === '--project') {
-      const { value, error } = valueAfter(rest, i, arg);
+      const error = applyValueFlag(args, arg, rest[i + 1]);
       if (error) return { ...args, error };
-      if (arg === '--project') args.projectId = value;
-      else {
-        const n = Number(value);
-        if (!Number.isInteger(n) || n <= 0) return { ...args, error: `--limit needs a positive integer, got '${value}'` };
-        args.limit = n;
-      }
       i += 1;
       continue;
     }
     if (arg.startsWith('--')) return { ...args, error: `unknown option ${arg}` };
-    // A bare positional is the store dir in --all mode, otherwise the fiche id/path.
-    if (args.mode === 'all') args.dir = arg;
-    else if (args.mode === 'usage') { args.mode = 'one'; args.target = arg; }
+    applyPositional(args, arg);
   }
   return args;
 }

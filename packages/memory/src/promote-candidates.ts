@@ -10,7 +10,7 @@
 // never an automatic file), and hand each to promoteCandidate — which appends through the Memory
 // Keeper write-lock (CLAUDE.md §8) and flips the row to `accepted`, making a re-run idempotent.
 // `dryRun` previews the exact same routing without a single write.
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { memoryCandidates, type getDb } from '@mas/db';
 import { GLOBAL_PROJECT, promoteCandidate, type MemoryStore, type RegisterKind } from './registers';
 import type { MemoryScope } from './retriever';
@@ -95,6 +95,32 @@ export interface PromoteCandidatesOpts {
 
 const DRY_RUN_ENTRY = '(dry-run)';
 
+interface RoutableRow {
+  id: string;
+  body: string;
+  target: ParsedDecision;
+}
+
+/** Split the pending rows into the routable ones and the deliberately-left-pending ones. */
+function triage(
+  rows: Array<{ id: string; body: string; classifierDecision: string | null }>,
+  opts: PromoteCandidatesOpts,
+  skipped: CandidateSkip[],
+): RoutableRow[] {
+  const routable: RoutableRow[] = [];
+  for (const row of rows) {
+    const target = parseClassifierDecision(row.classifierDecision);
+    if (!target) {
+      skipped.push({ id: row.id, reason: `decision not routable to a register: '${row.classifierDecision ?? '(none)'}'` });
+    } else if (target.scope === 'project' && !opts.projectId) {
+      skipped.push({ id: row.id, reason: 'scope=project needs an explicit projectId — not guessed' });
+    } else {
+      routable.push({ id: row.id, body: row.body, target });
+    }
+  }
+  return routable;
+}
+
 /**
  * Promote every pending candidate whose classifier decision resolves to a register. Global-scope
  * decisions land in `_global`; project-scope decisions need an explicit `projectId` (guessing one
@@ -108,20 +134,7 @@ export async function promoteClassifiedCandidates(
 ): Promise<CandidatesRunResult> {
   const res: CandidatesRunResult = { promoted: [], skipped: [], failed: [], remaining: 0, dryRun: opts.dryRun === true };
   const rows = await db.select().from(memoryCandidates).where(eq(memoryCandidates.status, 'pending'));
-
-  const routable: Array<{ id: string; body: string; target: ParsedDecision }> = [];
-  for (const row of rows) {
-    const target = parseClassifierDecision(row.classifierDecision);
-    if (!target) {
-      res.skipped.push({ id: row.id, reason: `decision not routable to a register: '${row.classifierDecision ?? '(none)'}'` });
-      continue;
-    }
-    if (target.scope === 'project' && !opts.projectId) {
-      res.skipped.push({ id: row.id, reason: `scope=project needs an explicit projectId — not guessed` });
-      continue;
-    }
-    routable.push({ id: row.id, body: row.body, target });
-  }
+  const routable = triage(rows, opts, res.skipped);
 
   for (let i = 0; i < routable.length; i++) {
     if (opts.limit !== undefined && res.promoted.length >= opts.limit) {

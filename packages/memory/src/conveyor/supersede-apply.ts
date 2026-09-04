@@ -27,7 +27,7 @@ export interface ApplyResult {
 interface Scanned { path: string; data: Record<string, unknown>; content: string; ef: ExistingFiche }
 
 /** Frontmatter scalar → string; non-string (object/number/missing) collapses to '' (avoids '[object Object]', S6551). */
-function asStr(v: unknown): string {
+export function asStr(v: unknown): string {
   return typeof v === 'string' ? v : '';
 }
 
