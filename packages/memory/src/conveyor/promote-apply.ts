@@ -12,13 +12,13 @@
 //   skipped  → NOTHING written, no LLM call spent
 // A fiche is never hard-deleted, and `trust` is never rewritten: promotion advances the lifecycle,
 // it does not launder the source's security tag. NOT in the @mas/memory barrel.
-import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import matter from 'gray-matter';
 import { FicheSchema } from '../fiche';
 import { applySupersede, asStr } from './supersede-apply';
 import {
-  formatIssues, judgeFiche, planPromotion, promotePromptEstimate,
+  formatIssues, judgeFiche, planPromotion,
   type PromoteDeps, type PromotionOutcome, type QualityVerdict,
 } from './promote';
 
@@ -51,16 +51,6 @@ export interface PromoteFileResult {
 /** A fiche's immutable slug path inside the store (STRUCTURE.md §5: `<id>.md`). */
 export function fichePath(dir: string, id: string): string {
   return join(dir, `${id}.md`);
-}
-
-/** Pre-flight estimate for a fiche file, so a batch can gate the spend before reading further. */
-export function promoteFileEstimate(path: string): number {
-  const parsed = matter(readFileSync(path, 'utf8'));
-  const data = parsed.data as Record<string, unknown>;
-  const id = asStr(data.id) || basename(path);
-  return promotePromptEstimate({
-    id, title: id, docType: asStr(data.doc_type) || 'reference', trust: 'untrusted', body: parsed.content,
-  });
 }
 
 const LOG_EVENT: Record<Exclude<PromotionOutcome, 'skipped'>, string> = {
@@ -140,10 +130,4 @@ export async function promoteFile(path: string, deps: PromoteApplyDeps): Promise
   writeFiche(path, { ...scored, lifecycle: plan.target }, parsed.content);
   appendFileSync(deps.logPath, logLine(LOG_EVENT[plan.outcome as 'held' | 'rejected'], id, lane, deps, `${judgment.verdict} · ${plan.reason ?? ''}`), 'utf8');
   return { ...base, outcome: plan.outcome, lifecycle: plan.target, ...(plan.reason ? { reason: plan.reason } : {}) };
-}
-
-/** Judge and promote one fiche by id. Returns null when the id has no file in the store. */
-export async function promoteId(id: string, deps: PromoteApplyDeps): Promise<PromoteFileResult | null> {
-  const path = fichePath(deps.dir, id);
-  return existsSync(path) ? promoteFile(path, deps) : null;
 }
