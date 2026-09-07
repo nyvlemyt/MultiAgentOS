@@ -32,8 +32,13 @@ export interface PromoteRunResult {
   skipped: number;
   /** True when the batch stopped early on the run budget (anti quota-bomb). */
   budgetStopped: boolean;
-  /** Candidates not yet processed when the run ended (budget stop or `--limit`). */
+  /** Candidates not yet processed when the run ended (budget stop, `--limit`, or an abort). */
   remaining: number;
+  /**
+   * Set when the batch stopped on an ENVIRONMENT failure (expired credential, exhausted quota,
+   * rate limit) rather than on a document. Carries the reason so the summary can say it.
+   */
+  aborted?: string;
 }
 
 export interface PromoteRunOpts {
@@ -41,6 +46,18 @@ export interface PromoteRunOpts {
   runCap?: number;
   /** Stop after this many judged fiches (promote a handful, verify, then widen). */
   limit?: number;
+}
+
+/**
+ * An environment failure, not a document failure. The distinction is load-bearing: one malformed
+ * fiche must never stop a 375-fiche batch (that rule stands), but a dead credential or an exhausted
+ * quota makes EVERY remaining call fail identically — continuing just prints 375 copies of the same
+ * error and charges the run budget for calls that never produced a token. Observed live on
+ * 2026-09-04: an expired OAuth token produced 22 identical failures and a spurious "budget cap
+ * reached" before the batch gave up.
+ */
+export function isFatalLLMError(reason: string): boolean {
+  return /\b401\b|\b429\b|authenticate|oauth|quota_exhausted|rate.?limit/i.test(reason);
 }
 
 const emptyResult = (): PromoteRunResult => ({
@@ -122,9 +139,17 @@ export async function promoteAll(deps: PromoteApplyDeps, opts: PromoteRunOpts = 
       res.remaining = candidates.length - i;
       return res;
     }
-    spent += cand.cost;
     judged += 1;
-    collect(res, await promoteOneSafely(cand.path, deps));
+    const outcome = await promoteOneSafely(cand.path, deps);
+    collect(res, outcome);
+    if (outcome.outcome === 'failed' && isFatalLLMError(outcome.reason ?? '')) {
+      res.aborted = outcome.reason;
+      res.remaining = candidates.length - i - 1;
+      return res;
+    }
+    // Charged only for a call that actually ran. A judge that threw (401, 429) billed nothing, so
+    // charging its estimate would fake a budget stop out of an environment outage.
+    if (outcome.outcome !== 'failed') spent += cand.cost;
   }
   return res;
 }
@@ -157,7 +182,8 @@ export function formatPromoteSummary(res: PromoteRunResult): string {
     `${res.rejected.length} rejected, ${res.superseded.length} superseded, ` +
     `${res.failed.length} failed, ${res.skipped} skipped.`;
   let head = base;
-  if (res.budgetStopped) head = `${base} Budget cap reached — paused, ${res.remaining} remaining (resume later).`;
+  if (res.aborted) head = `${base} Lot interrompu (panne d'environnement) — ${res.remaining} remaining. Cause : ${res.aborted}`;
+  else if (res.budgetStopped) head = `${base} Budget cap reached — paused, ${res.remaining} remaining (resume later).`;
   else if (res.remaining > 0) head = `${base} Stopped on --limit, ${res.remaining} remaining.`;
   return [head, ...res.failed.map((f) => `  FAIL ${f.id} — ${f.reason}`)].join('\n');
 }

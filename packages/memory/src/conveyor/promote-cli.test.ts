@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import matter from 'gray-matter';
 import type { LLMClient, LLMRequest } from '@mas/core';
 import { FicheSchema } from '../fiche';
-import { promoteAll, promoteTarget, formatPromoteSummary, parsePromoteArgs } from './promote-cli';
+import { promoteAll, promoteTarget, formatPromoteSummary, parsePromoteArgs, isFatalLLMError } from './promote-cli';
 import type { PromoteApplyDeps } from './promote-apply';
 import type { QualityVerdict } from './promote';
 
@@ -231,5 +231,72 @@ describe('parsePromoteArgs', () => {
 
   it('falls back to usage on no argument at all', () => {
     expect(parsePromoteArgs([])).toEqual({ mode: 'usage' });
+  });
+});
+
+describe('promoteAll — une panne d environnement arrete le lot, un mauvais document non', () => {
+  /** An LLM client that always fails the way an expired credential does. */
+  function deadAuthLLM(): LLMClient {
+    return {
+      async call() {
+        calls.push({} as LLMRequest);
+        throw new Error('Claude Code returned an error result: Failed to authenticate. API Error: 401 OAuth access token has expired. Re-authenticate to continue.');
+      },
+    };
+  }
+
+  it('arrete le lot au PREMIER echec d authentification, sans defiler les 375', async () => {
+    for (const id of ['aa', 'bb', 'cc', 'dd']) fiche(id);
+    const res = await promoteAll(deps({ llm: deadAuthLLM() }));
+    expect(res.aborted).toMatch(/authenticate|401/i);
+    expect(res.failed).toHaveLength(1);
+    expect(calls).toHaveLength(1);
+    expect(res.remaining).toBe(3);
+  });
+
+  it('ne facture PAS le budget pour un appel qui n a produit aucun token', async () => {
+    fiche('ee');
+    const res = await promoteAll(deps({ llm: deadAuthLLM() }));
+    expect(res.budgetStopped).toBe(false);
+  });
+
+  it('un document malforme reste une panne locale : le lot continue', async () => {
+    writeFileSync(join(dir, 'broken.md'), matter.stringify('b', { id: 'broken', slug: 'broken', source_key: 'sha256:x', lifecycle: 'distilled', trust: 'trusted' }), 'utf8');
+    fiche('zz');
+    const res = await promoteAll(deps());
+    expect(res.aborted).toBeUndefined();
+    expect(res.failed).toHaveLength(1);
+    expect(res.promoted).toEqual(['zz']);
+  });
+
+  it('le resume dit pourquoi le lot s est arrete', () => {
+    const out = formatPromoteSummary({
+      promoted: [], held: [], rejected: [], superseded: [], skipped: 0,
+      failed: [{ id: 'aa', path: '/k/aa.md', reason: '401 OAuth access token has expired' }],
+      budgetStopped: false, remaining: 374, aborted: '401 OAuth access token has expired',
+    });
+    expect(out).toMatch(/interrompu/i);
+    expect(out).toContain('374 remaining');
+    expect(out).toContain('401');
+  });
+});
+
+describe('isFatalLLMError', () => {
+  it.each([
+    '401 OAuth access token has expired. Re-authenticate to continue.',
+    'Failed to authenticate. API Error: 401',
+    'QUOTA_EXHAUSTED',
+    'HTTP Error 429: Too Many Requests',
+    'rate_limit reached',
+  ])('reconnait une panne d environnement (%s)', (msg) => {
+    expect(isFatalLLMError(msg)).toBe(true);
+  });
+
+  it.each([
+    'frontmatter is not FicheSchema-valid: lane: Required',
+    '[promote] malformed model output',
+    "filename 'x.md' does not match id 'y'",
+  ])('ne confond pas un defaut de document avec une panne (%s)', (msg) => {
+    expect(isFatalLLMError(msg)).toBe(false);
   });
 });
