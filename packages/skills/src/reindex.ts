@@ -1,7 +1,12 @@
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getDb, closeDb, skills } from '@mas/db';
-import { scanOrchestratorSkills, writeSummaryCache } from './scanner.js';
+import {
+  describeDegenerateEntries,
+  findDegenerateEntries,
+  scanOrchestratorSkills,
+  writeSummaryCache,
+} from './scanner.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../../..');
@@ -11,6 +16,11 @@ async function main() {
   const metas = scanOrchestratorSkills(REPO_ROOT);
   if (metas.length === 0) {
     console.error('[reindex] No SKILL.md files found. Create .claude/skills/mas-*/SKILL.md first.');
+    process.exit(1);
+  }
+  const degenerate = findDegenerateEntries(metas);
+  if (degenerate.length > 0) {
+    console.error(`[reindex] fix the SKILL.md frontmatter first — ${describeDegenerateEntries(degenerate)}`);
     process.exit(1);
   }
 

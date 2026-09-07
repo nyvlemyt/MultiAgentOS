@@ -1,5 +1,12 @@
 # Backlog — Router quota-window state persistence
 
+**Status:** ✅ RESOLVED 2026-06-15 (item 5b router-persistence, PR #18, merged `eaa142b`).
+Shipped as planned below: a `window_blocked {source, blockedAt, ttlMs}` event is written on
+block and the `blockedAt` Map is rehydrated from the latest events on init (core stays
+decoupled via hooks) — see `packages/agents/src/mission-events.ts` and
+`packages/agents/src/router-persist.test.ts` (a source blocked before "restart" is still
+skipped until TTL; cleared on first successful call).
+
 **Source**: Phase 3.5 Checker finding (info/medium), 2026-06-13. `docs/learning/2026-06-13-phase3.5-router/checker-verdict.md` §Findings #2.
 
 ## What

@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import matter from 'gray-matter';
 
 /**
  * Arsenal index builder (Phase 9 · 0a renforcée). Emits one small Markdown stub
@@ -36,28 +37,57 @@ export interface ArsenalBuildResult {
   outDir: string;
 }
 
-/** Parse YAML frontmatter into a flat map (nested keys flattened; flow arrays kept). */
-export function parseFrontmatter(raw: string): Record<string, string | string[]> {
-  const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw);
-  if (!match?.[1]) return {};
-  const fm: Record<string, string | string[]> = {};
-  for (const line of match[1].split('\n')) {
-    const colon = line.indexOf(':');
-    if (colon === -1) continue;
-    const key = line.slice(0, colon).trim();
-    if (!key) continue;
-    const val = line.slice(colon + 1).trim();
-    if (val.startsWith('[') && val.endsWith(']')) {
-      fm[key] = val
-        .slice(1, -1)
-        .split(',')
-        .map((s) => s.trim().replace(/^["']|["']$/g, ''))
-        .filter((s) => s.length > 0);
-    } else {
-      fm[key] = val.replace(/^["']|["']$/g, '');
-    }
+/**
+ * Parse YAML frontmatter into a flat map (nested maps flattened one level, arrays kept
+ * as string[]). gray-matter (already a @mas/memory dependency) does the YAML work, so
+ * block scalars (`description: |`, `summary: >-`) resolve to their text — the former
+ * line-based parser kept the bare indicator (17 library skills, 2026-09-02).
+ * Top-level keys win over nested ones; malformed YAML → {} (skipped downstream).
+ */
+export function parseFrontmatter(raw: string): FlatFrontmatter {
+  let data: Record<string, unknown>;
+  try {
+    // Empty options object: opts out of gray-matter's content-keyed memoization.
+    data = matter(raw, {}).data;
+  } catch {
+    return {};
+  }
+  const fm: FlatFrontmatter = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (isPlainObject(value)) flattenInto(fm, value);
+    else putFlat(fm, key, value);
   }
   return fm;
+}
+
+type FlatFrontmatter = Record<string, string | string[]>;
+
+/** Nested map → top level, never overriding a key already set at top level. */
+function flattenInto(fm: FlatFrontmatter, nested: Record<string, unknown>): void {
+  for (const [key, value] of Object.entries(nested)) {
+    if (fm[key] === undefined) putFlat(fm, key, value);
+  }
+}
+
+function putFlat(fm: FlatFrontmatter, key: string, value: unknown): void {
+  const flat = toFlat(value);
+  if (flat !== undefined) fm[key] = flat;
+}
+
+function toFlat(value: unknown): string | string[] | undefined {
+  if (Array.isArray(value)) return value.filter(isScalar).map(String);
+  if (isScalar(value)) return String(value);
+  if (value instanceof Date) return value.toISOString();
+  return undefined;
+}
+
+function isScalar(v: unknown): v is string | number | boolean {
+  return typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
+}
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  if (Array.isArray(v) || v instanceof Date) return false;
+  return typeof v === 'object' && v !== null;
 }
 
 function fmStr(fm: Record<string, string | string[]>, key: string): string {

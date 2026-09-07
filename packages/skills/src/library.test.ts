@@ -1,13 +1,15 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, rmSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import {
   scanLibrarySkills,
   buildLibraryIndex,
   loadLibraryIndex,
   clusterToDomain,
+  findDegenerateEntries,
 } from './scanner.js';
+import type { SkillMeta } from './types.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../../..');
@@ -49,11 +51,25 @@ describe('scanLibrarySkills', () => {
     const taste = metas.find((m) => m.id === 'taste')!;
     expect(taste.tags).toContain('skill:vertical');
   });
+
+  it('resolves YAML block scalars (accessibility uses "description: |" + "summary: >-")', () => {
+    const acc = metas.find((m) => m.id === 'accessibility');
+    expect(acc).toBeDefined();
+    expect(acc!.description).toContain('WCAG 2.2');
+    expect(acc!.summary).toContain('POUR');
+  });
+
+  it('has zero degenerate L1 entries — bare "|" / ">-" / blank (non-regression 2026-09-02)', () => {
+    expect(findDegenerateEntries(metas)).toEqual([]);
+  });
 });
 
 describe('buildLibraryIndex + loadLibraryIndex round-trip', () => {
   beforeAll(() => {
-    if (existsSync(INDEX_PATH)) rmSync(INDEX_PATH);
+    // Rebuild in place — never rmSync() first. index.json is a shared generated
+    // artifact and @mas/agents reads it concurrently under the root runner
+    // (`pnpm test:coverage`); deleting it made dispatch-arsenal fail as a race.
+    // buildLibraryIndex writes atomically, so readers always see a complete file.
     buildLibraryIndex(REPO_ROOT);
   });
 
@@ -78,5 +94,10 @@ describe('buildLibraryIndex + loadLibraryIndex round-trip', () => {
     const taste = parsed.find((e: { id: string }) => e.id === 'taste');
     expect(taste.summary).toBeDefined();
     expect(JSON.stringify(taste)).not.toContain('## Prompt Defense Baseline');
+  });
+
+  it('the generated index.json carries no degenerate entries', () => {
+    const parsed = JSON.parse(readFileSync(INDEX_PATH, 'utf8')) as SkillMeta[];
+    expect(findDegenerateEntries(parsed)).toEqual([]);
   });
 });
