@@ -300,3 +300,33 @@ describe('isFatalLLMError', () => {
     expect(isFatalLLMError(msg)).toBe(false);
   });
 });
+
+describe('parsePromoteArgs — plafond de la passe', () => {
+  it('lit --run-cap', () => {
+    expect(parsePromoteArgs(['--all', '--run-cap', '250000'])).toEqual({ mode: 'all', runCap: 250_000 });
+  });
+
+  it('refuse un --run-cap non numerique ou absent plutot que de retomber sur le defaut', () => {
+    expect(parsePromoteArgs(['--all', '--run-cap', 'beaucoup']).error).toMatch(/--run-cap/);
+    expect(parsePromoteArgs(['--all', '--run-cap']).error).toMatch(/--run-cap/);
+  });
+
+  it('combine --run-cap et --limit', () => {
+    expect(parsePromoteArgs(['--all', '--run-cap', '90000', '--limit', '40']))
+      .toEqual({ mode: 'all', runCap: 90_000, limit: 40 });
+  });
+});
+
+describe('promoteAll — le plafond de passe est bien celui qu on lui donne', () => {
+  it('juge plus de fiches quand on releve le plafond', async () => {
+    for (const id of ['p1', 'p2', 'p3', 'p4']) fiche(id);
+    const serre = await promoteAll(deps(), { runCap: 900 });
+    expect(serre.budgetStopped).toBe(true);
+
+    calls = [];
+    for (const id of ['q1', 'q2', 'q3', 'q4']) fiche(id);
+    const large = await promoteAll(deps(), { runCap: 500_000 });
+    expect(large.budgetStopped).toBe(false);
+    expect(large.promoted.length).toBeGreaterThan(serre.promoted.length);
+  });
+});

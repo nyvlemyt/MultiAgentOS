@@ -30,7 +30,7 @@ import type { NetGuardDeps } from './conveyor/net-guard';
 const USAGE =
   'usage: mas capture <path|url> | mas capture --html [file|-] | mas capture --inbox [dir]\n' +
   '       mas distill <sas-doc-path> | mas distill --all [dir]\n' +
-  '       mas promote <fiche-id|path> | mas promote --all [dir] [--limit N] [--approve-untrusted]\n' +
+  '       mas promote <fiche-id|path> | mas promote --all [dir] [--limit N] [--run-cap N] [--approve-untrusted]\n' +
   '       mas promote --candidates [--dry-run] [--limit N] [--project <id>]';
 
 function findRepoRoot(): string {
@@ -158,7 +158,10 @@ async function runPromote(root: string, rest: string[]): Promise<void> {
     return;
   }
   const deps = buildPromoteDeps(root, args.dir, args.approveUntrusted === true);
-  const batchOpts = args.limit !== undefined ? { limit: args.limit } : {};
+  const batchOpts = {
+    ...(args.limit !== undefined ? { limit: args.limit } : {}),
+    ...(args.runCap !== undefined ? { runCap: args.runCap } : {}),
+  };
   const res = args.mode === 'all'
     ? await promoteAll(deps, batchOpts)
     : await promoteTarget(args.target!, deps);

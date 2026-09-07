@@ -197,6 +197,8 @@ export interface PromoteArgs {
   /** Store directory override, in `all` mode. */
   dir?: string;
   limit?: number;
+  /** Cumulative ceiling for the whole run. Without it, DEFAULT_PROMOTE_TOKEN_CAP (~22 fiches). */
+  runCap?: number;
   approveUntrusted?: boolean;
   dryRun?: boolean;
   projectId?: string;
@@ -206,12 +208,14 @@ export interface PromoteArgs {
 
 // Flags that only set a field — kept as DATA so parsePromoteArgs stays a flat dispatch.
 const MODE_FLAGS: Record<string, PromoteArgs['mode']> = { '--all': 'all', '--candidates': 'candidates' };
+// Numeric flags, with the field they fill. Kept as DATA alongside the others.
+const NUM_FLAGS: Record<string, 'limit' | 'runCap'> = { '--limit': 'limit', '--run-cap': 'runCap' };
 const BOOL_FLAGS: Record<string, 'approveUntrusted' | 'dryRun'> = {
   '--approve-untrusted': 'approveUntrusted',
   '--dry-run': 'dryRun',
 };
 
-/** Apply a `--limit`/`--project` pair onto `args`, or return why the value is unusable. */
+/** Apply a value-taking flag onto `args`, or return why the value is unusable. */
 function applyValueFlag(args: PromoteArgs, flag: string, value: string | undefined): string | null {
   if (value === undefined || value.startsWith('--')) return `${flag} needs a value`;
   if (flag === '--project') {
@@ -219,8 +223,8 @@ function applyValueFlag(args: PromoteArgs, flag: string, value: string | undefin
     return null;
   }
   const n = Number(value);
-  if (!Number.isInteger(n) || n <= 0) return `--limit needs a positive integer, got '${value}'`;
-  args.limit = n;
+  if (!Number.isInteger(n) || n <= 0) return `${flag} needs a positive integer, got '${value}'`;
+  args[NUM_FLAGS[flag]!] = n;
   return null;
 }
 
@@ -252,7 +256,7 @@ export function parsePromoteArgs(rest: string[]): PromoteArgs {
       args[bool] = true;
       continue;
     }
-    if (arg === '--limit' || arg === '--project') {
+    if (NUM_FLAGS[arg] || arg === '--project') {
       const error = applyValueFlag(args, arg, rest[i + 1]);
       if (error) return { ...args, error };
       i += 1;

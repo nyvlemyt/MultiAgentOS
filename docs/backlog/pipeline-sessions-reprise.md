@@ -19,14 +19,15 @@
 ```
 [0] Housekeeping (merges #71/#72 + rebase)  ← FAIRE EN PREMIER, court
         │
-        ├──► TRACK MÉMOIRE (séquentiel sur brique-1, packages/memory)
-        │      [A] Promotion distilled→active + 51 candidats
-        │      [B] Nettoyages données (createdAt, source_kind, Obsidian, hook reseed)
-        │      [C] Brique 5 — onglet cockpit  (apps/web → parallélisable avec A/B)
-        │      [E] Merge brique-1 → main       ← APRÈS A,B,C
+        ├──► TRACK MÉMOIRE
+        │      [A] Promotion distilled→active          ✅ FAIT (PR #77, base brique-1)
+        │      [E] Merge brique-1 → main               ⏳ PR #79 ouverte  ← MAINTENANT, pas après B/C
+        │      [B] Nettoyages données                  → base MAIN, après #79
+        │      [C] Brique 5 — onglet cockpit           → base MAIN, après #79
+        │      [F] Classifieur : faux positifs cours   → base MAIN, après #79
         │
-        ├──► TRACK DESIGN (docs seuls, démarrable tout de suite, en parallèle)
-        │      [D] Mémoire v2 : intake Graphify + mesure gap QMD + ADR  (AUCUN code)
+        ├──► TRACK DESIGN (docs seuls)
+        │      [D] Mémoire v2 : intake Graphify + gap QMD + ADR 0010   ✅ FAIT (poussé 2026-09-04)
         │
         └──► TRACK EXPLOITATION (branches basées MAIN, parallèle total)
                [X1] C3 rapport de mission  ← débloque les suivantes
@@ -34,26 +35,43 @@
                [X5] C8 réveil · [X6] C11 vérif ternaire · [X7] C5+C13 routage
 ```
 
-Règle d'or : **tout ce qui touche `packages/memory` reste séquentiel sur `brique-1`** ;
-les cartes C-x vivent sur des branches **basées `main`** et n'entrent jamais en conflit.
+### Révision du 2026-09-04 — [E] passe AVANT [B] et [C]
+
+Le plan d'origine gardait `brique-1` vivante jusqu'à ce que A, B et C soient dedans, pour la merger
+« d'un bloc ». **Décision Melvyn du 2026-09-04 : on inverse.** `brique-1` part dans `main` dès que
+#77 est dedans, et B, C et F deviennent des branches courtes basées sur `main`.
+
+Pourquoi : la règle d'or (« tout ce qui touche `packages/memory` reste séquentiel ») ne demande pas
+un *second tronc*, elle demande **une seule branche à la fois sur ces fichiers**. Cette garantie est
+identique sur `main`, avec un tronc en moins. Le coût du second tronc, lui, était réel et mesuré :
+à 47 branches et deux bases possibles, plus personne ne savait sur quelle branche démarrer
+(audit complet : `docs/workflows/etat-branches-et-menage.md`).
+
+**Ordre de fusion à respecter** — #74/#75/#76 → `main` · **#77 → `brique-1`** · **#79
+(`brique-1`→`main`)** · #78 → `main` puis suppression des 25 branches mortes. Merger #79 avant #77
+ferait disparaître la base de #77.
+
+Règle d'or, reformulée : **une seule branche à la fois touche `packages/memory`**, et elle part de
+`main`. Plus jamais de tronc long parallèle.
 
 ## Tableau récap
 
-| # | Sujet | Base | Worktree | Modèle | Effort | Dépend de |
-|---|-------|------|----------|--------|--------|-----------|
-| 0 | Housekeeping | brique-1 | non | Sonnet | low | — |
-| A | Promotion mémoire (P1-6+P1-8) | brique-1 | oui | **Opus** | **high** | 0 |
-| B | Nettoyages données (P1-7/9/5) | brique-1 | oui | Sonnet | medium | 0 |
-| C | Brique 5 cockpit (P1-10) | brique-1 | oui | **Opus** | high | 0 |
-| D | Mémoire v2 design (ADR) | brique-1 (docs) | non | **Opus** | **max** | — |
-| E | Merge brique-1 → main (P1-13) | main | non | Sonnet | low | A,B,C |
-| X1 | C3 rapport mission | main | oui | Opus | high | E (ou brique-1 mergé) |
-| X2 | C10 reprise nextAction | main | oui | Opus | medium | X1 |
-| X3 | C9 écritures externes | main | oui | Opus | medium | X1 |
-| X4 | C4 prompt à coller | main | oui | Opus | medium | X1,X2 |
-| X5 | C8 rapport réveil | main | oui | Sonnet | medium | X1 |
-| X6 | C11 vérif ternaire | main | oui | Opus | high | X1 |
-| X7 | C5+C13 routage par nature | main | oui | Opus | high | X1 |
+| # | Sujet | Base | Worktree | Modèle | Effort | Dépend de | Statut |
+|---|-------|------|----------|--------|--------|-----------|--------|
+| 0 | Housekeeping | brique-1 | non | Sonnet | low | — | ✅ fait |
+| A | Promotion mémoire (P1-6) | brique-1 | oui | **Opus** | **high** | 0 | ✅ PR #77 |
+| E | Merge brique-1 → main (P1-13) | main | non | Sonnet | low | **A seule** | ⏳ PR #79 |
+| B | Nettoyages données (P1-7/9/5) | **main** | oui | Sonnet | medium | E | à faire |
+| C | Brique 5 cockpit (P1-10) | **main** | oui | **Opus** | high | E | à faire |
+| F | Classifieur faux positifs cours | **main** | oui | **Opus** | high | E | à faire |
+| D | Mémoire v2 design (ADR 0010) | brique-1 (docs) | non | **Opus** | **max** | — | ✅ poussé |
+| X1 | C3 rapport mission | main | oui | Opus | high | E (ou brique-1 mergé) | à faire |
+| X2 | C10 reprise nextAction | main | oui | Opus | medium | X1 | à faire |
+| X3 | C9 écritures externes | main | oui | Opus | medium | X1 | à faire |
+| X4 | C4 prompt à coller | main | oui | Opus | medium | X1,X2 | à faire |
+| X5 | C8 rapport réveil | main | oui | Sonnet | medium | X1 | à faire |
+| X6 | C11 vérif ternaire | main | oui | Opus | high | X1 | à faire |
+| X7 | C5+C13 routage par nature | main | oui | Opus | high | X1 | à faire |
 
 ---
 
@@ -71,7 +89,7 @@ worktrees restants (git worktree list) et les 3 branches héritées à finir/jet
 dis-moi pour chacune finir ou supprimer, ne tranche pas seul. Rapport visuel court à la fin.
 ```
 
-## [A] Promotion distilled→active + 51 candidats — PROMPT
+## [A] Promotion distilled→active — PROMPT — ✅ FAIT (PR #77)
 > Modèle **Opus** · effort **high** · worktree basé `brique-1` · branche `knowledge-os/promotion` · PR base brique-1.
 
 ```
@@ -92,7 +110,7 @@ mémoire mission (le routage seed est par cycle de vie). Respecte les règles co
 ```
 
 ## [B] Nettoyages données mémoire — PROMPT
-> Modèle Sonnet · effort medium · worktree basé `brique-1` · branche `knowledge-os/memory-cleanups` · PR base brique-1.
+> Modèle Sonnet · effort medium · worktree basé **`main`** (après #79) · branche `chore/memory-cleanups` · PR base main.
 
 ```
 Nettoyages de données mémoire (P1-7, P1-9, P1-5), en TDD, chacun isolé :
@@ -109,7 +127,7 @@ Règles communes du runbook. NE touche pas au code de promotion (chantier A, bra
 ```
 
 ## [C] Brique 5 — onglet cockpit Ressources/Connaissances — PROMPT
-> Modèle **Opus** · effort high · worktree basé `brique-1` · branche `knowledge-os/brique-5` · PR base brique-1.
+> Modèle **Opus** · effort high · worktree basé **`main`** (après #79) · branche `feat/brique-5-cockpit` · PR base main.
 
 ```
 Construis la Brique 5 : l'onglet cockpit Ressources/Connaissances (apps/web). Lis d'abord
