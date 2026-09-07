@@ -7,12 +7,12 @@ order: null
 manifest: null
 derived_from: 'sha256:d580b970155d9acd54831852aab750d3a7cda0e048342a9e84241631ff4dc3a5'
 sources: []
-lifecycle: distilled
+lifecycle: active
 superseded_by: null
 trust: untrusted
 ocr_confidence: null
 retrieval_context: null
-quality_score: null
+quality_score: PASS
 kind: resource
 register: learnings
 scope: global

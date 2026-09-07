@@ -163,6 +163,74 @@ describe('MemoryStore wikilinks', () => {
   });
 });
 
+describe('parse — un corps riche ne doit pas etre pris pour des entrees', () => {
+  function keeper() {
+    return new MemoryStore({ root, writerAgent: MEMORY_KEEPER_AGENT });
+  }
+
+  const COURSE_BODY = [
+    'TD part 01 - Docker',
+    '',
+    '## Contents',
+    '',
+    '1.1 Contexte et objectif',
+    '',
+    '## 2.1 Variable cible',
+    '',
+    'suite du cours',
+  ].join('\n');
+
+  it('garde UNE entree quand le corps porte ses propres titres markdown', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'TD part 01 - Docker', body: COURSE_BODY });
+    const entries = s.read('_global', 'learnings');
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.id).toBe('LRN-001');
+    expect(entries[0]!.body).toContain('## Contents');
+    expect(entries[0]!.body).toContain('## 2.1 Variable cible');
+  });
+
+  it('numerote la suite sur les vraies entrees, pas sur les titres du corps', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'A', body: COURSE_BODY });
+    const second = s.append('_global', 'learnings', { title: 'B', body: 'court' });
+    expect(second.id).toBe('LRN-002');
+  });
+
+  it('ne casse pas le round-trip des metadonnees', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'A', body: COURSE_BODY, source: 'candidate:c1' });
+    const [e] = s.read('_global', 'learnings');
+    expect(e!.source).toBe('candidate:c1');
+    expect(e!.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('lit bien plusieurs entrees consecutives', () => {
+    const s = keeper();
+    s.append('_global', 'blockers', { title: 'un', body: '## faux titre\ncorps un' });
+    s.append('_global', 'blockers', { title: 'deux', body: 'corps deux' });
+    const entries = s.read('_global', 'blockers');
+    expect(entries.map((e) => e.id)).toEqual(['BLK-001', 'BLK-002']);
+    expect(entries[0]!.body).toContain('corps un');
+    expect(entries[1]!.body).toBe('corps deux');
+  });
+
+  it('lit une entree de journal, dont l id est une date', () => {
+    const s = keeper();
+    const created = s.append('_global', 'journal', { title: '', body: '## section\nnote du jour' });
+    const entries = s.read('_global', 'journal');
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.id).toBe(created.id);
+    expect(entries[0]!.body).toContain('note du jour');
+  });
+
+  it('toDocs ne fabrique pas de faux documents pour le retriever', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'A', body: COURSE_BODY });
+    expect(s.toDocs('_global')).toHaveLength(1);
+  });
+});
+
 async function seedCandidate(id: string) {
   const db = getDb();
   await db.insert(projects).values({

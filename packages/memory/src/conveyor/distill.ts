@@ -33,10 +33,12 @@ export function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-/** Thrown when the pre-flight estimate exceeds the cap. The call is never made (never burns past). */
+/** Thrown when the pre-flight estimate exceeds the cap. The call is never made (never burns past).
+ * `stage` labels which conveyor stage refused the spend (distill, promote) — the mechanism is the
+ * same, so the class is shared rather than duplicated per stage. */
 export class BudgetExceededError extends Error {
-  constructor(readonly estimate: number, readonly cap: number, readonly remaining: number) {
-    super(`[distill] token budget exceeded: estimate ${estimate} > cap ${cap} (remaining ${remaining})`);
+  constructor(readonly estimate: number, readonly cap: number, readonly remaining: number, stage = 'distill') {
+    super(`[${stage}] token budget exceeded: estimate ${estimate} > cap ${cap} (remaining ${remaining})`);
     this.name = 'BudgetExceededError';
   }
 }

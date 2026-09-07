@@ -106,26 +106,49 @@ function serialize(entries: RegisterEntry[]): string {
     .join('\n');
 }
 
+/**
+ * A register entry header, and ONLY that: `## <id>` where the id is a register id
+ * (BDR/LRN/BLK/EVAL-NNN) or a journal date. Splitting on any `^## ` — as this parser
+ * used to — shreds an entry whose BODY carries its own markdown headings into phantom
+ * entries with garbage ids ('Contents', '2.1 Variable cible'): the retriever then
+ * indexes them as documents and nextId() counts them, so LRN-044 was minted LRN-082.
+ * That surfaced the day the first ingested course documents landed in a register.
+ * The quantifiers below are separated by literals — no super-linear backtracking (S5852).
+ */
+const ENTRY_HEADER = /^## ((?:BDR|LRN|BLK|EVAL)-\d{3,}|\d{4}-\d{2}-\d{2})(?: — (.*))?$/;
+
+/** Split an entry's raw lines into its `- key: value` meta head and its body. */
+function readEntry(id: string, title: string, lines: string[]): RegisterEntry {
+  const entry: RegisterEntry = { id, title, body: '' };
+  let i = 0;
+  for (; i < lines.length; i++) {
+    // (\S.*)? keeps the value start disjoint from \s* — no overlapping
+    // quantifiers, no super-linear backtracking (S5852).
+    const m = /^- (\w+):\s*(\S.*)?$/.exec(lines[i]!);
+    if (!m) break;
+    if (m[1] === 'date') entry.date = (m[2] ?? '').trim();
+    if (m[1] === 'source') entry.source = (m[2] ?? '').trim();
+  }
+  entry.body = lines.slice(i).join('\n').trim();
+  return entry;
+}
+
 function parse(content: string): RegisterEntry[] {
-  const chunks = content.split(/^## /m).filter((c) => c.trim().length > 0);
-  return chunks.map((chunk) => {
-    const lines = chunk.split('\n');
-    const header = lines.shift() ?? '';
-    const [id, ...titleParts] = header.split(' — ');
-    const title = titleParts.join(' — ').trim();
-    const entry: RegisterEntry = { id: id!.trim(), title, body: '' };
-    let i = 0;
-    for (; i < lines.length; i++) {
-      // (\S.*)? keeps the value start disjoint from \s* — no overlapping
-      // quantifiers, no super-linear backtracking (S5852).
-      const m = /^- (\w+):\s*(\S.*)?$/.exec(lines[i]!);
-      if (!m) break;
-      if (m[1] === 'date') entry.date = (m[2] ?? '').trim();
-      if (m[1] === 'source') entry.source = (m[2] ?? '').trim();
+  const entries: RegisterEntry[] = [];
+  let head: { id: string; title: string } | null = null;
+  let lines: string[] = [];
+  for (const line of content.split('\n')) {
+    const m = ENTRY_HEADER.exec(line);
+    if (!m) {
+      if (head) lines.push(line);
+      continue;
     }
-    entry.body = lines.slice(i).join('\n').trim();
-    return entry;
-  });
+    if (head) entries.push(readEntry(head.id, head.title, lines));
+    head = { id: m[1]!, title: (m[2] ?? '').trim() };
+    lines = [];
+  }
+  if (head) entries.push(readEntry(head.id, head.title, lines));
+  return entries;
 }
 
 export class MemoryStore {

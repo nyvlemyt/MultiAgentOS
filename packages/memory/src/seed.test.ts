@@ -111,6 +111,42 @@ describe('routage études vs savoir mission (P1-14, décision 2026-08-31)', () =
     expect(readdirSync(etudes)).toHaveLength(1);
   });
 
+  it('une fiche promue MIGRE : elle entre en mémoire mission ET quitte le miroir études', () => {
+    const { kn, etudes } = makeDirs();
+    seedGlobalKnowledge(keeperStore(), kn, etudes);
+    const mirrored = join(etudes, 'docs__knowledge__cours.md');
+    expect(existsSync(mirrored)).toBe(true);
+
+    // La promotion (mas promote) fait passer la fiche à `active` dans docs/knowledge.
+    writeFileSync(join(kn, 'cours.md'), COURS.replace('lifecycle: distilled', 'lifecycle: active'), 'utf8');
+    const res = seedGlobalKnowledge(keeperStore(), kn, etudes);
+
+    expect(res.imported).toContain('docs/knowledge/cours.md');
+    expect(res.migrated).toContain('docs/knowledge/cours.md');
+    expect(existsSync(mirrored)).toBe(false); // plus de jumeau obsolète
+    const missionDocs = keeperStore().knowledgeDocs();
+    expect(missionDocs.some((d) => d.body.includes('Fourier'))).toBe(true);
+  });
+
+  it('la migration est idempotente — un troisième seed ne re-signale rien', () => {
+    const { kn, etudes } = makeDirs();
+    seedGlobalKnowledge(keeperStore(), kn, etudes);
+    writeFileSync(join(kn, 'cours.md'), COURS.replace('lifecycle: distilled', 'lifecycle: active'), 'utf8');
+    seedGlobalKnowledge(keeperStore(), kn, etudes);
+    const res3 = seedGlobalKnowledge(keeperStore(), kn, etudes);
+    expect(res3.migrated).toEqual([]);
+    expect(res3.imported).toEqual([]);
+  });
+
+  it('une fiche encore distilled ne migre pas (le miroir reste la seule copie)', () => {
+    const { kn, etudes } = makeDirs();
+    seedGlobalKnowledge(keeperStore(), kn, etudes);
+    const res2 = seedGlobalKnowledge(keeperStore(), kn, etudes);
+    expect(res2.migrated).toEqual([]);
+    expect(existsSync(join(etudes, 'docs__knowledge__cours.md'))).toBe(true);
+    expect(keeperStore().knowledgeDocs().some((d) => d.body.includes('Fourier'))).toBe(false);
+  });
+
   it('sans frontmatter (fichier curé historique) → mémoire mission', () => {
     const kn = join(root, 'kn2');
     mkdirSync(kn, { recursive: true });
