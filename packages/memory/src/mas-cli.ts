@@ -2,7 +2,7 @@
 // `mas distill <sas-doc-path> | --all [dir]`, and `mas promote <fiche-id|path> | --all | --candidates`.
 // Builds the real registry (markitdown + pdftotext + Defuddle + yt-dlp) and the temp-free DB; the
 // testable logic lives in conveyor/cli.ts + conveyor/distill-cli.ts + conveyor/promote-cli.ts +
-// promote-candidates.ts. Capture's default path is zero-LLM (rules-only) → §11-safe; distill calls
+// promote-candidates.ts. Capture is zero-LLM by construction → §11-safe; distill calls
 // the ONE injected @mas/core claudeCodeLLM (Sonnet) and promote the same client at the promotion
 // tier (Opus, ADR 0008 clause 11) — subscription, never PAYG (§11). The url/youtube egress leaves
 // only through net-guard, seeded from config/permissions.json#allowed_hosts (§5).
@@ -23,6 +23,7 @@ import { distillAll, distillPath, formatDistillSummary, type DistillCliDeps } fr
 import { formatPromoteSummary, parsePromoteArgs, promoteAll, promoteTarget } from './conveyor/promote-cli';
 import type { PromoteApplyDeps } from './conveyor/promote-apply';
 import { formatCandidatesSummary, promoteClassifiedCandidates } from './promote-candidates';
+import { formatReclassifySummary, reclassifyPendingCandidates } from './reclassify';
 import { MEMORY_KEEPER_AGENT, MemoryStore } from './registers';
 import type { PipelineDeps } from './conveyor/pipeline';
 import type { NetGuardDeps } from './conveyor/net-guard';
@@ -31,7 +32,8 @@ const USAGE =
   'usage: mas capture <path|url> | mas capture --html [file|-] | mas capture --inbox [dir]\n' +
   '       mas distill <sas-doc-path> | mas distill --all [dir]\n' +
   '       mas promote <fiche-id|path> | mas promote --all [dir] [--limit N] [--run-cap N] [--approve-untrusted]\n' +
-  '       mas promote --candidates [--dry-run] [--limit N] [--project <id>]';
+  '       mas promote --candidates [--dry-run] [--limit N] [--project <id>]\n' +
+  '       mas reclassify [--dry-run]';
 
 function findRepoRoot(): string {
   let dir = process.cwd();
@@ -65,7 +67,7 @@ function buildDeps(root: string): PipelineDeps {
   registry.register('html', makeHtmlExtractor());
   registry.register('url', makeUrlExtractor({ ...guard, fetch }));
   registry.register('youtube', makeYoutubeExtractor(realYoutubeRunner, guard));
-  return { registry }; // no llm/budget → rules-only, §11-safe
+  return { registry }; // the capture path takes no LLM at all — §11-safe by construction
 }
 
 async function runCapture(root: string, rest: string[]): Promise<void> {
@@ -168,12 +170,22 @@ async function runPromote(root: string, rest: string[]): Promise<void> {
   console.log(formatPromoteSummary(res));
 }
 
+/**
+ * Withdraw the register decisions the provenance gate no longer stands behind (see reclassify.ts).
+ * Idempotent, so it is safe to run before every `mas promote --candidates`.
+ */
+async function runReclassify(rest: string[]): Promise<void> {
+  const dryRun = rest.includes('--dry-run');
+  console.log(formatReclassifySummary(await reclassifyPendingCandidates(getDb(), { dryRun })));
+}
+
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   const root = findRepoRoot();
   if (cmd === 'capture' && rest.length > 0) return runCapture(root, rest);
   if (cmd === 'distill' && rest.length > 0) return runDistill(root, rest);
   if (cmd === 'promote') return runPromote(root, rest);
+  if (cmd === 'reclassify') return runReclassify(rest);
   console.error(USAGE);
   process.exitCode = 1;
 }

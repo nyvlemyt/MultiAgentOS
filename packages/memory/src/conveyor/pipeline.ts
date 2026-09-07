@@ -1,15 +1,18 @@
 // packages/memory/src/conveyor/pipeline.ts
 // The markdown-first ingestion conveyor (design spec §5 Brique 6). Orchestrates the FROZEN units:
-// extract → admission SAS (inside captureCandidates) → deterministic-rules classify → manifest →
-// write (the one door). The ONLY LLM in the capture path is the optional, budget-gated,
-// anti-injection-wrapped classify-on-abstain — default OFF (§11-safe). NOT in the @mas/memory barrel.
+// extract → admission SAS (inside captureCandidates) → manifest → write (the one door).
+// The capture path is now UNCONDITIONALLY zero-LLM (§11-safe by construction, not by default):
+// register classification left it on 2026-09-07. Everything this conveyor produces is an ingested
+// document, and the mission registers take no ingested material (ADR 0004 §5, amendement
+// 2026-09-07), so there is no register question left to ask — of a rule table or of a model. The
+// optional budget-gated classify-on-abstain seam went with it: it could only have laundered the
+// same category error at one quota call per document. NOT in the @mas/memory barrel.
 import { basename } from 'node:path';
 import type { getDb } from '@mas/db';
 import { captureCandidates, type CaptureCandidate, type CaptureResult } from '../capture';
-import { classifyByRulesOnly } from '../classifier';
+import { INGESTED_ABSTAIN } from '../classifier';
 import type { ExtractorRegistry, ExtractResult } from './extractor';
 import type { DeadLetterCause } from './admission';
-import { wrapUntrusted } from './anti-injection';
 import { ExtractorEmptyError } from './extractors/pdf';
 import { BlockedHostError } from './net-guard';
 import { FetchFailedError } from './extractors/url';
@@ -34,10 +37,6 @@ export interface PipelineSource {
 export interface PipelineDeps {
   registry: ExtractorRegistry;
   sourceTaskId?: string | null;
-  /** Optional light LLM for classify-on-abstain. Injected (this package stays LLM-free, §11). */
-  llm?: (prompt: string) => Promise<string> | string;
-  /** Optional budget gate — true ⇒ skip the LLM call (never a silent quota bomb). */
-  budgetBlocked?: () => boolean;
 }
 
 function failed(db: Db, taskId: string | null, body: string, cause: DeadLetterCause, detail: string): Promise<CaptureResult> {
@@ -52,22 +51,10 @@ function causeFor(e: unknown): DeadLetterCause {
   return 'extractor_crash';
 }
 
-/** Rules-first classify; LLM-on-abstain only when wired AND budget open. Returns the decision string. */
-async function decide(markdown: string, deps: PipelineDeps): Promise<string> {
-  const ruled = classifyByRulesOnly({ body: markdown, candidateType: 'reference' });
-  if (ruled) return `${ruled.register}/${ruled.scope} (rule:${ruled.rule})`;
-  if (deps.llm && deps.budgetBlocked?.() !== true) {
-    const answer = await deps.llm(wrapUntrusted(markdown)); // anti-injection BEFORE the model
-    return `llm:${String(answer).trim().slice(0, 40)}`;
-  }
-  const why = deps.llm ? 'llm-classify skipped (budget)' : 'needs human triage';
-  return `abstain — ${why}`;
-}
-
 /**
- * Capture one source through the conveyor. Resolvable kind → extract → classify → one pending
- * candidate at the one door. Unknown kind / oversize / extractor crash / empty extraction →
- * a `capture_failed` dead-letter (visible + relaunchable, never silent).
+ * Capture one source through the conveyor. Resolvable kind → extract → one pending candidate at
+ * the one door, stamped for human triage. Unknown kind / oversize / extractor crash / empty
+ * extraction → a `capture_failed` dead-letter (visible + relaunchable, never silent).
  */
 export async function runCapturePipeline(db: Db, src: PipelineSource, deps: PipelineDeps): Promise<CaptureResult> {
   const taskId = deps.sourceTaskId ?? null;
@@ -97,7 +84,7 @@ export async function runCapturePipeline(db: Db, src: PipelineSource, deps: Pipe
     trust: result.trust,
     sourceResolvable: true,
     signals: ['reference', src.kind],
-    classifierDecision: await decide(result.markdown, deps),
+    classifierDecision: INGESTED_ABSTAIN,
   };
   return captureCandidates(db, taskId, [candidate]);
 }
@@ -130,12 +117,12 @@ async function extractAll(deps: PipelineDeps, sources: PipelineSource[]): Promis
   return { ok, dead };
 }
 
-async function manifestCandidate(node: ManifestNode, deps: PipelineDeps): Promise<CaptureCandidate> {
+function manifestCandidate(node: ManifestNode): CaptureCandidate {
   const body = node.role === 'child' ? `<!-- part_of: ${node.part_of} order: ${node.order} -->\n${node.markdown}` : node.markdown;
   return {
     type: 'reference', body, title: node.title, sourceKey: node.source_key, trust: node.trust,
     sourceResolvable: true, signals: ['reference', node.role],
-    classifierDecision: await decide(node.markdown, deps),
+    classifierDecision: INGESTED_ABSTAIN,
   };
 }
 
@@ -155,13 +142,13 @@ export async function runMatierePipeline(db: Db, input: MatiereInput, deps: Pipe
       trust: ok.every((e) => e.result.trust === 'trusted') ? 'trusted' : 'untrusted',
       files: ok.map((e) => ({ sourceKey: e.result.source_key, heading: e.src.title ?? basename(e.src.source), markdown: e.result.markdown })),
     });
-    for (const node of nodes) items.push(await manifestCandidate(node, deps));
+    for (const node of nodes) items.push(manifestCandidate(node));
   } else if (ok.length === 1) {
     const only = ok[0]!;
     items.push({
       type: 'reference', body: only.result.markdown, title: only.src.title ?? basename(only.src.source),
       sourceKey: only.result.source_key, trust: only.result.trust, sourceResolvable: true,
-      signals: ['reference', only.src.kind], classifierDecision: await decide(only.result.markdown, deps),
+      signals: ['reference', only.src.kind], classifierDecision: INGESTED_ABSTAIN,
     });
   }
   return captureCandidates(db, taskId, items);

@@ -56,6 +56,7 @@ export {
   CAPTURE_DECISION,
   type CaptureCandidate,
   type CandidateType,
+  type CandidateSourceKind,
 } from './capture';
 export { runCloseOutRitual, AUTO_CAPTURE_EVENT, type RitualResult } from './auto-capture';
 export {
@@ -69,11 +70,21 @@ export {
 export {
   classifyCandidate,
   classifyByRulesOnly,
+  isIngestedProvenance,
+  INGESTED_ABSTAIN,
   type ClassifierInput,
   type ClassifierDecision,
   type ClassifierOpts,
   type LlmFallbackInfo,
 } from './classifier';
+export {
+  revokedDecision,
+  reclassifyPendingCandidates,
+  formatReclassifySummary,
+  type StoredCandidate,
+  type ReclassifyChange,
+  type ReclassifySummary,
+} from './reclassify';
 export { seedGlobalKnowledge, runSeed, type SeedResult, type RunSeedOpts } from './seed';
 export {
   promoteClassifiedCandidates,

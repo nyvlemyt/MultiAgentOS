@@ -9,6 +9,7 @@ import { eq } from 'drizzle-orm';
 import { getDb, closeDb, memoryCandidates } from '@mas/db';
 import { ExtractorRegistry } from './extractor';
 import { runCapturePipeline, runMatierePipeline } from './pipeline';
+import { INGESTED_ABSTAIN } from '../classifier';
 import { BlockedHostError } from './net-guard';
 import { FetchFailedError } from './extractors/url';
 
@@ -41,10 +42,21 @@ describe('runCapturePipeline', () => {
     expect(row!.sourceKey).toBe('pdf:k1');
     expect(row!.trust).toBe('untrusted');
     expect(row!.type).toBe('reference');
-    expect(row!.classifierDecision).toContain('learnings');
+    // An ingested body carrying a registry keyword ('learned') is exactly the 2026-09-04 false
+    // positive: the conveyor is outside the mission table's domain, so it abstains to triage.
+    expect(row!.classifierDecision).toBe(INGESTED_ABSTAIN);
   });
 
-  it('records abstain as a flagged pending candidate (never silently mis-filed)', async () => {
+  it('stamps the same triage decision on a course support whose words look like a register', async () => {
+    const db = getDb();
+    // 'Deep Learning' is what fired kw-learning on 43 of the 51 mis-filed documents.
+    const registry = registryWith(async () => ({ markdown: 'Deep Learning — cours 3, réseaux convolutifs.', source_key: 'pdf:k1b', trust: 'untrusted' }));
+    const res = await runCapturePipeline(db, { kind: 'pdf', source: '/dl.pdf' }, { registry });
+    const [row] = await db.select().from(memoryCandidates).where(eq(memoryCandidates.id, res.pending[0]!));
+    expect(row!.classifierDecision).toBe(INGESTED_ABSTAIN);
+  });
+
+  it('records the abstain as a flagged pending candidate (never silently mis-filed)', async () => {
     const db = getDb();
     const registry = registryWith(async () => ({ markdown: 'neutral prose with no register signal at all', source_key: 'pdf:k2', trust: 'untrusted' }));
     const res = await runCapturePipeline(db, { kind: 'pdf', source: '/y.pdf' }, { registry });
@@ -80,19 +92,6 @@ describe('runCapturePipeline', () => {
     expect(row!.classifierDecision).toContain('oversize');
   });
 
-  it('runs the budget-gated LLM only when wired AND budget is open, with anti-injection wrap', async () => {
-    const db = getDb();
-    const reg = registryWith(async () => ({ markdown: 'neutral prose with no register signal at all', source_key: 'pdf:k3', trust: 'untrusted' }));
-    const seen: string[] = [];
-    const llm = (p: string) => { seen.push(p); return 'learnings'; };
-    // budget blocked → LLM NOT called
-    await runCapturePipeline(db, { kind: 'pdf', source: '/b.pdf' }, { registry: reg, llm, budgetBlocked: () => true });
-    expect(seen).toHaveLength(0);
-    // budget open → LLM called, prompt is anti-injection-wrapped
-    await runCapturePipeline(db, { kind: 'pdf', source: '/b2.pdf' }, { registry: reg, llm, budgetBlocked: () => false });
-    expect(seen).toHaveLength(1);
-    expect(seen[0]).toContain('<untrusted-source>');
-  });
 });
 
 describe('runCapturePipeline — fetch dead-letters', () => {
