@@ -375,6 +375,8 @@ Implémenter dans `packages/core/src/llm.real.ts` : passer `effort` dans les opt
 
 ## Phase 8 · Packaging + multi-mission (later)
 
+> **✅ Functional half shipped 2026-06-14** — 8a multi-project parallel execution (concurrency budget per project) landed via PR #15, merged to `main` through the #16 retarget. The packaging half (Tauri wrapper, CLI executor, notifier) stays "later".
+
 - Tauri desktop wrapper.
 - Multi-project parallel execution (concurrency budget per project).
 - Claude Code CLI integration as an alternative executor for shell-heavy missions (use the headless `claude` CLI from `apps/worker`).
@@ -410,6 +412,9 @@ La **mémoire de base** est livrée (PR #35, `phase/9a-memory` : pont savoir→m
 - *Critères de sortie 0a renforcée* : base livrée (pont + hard gate Phase 4 + index persistant + note manuelle + `memory_items` tranché, PR #35) **plus** : requête **sémantique** (« éviter d'oublier entre sessions ») → bon doc savoir ; requête **arsenal** (« skill audit PR », « agent revue sécu ») → bon skill/agent froid ; mémoire **projet** retrouvée par pertinence ; **fallback FTS** OK si QMD coupé ; recherche **interrogeable en MCP** ; **harnais d'éval** retrieval vert ; 5 checks + Sonar exit 0.
 
 **0b · Vrai pipeline doer/checker** (sortir du « prompt unique » + gardes mock)
+
+> **✅ Étape 0b mergée dans `main` le 2026-06-25.** Construite en PR #37 (`phase/9b-pipeline`), atterrie via le re-land PR #42 (tip `eaff97f`) : vrais critiques dans le chemin de revue, boucle évaluateur-optimiseur bornée (`MAX_REVIEW_ITERATIONS=2`), chaînage de prompts, reality check déterministe. 5 checks verts + Sonar exit 0.
+
 - Remplacer les critiques *mock* par de **vrais appels LLM** vers les fiches déjà spécifiées : `mockReviewer` / `mockCodeReviewer` / `mockSecReviewer` / `mockQualityController` / `mockRealityChecker` (`packages/core/src/llm.ts`) → délégation aux fiches (`reviewer`/`sec-reviewer` sonnet-4-6, `quality-controller`). Prompt de revue couvrant : `docs/knowledge/prompting-anthropic.md:104-110`.
 - **Boucle évaluateur-optimiseur** dans `runDelegatedTask` (`packages/agents/src/dispatch.ts` ~513-563) : un verdict `NEEDS_WORK`/`BLOCK` ré-invoque le producteur (`delegateWithDiff`, `delegate.ts`) avec les findings injectés, borné par `maxReviewIterations` (2-3) + budget tâche. (Aujourd'hui : verdict loggé puis ignoré.)
 - **Reality Checker réel** : calculer de vraies preuves (diff applique ? tests cités ? diff couvre la demande ?) au lieu de `evidence:false` codé en dur (`dispatch.ts` ~501).
@@ -418,12 +423,18 @@ La **mémoire de base** est livrée (PR #35, `phase/9a-memory` : pont savoir→m
 - *Critères de sortie 0b* : une tâche s'exécute producteur → **vrai** critique → sur NEEDS_WORK, boucle de correction bornée ; plus aucun critique mock dans le chemin runtime ; tâches dépendantes reçoivent le contexte amont.
 
 **Vague A · Auto-audit & durcissement des fondations 0a/0b** *(intercalée entre 0b et 0c — campagne 2026-06-24, `docs/learning/2026-06-24-campaign-0/CAMPAIGN.md §5`)*
+
+> **✅ Vague A mergée dans `main` le 2026-06-25** (union re-landée avec 0c + 0d via PR #42, tip `eaff97f`). Amendement F1 (ADR 0007) mergé via PR #43 (tip `c200b94`).
+
 - **Re-prouver les critères de sortie 0a *au runtime*** (pas « ça compile ») : requête sémantique → bon doc savoir ; requête arsenal → bon skill/agent froid ; mémoire projet par pertinence ; **fallback FTS** si QMD coupé ; **appel `query` MCP hors worker répond**. Documenter honnêtement tout « infra seulement » (le MCP exposé-mais-non-consommé est attendu → **0d le consomme**).
 - **Solder la dette `S5906`** : 27 smells MINOR « prefer specific assertion » dans des fichiers de test, antérieurs à #35 (aucun introduit par 0a) — passe dédiée (matchers précis), 5ᵉ check propre sur le scan complet, pas seulement par-PR.
 - **Self-audit §13** des fondations (`CLAUDE.md`, `AGENTS.md`, fiches Tier A, ADR 0003) contre le meilleur savoir courant ; corriger ou backloguer la dette.
 - *Critères de sortie A* : critères 0a re-prouvés au runtime (ou écart documenté + planifié en 0d) ; scan Sonar sans `S5906` ; rapport d'audit écrit ; 5 checks + Sonar exit 0.
 
 **0c · Roster Tier A au meilleur niveau**
+
+> **✅ Étape 0c mergée dans `main` le 2026-06-25** (union re-landée avec Vague A + 0d via PR #42, tip `eaff97f`).
+
 - **Promouvoir un agent ÉVALUATEUR en Tier A** (juge de qualité sur grille + boucle de correction) — le `agent-evaluator` dort déjà dans `packages/agents/library/` ; doctrine RES-043 « agent-as-judge » (`docs/knowledge/vibeflow/agents-skills.md`). Distinct des gardes QC/Reviewer/Sec.
 - **Séparer planner et orchestrateur** : `mission-planner` = auteur one-shot du DAG ; nouvelle fiche `orchestrator`/`dispatcher` gouvernant la boucle de `dispatch.ts` (claim de tâches, budget, gates §5, pilotage de la boucle d'éval).
 - Réconcilier la dérive doc : `AGENTS.md` §3 (« 6 agents » → 7, ajouter `quality-controller`) + §7 liste de fichiers.
@@ -431,6 +442,8 @@ La **mémoire de base** est livrée (PR #35, `phase/9a-memory` : pont savoir→m
 - *Critères de sortie 0c* : fiche évaluateur en Tier A + câblée dans la boucle 0b ; planner/orchestrateur séparés avec fiches complètes (schéma AGENTS.md §2) ; `AGENTS.md` à jour.
 
 **0d · Exploitation de l'arsenal (le cerveau qui agit)** *(créée 2026-06-24 — voir ADR 0007 + `CAMPAIGN.md §5/§6`)*
+
+> **✅ Étape 0d mergée dans `main` le 2026-06-25** (union re-landée avec Vague A + 0c via PR #42, tip `eaff97f`). Amendement F1 (ADR 0007) mergé via PR #43 (tip `c200b94`).
 
 0a a *rangé* le cerveau (savoir + mémoire + arsenal indexés QMD) et 0a/0b l'**utilisent** pour le savoir + la mémoire — mais l'**arsenal dort** : `selectLibrarySkills` choisit par score de tags **statique** sans interroger le retriever (`packages/skills/src/select.ts:135-158`), les agents par table codée en dur (`TIER_B_DELEGATION_MAP`, `dispatch.ts`), et le cerveau MCP est exposé mais aucun agent ne l'appelle. 0d le fait **agir**.
 
@@ -440,6 +453,8 @@ La **mémoire de base** est livrée (PR #35, `phase/9a-memory` : pont savoir→m
 - **Golden set d'éval arsenal** en CI : requêtes-or → bon skill/agent/règle, rejouées à chaque changement de collection (anti-régression silencieuse, principe 7).
 - **Périmètre resserré (recommandation user 2026-06-24)** — **différé** : ingestion des 20+ PDF `docs/resources/` → **vague 0e** dédiée (pipeline d'intake : normalisation Markdown + gate sécu/qualité + Keeper) ; **passe frontmatter unifié** → en tête de 0e (elle en a besoin) ; **console arsenal (UI)** → **Étape 3**. Bâclés pour « tout caser », ils saboteraient le principe qualité ; faits ensuite, ils s'appuient sur un cœur 0d éprouvé.
 - *Critères de sortie 0d* : une mission réelle voit **le bon skill/agent remonter par recherche sémantique** (pas tag statique) ; un agent peut **interroger le cerveau via MCP** ; golden set vert ; fallback FTS intact ; 5 checks + Sonar exit 0.
+
+> **Chantier actif post-Étape 0 — Living Knowledge OS (ADR 0008)** : séquencé dans `docs/superpowers/plans/2026-06-27-knowledge-os-round2.md`. État : Briques 1/4/hook sur `main` (PR #53) ; Brique 6 (convoyeur + extracteurs) mergée dans la branche `knowledge-os/brique-1` (PR #54/#55/#56) ; reste la **Brique 5** (onglet cockpit Ressources/Connaissances).
 
 ### Étape 1 · Couche live simple  *(le cœur : ça doit juste marcher)*
 
