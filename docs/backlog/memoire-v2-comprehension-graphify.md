@@ -3,6 +3,16 @@
 > **Statut** : VISION CAPTURÉE le 2026-08-31 (Melvyn, à froid). **Ne pas exécuter** — préparé pour
 > une session dédiée après reset des tokens. Ce document fige l'intention et pose les questions à
 > trancher avant de coder. Il **rouvre P1-14** (`docs/BACKLOG.md`) et va au-delà.
+>
+> **2026-09-04 — session de design tenue.** Les 4 questions du §3 sont instruites et tranchées
+> (par défaut, en attente d'arbitrage) dans **[ADR 0010](../decisions/0010-memoire-v2-graphe-et-fiches-vivantes.md)**.
+> Pièces : mesure du gap → [`audits/2026-09-04-gap-retrieval-qmd.md`](../audits/2026-09-04-gap-retrieval-qmd.md) ·
+> ré-audit Graphify → [`intake/2026-09-04-graphify-reaudit-memoire.md`](../intake/2026-09-04-graphify-reaudit-memoire.md) ·
+> exécution → [`memoire-v2-increments-tdd.md`](memoire-v2-increments-tdd.md).
+> **Trois constats corrigent ce document** : (1) P1-14 n'a pas isolé les cours, il les a **dupliqués**
+> (19,5 % de l'index) ; (2) le levier n'est ni le ranking ni le chunking mais la **structure des
+> fiches** ; (3) le corpus porte **0 arête sémantique** — le graphe est en aval de la couche notion,
+> pas en amont.
 
 ## 1. Ce que Melvyn veut (reformulé)
 
