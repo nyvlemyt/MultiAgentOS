@@ -21,11 +21,19 @@ export const CAPTURE_DECISION =
 
 export type CandidateType = 'user' | 'feedback' | 'project' | 'reference';
 
+/**
+ * Every provenance a candidate can carry at the one door: the five intake source kinds
+ * (intake.ts `SourceKind`) plus `mission`, which only the close-out ritual stamps. Mirrors the
+ * `memory_candidates.source_kind` column enum — the classifier's provenance gate reads it, so the
+ * two producers must be nameable in one type.
+ */
+export type CandidateSourceKind = 'note' | 'skill' | 'pattern' | 'repo' | 'course' | 'mission';
+
 export interface CaptureCandidate {
   type: CandidateType;
   body: string;
   /** Intake provenance (Phase 4.5) — 'mission' for ritual captures. */
-  sourceKind?: 'note' | 'skill' | 'pattern' | 'repo' | 'course' | 'mission';
+  sourceKind?: CandidateSourceKind;
   dossierPath?: string;
   /** Brique 6 deltas — supersede/dedup match key + the untrusted-never-auto-promote security tag. */
   sourceKey?: string;

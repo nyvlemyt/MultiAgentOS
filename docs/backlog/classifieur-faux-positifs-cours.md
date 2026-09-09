@@ -1,7 +1,13 @@
 # Classifieur — faux positifs sur les documents de cours
 
 > Constaté le 2026-09-04 en promouvant les 51 candidats classés (P1-8, PR #77).
-> Statut : **à traiter**. Bloque la crédibilité des registres, pas leur mécanique.
+> Statut : **RÉSOLU le 2026-09-07**. Décision et raisonnement :
+> `docs/decisions/0004-memory-intake-and-auto-capture.md` §Amendement (2026-09-07).
+> Mise en œuvre : porte de provenance (`isIngestedProvenance`, `classifier.ts`) + passe de
+> retrait des décisions déjà stockées (`mas reclassify`, `reclassify.ts`).
+> Mesuré après correction : 379 scannés → 51 décisions retirées (43 + 7 + 1, exactement les
+> faux positifs listés ci-dessous), `mas promote --candidates` promeut **0**, les 378 fiches
+> restent servies par le miroir études (`mem:eval` 12/12, dont `etudes-fourier`).
 
 ## Le symptôme, mesuré
 
@@ -30,18 +36,31 @@ Le vrai signal manquant est déjà en base et n'est pas lu : `trust='untrusted'`
 d'ingestion. Un document ingéré n'est **pas** un candidat de mission ; le lui appliquer, c'est
 appliquer un classifieur hors de son domaine de validité.
 
-## Piste (à trancher en session dédiée)
+## Ce qui a été retenu (2026-09-07)
 
-1. **Porte d'entrée par provenance** : un candidat `untrusted` issu du convoyeur ne passe pas par la
-   table mots-clés de mission. Il abstient par défaut → triage humain, ou passe par une table
-   dédiée aux ressources. C'est un `if` sur un champ déjà rempli, pas un nouveau modèle.
-2. **Registre `resources`** plutôt que de forcer les 5 registres de mission : un cours n'est ni une
-   décision, ni un blocage, ni un apprentissage de mission. Le miroir études (P1-14) joue déjà ce
-   rôle côté retrieval ; les registres n'ont peut-être simplement pas à recevoir de l'ingéré.
-3. **Ne rien changer aux 5 règles de mission** : elles sont correctes *dans leur domaine*. Le défaut
-   est l'absence de frontière, pas le contenu de la table.
+1. **Porte d'entrée par provenance** — retenu tel quel. `isIngestedProvenance` lit trois champs
+   déjà remplis (`trust`, `candidateType === 'reference'`, `source_kind`) et échoue fermée : un
+   seul suffit. Un tag utilisateur explicite passe outre — un humain qui a regardé le document
+   surclasse l'heuristique.
+2. **Registre `resources`** — **écarté**. Les registres ne reçoivent tout simplement pas d'ingéré :
+   ils sont un journal de bord à la première personne, le miroir études sert déjà le retrieval
+   (378 fiches), et leur mécanique est hostile aux documents longs (le déchiquetage `##` et les
+   51 titres en commentaire HTML l'ont montré). Argumentaire complet dans l'amendement de l'ADR.
+3. **Les 5 règles de mission n'ont pas bougé.** En revanche le signal « source type »
+   (`skill`/`pattern`/`repo`/`course` → `learnings`) est retiré : son domaine entier est hors
+   bornes. Et le fallback LLM n'est plus consulté sur un ingéré — le chemin de capture est
+   désormais zéro-LLM *par construction*.
 
-## Rollback des 51, si Melvyn veut repartir de zéro
+## Reste ouvert
+
+- **Les 379 sont `rejected`** (décision Melvyn du 2026-09-09), pas en attente : la décision étant
+  prise, les laisser `pending` aurait saturé la boîte de réception pour toujours. Le savoir n'est
+  pas perdu — il vit dans le miroir études.
+- La suite, si le besoin de classement revient : une table propre aux ressources (kind / matière /
+  niveau) routant vers des **attributs de fiche** — pas vers les 5 registres, que l'amendement
+  ferme définitivement à l'ingéré.
+
+## Rollback des 51 (historique — déjà exécuté le 2026-09-04)
 
 ```bash
 sqlite3 data/mas.db "update memory_candidates set status='pending' where status='accepted';"
