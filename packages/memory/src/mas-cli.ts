@@ -23,7 +23,12 @@ import { distillAll, distillPath, formatDistillSummary, type DistillCliDeps } fr
 import { formatPromoteSummary, parsePromoteArgs, promoteAll, promoteTarget } from './conveyor/promote-cli';
 import type { PromoteApplyDeps } from './conveyor/promote-apply';
 import { formatCandidatesSummary, promoteClassifiedCandidates } from './promote-candidates';
-import { formatReclassifySummary, reclassifyPendingCandidates } from './reclassify';
+import {
+  formatRejectSummary,
+  formatReclassifySummary,
+  reclassifyPendingCandidates,
+  rejectIngestedCandidates,
+} from './reclassify';
 import { MEMORY_KEEPER_AGENT, MemoryStore } from './registers';
 import type { PipelineDeps } from './conveyor/pipeline';
 import type { NetGuardDeps } from './conveyor/net-guard';
@@ -33,7 +38,7 @@ const USAGE =
   '       mas distill <sas-doc-path> | mas distill --all [dir]\n' +
   '       mas promote <fiche-id|path> | mas promote --all [dir] [--limit N] [--run-cap N] [--approve-untrusted]\n' +
   '       mas promote --candidates [--dry-run] [--limit N] [--project <id>]\n' +
-  '       mas reclassify [--dry-run]';
+  '       mas reclassify [--reject] [--dry-run]';
 
 function findRepoRoot(): string {
   let dir = process.cwd();
@@ -176,7 +181,14 @@ async function runPromote(root: string, rest: string[]): Promise<void> {
  */
 async function runReclassify(rest: string[]): Promise<void> {
   const dryRun = rest.includes('--dry-run');
-  console.log(formatReclassifySummary(await reclassifyPendingCandidates(getDb(), { dryRun })));
+  const db = getDb();
+  // --reject escalates from "this decision is void" to "this row is not register material at all"
+  // (reclassify.ts INGESTED_REJECTED). Opt-in, because only the second one closes a candidate.
+  if (rest.includes('--reject')) {
+    console.log(formatRejectSummary(await rejectIngestedCandidates(db, { dryRun })));
+    return;
+  }
+  console.log(formatReclassifySummary(await reclassifyPendingCandidates(db, { dryRun })));
 }
 
 async function main(): Promise<void> {

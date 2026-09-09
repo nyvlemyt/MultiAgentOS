@@ -81,7 +81,12 @@ export {
   revokedDecision,
   reclassifyPendingCandidates,
   formatReclassifySummary,
+  rejectableAsIngested,
+  rejectIngestedCandidates,
+  formatRejectSummary,
+  INGESTED_REJECTED,
   type StoredCandidate,
+  type RejectSummary,
   type ReclassifyChange,
   type ReclassifySummary,
 } from './reclassify';

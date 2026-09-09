@@ -53,9 +53,12 @@ appliquer un classifieur hors de son domaine de validité.
 
 ## Reste ouvert
 
-- **Les 379 sont en triage humain**, pas classés. Si ce coût se révèle trop lourd, la suite est une
-  table de classement propre aux ressources (kind / matière / niveau) routant vers des attributs de
-  fiche — **pas** vers les 5 registres, que l'amendement ferme définitivement à l'ingéré.
+- **Les 379 sont `rejected`** (décision Melvyn du 2026-09-09), pas en attente : la décision étant
+  prise, les laisser `pending` aurait saturé la boîte de réception pour toujours. Le savoir n'est
+  pas perdu — il vit dans le miroir études.
+- La suite, si le besoin de classement revient : une table propre aux ressources (kind / matière /
+  niveau) routant vers des **attributs de fiche** — pas vers les 5 registres, que l'amendement
+  ferme définitivement à l'ingéré.
 
 ## Rollback des 51 (historique — déjà exécuté le 2026-09-04)
 

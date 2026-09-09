@@ -153,8 +153,15 @@ Le domicile durable d'un ingéré reste donc le chemin fiche : `mas capture` →
 
 ### Conséquences
 
-- `data/memory/<projectId>/*.md` ne contient que du savoir de mission. Les 379 candidats ingérés
-  restent `pending` → boîte de triage humain, et sont cherchables via `mas-etudes`.
+- `data/memory/<projectId>/*.md` ne contient que du savoir de mission.
+- **Les 379 candidats ingérés sont `rejected`, pas `pending`** (décision Melvyn, 2026-09-09 —
+  correction d'un premier jet qui les laissait en attente). Si aucun ingéré n'est jamais du
+  matériau de registre, alors « en attente d'une décision humaine » est un mensonge : la décision
+  est prise. Et une boîte de réception saturée à 379 pour toujours cesse d'être un signal. Le rejet
+  ne ferme la porte **que du registre** : le document vit dans `docs/knowledge` + le miroir études
+  et reste cherchable (`mem:eval` le couvre), le statut se défait d'un `UPDATE`, et le dédoublonnage
+  par `source_key` matche toujours une ligne rejetée — donc fermer ne peut pas déclencher de boucle
+  de réingestion. Passe : `mas reclassify --reject [--dry-run]`.
 - `mas promote --candidates` sur un lot purement ingéré promeut **0** — ce n'est pas une panne,
   c'est la bonne réponse.
 - `PipelineDeps` perd `llm` et `budgetBlocked` ; `buildDeps` (mas-cli) n'injecte plus rien.

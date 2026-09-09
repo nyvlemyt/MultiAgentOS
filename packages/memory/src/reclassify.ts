@@ -10,8 +10,10 @@
 // for durable-value repairs (cf. provenance-backfill-cli.ts): a pure decision function, an
 // idempotent batch, a --dry-run, and nothing silent.
 //
-// It only ever WITHDRAWS: it never invents a register. A row whose decision it withdraws goes to
-// human triage, which is where an ingested document belonged all along.
+// Two passes, deliberately separable — one is cosmetic, the other is a lifecycle decision:
+//   reclassifyPendingCandidates  withdraws an out-of-domain decision (reversible, no status change);
+//   rejectIngestedCandidates     closes the row, because no ingested document is register material.
+// Neither ever invents a register.
 import { eq } from 'drizzle-orm';
 import { memoryCandidates, type getDb } from '@mas/db';
 import { INGESTED_ABSTAIN, isIngestedProvenance, type ClassifierInput } from './classifier';
@@ -115,4 +117,69 @@ export function formatReclassifySummary(res: ReclassifySummary): string {
   const head =
     `${prefix} ${res.scanned} scanned, ${res.revoked.length} withdrawn, ${res.untouched} untouched.`;
   return [head, ...byFrom(res.revoked)].join('\n');
+}
+
+/**
+ * Why a closed row was closed. Not an abstain: withdrawing a decision leaves a question open, but
+ * the ADR answered it — the registers take no ingested material (ADR 0004 §5, amendement
+ * 2026-09-07). Keeping such a row `pending` would claim a human decision is still owed, and 379 of
+ * them turn the Memory Center inbox from a signal into permanent noise.
+ *
+ * `rejected` closes the row as a REGISTER candidate only. The document itself is untouched: it
+ * lives in docs/knowledge + the études mirror and stays searchable (mem:eval covers it). The status
+ * is one UPDATE away from reversible, and the conveyor's source_key dedup still matches a rejected
+ * row — so closing these cannot trigger a re-ingestion loop.
+ */
+export const INGESTED_REJECTED =
+  'rejected — ingested source: not register material; lives in the fiche/études path';
+
+/**
+ * True when the row is not a register candidate at all. Pure. Same escape hatch as the withdrawal:
+ * an explicitly human-tagged row is genuinely awaiting a promotion, so it stays in the inbox.
+ */
+export function rejectableAsIngested(row: StoredCandidate): boolean {
+  if (row.classifierDecision?.includes(USER_TAG_RULE)) return false;
+  return isIngestedProvenance(provenanceOf(row));
+}
+
+export interface RejectSummary {
+  /** Pending rows examined. */
+  scanned: number;
+  /** Ids closed this run (empty on a replay — idempotence). */
+  rejected: string[];
+  /** Rows deliberately left pending (mission provenance, or a human tag). */
+  kept: number;
+  dryRun: boolean;
+}
+
+/** Close every ingested pending row, recording INGESTED_REJECTED as the reason on the row itself. */
+export async function rejectIngestedCandidates(
+  db: Db,
+  opts: { dryRun?: boolean },
+): Promise<RejectSummary> {
+  const rows = await db.select().from(memoryCandidates).where(eq(memoryCandidates.status, 'pending'));
+  const res: RejectSummary = { scanned: rows.length, rejected: [], kept: 0, dryRun: opts.dryRun === true };
+
+  for (const row of rows) {
+    if (!rejectableAsIngested(row)) {
+      res.kept++;
+      continue;
+    }
+    res.rejected.push(row.id);
+    if (!res.dryRun) {
+      await db
+        .update(memoryCandidates)
+        .set({ status: 'rejected', classifierDecision: INGESTED_REJECTED })
+        .where(eq(memoryCandidates.id, row.id));
+    }
+  }
+  return res;
+}
+
+export function formatRejectSummary(res: RejectSummary): string {
+  const prefix = res.dryRun ? '[mas reclassify --reject · DRY-RUN]' : '[mas reclassify --reject]';
+  return (
+    `${prefix} ${res.scanned} scanned, ${res.rejected.length} closed as non-register material, ` +
+    `${res.kept} kept pending.`
+  );
 }
