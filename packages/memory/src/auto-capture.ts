@@ -62,7 +62,7 @@ export async function runCloseOutRitual(db: Db, missionId: string): Promise<Ritu
     items.push({ type: 'project', sourceKind: 'mission', body: `Blocked: mission "${m.title}" ended blocked — needs follow-up.` });
   }
 
-  const candidateIds = await captureCandidates(db, anchor.id, items);
+  const { pending: candidateIds } = await captureCandidates(db, anchor.id, items);
   await db.insert(events).values({
     id: `evt_${randomUUID()}`,
     missionId,

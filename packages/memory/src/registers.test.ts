@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, unlinkSync } from 'node:fs';
+import { mkdtempSync, rmSync, unlinkSync, existsSync, readFileSync } from 'node:fs';
+import matter from 'gray-matter';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -162,6 +163,74 @@ describe('MemoryStore wikilinks', () => {
   });
 });
 
+describe('parse — un corps riche ne doit pas etre pris pour des entrees', () => {
+  function keeper() {
+    return new MemoryStore({ root, writerAgent: MEMORY_KEEPER_AGENT });
+  }
+
+  const COURSE_BODY = [
+    'TD part 01 - Docker',
+    '',
+    '## Contents',
+    '',
+    '1.1 Contexte et objectif',
+    '',
+    '## 2.1 Variable cible',
+    '',
+    'suite du cours',
+  ].join('\n');
+
+  it('garde UNE entree quand le corps porte ses propres titres markdown', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'TD part 01 - Docker', body: COURSE_BODY });
+    const entries = s.read('_global', 'learnings');
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.id).toBe('LRN-001');
+    expect(entries[0]!.body).toContain('## Contents');
+    expect(entries[0]!.body).toContain('## 2.1 Variable cible');
+  });
+
+  it('numerote la suite sur les vraies entrees, pas sur les titres du corps', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'A', body: COURSE_BODY });
+    const second = s.append('_global', 'learnings', { title: 'B', body: 'court' });
+    expect(second.id).toBe('LRN-002');
+  });
+
+  it('ne casse pas le round-trip des metadonnees', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'A', body: COURSE_BODY, source: 'candidate:c1' });
+    const [e] = s.read('_global', 'learnings');
+    expect(e!.source).toBe('candidate:c1');
+    expect(e!.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('lit bien plusieurs entrees consecutives', () => {
+    const s = keeper();
+    s.append('_global', 'blockers', { title: 'un', body: '## faux titre\ncorps un' });
+    s.append('_global', 'blockers', { title: 'deux', body: 'corps deux' });
+    const entries = s.read('_global', 'blockers');
+    expect(entries.map((e) => e.id)).toEqual(['BLK-001', 'BLK-002']);
+    expect(entries[0]!.body).toContain('corps un');
+    expect(entries[1]!.body).toBe('corps deux');
+  });
+
+  it('lit une entree de journal, dont l id est une date', () => {
+    const s = keeper();
+    const created = s.append('_global', 'journal', { title: '', body: '## section\nnote du jour' });
+    const entries = s.read('_global', 'journal');
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.id).toBe(created.id);
+    expect(entries[0]!.body).toContain('note du jour');
+  });
+
+  it('toDocs ne fabrique pas de faux documents pour le retriever', () => {
+    const s = keeper();
+    s.append('_global', 'learnings', { title: 'A', body: COURSE_BODY });
+    expect(s.toDocs('_global')).toHaveLength(1);
+  });
+});
+
 async function seedCandidate(id: string) {
   const db = getDb();
   await db.insert(projects).values({
@@ -214,5 +283,43 @@ describe('promoteCandidate (memory_candidates → register)', () => {
       promoteCandidate(db, 'c2', { projectId: 'proj', kind: 'decisions' }, keeperStore()),
     ).rejects.toThrow();
     expect(keeperStore().read('proj', 'decisions')).toHaveLength(1);
+  });
+});
+
+describe('pont miroir — frontmatter intact et nommage (P1-3)', () => {
+  const FICHE = '---\nid: fiche-test\nlifecycle: distilled\n---\n\n# Corps de la fiche\n';
+
+  it('ne double pas le suffixe .md du fichier miroir', () => {
+    const s = keeperStore();
+    s.writeKnowledge('docs/knowledge/foo.md', FICHE);
+    expect(existsSync(join(root, '_global', 'knowledge', 'docs__knowledge__foo.md'))).toBe(true);
+    expect(existsSync(join(root, '_global', 'knowledge', 'docs__knowledge__foo.md.md'))).toBe(false);
+    expect(s.hasKnowledge('docs/knowledge/foo.md')).toBe(true);
+  });
+
+  it('garde le frontmatter YAML lisible — la provenance vient après le bloc ---', () => {
+    const s = keeperStore();
+    s.writeKnowledge('docs/knowledge/foo.md', FICHE);
+    const raw = readFileSync(join(root, '_global', 'knowledge', 'docs__knowledge__foo.md'), 'utf8');
+    expect(raw.startsWith('---\n')).toBe(true);
+    expect(matter(raw).data.id).toBe('fiche-test');
+    expect(raw).toContain('<!-- source: docs/knowledge/foo.md -->');
+  });
+
+  it('knowledgeDocs retrouve la provenance quand elle suit le frontmatter', () => {
+    const s = keeperStore();
+    s.writeKnowledge('docs/knowledge/foo.md', FICHE);
+    const docs = s.knowledgeDocs();
+    expect(docs).toHaveLength(1);
+    expect(docs[0]!.source).toBe('docs/knowledge/foo.md');
+    expect(docs[0]!.body).toContain('# Corps de la fiche');
+  });
+
+  it('un corps sans frontmatter garde la provenance en tête (compat ancien format)', () => {
+    const s = keeperStore();
+    s.writeKnowledge('note-libre', 'juste du texte sans yaml');
+    const docs = s.knowledgeDocs();
+    expect(docs[0]!.source).toBe('note-libre');
+    expect(docs[0]!.body).toContain('juste du texte sans yaml');
   });
 });

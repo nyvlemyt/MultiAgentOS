@@ -63,6 +63,25 @@ export function linkifyIds(text: string): string {
   return text.replace(/(?<!\[\[)(BDR|LRN|BLK|EVAL)-\d{3,}(?!\]\])/g, '[[$&]]');
 }
 
+
+/**
+ * Prefix a provenance comment, AFTER the YAML frontmatter block when one is present —
+ * a leading comment would make the frontmatter invisible to any `---`-first parser.
+ * Shared by the mission mirror (writeKnowledge) and the études mirror (seed).
+ */
+export function withProvenance(source: string, body: string): string {
+  const provenance = `<!-- source: ${source} -->`;
+  if (body.startsWith('---\n') || body.startsWith('---\r\n')) {
+    const close = body.indexOf('\n---', 3);
+    if (close !== -1) {
+      const lineEnd = body.indexOf('\n', close + 1);
+      const cut = lineEnd === -1 ? body.length : lineEnd + 1;
+      return `${body.slice(0, cut)}${provenance}\n${body.slice(cut)}`;
+    }
+  }
+  return `${provenance}\n${body}`;
+}
+
 export interface MemoryStoreOpts {
   /** Root of the memory store, e.g. data/memory. */
   root: string;
@@ -87,26 +106,49 @@ function serialize(entries: RegisterEntry[]): string {
     .join('\n');
 }
 
+/**
+ * A register entry header, and ONLY that: `## <id>` where the id is a register id
+ * (BDR/LRN/BLK/EVAL-NNN) or a journal date. Splitting on any `^## ` — as this parser
+ * used to — shreds an entry whose BODY carries its own markdown headings into phantom
+ * entries with garbage ids ('Contents', '2.1 Variable cible'): the retriever then
+ * indexes them as documents and nextId() counts them, so LRN-044 was minted LRN-082.
+ * That surfaced the day the first ingested course documents landed in a register.
+ * The quantifiers below are separated by literals — no super-linear backtracking (S5852).
+ */
+const ENTRY_HEADER = /^## ((?:BDR|LRN|BLK|EVAL)-\d{3,}|\d{4}-\d{2}-\d{2})(?: — (.*))?$/;
+
+/** Split an entry's raw lines into its `- key: value` meta head and its body. */
+function readEntry(id: string, title: string, lines: string[]): RegisterEntry {
+  const entry: RegisterEntry = { id, title, body: '' };
+  let i = 0;
+  for (; i < lines.length; i++) {
+    // (\S.*)? keeps the value start disjoint from \s* — no overlapping
+    // quantifiers, no super-linear backtracking (S5852).
+    const m = /^- (\w+):\s*(\S.*)?$/.exec(lines[i]!);
+    if (!m) break;
+    if (m[1] === 'date') entry.date = (m[2] ?? '').trim();
+    if (m[1] === 'source') entry.source = (m[2] ?? '').trim();
+  }
+  entry.body = lines.slice(i).join('\n').trim();
+  return entry;
+}
+
 function parse(content: string): RegisterEntry[] {
-  const chunks = content.split(/^## /m).filter((c) => c.trim().length > 0);
-  return chunks.map((chunk) => {
-    const lines = chunk.split('\n');
-    const header = lines.shift() ?? '';
-    const [id, ...titleParts] = header.split(' — ');
-    const title = titleParts.join(' — ').trim();
-    const entry: RegisterEntry = { id: id!.trim(), title, body: '' };
-    let i = 0;
-    for (; i < lines.length; i++) {
-      // (\S.*)? keeps the value start disjoint from \s* — no overlapping
-      // quantifiers, no super-linear backtracking (S5852).
-      const m = /^- (\w+):\s*(\S.*)?$/.exec(lines[i]!);
-      if (!m) break;
-      if (m[1] === 'date') entry.date = (m[2] ?? '').trim();
-      if (m[1] === 'source') entry.source = (m[2] ?? '').trim();
+  const entries: RegisterEntry[] = [];
+  let head: { id: string; title: string } | null = null;
+  let lines: string[] = [];
+  for (const line of content.split('\n')) {
+    const m = ENTRY_HEADER.exec(line);
+    if (!m) {
+      if (head) lines.push(line);
+      continue;
     }
-    entry.body = lines.slice(i).join('\n').trim();
-    return entry;
-  });
+    if (head) entries.push(readEntry(head.id, head.title, lines));
+    head = { id: m[1]!, title: (m[2] ?? '').trim() };
+    lines = [];
+  }
+  if (head) entries.push(readEntry(head.id, head.title, lines));
+  return entries;
 }
 
 export class MemoryStore {
@@ -175,18 +217,24 @@ export class MemoryStore {
   }
 
   private knowledgeFile(source: string): string {
-    return join(this.knowledgeDir(), `${source.replace(/[/\\]/g, '__')}.md`);
+    const flat = source.replace(/[/\\]/g, '__');
+    return join(this.knowledgeDir(), flat.endsWith('.md') ? flat : `${flat}.md`);
   }
 
   hasKnowledge(source: string): boolean {
     return existsSync(this.knowledgeFile(source));
   }
 
-  /** Persist one knowledge file under _global/knowledge/ with source provenance. */
+  /**
+   * Persist one knowledge file under _global/knowledge/ with source provenance.
+   * The provenance comment lands AFTER a YAML frontmatter block when one is
+   * present — a leading comment would make the frontmatter invisible to any
+   * `---`-first parser (gray-matter), which is exactly the bug this fixes.
+   */
   writeKnowledge(source: string, body: string): void {
     this.assertWriter();
     mkdirSync(this.knowledgeDir(), { recursive: true });
-    writeFileSync(this.knowledgeFile(source), `<!-- source: ${source} -->\n${body}`, 'utf8');
+    writeFileSync(this.knowledgeFile(source), withProvenance(source, body), 'utf8');
   }
 
   /** Seeded knowledge as retriever docs (one per file, scope=global). */
@@ -197,9 +245,25 @@ export class MemoryStore {
       .filter((f) => f.endsWith('.md'))
       .map((f) => {
         const raw = readFileSync(join(dir, f), 'utf8');
-        const m = /^<!-- source: (.+?) -->\n?/.exec(raw);
-        const source = m ? m[1]! : f;
-        const body = m ? raw.slice(m[0].length) : raw;
+        let source = f;
+        let body = raw;
+        const lead = /^<!-- source: (.+?) -->\n?/.exec(raw);
+        if (lead) {
+          source = lead[1]!;
+          body = raw.slice(lead[0].length);
+        } else if (raw.startsWith('---')) {
+          // provenance sits after the frontmatter block (new format)
+          const close = raw.indexOf('\n---', 3);
+          if (close !== -1) {
+            const lineEnd = raw.indexOf('\n', close + 1);
+            const after = lineEnd === -1 ? raw.length : lineEnd + 1;
+            const m = /^<!-- source: (.+?) -->\n?/.exec(raw.slice(after));
+            if (m) {
+              source = m[1]!;
+              body = raw.slice(0, after) + raw.slice(after + m[0].length);
+            }
+          }
+        }
         return {
           id: `knowledge/${source}`,
           scope: 'global' as MemoryScope,

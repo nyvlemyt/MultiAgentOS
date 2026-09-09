@@ -223,15 +223,17 @@ export const QMD_WORKFLOWS = 'mas-workflows';
 export const QMD_MEMORY = 'mas-memory';
 export const QMD_ARSENAL = 'mas-arsenal';
 export const QMD_RESOURCES = 'mas-resources';
+export const QMD_ETUDES = 'mas-etudes';
 
 /**
- * Default collections for the MISSION-MEMORY context path (dispatch). Memory +
- * the two knowledge-family collections — QMD indexes one path per collection, so
- * docs/knowledge and docs/workflows are two collections, both queried as "what the
- * system knows" (PHASE9-0a §3). mas-arsenal is deliberately EXCLUDED here: it is
- * the Skill Router's candidate corpus, not mission-memory context.
+ * Default collections for the MISSION-MEMORY context path (dispatch).
+ * mas-memory carries the mission-grade mirror (curated + promoted fiches) and
+ * mas-workflows the runbooks. EXCLUDED on purpose: mas-arsenal (Skill Router
+ * corpus), mas-etudes (unpromoted untrusted stock — P1-14, 2026-08-31: course
+ * fiches drowned engineering queries), and mas-knowledge (raw docs/knowledge dir,
+ * whose mission-grade subset already lives in the mas-memory mirror).
  */
-export const QMD_MEMORY_COLLECTIONS = [QMD_MEMORY, QMD_KNOWLEDGE, QMD_WORKFLOWS];
+export const QMD_MEMORY_COLLECTIONS = [QMD_MEMORY, QMD_WORKFLOWS];
 
 /** Repo-relative folder each collection indexes — used to rebuild hit provenance. */
 const COLLECTION_ROOT: Record<string, string> = {
@@ -240,6 +242,7 @@ const COLLECTION_ROOT: Record<string, string> = {
   [QMD_MEMORY]: 'data/memory',
   [QMD_ARSENAL]: 'data/arsenal-index',
   [QMD_RESOURCES]: 'docs/resources',
+  [QMD_ETUDES]: 'data/etudes',
 };
 
 /** Map one `qmd://<collection>/<rest>` hit to a MemoryDoc scope/source/project. */
@@ -251,9 +254,14 @@ function mapQmdHit(raw: QmdRawHit): (MemoryHit & { collection: string; projectId
   let scope: MemoryScope = 'global';
   let projectId: string | undefined;
   // mas-memory ids are `<projectId|_global>/<register>` — derive scope from seg0.
-  if (collection === QMD_MEMORY && rest.split('/')[0] !== '_global') {
+  // qmd slugifies path segments and SWALLOWS the leading underscore of `_global`,
+  // so both spellings are the global scope (bug 2026-08-31: every memory-mirror
+  // hit was mislabeled scope:project/projectId:'global' and filtered out of the
+  // mission context's global slots — silently, since June).
+  const seg0 = rest.split('/')[0];
+  if (collection === QMD_MEMORY && seg0 !== '_global' && seg0 !== 'global') {
     scope = 'project';
-    projectId = rest.split('/')[0];
+    projectId = seg0;
   }
   const root = COLLECTION_ROOT[collection];
   const source = root ? `${root}/${rest}` : rest;

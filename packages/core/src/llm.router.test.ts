@@ -68,7 +68,8 @@ describe('domain resolution (paid OFF — defaults per §11.bis)', () => {
     // enabled primaries hit directly
     'code-execution': 'claude',
     planning: 'claude',
-    memory: 'gemini-free',
+    // memory is quality-default since Brique 6 (ADR 0008 clause 11): strong subscription primary.
+    memory: 'claude',
     security: 'claude',
   };
 
@@ -137,7 +138,8 @@ describe('failover taxonomy (ADR 0002 Q2)', () => {
     clients['gemini-free'].call.mockRejectedValueOnce(
       Object.assign(new Error('window'), { code: 'QUOTA_EXHAUSTED' }),
     );
-    const resp = await router.call(reqFor('memory'));
+    // search keeps the gemini-free → claude chain (memory is now claude-primary since Brique 6).
+    const resp = await router.call(reqFor('search'));
     expect(resp.provider).toBe('claude');
     expect(events[0]).toMatchObject({ type: 'provider_fallback', reason: 'quota' });
   });

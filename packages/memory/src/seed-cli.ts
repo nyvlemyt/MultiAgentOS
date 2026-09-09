@@ -21,7 +21,10 @@ function main(): void {
   console.log(`[mem:seed] knowledge: ${knowledgeDir}`);
   console.log(`[mem:seed] target: ${memoryRoot}`);
   const res = runSeed({ memoryRoot, knowledgeDir });
-  console.log(`[mem:seed] imported=${res.imported.length} skipped=${res.skipped.length}`);
+  console.log(
+    `[mem:seed] imported=${res.imported.length} skipped=${res.skipped.length} ` +
+      `etudes=${res.etudes.length} migrated=${res.migrated.length}`,
+  );
 }
 
 main();

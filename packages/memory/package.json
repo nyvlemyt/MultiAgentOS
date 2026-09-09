@@ -14,13 +14,18 @@
     "seed": "tsx src/seed-cli.ts",
     "arsenal:build": "tsx src/arsenal-cli.ts",
     "mem:eval": "tsx src/eval-cli.ts",
-    "mem:doctor": "tsx src/doctor-cli.ts"
+    "mem:doctor": "tsx src/doctor-cli.ts",
+    "mem:backfill-provenance": "tsx src/provenance-backfill-cli.ts",
+    "mas": "tsx src/mas-cli.ts"
   },
   "dependencies": {
+    "@mas/core": "workspace:*",
     "@mas/db": "workspace:*",
     "better-sqlite3": "^11.3.0",
+    "defuddle": "^0.19.1",
     "drizzle-orm": "0.36.4",
     "gray-matter": "^4.0.3",
+    "linkedom": "^0.18.12",
     "zod": "^3.23.8"
   },
   "devDependencies": {
