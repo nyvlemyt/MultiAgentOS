@@ -52,9 +52,9 @@ describe('grounding parity (ADR 0002 §4, DoD #4)', () => {
       sleep: async () => {},
     });
 
-    const task: LLMRequest = { system: GROUNDING, user: 'Task: build empty state', model: 'm', mode: 'eco', domain: 'memory' };
+    const task: LLMRequest = { system: GROUNDING, user: 'Task: build empty state', model: 'm', mode: 'eco', domain: 'search' };
 
-    // First call lands on gemini (memory → gemini-free).
+    // First call lands on gemini (search → gemini-free; perplexity primary is paid-OFF).
     await router.call({ ...task });
 
     // Force a failover so the SAME task is served by claude instead.

@@ -113,9 +113,9 @@ export async function intakeSource(
     .filter(Boolean)
     .join('\n');
 
-  const [candidateId] = await captureCandidates(db, opts.sourceTaskId ?? null, [
+  const { pending } = await captureCandidates(db, opts.sourceTaskId ?? null, [
     { type: CANDIDATE_TYPE[src.kind], body, sourceKind: src.kind, dossierPath },
   ]);
 
-  return { dossierPath, candidateId: candidateId! };
+  return { dossierPath, candidateId: pending[0]! };
 }

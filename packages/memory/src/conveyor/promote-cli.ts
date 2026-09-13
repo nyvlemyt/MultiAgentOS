@@ -1,0 +1,269 @@
+// packages/memory/src/conveyor/promote-cli.ts
+// Testable CLI logic for `pnpm mas promote <fiche-id|path>` and `mas promote --all` (subprocess-free;
+// the real @mas/core LLMClient is injected by mas-cli.ts, exactly as distill-cli.ts does it — §11).
+// Mirrors distill-cli.ts deliberately: the same cumulative pre-flight budget gate (a corpus-wide
+// `--all` over 375 fiches must never become a quota bomb), the same "one bad doc is a visible
+// failure, not a stopped batch" rule, and the same zero-cost skip for docs already past the stage.
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { basename, join } from 'node:path';
+import matter from 'gray-matter';
+import { DEFAULT_PROMOTE_TOKEN_CAP, promotePromptEstimate, PROMOTE_ENTRY_STATE } from './promote';
+import { promoteFile, type PromoteApplyDeps, type PromoteFileResult } from './promote-apply';
+import { asStr } from './supersede-apply';
+
+export interface PromoteFailure {
+  id: string;
+  path: string;
+  reason: string;
+}
+
+export interface PromoteRunResult {
+  /** Ids that reached `active`. */
+  promoted: string[];
+  /** Ids judged but held at `distilled` (NEEDS_WORK, or an untrusted fiche without approval). */
+  held: string[];
+  /** Ids archived as `rejected-kept` on a BLOCK verdict (never deleted). */
+  rejected: string[];
+  /** Paths of fiches flipped to `superseded` by these promotions. */
+  superseded: string[];
+  /** Fiches that could not be judged or written — visible, never silent. */
+  failed: PromoteFailure[];
+  /** Fiches that were not promotion candidates (already past `distilled`). Cost nothing. */
+  skipped: number;
+  /** True when the batch stopped early on the run budget (anti quota-bomb). */
+  budgetStopped: boolean;
+  /** Candidates not yet processed when the run ended (budget stop, `--limit`, or an abort). */
+  remaining: number;
+  /**
+   * Set when the batch stopped on an ENVIRONMENT failure (expired credential, exhausted quota,
+   * rate limit) rather than on a document. Carries the reason so the summary can say it.
+   */
+  aborted?: string;
+}
+
+export interface PromoteRunOpts {
+  /** Cumulative ceiling for the WHOLE run. Default DEFAULT_PROMOTE_TOKEN_CAP. */
+  runCap?: number;
+  /** Stop after this many judged fiches (promote a handful, verify, then widen). */
+  limit?: number;
+}
+
+/**
+ * An environment failure, not a document failure. The distinction is load-bearing: one malformed
+ * fiche must never stop a 375-fiche batch (that rule stands), but a dead credential or an exhausted
+ * quota makes EVERY remaining call fail identically — continuing just prints 375 copies of the same
+ * error and charges the run budget for calls that never produced a token. Observed live on
+ * 2026-09-04: an expired OAuth token produced 22 identical failures and a spurious "budget cap
+ * reached" before the batch gave up.
+ */
+export function isFatalLLMError(reason: string): boolean {
+  return /\b401\b|\b429\b|authenticate|oauth|quota_exhausted|rate.?limit/i.test(reason);
+}
+
+const emptyResult = (): PromoteRunResult => ({
+  promoted: [], held: [], rejected: [], superseded: [], failed: [], skipped: 0,
+  budgetStopped: false, remaining: 0,
+});
+
+/** Fold one file result into the run buckets. */
+function collect(res: PromoteRunResult, r: PromoteFileResult): void {
+  switch (r.outcome) {
+    case 'promoted':
+      res.promoted.push(r.id);
+      if (r.superseded) res.superseded.push(r.superseded);
+      break;
+    case 'held': res.held.push(r.id); break;
+    case 'rejected': res.rejected.push(r.id); break;
+    case 'skipped': res.skipped += 1; break;
+    default: res.failed.push({ id: r.id, path: r.path, reason: r.reason ?? 'unknown failure' });
+  }
+}
+
+/** `.md` fiches in the store, sorted for deterministic order. Dotfiles and the consolidation log
+ * (which carries no frontmatter and is not a fiche) are not candidates. */
+function listFiches(dir: string, logPath: string): string[] {
+  const logName = basename(logPath);
+  return readdirSync(dir)
+    .filter((n) => n.endsWith('.md') && !n.startsWith('.') && n !== logName)
+    .sort()
+    .map((n) => join(dir, n));
+}
+
+interface Head {
+  path: string;
+  lifecycle: string;
+  /** Pre-flight cost of judging this fiche, 0 for a non-candidate. */
+  cost: number;
+}
+
+/** Read just enough of a fiche to know whether it is a candidate and what judging it would cost. */
+function head(path: string): Head {
+  const parsed = matter(readFileSync(path, 'utf8'));
+  const data = parsed.data as Record<string, unknown>;
+  const lifecycle = asStr(data.lifecycle);
+  if (lifecycle !== PROMOTE_ENTRY_STATE) return { path, lifecycle, cost: 0 };
+  const id = asStr(data.id);
+  return {
+    path, lifecycle,
+    cost: promotePromptEstimate({
+      id, title: id, docType: asStr(data.doc_type) || 'reference', trust: 'untrusted', body: parsed.content,
+    }),
+  };
+}
+
+/**
+ * Judge every promotion candidate in the store, spending a CUMULATIVE run budget. Before each
+ * candidate, the estimate of the EXACT prompt the judge will send is added to the running spend;
+ * if that would cross the run cap the batch stops cleanly (`budgetStopped`) and `remaining` counts
+ * the untouched candidates. Non-candidates are skipped for free, so replaying `--all` over an
+ * already-promoted corpus costs nothing. A single fiche's failure is recorded and the batch
+ * continues; only the budget or `limit` stops it.
+ */
+export async function promoteAll(deps: PromoteApplyDeps, opts: PromoteRunOpts = {}): Promise<PromoteRunResult> {
+  const res = emptyResult();
+  const cap = opts.runCap ?? DEFAULT_PROMOTE_TOKEN_CAP;
+  const heads = listFiches(deps.dir, deps.logPath).map(head);
+  const candidates = heads.filter((h) => h.lifecycle === PROMOTE_ENTRY_STATE);
+  res.skipped = heads.length - candidates.length;
+
+  let spent = 0;
+  let judged = 0;
+  for (let i = 0; i < candidates.length; i++) {
+    if (opts.limit !== undefined && judged >= opts.limit) {
+      res.remaining = candidates.length - i;
+      return res;
+    }
+    const cand = candidates[i]!;
+    if (spent + cand.cost > cap) {
+      res.budgetStopped = true;
+      res.remaining = candidates.length - i;
+      return res;
+    }
+    judged += 1;
+    const outcome = await promoteOneSafely(cand.path, deps);
+    collect(res, outcome);
+    if (outcome.outcome === 'failed' && isFatalLLMError(outcome.reason ?? '')) {
+      res.aborted = outcome.reason;
+      res.remaining = candidates.length - i - 1;
+      return res;
+    }
+    // Charged only for a call that actually ran. A judge that threw (401, 429) billed nothing, so
+    // charging its estimate would fake a budget stop out of an environment outage.
+    if (outcome.outcome !== 'failed') spent += cand.cost;
+  }
+  return res;
+}
+
+/** promoteFile, with an unexpected throw turned into a visible failure rather than a dead batch. */
+async function promoteOneSafely(path: string, deps: PromoteApplyDeps): Promise<PromoteFileResult> {
+  try {
+    return await promoteFile(path, deps);
+  } catch (e) {
+    const id = basename(path).replace(/\.md$/, '');
+    return { path, id, outcome: 'failed', lifecycle: '', reason: (e as Error).message };
+  }
+}
+
+/** Promote ONE fiche, named either by id or by path. An unknown target is a visible failure. */
+export async function promoteTarget(target: string, deps: PromoteApplyDeps): Promise<PromoteRunResult> {
+  const res = emptyResult();
+  const path = target.endsWith('.md') ? target : join(deps.dir, `${target}.md`);
+  if (!existsSync(path)) {
+    res.failed.push({ id: basename(path).replace(/\.md$/, ''), path, reason: `fiche not found: ${path}` });
+    return res;
+  }
+  collect(res, await promoteOneSafely(path, deps));
+  return res;
+}
+
+export function formatPromoteSummary(res: PromoteRunResult): string {
+  const base =
+    `[mas promote] ${res.promoted.length} promoted, ${res.held.length} held, ` +
+    `${res.rejected.length} rejected, ${res.superseded.length} superseded, ` +
+    `${res.failed.length} failed, ${res.skipped} skipped.`;
+  let head = base;
+  if (res.aborted) head = `${base} Lot interrompu (panne d'environnement) — ${res.remaining} remaining. Cause : ${res.aborted}`;
+  else if (res.budgetStopped) head = `${base} Budget cap reached — paused, ${res.remaining} remaining (resume later).`;
+  else if (res.remaining > 0) head = `${base} Stopped on --limit, ${res.remaining} remaining.`;
+  return [head, ...res.failed.map((f) => `  FAIL ${f.id} — ${f.reason}`)].join('\n');
+}
+
+// ---- Argument parsing (pure, so mas-cli.ts stays thin wiring) -------------
+
+export interface PromoteArgs {
+  mode: 'one' | 'all' | 'candidates' | 'usage';
+  /** Fiche id or path, in `one` mode. */
+  target?: string;
+  /** Store directory override, in `all` mode. */
+  dir?: string;
+  limit?: number;
+  /** Cumulative ceiling for the whole run. Without it, DEFAULT_PROMOTE_TOKEN_CAP (~22 fiches). */
+  runCap?: number;
+  approveUntrusted?: boolean;
+  dryRun?: boolean;
+  projectId?: string;
+  /** Set when an option is malformed — the caller prints it and exits non-zero. */
+  error?: string;
+}
+
+// Flags that only set a field — kept as DATA so parsePromoteArgs stays a flat dispatch.
+const MODE_FLAGS: Record<string, PromoteArgs['mode']> = { '--all': 'all', '--candidates': 'candidates' };
+// Numeric flags, with the field they fill. Kept as DATA alongside the others.
+const NUM_FLAGS: Record<string, 'limit' | 'runCap'> = { '--limit': 'limit', '--run-cap': 'runCap' };
+const BOOL_FLAGS: Record<string, 'approveUntrusted' | 'dryRun'> = {
+  '--approve-untrusted': 'approveUntrusted',
+  '--dry-run': 'dryRun',
+};
+
+/** Apply a value-taking flag onto `args`, or return why the value is unusable. */
+function applyValueFlag(args: PromoteArgs, flag: string, value: string | undefined): string | null {
+  if (value === undefined || value.startsWith('--')) return `${flag} needs a value`;
+  if (flag === '--project') {
+    args.projectId = value;
+    return null;
+  }
+  const n = Number(value);
+  if (!Number.isInteger(n) || n <= 0) return `${flag} needs a positive integer, got '${value}'`;
+  args[NUM_FLAGS[flag]!] = n;
+  return null;
+}
+
+/** A bare positional: the store dir in `--all` mode, otherwise the fiche id/path. */
+function applyPositional(args: PromoteArgs, arg: string): void {
+  if (args.mode === 'all') args.dir = arg;
+  else if (args.mode === 'usage') {
+    args.mode = 'one';
+    args.target = arg;
+  }
+}
+
+/**
+ * Parse `mas promote` arguments. Order-independent, and a malformed `--limit`/`--project` is a
+ * hard error rather than a silent full-corpus run (that is the difference between promoting three
+ * fiches and judging 375 with Opus).
+ */
+export function parsePromoteArgs(rest: string[]): PromoteArgs {
+  const args: PromoteArgs = { mode: 'usage' };
+  for (let i = 0; i < rest.length; i++) {
+    const arg = rest[i]!;
+    const mode = MODE_FLAGS[arg];
+    if (mode) {
+      args.mode = mode;
+      continue;
+    }
+    const bool = BOOL_FLAGS[arg];
+    if (bool) {
+      args[bool] = true;
+      continue;
+    }
+    if (NUM_FLAGS[arg] || arg === '--project') {
+      const error = applyValueFlag(args, arg, rest[i + 1]);
+      if (error) return { ...args, error };
+      i += 1;
+      continue;
+    }
+    if (arg.startsWith('--')) return { ...args, error: `unknown option ${arg}` };
+    applyPositional(args, arg);
+  }
+  return args;
+}

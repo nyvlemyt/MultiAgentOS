@@ -71,3 +71,100 @@ This phase is **re-sequenced before Phase 3.5** (the multi-account router): the 
 - **Receptacle livré.** La moitié receptacle (Ideas Inbox / Decision Log / prioritization), notée « follows Phase 3.5 » à l'origine, est en place : routes `/ideas` et `/priorities`, table `decisions` (`packages/db/src/schema.ts`).
 - **QMD vivant.** Le retriever QMD, listé en « deferred » ci-dessus (ADR 0003, 4.x), a été promu **retriever primaire en production** en Phase 9a2 (2026-06-23), avec FTS5 en fallback. Le seam `MemoryRetriever` de cet ADR reste l'interface ; QMD en est l'implémentation par défaut.
 - **Correction de renvoi.** L'indexation de code « Graphify » était renvoyée à un « future ADR 0006 ». Le numéro **0006** a en réalité été attribué au scoring de risque 4-axes ; l'ADR context-indexing reste **0008** (numéro réservé). Renvoi corrigé ci-dessus.
+
+## Amendement (2026-09-07) — les 5 registres ne reçoivent pas d'ingéré
+
+> Déclencheur : `docs/backlog/classifieur-faux-positifs-cours.md`. En promouvant les 51 candidats
+> classés (P1-8), les 51 se sont révélés être 51 documents de cours, et les trois quarts des
+> rangements étaient faux. La clause 5 ci-dessus est corrigée ici, pas réécrite.
+
+### Le constat
+
+La table de mots-clés de la clause 5 avait été calibrée en juin sur de la prose de **mission** —
+les phrases courtes qu'un agent écrit sur sa propre exécution (« Decided to… », « We learned
+that… »). Le tapis roulant d'ingestion (Brique 6) lui a ensuite servi de la prose de **cours**.
+Les mots du registre y sont aussi les mots du domaine enseigné :
+
+| Règle | Ce qu'elle cherchait | Ce qu'elle a frappé | N |
+|---|---|---|---|
+| `kw-learning` | « we **learned** that… » | « Deep **Learning** », « Machine **Learning** » | 43 |
+| `kw-blocker` | « **blocked** on… » | la consigne d'un TD : « don't stay **blocked** » | 7 |
+| `kw-eval` | « **benchmark**: 4ms » | le titre « **Score** Report » (anglais) | 1 |
+
+La règle ne pouvait pas distinguer les deux sens, **parce qu'elle n'avait jamais eu à le faire** :
+il lui manquait une frontière, pas des mots.
+
+### La question de fond, tranchée
+
+**Un document ingéré n'entre pas dans les 5 registres de mission.** Pas de 6ᵉ registre
+`resources` non plus. Quatre raisons, dans l'ordre de poids :
+
+1. **Les registres sont un journal de bord à la première personne.** Les 5 registres viennent du
+   rituel de clôture (`project-doctrine`) : *qu'avons-nous décidé / appris / qu'est-ce qui nous a
+   bloqués / qu'avons-nous fait / mesuré*. Chaque entrée répond d'une question sur **notre propre
+   exécution**. Un cours de Deep Learning ne répond d'aucune : ce n'est pas « nous avons appris X »,
+   c'est « quelqu'un enseigne X ».
+2. **Le besoin de retrieval est déjà servi ailleurs.** Le miroir études (P1-14, collection QMD
+   `mas-etudes`) existe précisément pour que le stock `untrusted` non promu reste cherchable sans
+   entrer dans le contexte mission (`seed.ts` `isEtude`). Il n'y a donc **aucun trou de retrieval**
+   à combler en forçant les cours dans les registres. Un registre `resources` serait un second
+   domicile pour les mêmes documents : deux copies, deux ids, provenance scindée.
+3. **La mécanique des registres est hostile aux documents longs — constat, pas théorie.** Un corps
+   portant ses propres titres `##` a été déchiqueté en entrées fantômes (`Contents`,
+   `2.1 Variable cible`) et a fait frapper LRN-044 en LRN-082 ; `deriveTitle` a produit 51 entrées
+   titrées par un commentaire HTML (`<!-- part_of: … -->`). Les deux bugs sont apparus le jour où
+   les premiers cours ingérés ont atterri dans un registre. Un fichier de registre est une liste
+   d'entrées **courtes** ; l'extraction d'un PDF de 40 pages est une autre forme de donnée.
+4. **Un invariant de sécurité l'interdisait déjà.** ADR 0008 clause 6 / `canAutoPromote` :
+   `untrusted` n'est **jamais** auto-promouvable, allowlist ou pas. Un classifieur qui rendait une
+   décision routable sur un corps `untrusted` fabriquait le prétexte d'une écriture qu'un autre
+   invariant refusait. La porte ci-dessous met les deux d'accord au lieu de les faire courir l'un
+   contre l'autre.
+
+Le domicile durable d'un ingéré reste donc le chemin fiche : `mas capture` → `mas distill` →
+`mas promote` → miroir études, et sa promotion en mémoire mission passe par son cycle de vie
+(`active`/`audited`, P1-6), jamais par la table de mots-clés.
+
+### Ce que la clause 5 devient
+
+- **Une porte de provenance précède la table** (`isIngestedProvenance`, `classifier.ts`). Elle lit
+  trois champs **déjà remplis** par les producteurs — le tampon `trust` d'un extracteur, le type
+  `reference` que l'intake donne à toute source documentaire, et `source_kind` — et **échoue
+  fermée** : un seul suffit. Ce n'est pas un modèle de plus, c'est un `if`.
+- **Les 5 règles de mission sont inchangées.** Elles sont justes dans leur domaine ; le défaut
+  était l'absence de frontière. `note` reste jugé par elles (une note est écrite par l'utilisateur),
+  ce qui préserve l'auto-file de la clause 7.
+- **Le signal « source type » de la clause 5 est retiré** (`skill`/`pattern`/`repo`/`course` →
+  `learnings`). Il ne visait que des kinds documentaires, donc son domaine entier est désormais
+  hors bornes : le garder aurait fait croire à un lecteur que l'ingéré route encore.
+- **Le fallback LLM n'est pas consulté sur un ingéré.** « Lequel des 5 registres de mission ? »
+  n'est pas une question dont un cours a la réponse : la poser à un modèle ne ferait que blanchir
+  la même erreur de catégorie, à un appel de quota par document. Le seam optionnel de
+  classification-sur-abstention du tapis roulant disparaît donc, et le chemin de capture devient
+  **zéro-LLM par construction** et non plus par défaut — un §11 plus fort qu'avant.
+- **Un tag utilisateur explicite passe outre la porte.** Un humain qui a étiqueté un document l'a
+  regardé, et ce jugement surclasse toute heuristique de provenance. C'est la seule voie par
+  laquelle de l'ingéré atteint encore un registre.
+- **Les décisions déjà stockées sont retirées, pas réinterprétées** (`mas reclassify`,
+  `reclassify.ts`). `promoteClassifiedCandidates` exécute fidèlement la décision qu'il lit — il ne
+  la fabrique pas — donc corriger le classifieur ne suffisait pas : les 51 décisions de juin
+  étaient de la donnée. La passe ne fait que **retirer** (jamais inventer un registre), est
+  idempotente et possède un `--dry-run`.
+
+### Conséquences
+
+- `data/memory/<projectId>/*.md` ne contient que du savoir de mission.
+- **Les 379 candidats ingérés sont `rejected`, pas `pending`** (décision Melvyn, 2026-09-09 —
+  correction d'un premier jet qui les laissait en attente). Si aucun ingéré n'est jamais du
+  matériau de registre, alors « en attente d'une décision humaine » est un mensonge : la décision
+  est prise. Et une boîte de réception saturée à 379 pour toujours cesse d'être un signal. Le rejet
+  ne ferme la porte **que du registre** : le document vit dans `docs/knowledge` + le miroir études
+  et reste cherchable (`mem:eval` le couvre), le statut se défait d'un `UPDATE`, et le dédoublonnage
+  par `source_key` matche toujours une ligne rejetée — donc fermer ne peut pas déclencher de boucle
+  de réingestion. Passe : `mas reclassify --reject [--dry-run]`.
+- `mas promote --candidates` sur un lot purement ingéré promeut **0** — ce n'est pas une panne,
+  c'est la bonne réponse.
+- `PipelineDeps` perd `llm` et `budgetBlocked` ; `buildDeps` (mas-cli) n'injecte plus rien.
+- Reste ouvert : une table de classement propre aux ressources (kind, matière, niveau) si le triage
+  humain des 379 se révèle trop coûteux. Elle classerait vers des attributs de fiche, **pas** vers
+  les 5 registres — le présent amendement ferme cette voie-là.

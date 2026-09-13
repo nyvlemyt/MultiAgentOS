@@ -1,0 +1,210 @@
+// `pnpm mas capture <path|url>`, `mas capture --html [file|-]`, `mas capture --inbox [dir]`,
+// `mas distill <sas-doc-path> | --all [dir]`, and `mas promote <fiche-id|path> | --all | --candidates`.
+// Builds the real registry (markitdown + pdftotext + Defuddle + yt-dlp) and the temp-free DB; the
+// testable logic lives in conveyor/cli.ts + conveyor/distill-cli.ts + conveyor/promote-cli.ts +
+// promote-candidates.ts. Capture is zero-LLM by construction → §11-safe; distill calls
+// the ONE injected @mas/core claudeCodeLLM (Sonnet) and promote the same client at the promotion
+// tier (Opus, ADR 0008 clause 11) — subscription, never PAYG (§11). The url/youtube egress leaves
+// only through net-guard, seeded from config/permissions.json#allowed_hosts (§5).
+// Pattern from packages/memory/src/doctor-cli.ts.
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { basename, dirname, resolve } from 'node:path';
+import { lookup } from 'node:dns/promises';
+import { getDb } from '@mas/db';
+import { claudeCodeLLM } from '@mas/core';
+import { ExtractorRegistry } from './conveyor/extractor';
+import { makePdfExtractor } from './conveyor/extractors/pdf';
+import { makeOfficeExtractor } from './conveyor/extractors/office';
+import { makeHtmlExtractor } from './conveyor/extractors/html';
+import { makeUrlExtractor } from './conveyor/extractors/url';
+import { makeYoutubeExtractor, realYoutubeRunner } from './conveyor/extractors/youtube';
+import { captureHtmlBlob, captureInbox, captureOne, formatSummary } from './conveyor/cli';
+import { distillAll, distillPath, formatDistillSummary, type DistillCliDeps } from './conveyor/distill-cli';
+import { formatPromoteSummary, parsePromoteArgs, promoteAll, promoteTarget } from './conveyor/promote-cli';
+import type { PromoteApplyDeps } from './conveyor/promote-apply';
+import { formatCandidatesSummary, promoteClassifiedCandidates } from './promote-candidates';
+import {
+  formatRejectSummary,
+  formatReclassifySummary,
+  reclassifyPendingCandidates,
+  rejectIngestedCandidates,
+} from './reclassify';
+import { MEMORY_KEEPER_AGENT, MemoryStore } from './registers';
+import type { PipelineDeps } from './conveyor/pipeline';
+import type { NetGuardDeps } from './conveyor/net-guard';
+
+const USAGE =
+  'usage: mas capture <path|url> | mas capture --html [file|-] | mas capture --inbox [dir]\n' +
+  '       mas distill <sas-doc-path> | mas distill --all [dir]\n' +
+  '       mas promote <fiche-id|path> | mas promote --all [dir] [--limit N] [--run-cap N] [--approve-untrusted]\n' +
+  '       mas promote --candidates [--dry-run] [--limit N] [--project <id>]\n' +
+  '       mas reclassify [--reject] [--dry-run]';
+
+function findRepoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(resolve(dir, 'pnpm-workspace.yaml'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
+
+const resolveHost = async (host: string): Promise<string[]> => (await lookup(host, { all: true })).map((a) => a.address);
+
+function loadAllowedHosts(root: string): string[] {
+  try {
+    const cfg = JSON.parse(readFileSync(resolve(root, 'config/permissions.json'), 'utf8')) as { allowed_hosts?: string[] };
+    return cfg.allowed_hosts ?? [];
+  } catch {
+    return [];
+  }
+}
+
+function buildDeps(root: string): PipelineDeps {
+  const guard: NetGuardDeps = { allowedHosts: loadAllowedHosts(root), resolve: resolveHost };
+  const registry = new ExtractorRegistry();
+  registry.register('pdf', makePdfExtractor());
+  const office = makeOfficeExtractor();
+  registry.register('docx', office);
+  registry.register('pptx', office);
+  registry.register('html', makeHtmlExtractor());
+  registry.register('url', makeUrlExtractor({ ...guard, fetch }));
+  registry.register('youtube', makeYoutubeExtractor(realYoutubeRunner, guard));
+  return { registry }; // the capture path takes no LLM at all — §11-safe by construction
+}
+
+async function runCapture(root: string, rest: string[]): Promise<void> {
+  const db = getDb();
+  const deps = buildDeps(root);
+  if (rest[0] === '--html') {
+    const arg = rest[1];
+    const fromStdin = !arg || arg === '-';
+    const blob = fromStdin ? readFileSync(0, 'utf8') : readFileSync(resolve(arg), 'utf8');
+    const title = fromStdin ? 'pasted-html' : basename(arg);
+    console.log(formatSummary(await captureHtmlBlob(db, blob, title, deps)));
+    return;
+  }
+  if (rest[0] === '--inbox') {
+    const dir = rest[1] ?? resolve(root, 'docs/resources/inbox');
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    console.log(formatSummary(await captureInbox(db, dir, deps)));
+    return;
+  }
+  console.log(formatSummary(await captureOne(db, rest[0]!, deps)));
+}
+
+/** Distill deps wiring the ONE @mas/core LLM client (Sonnet, subscription — §11). */
+function buildDistillDeps(root: string): DistillCliDeps {
+  const outDir = resolve(root, 'docs/knowledge');
+  mkdirSync(outDir, { recursive: true });
+  return {
+    llm: claudeCodeLLM(), // throws if ANTHROPIC_API_KEY is set (§11 guard) — a smell, not a feature
+    outDir,
+    logPath: resolve(outDir, 'consolidation-log.md'),
+    date: new Date().toISOString().slice(0, 10),
+    keeper: 'memory-keeper',
+  };
+}
+
+async function runDistill(root: string, rest: string[]): Promise<void> {
+  const deps = buildDistillDeps(root);
+  if (rest[0] === '--all') {
+    // resolve(root, …) : pnpm --filter runs this CLI with cwd=packages/memory — a raw relative
+    // arg would silently point inside the package (empty dir created, 0 docs distilled).
+    const dir = rest[1] ? resolve(root, rest[1]) : resolve(root, 'docs/resources/inbox');
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    console.log(formatDistillSummary(await distillAll(dir, deps)));
+    return;
+  }
+  console.log(formatDistillSummary(await distillPath(resolve(root, rest[0]!), deps)));
+}
+
+/** Promote deps wiring the ONE @mas/core LLM client at the promotion tier (Opus, subscription — §11). */
+function buildPromoteDeps(root: string, dir: string | undefined, approveUntrusted: boolean): PromoteApplyDeps {
+  const store = dir ? resolve(root, dir) : resolve(root, 'docs/knowledge');
+  mkdirSync(store, { recursive: true });
+  return {
+    llm: claudeCodeLLM(), // throws if ANTHROPIC_API_KEY is set (§11 guard) — a smell, not a feature
+    dir: store,
+    logPath: resolve(store, 'consolidation-log.md'),
+    date: new Date().toISOString().slice(0, 10),
+    keeper: MEMORY_KEEPER_AGENT,
+    approveUntrusted,
+  };
+}
+
+/** Memory Keeper-identity register store — CLAUDE.md §8 forbids any other writer. */
+function buildMemoryStore(root: string): MemoryStore {
+  return new MemoryStore({
+    root: process.env.MAS_MEMORY_ROOT ?? resolve(root, 'data/memory'),
+    writerAgent: MEMORY_KEEPER_AGENT,
+  });
+}
+
+async function runPromote(root: string, rest: string[]): Promise<void> {
+  const args = parsePromoteArgs(rest);
+  if (args.error) {
+    console.error(`[mas promote] ${args.error}`);
+    process.exitCode = 1;
+    return;
+  }
+  if (args.mode === 'candidates') {
+    const res = await promoteClassifiedCandidates(getDb(), buildMemoryStore(root), {
+      ...(args.dryRun ? { dryRun: true } : {}),
+      ...(args.limit !== undefined ? { limit: args.limit } : {}),
+      ...(args.projectId ? { projectId: args.projectId } : {}),
+    });
+    console.log(formatCandidatesSummary(res));
+    return;
+  }
+  if (args.mode === 'usage') {
+    console.error(USAGE);
+    process.exitCode = 1;
+    return;
+  }
+  const deps = buildPromoteDeps(root, args.dir, args.approveUntrusted === true);
+  const batchOpts = {
+    ...(args.limit !== undefined ? { limit: args.limit } : {}),
+    ...(args.runCap !== undefined ? { runCap: args.runCap } : {}),
+  };
+  const res = args.mode === 'all'
+    ? await promoteAll(deps, batchOpts)
+    : await promoteTarget(args.target!, deps);
+  console.log(formatPromoteSummary(res));
+}
+
+/**
+ * Withdraw the register decisions the provenance gate no longer stands behind (see reclassify.ts).
+ * Idempotent, so it is safe to run before every `mas promote --candidates`.
+ */
+async function runReclassify(rest: string[]): Promise<void> {
+  const dryRun = rest.includes('--dry-run');
+  const db = getDb();
+  // --reject escalates from "this decision is void" to "this row is not register material at all"
+  // (reclassify.ts INGESTED_REJECTED). Opt-in, because only the second one closes a candidate.
+  if (rest.includes('--reject')) {
+    console.log(formatRejectSummary(await rejectIngestedCandidates(db, { dryRun })));
+    return;
+  }
+  console.log(formatReclassifySummary(await reclassifyPendingCandidates(db, { dryRun })));
+}
+
+async function main(): Promise<void> {
+  const [cmd, ...rest] = process.argv.slice(2);
+  const root = findRepoRoot();
+  if (cmd === 'capture' && rest.length > 0) return runCapture(root, rest);
+  if (cmd === 'distill' && rest.length > 0) return runDistill(root, rest);
+  if (cmd === 'promote') return runPromote(root, rest);
+  if (cmd === 'reclassify') return runReclassify(rest);
+  console.error(USAGE);
+  process.exitCode = 1;
+}
+
+try {
+  await main();
+} catch (e) {
+  console.error(`[mas] ${(e as Error).message}`);
+  process.exitCode = 1;
+}

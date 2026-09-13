@@ -3,7 +3,7 @@
 # docs/resources/** or docs/knowledge/** is written, run the Brique 1d
 # frontmatter gardien on just that file so a bad lifecycle / unresolvable
 # relation / missing tier-1 identity is caught at authoring time, not only in
-# CI. Mirrors .claude/hooks/token-watch.sh (stdin JSON, jq, no model tokens).
+# CI. Same shape as any PostToolUse hook here: stdin JSON, jq, no model tokens spent.
 #
 # stdin: PostToolUse JSON { tool_input: { file_path } }. Non-.md or out-of-scope
 # paths → silent no-op (cheap pre-filter, no tsx spin-up). A validator error →

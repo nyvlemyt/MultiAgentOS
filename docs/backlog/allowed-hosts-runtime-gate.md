@@ -18,3 +18,7 @@ Same class of inert-control bug as the perms-category wiring fixed in PR #44 (`c
 1. Add a host-check seam at the single outbound boundary (wherever a domain agent would `fetch`/send): resolve the target host, compare against `perms.allowed_hosts`, and route a miss through the §5 gate (pause-for-validation), mirroring how `classifyRisk` now consumes `perms` (PR #44).
 2. TDD: a task targeting a non-allowlisted host pauses at the §5 gate; an allowlisted host passes.
 3. Cross-check the other §5 controls flagged prompt-only by the scan (`S5-1` cross-project write guard, refuted as already partly enforced) so wiring stays consistent.
+
+## RESOLVED — 2026-06-29 (Brique 6 increment 3)
+
+The host-check seam shipped as `packages/memory/src/conveyor/net-guard.ts` (`assertFetchAllowed`): scheme allowlist + `allowed_hosts` exact-match + SSRF/DNS-rebind block, DNS injected for tests. Its first consumers are the conveyor's `url` and `youtube` extractors — the "first outbound-calling" trigger this card was waiting for. A blocked host dead-letters as `host_not_allowed` (visible + relaunchable, never silent). The broader dispatch-path reuse (domain agents routing a miss through the interactive §5 pause) consumes the same seam when it lands.

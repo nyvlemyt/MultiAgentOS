@@ -73,6 +73,8 @@ add_collection "mas-workflows" "$ROOT/docs/workflows"
 add_collection "mas-memory"    "$ROOT/data/memory"
 add_collection "mas-arsenal"   "$ROOT/data/arsenal-index"
 add_collection "mas-resources" "$ROOT/docs/resources"
+mkdir -p "$ROOT/data/etudes"
+add_collection "mas-etudes" "$ROOT/data/etudes"
 
 # 4. Re-index + embed. `update` refreshes the FTS/document layer from disk; `embed`
 #    (re)builds the vector layer used by `qmd query`/`vsearch`. Both incremental.

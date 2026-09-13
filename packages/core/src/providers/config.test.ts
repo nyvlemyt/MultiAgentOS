@@ -22,6 +22,10 @@ describe('loadRoutingConfig', () => {
     }
     expect(cfg.domains['code-execution']!.primary).toBe('claude');
     expect(cfg.domains['code-execution']!.fallback).toEqual([]);
+    // Brique 6 quality-default (ADR 0008 clause 11 / design spec §13.2): classify + distill
+    // permanently shape the corpus → strong subscription model, NO paid openai in this domain.
+    expect(cfg.domains['memory']!.primary).toBe('claude');
+    expect(cfg.domains['memory']!.fallback).toEqual(['gemini-free']);
   });
 
   it('missing file ⇒ safe defaults (everything routes to claude), never crash', () => {
