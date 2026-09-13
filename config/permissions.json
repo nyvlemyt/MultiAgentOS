@@ -1,6 +1,44 @@
 {
   "version": 1,
-  "categories": [],
+  "categories": [
+    { "category": "destructive-filesystem", "action": "rm -rf", "risk": "blocking", "allow_list": [] },
+    { "category": "destructive-git", "action": "git reset --hard", "risk": "blocking", "allow_list": [] },
+    { "category": "destructive-git", "action": "git push --force", "risk": "blocking", "allow_list": [] },
+    { "category": "destructive-git", "action": "git branch -d", "risk": "blocking", "allow_list": [] },
+    { "category": "destructive-git", "action": "git push --delete", "risk": "blocking", "allow_list": [] },
+    { "category": "secrets-write", "action": ".env", "risk": "blocking", "allow_list": [] },
+    { "category": "secrets-write", "action": "keystore", "risk": "blocking", "allow_list": [] },
+    { "category": "secrets-write", "action": "id_rsa", "risk": "blocking", "allow_list": [] },
+    { "category": "dangerous-shell", "action": "curl | sh", "risk": "blocking", "allow_list": [] },
+    { "category": "dangerous-shell", "action": "sudo", "risk": "blocking", "allow_list": [] },
+    { "category": "dangerous-shell", "action": "eval(", "risk": "blocking", "allow_list": [] },
+
+    { "category": "path-escape", "action": "/etc/", "risk": "blocking", "allow_list": [] },
+    { "category": "path-escape", "action": "~/.ssh", "risk": "blocking", "allow_list": [] },
+    { "category": "path-escape", "action": "~/.aws", "risk": "blocking", "allow_list": [] },
+    { "category": "path-escape", "action": "outside the project path", "risk": "blocking", "allow_list": [] },
+    { "category": "path-escape", "action": "hors du projet", "risk": "blocking", "allow_list": [] },
+
+    { "category": "outbound-message", "action": "send message", "risk": "high", "allow_list": [] },
+    { "category": "outbound-message", "action": "send a message", "risk": "high", "allow_list": [] },
+    { "category": "outbound-message", "action": "send an email", "risk": "high", "allow_list": [] },
+    { "category": "outbound-message", "action": "send email", "risk": "high", "allow_list": [] },
+    { "category": "outbound-message", "action": "envoyer un message", "risk": "high", "allow_list": [] },
+    { "category": "outbound-message", "action": "envoyer un email", "risk": "high", "allow_list": [] },
+    { "category": "outbound-message", "action": "envoyer un mail", "risk": "high", "allow_list": [] },
+
+    { "category": "payment", "action": "payment", "risk": "blocking", "allow_list": [] },
+    { "category": "payment", "action": "paiement", "risk": "blocking", "allow_list": [] },
+    { "category": "payment", "action": "wire transfer", "risk": "blocking", "allow_list": [] },
+    { "category": "payment", "action": "virement", "risk": "blocking", "allow_list": [] },
+
+    { "category": "outbound-network", "action": "post to slack", "risk": "high", "allow_list": [] },
+    { "category": "outbound-network", "action": "upload to", "risk": "high", "allow_list": [] },
+    { "category": "outbound-network", "action": "publish to", "risk": "high", "allow_list": [] },
+    { "category": "outbound-network", "action": "call the webhook", "risk": "high", "allow_list": [] },
+    { "category": "outbound-network", "action": "envoyer vers", "risk": "high", "allow_list": [] },
+    { "category": "outbound-network", "action": "publier sur", "risk": "high", "allow_list": [] }
+  ],
   "allowed_hosts": [
     "help.obsidian.md",
     "obsidian.md",
