@@ -2,7 +2,7 @@
 
 **Opened** 2026-07-31 · **Status** open · **Owner** next hardening bloc
 
-`packages/agents/src/dispatch.ts` is **821 lines**, over the §7 cap of 800. It is the single
+`packages/agents/src/dispatch.ts` is **811 lines** (821 until 2026-09-15, when `pauseForRiskGate` moved to `risk-gate.ts` alongside the new §5 path gate — first net shrink since #42), over the §7 cap of 800. It is the single
 documented exception in both God-file guards (`.claude/hooks/limit-file-size.sh`,
 `scripts/check-max-lines.sh`) so the guards could ship green instead of shipping disabled.
 

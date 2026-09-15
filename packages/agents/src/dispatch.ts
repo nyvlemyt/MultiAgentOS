@@ -1,5 +1,5 @@
-import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { realpath } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -15,6 +15,8 @@ import {
 import {
   mockMissionPlanner,
   classifyRisk,
+  assertDiffWithinProject,
+  BlockedPathError,
   languageDirective,
   loadPermissions,
   EMPTY_PERMISSIONS,
@@ -30,6 +32,7 @@ import { selectLibrarySkills } from '@mas/skills';
 import { type MemoryContext } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
 import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
+import { pauseForRiskGate, pauseForPathEscape, type RiskGatePause } from './risk-gate';
 import { realSecReviewer } from './reviewers';
 import { TIER_B_DELEGATION_MAP, domainScopeFor, loadAgentLibraryIndex, type AgentLibraryMeta } from './library';
 import { scoreColdAgentSuggestion } from './cold-agent-suggest';
@@ -325,33 +328,6 @@ async function selectRunnableTasks(db: Db, missionId: string): Promise<Task[]> {
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
-async function pauseForRiskGate(
-  db: Db,
-  m: Mission,
-  next: Task,
-): Promise<{ kind: 'paused_for_validation'; taskId: string }> {
-  await db
-    .update(tasks)
-    .set({ status: 'needs_validation', updatedAt: new Date() })
-    .where(eq(tasks.id, next.id));
-  await db.insert(validations).values({
-    id: `val_${randomUUID()}`,
-    taskId: next.id,
-    requestedByAgent: next.agentId ?? 'dispatcher',
-    actionSummary: `Run high-risk task: ${next.title}`,
-    status: 'pending',
-    payloadJson: JSON.stringify({ risk: next.risk }),
-  });
-  await logEvent(db, {
-    missionId: m.id,
-    taskId: next.id,
-    type: 'validation_requested',
-    risk: next.risk,
-    payload: { reason: 'risk gate' },
-  });
-  return { kind: 'paused_for_validation', taskId: next.id };
-}
-
 // Shared finalize step for a completed task (raw + delegated paths): persist the
 // session id on first call, mark the task done + spend, bump mission spend, and
 // log the single task_done event. extraPayload carries path-specific telemetry.
@@ -423,9 +399,11 @@ interface GateArgs {
   lastMessage: string;
 }
 
-async function gateProducedDiff(
-  args: GateArgs,
-): Promise<{ outputPath: string; review: ReviewGateResult }> {
+type GateOutcome =
+  | { kind: 'reviewed'; outputPath: string; review: ReviewGateResult }
+  | { kind: 'path_escape'; outputPath: string; escape: BlockedPathError };
+
+async function gateProducedDiff(args: GateArgs): Promise<GateOutcome> {
   const { db, m, next, repoDir, diff, fiche, llm, lastMessage } = args;
   const patchPath = `${OUTPUTS_DIR}/${next.id}.patch`;
   const absDir = resolve(repoRootDir(), OUTPUTS_DIR);
@@ -434,6 +412,16 @@ async function gateProducedDiff(
   // extracted diff body is trimmed, so re-add one before writing/validating.
   const patch = diff.endsWith('\n') ? diff : `${diff}\n`;
   writeFileSync(resolve(repoRootDir(), patchPath), patch, 'utf-8');
+
+  // §5 path gate — write containment runs BEFORE any critic, so a diff that would
+  // touch a path outside project.path never costs a review call and never ends as
+  // task_done: the caller routes it to the human pause (pauseForPathEscape).
+  try {
+    await assertDiffWithinProject(patch, { projectRoot: repoDir, realpath });
+  } catch (e) {
+    if (e instanceof BlockedPathError) return { kind: 'path_escape', outputPath: patchPath, escape: e };
+    throw e;
+  }
 
   const review = await reviewProducedDiff({
     taskId: next.id,
@@ -452,7 +440,7 @@ async function gateProducedDiff(
     risk: next.risk,
     payload: { verdicts: review.verdicts, approved: review.approved, diffValid: review.diffValid, fiche },
   });
-  return { outputPath: patchPath, review };
+  return { kind: 'reviewed', outputPath: patchPath, review };
 }
 
 // Evaluator-Optimizer (anthropic-ecosystem.md:170): a produced diff that the gate
@@ -478,7 +466,7 @@ async function runDelegatedTask(
   next: Task,
   ctx: DelegationContext,
   taskSkillIds: string[],
-): Promise<{ kind: 'task_done'; taskId: string }> {
+): Promise<{ kind: 'task_done'; taskId: string } | RiskGatePause> {
   const { proj, llm, skillContext, memCtx, upstream, delegation, agentId } = ctx;
   // Prompt chaining: the delegated path carries upstream output in skillContext
   // (the producer/critic system prompt), since the user prompt is the task brief.
@@ -517,6 +505,7 @@ async function runDelegatedTask(
 
   if (outcome.diff && proj?.path) {
     const gated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
+    if (gated.kind === 'path_escape') return pauseForPathEscape(db, m, next, gated.escape, gated.outputPath, spentTokens);
     outputPath = gated.outputPath;
     review = gated.review;
 
@@ -548,6 +537,7 @@ async function runDelegatedTask(
         break;
       }
       const reGated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
+      if (reGated.kind === 'path_escape') return pauseForPathEscape(db, m, next, reGated.escape, reGated.outputPath, spentTokens);
       outputPath = reGated.outputPath;
       review = reGated.review;
       await logEvent(db, {
@@ -611,7 +601,7 @@ async function executeTaskWithLLM(
   m: Mission,
   next: Task,
   missionId: string,
-): Promise<{ kind: 'task_done'; taskId: string }> {
+): Promise<{ kind: 'task_done'; taskId: string } | RiskGatePause> {
   // Look up project to build the real LLM client.
   const [proj] = await db
     .select({
