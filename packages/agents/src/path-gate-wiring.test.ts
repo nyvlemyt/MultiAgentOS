@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { makeTempGitRepo } from './testing';
+import { useDispatchHarness, seedTierBMission, eventsOfType } from './testing';
 
 // End-to-end proof of the §5 PATH gate: a Tier-B producer whose diff would write
 // outside project.path must PAUSE for a human (needs_validation + pending
@@ -11,101 +11,41 @@ const producer = vi.hoisted(() => ({ diff: '' }));
 
 vi.mock('@mas/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@mas/core')>();
-  return {
-    ...actual,
-    claudeCodeLLM: vi.fn(() => ({
-      call: vi.fn(async (req: import('@mas/core').LLMRequest) => ({
-        text: req.reviewKind
-          ? actual.mockVerdictText(req.reviewKind, req.user)
-          : `Here is the change:\n\`\`\`diff\n${producer.diff}\n\`\`\``,
-        inputTokens: 220,
-        outputTokens: 80,
-        cacheReadTokens: 60,
-        cacheCreationTokens: 20,
-        quotaUnits: 0,
-        model: 'claude-haiku-4-5',
-        sessionId: 'test-session-id',
-      })),
-    })),
-  };
+  const { mockTierBCore } = await import('./testing');
+  return mockTierBCore(actual, () => `Here is the change:\n\`\`\`diff\n${producer.diff}\n\`\`\``);
 });
 
-import { unlinkSync, mkdirSync, mkdtempSync, symlinkSync, rmSync } from 'node:fs';
+import { mkdtempSync, symlinkSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { eq, and } from 'drizzle-orm';
-import { getDb, closeDb, projects, agents, missions, tasks, events, validations } from '@mas/db';
+import { eq } from 'drizzle-orm';
+import { getDb, tasks, validations } from '@mas/db';
 import { executeNextTask, runMission } from './dispatch';
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../db/migrations');
 const PROJECT_ID = 'pathgate-proj';
 const DELEGATION_AGENT = 'design-ui-designer';
-const AGENT_IDS = [DELEGATION_AGENT, 'reviewer', 'quality-controller', 'sec-reviewer'];
 const PAUSED = 'paused_for_validation';
 const TRAVERSAL_TARGET = '../outside.txt';
 const SYMLINK_TARGET = 'link/evil.txt';
 
-let dbPath: string;
-let repoDir: string;
+const h = useDispatchHarness(MIGRATIONS_FOLDER, 'mas-pathgate-');
 let outsideDir: string;
-
-beforeEach(async () => {
-  delete process.env.MAS_MOCK_LLM;
-  process.env.MAS_ROUTING_CONFIG = '/nonexistent/model-routing.json';
-  const dir = join(tmpdir(), 'mas-test');
-  mkdirSync(dir, { recursive: true });
-  dbPath = join(dir, `${randomUUID()}.db`);
-  process.env.MAS_DB_PATH = dbPath;
-  migrate(getDb(), { migrationsFolder: MIGRATIONS_FOLDER });
-  repoDir = await makeTempGitRepo('mas-pathgate-');
+beforeEach(() => {
   outsideDir = mkdtempSync(join(tmpdir(), 'mas-outside-'));
 });
-
 afterEach(() => {
-  closeDb();
-  try { unlinkSync(dbPath); } catch { /* ignore */ }
   try { rmSync(outsideDir, { recursive: true, force: true }); } catch { /* ignore */ }
-  delete process.env.MAS_DB_PATH;
-  delete process.env.MAS_ROUTING_CONFIG;
 });
 
-async function seed(missionId: string): Promise<string> {
-  const db = getDb();
-  await db.insert(projects).values({
-    id: PROJECT_ID, name: 'Path gate', slug: 'pathgate', path: repoDir, type: 'other',
-    createdAt: new Date(), lastActiveAt: new Date(),
-  });
-  for (const id of AGENT_IDS) {
-    await db.insert(agents).values({
-      id, tier: 'A', fichePath: `f/${id}.md`, name: id, model: 'claude-haiku-4-5',
-      enabled: true, totalRuns: 0, totalTokens: 0, successRate: 1,
-    });
-  }
-  await db.insert(missions).values({
-    id: missionId, projectId: PROJECT_ID, title: 'Path gate mission',
-    objective: 'Edit file.txt', status: 'planned', risk: 'low',
-    budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
-  });
-  const taskId = `${missionId}_t1`;
-  await db.insert(tasks).values({
-    id: taskId, missionId, title: 'Edit file.txt', description: 'Change hello to goodbye in file.txt.',
-    status: 'todo', risk: 'low', agentId: DELEGATION_AGENT,
-    skillsJson: '[]', dependsOnJson: '[]', budgetTokens: 5000, spentTokens: 0,
-    createdAt: new Date(), updatedAt: new Date(),
-  });
-  return taskId;
-}
-
-async function eventsOfType(missionId: string, type: string) {
-  const db = getDb();
-  return db.select().from(events).where(and(eq(events.missionId, missionId), eq(events.type, type)));
-}
-
 async function runOnce(missionId: string) {
-  const taskId = await seed(missionId);
+  const taskId = await seedTierBMission({
+    missionId, projectId: PROJECT_ID, name: 'Path gate', slug: 'pathgate', repoDir: h.repoDir,
+    agentIds: [DELEGATION_AGENT, 'reviewer', 'quality-controller', 'sec-reviewer'],
+    missionTitle: 'Path gate mission', objective: 'Edit file.txt', missionBudget: 20000,
+    task: { title: 'Edit file.txt', description: 'Change hello to goodbye in file.txt.', budgetTokens: 5000 },
+  });
   await runMission(missionId);
   const res = await executeNextTask(missionId);
   const db = getDb();
@@ -152,7 +92,7 @@ describe('§5 path gate — a diff that traverses out of the project', () => {
 describe('§5 path gate — a diff that escapes through a real symlink', () => {
   const MID = 'mid_pathgate_symlink';
   beforeEach(() => {
-    symlinkSync(outsideDir, join(repoDir, 'link'));
+    symlinkSync(outsideDir, join(h.repoDir, 'link'));
     producer.diff = `--- /dev/null\n+++ b/${SYMLINK_TARGET}\n@@ -0,0 +1 @@\n+pwned`;
   });
 
