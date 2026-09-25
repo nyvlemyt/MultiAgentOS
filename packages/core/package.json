@@ -12,6 +12,7 @@
     "./permissions": "./src/permissions.ts"
   },
   "scripts": {
+    "lint": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
