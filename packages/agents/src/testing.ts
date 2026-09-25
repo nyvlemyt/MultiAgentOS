@@ -1,12 +1,13 @@
-import { beforeEach, afterEach } from 'vitest';
-import { unlinkSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { beforeEach, afterEach, vi } from 'vitest';
+import { unlinkSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { getDb, closeDb, projects, agents, missions } from '@mas/db';
+import { and, eq } from 'drizzle-orm';
+import { getDb, closeDb, projects, agents, missions, tasks, events } from '@mas/db';
 
 const git = promisify(execFile);
 
@@ -116,4 +117,127 @@ export async function seedMission(
     status: 'draft', risk: 'low',
     budgetTokens: 20000, spentTokens: 0, createdAt: new Date(), updatedAt: new Date(),
   });
+}
+
+// ---------------------------------------------------------------------------
+// Shared harness for the dispatch-flow suites that drive the real dispatch path
+// against a fresh env-driven DB, with @mas/core mocked (mockTierBCore) or the
+// deterministic mockLLM (`mockLlm` option). One copy here instead of one per
+// suite — Sonar's new-code duplication gate caught the fourth copy.
+// ---------------------------------------------------------------------------
+
+/**
+ * The @mas/core mock used by those suites: a critic call (reviewKind set) gets a
+ * deterministic, parseable verdict so CI stays live-model-free; any other call
+ * returns the producer text the suite decides (constant, per-test, or stateful —
+ * the callback receives the request, so a suite can also record its prompts).
+ * Call it from inside the vi.mock factory via `await import('./testing')` — the
+ * factory is hoisted, so it cannot see static imports.
+ */
+export function mockTierBCore(
+  actual: typeof import('@mas/core'),
+  producerText: (req: import('@mas/core').LLMRequest) => string,
+) {
+  const base = {
+    inputTokens: 220,
+    outputTokens: 80,
+    cacheReadTokens: 60,
+    cacheCreationTokens: 20,
+    quotaUnits: 0,
+    model: 'claude-haiku-4-5',
+    sessionId: 'test-session-id',
+  };
+  return {
+    ...actual,
+    claudeCodeLLM: vi.fn(() => ({
+      call: vi.fn(async (req: import('@mas/core').LLMRequest) => ({
+        text: req.reviewKind ? actual.mockVerdictText(req.reviewKind, req.user) : producerText(req),
+        ...base,
+      })),
+    })),
+  };
+}
+
+export interface DispatchHarnessOptions {
+  /** mkdtemp prefix — `repoDir` becomes a fresh git repo per test. */
+  repoPrefix?: string;
+  /**
+   * MAS_MOCK_LLM=1 so selectLLM short-circuits to the deterministic mockLLM.
+   * Default: cleared, so the suite's own claudeCodeLLM mock is what runs.
+   */
+  mockLlm?: boolean;
+}
+
+/**
+ * Env-driven DB + temp-repo harness: fresh SQLite through MAS_DB_PATH, the
+ * routing config pointed at a missing file (single provider, no live router, no
+ * plan-cap override), MAS_MOCK_LLM cleared or set per `mockLlm`. `dbPath` and
+ * `repoDir` are per-test values — read them inside the test, after beforeEach
+ * has run.
+ */
+export function useDispatchHarness(
+  migrationsFolder: string,
+  opts: DispatchHarnessOptions = {},
+): { repoDir: string; dbPath: string } {
+  const ctx = { repoDir: '', dbPath: '' };
+  beforeEach(async () => {
+    if (opts.mockLlm) process.env.MAS_MOCK_LLM = '1';
+    else delete process.env.MAS_MOCK_LLM;
+    process.env.MAS_ROUTING_CONFIG = '/nonexistent/model-routing.json';
+    const dir = join(tmpdir(), 'mas-test');
+    mkdirSync(dir, { recursive: true });
+    ctx.dbPath = join(dir, `${randomUUID()}.db`);
+    process.env.MAS_DB_PATH = ctx.dbPath;
+    migrate(getDb(), { migrationsFolder });
+    if (opts.repoPrefix) ctx.repoDir = await makeTempGitRepo(opts.repoPrefix);
+  });
+  afterEach(() => {
+    closeDb();
+    try { unlinkSync(ctx.dbPath); } catch { /* ignore */ }
+    delete process.env.MAS_DB_PATH;
+    delete process.env.MAS_ROUTING_CONFIG;
+    delete process.env.MAS_MOCK_LLM;
+  });
+  return ctx;
+}
+
+export interface TierBSeed {
+  missionId: string;
+  projectId: string;
+  name: string;
+  slug: string;
+  repoDir: string;
+  agentIds: readonly string[];
+  missionTitle: string;
+  objective: string;
+  missionBudget: number;
+  task: { title: string; description: string; budgetTokens: number };
+}
+
+/** Project at repoDir + roster + a `planned` mission + one `todo` low-risk task delegated to agentIds[0]. Returns the task id. */
+export async function seedTierBMission(seed: TierBSeed): Promise<string> {
+  const db = getDb();
+  await db.insert(projects).values({
+    id: seed.projectId, name: seed.name, slug: seed.slug, path: seed.repoDir, type: 'other',
+    createdAt: new Date(), lastActiveAt: new Date(),
+  });
+  await seedAgents(seed.agentIds);
+  await db.insert(missions).values({
+    id: seed.missionId, projectId: seed.projectId, title: seed.missionTitle, objective: seed.objective,
+    status: 'planned', risk: 'low', budgetTokens: seed.missionBudget, spentTokens: 0,
+    createdAt: new Date(), updatedAt: new Date(),
+  });
+  const taskId = `${seed.missionId}_t1`;
+  await db.insert(tasks).values({
+    id: taskId, missionId: seed.missionId, title: seed.task.title, description: seed.task.description,
+    status: 'todo', risk: 'low', agentId: seed.agentIds[0],
+    skillsJson: '[]', dependsOnJson: '[]', budgetTokens: seed.task.budgetTokens, spentTokens: 0,
+    createdAt: new Date(), updatedAt: new Date(),
+  });
+  return taskId;
+}
+
+/** All events of one type for a mission (the usual assertion query). */
+export function eventsOfType(missionId: string, type: string) {
+  return getDb().select().from(events).where(and(eq(events.missionId, missionId), eq(events.type, type)));
 }

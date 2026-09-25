@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { getDb, budgets, events } from '@mas/db';
 import { selectForTick, runDispatchTick, type DispatchTickConfig } from './dispatch-tick';
 import { seedDispatchableMission as seedMission } from './fixtures';
-import { useTestDb } from './testing';
+import { useDispatchHarness } from './testing';
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../db/migrations');
 
@@ -53,13 +53,10 @@ describe('selectForTick — pure selection', () => {
 });
 
 describe('runDispatchTick — integration (mock LLM)', () => {
-  useTestDb(MIGRATIONS_FOLDER);
-  beforeEach(() => {
-    process.env.MAS_MOCK_LLM = '1';
-  });
-  afterEach(() => {
-    delete process.env.MAS_MOCK_LLM;
-  });
+  // MAS_MOCK_LLM=1 short-circuits selectLLM to the deterministic mockLLM; the
+  // harness also pins the routing config to a missing file, so no plan override
+  // applies and a month cap can only come from the budgets row.
+  useDispatchHarness(MIGRATIONS_FOLDER, { mockLlm: true });
 
   it('advances one mission per project across two projects', async () => {
     await seedMission('m1', 'p1');
@@ -81,7 +78,6 @@ describe('runDispatchTick — integration (mock LLM)', () => {
 
   it('halts every mission and emits budget_exceeded when the month cap is reached', async () => {
     // No plan override (config absent) → cap comes from the month budgets row.
-    process.env.MAS_ROUTING_CONFIG = '/nonexistent/model-routing.json';
     const db = getDb();
     await db.insert(budgets).values({
       id: 'b_month', scope: 'global', period: 'month', tokensCap: 1000,
@@ -100,7 +96,5 @@ describe('runDispatchTick — integration (mock LLM)', () => {
     const emitted = await db.select().from(events).where(eq(events.type, 'budget_exceeded'));
     expect(emitted).toHaveLength(1);
     expect(JSON.parse(emitted[0]!.payloadJson ?? '{}').window).toBe('month');
-
-    delete process.env.MAS_ROUTING_CONFIG;
   });
 });

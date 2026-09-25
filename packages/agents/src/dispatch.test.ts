@@ -1,43 +1,19 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { seedMission, TIER_A_ROSTER, useDispatchHarness } from './testing';
 
+// Shared Tier-B mock (testing.ts): critics get a parseable verdict, the producer
+// returns the executed-task text. Dynamic import — the factory is hoisted.
 vi.mock('@mas/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@mas/core')>();
-  return {
-    ...actual,
-    // A critic call (reviewKind set) gets a deterministic, parseable verdict so
-    // CI stays live-model-free; the producer call returns the executed-task text.
-    claudeCodeLLM: vi.fn(() => ({
-      call: vi.fn(async (req: import('@mas/core').LLMRequest) => ({
-        text: req.reviewKind
-          ? actual.mockVerdictText(req.reviewKind, req.user)
-          : '[test-mock] task executed',
-        inputTokens: 220,
-        outputTokens: 80,
-        cacheReadTokens: 60,
-        cacheCreationTokens: 20,
-        quotaUnits: 0,
-        model: 'claude-haiku-4-5',
-        sessionId: 'test-session-id',
-      })),
-    })),
-  };
+  const { mockTierBCore } = await import('./testing');
+  return mockTierBCore(actual, () => '[test-mock] task executed');
 });
-import { unlinkSync, mkdirSync } from 'node:fs';
+
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { eq, and } from 'drizzle-orm';
-import {
-  getDb,
-  closeDb,
-  projects,
-  agents,
-  missions,
-  tasks,
-  events,
-} from '@mas/db';
+import { getDb, projects, agents, missions, tasks, events } from '@mas/db';
 import {
   planMission,
   runMission,
@@ -49,17 +25,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../db/migrations');
 
 const PROJECT_ID = 'test-proj';
-const AGENT_IDS = [
-  'mission-planner',
-  'orchestrator',
-  'skill-router',
-  'design-ux-architect',
-  'engineering-frontend-developer',
-  'quality-controller',
-  'sec-reviewer',
-  'reviewer',
-  'agent-evaluator',
-];
 
 async function seedMinimal(missionId: string) {
   const db = getDb();
@@ -72,7 +37,7 @@ async function seedMinimal(missionId: string) {
     createdAt: new Date(),
     lastActiveAt: new Date(),
   });
-  for (const id of AGENT_IDS) {
+  for (const id of TIER_A_ROSTER) {
     await db.insert(agents).values({
       id,
       tier: 'A',
@@ -85,44 +50,14 @@ async function seedMinimal(missionId: string) {
       successRate: 1,
     });
   }
-  await db.insert(missions).values({
-    id: missionId,
-    projectId: PROJECT_ID,
-    title: 'Test mission',
-    objective: 'Test objective',
-    status: 'draft',
-    risk: 'low',
-    budgetTokens: 20000,
-    spentTokens: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
+  await seedMission(missionId, PROJECT_ID, { title: 'Test mission', objective: 'Test objective' });
 }
 
-let dbPath: string;
-
-beforeEach(async () => {
-  // This suite drives the claudeCodeLLM branch via vi.mock('@mas/core'); a
-  // globally exported MAS_MOCK_LLM=1 would flip selectLLM to mockLLM and skew
-  // the token-accounting fixtures (260 vs 300).
-  delete process.env.MAS_MOCK_LLM;
-  // Pin the router off: a developer's local .env.local (e.g. GEMINI_API_KEY)
-  // must not flip selectLLM to the router branch and skew these fixtures.
-  process.env.MAS_ROUTING_CONFIG = '/nonexistent/model-routing.json';
-  const dir = join(tmpdir(), 'mas-test');
-  mkdirSync(dir, { recursive: true });
-  dbPath = join(dir, `${randomUUID()}.db`);
-  process.env.MAS_DB_PATH = dbPath;
-  const db = getDb();
-  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
-});
-
-afterEach(() => {
-  closeDb();
-  try { unlinkSync(dbPath); } catch { /* ignore */ }
-  delete process.env.MAS_DB_PATH;
-  delete process.env.MAS_ROUTING_CONFIG;
-});
+// This suite drives the claudeCodeLLM branch via vi.mock('@mas/core'): the
+// harness clears MAS_MOCK_LLM (a globally exported =1 would flip selectLLM to
+// mockLLM and skew the token-accounting fixtures, 260 vs 300) and pins the
+// router off (a developer's .env.local must not flip selectLLM to the router).
+const h = useDispatchHarness(MIGRATIONS_FOLDER);
 
 // Drives a mission through all low/medium tasks up to (but not including) the
 // first high-risk task. Returns the mission id used.
@@ -333,8 +268,8 @@ describe('dispatch — smoke DB isolation', () => {
     const db = getDb();
     const rows = await db.select().from(missions).where(eq(missions.id, MID));
     expect(rows).toHaveLength(1);
-    // The DB file must be the temp path set in beforeEach, not the default data/mas.db.
-    expect(dbPath).toContain(tmpdir());
-    expect(dbPath).not.toContain('data/mas.db');
+    // The DB file must be the temp path set by the harness, not the default data/mas.db.
+    expect(h.dbPath).toContain(tmpdir());
+    expect(h.dbPath).not.toContain('data/mas.db');
   });
 });
