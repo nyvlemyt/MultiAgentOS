@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAOS — où en est-on (page vivante)</title>
+<style>
+  body { margin: 0; padding: 32px 20px 64px; background: #FAF9F6; color: #26242E; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.55; }
+  main { max-width: 1040px; margin: 0 auto; }
+  h1 { font-size: 2.3rem; font-weight: 800; margin: 0 0 8px; }
+  h2 { font-size: 1.35rem; font-weight: 700; margin: 40px 0 12px; color: #26242E; }
+  h3 { font-size: 1.05rem; font-weight: 700; margin: 20px 0 8px; }
+  .these { font-size: 1.2rem; margin: 0 0 20px; }
+  .eyebrow { color: #55527E; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; }
+  nav a { margin-right: 14px; color: #55527E; }
+  .kpis { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0 8px; }
+  .kpi { flex: 1 1 180px; background: #141B23; color: #DCE4EC; border-radius: 12px; padding: 14px 16px; }
+  .kpi b { display: block; font-size: 1.8rem; color: #E8B34B; }
+  .card { background: #fff; border: 1px solid #E6E3DC; border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .chip { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 0.8rem; font-weight: 700; }
+  .ok { background: #E3F1E8; color: #2F7D4F; } .warn { background: #F6EBD6; color: #A96F14; } .todo { background: #EEEDF3; color: #55527E; } .hot { background: #F8E3E8; color: #C8405F; }
+  .row { border-left: 4px solid #E6E3DC; padding: 6px 12px; margin: 8px 0; }
+  .row.ok { border-color: #2F7D4F; background: transparent; color: inherit; } .row.warn { border-color: #A96F14; background: transparent; color: inherit; } .row.todo { border-color: #55527E; background: transparent; color: inherit; } .row.hot { border-color: #C8405F; background: transparent; color: inherit; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .node { background: #141B23; color: #DCE4EC; border-radius: 10px; padding: 8px 12px; font-size: 0.9rem; }
+  .arrow { color: #8A8794; }
+  ol.steps { padding-left: 0; list-style: none; counter-reset: s; }
+  ol.steps li { counter-increment: s; margin: 8px 0; padding-left: 36px; position: relative; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: #55527E; color: #fff; text-align: center; font-weight: 700; line-height: 26px; }
+  .muted { color: #8A8794; font-size: 0.85rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #E6E3DC; vertical-align: top; }
+  footer { margin-top: 48px; color: #8A8794; font-size: 0.85rem; }
+  code { background: #EEEDF3; padding: 1px 5px; border-radius: 4px; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">MultiAgentOS · page d'état vivante · dernière mise à jour 2026-09-25</p>
+  <h1>Où en est MAOS</h1>
+  <p class="these">Le socle est construit et gardé : phases 0 à 7 livrées, portique de sécurité armé, mémoire qui ingère et promeut. Ce qui manque, c'est la <strong>surface</strong> (conversation, éditeur, graphe) — et c'est précisément ta vision du 25/09.</p>
+  <nav><a href="#etat">État</a><a href="#marche">Ce qui marche</a><a href="#reste">Ce qui reste</a><a href="#vision">Vision 25/09</a><a href="#valider">À valider par toi</a><a href="#reprise">Règles de reprise</a></nav>
+
+  <div class="kpis">
+    <div class="kpi"><span>Phases ROADMAP livrées</span><b>7 / 9</b><span class="muted">8 à moitié · 9 en cours</span></div>
+    <div class="kpi"><span>Tests au vert</span><b>1 225</b><span class="muted">6 contrôles bloquants</span></div>
+    <div class="kpi"><span>Tronc</span><b>1</b><span class="muted">main, depuis #79 (13/09)</span></div>
+    <div class="kpi"><span>PR ouverte</span><b>#82</b><span class="muted">garde chemin §5 · 6/6 verts · à merger</span></div>
+  </div>
+
+  <h2 id="etat">L'état, en une image</h2>
+  <div class="card">
+    <p class="muted">L'usine (socle) est là ; la vitrine (surface) est à faire.</p>
+    <div class="flow">
+      <span class="node">Mission → tâches → agents ✅</span><span class="arrow">→</span>
+      <span class="node">Portique §5 (catégories · chemin · hôte) ✅</span><span class="arrow">→</span>
+      <span class="node">Mémoire : capture → distille → promeut ✅</span><span class="arrow">→</span>
+      <span class="node">Surface : chat · éditeur · graphe ⬜</span>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>Phases</h3>
+      <div class="row ok">0 · Fondations + vision visuelle <span class="chip ok">livrée</span></div>
+      <div class="row ok">1 · Cycle de mission <span class="chip ok">livrée</span></div>
+      <div class="row ok">2 · Pont Claude Code (Agent SDK) <span class="chip ok">livrée</span></div>
+      <div class="row ok">3 · Registre de skills <span class="chip ok">livrée</span></div>
+      <div class="row ok">3.5 · Routeur multi-modèles <span class="chip ok">livrée</span></div>
+      <div class="row ok">4 / 4.5 · Mémoire + intake + idées/décisions <span class="chip ok">livrées</span></div>
+      <div class="row ok">5 · 6 · 7 · Tier B, autonomie, modèles de projet <span class="chip ok">livrées</span></div>
+      <div class="row warn">8 · Multi-mission ✅ / packaging Tauri ⬜ <span class="chip warn">moitié</span></div>
+      <div class="row warn">9 · Exploitation &amp; auto-construction <span class="chip warn">en cours</span></div>
+    </div>
+    <div class="card"><h3>Chantiers récents</h3>
+      <div class="row ok">Fusion des deux troncs (#79) — un seul <code>main</code> <span class="chip ok">13/09</span></div>
+      <div class="row ok">Catégories §5 déclarées + verrouillées (#81) <span class="chip ok">13/09</span></div>
+      <div class="row warn">Garde chemin §5 + <code>dispatch.ts</code> 821→690 (#82) <span class="chip warn">draft, 6/6, à merger</span></div>
+      <div class="row ok">Ménage : 25 branches mortes + 8 distantes, 46 tags d'archive <span class="chip ok">15/09</span></div>
+      <div class="row warn">2 tâches en cours dans des sessions à part : lint tsc des 4 packages · 3 dernières copies du harnais de test <span class="chip warn">en cours</span></div>
+    </div>
+  </div>
+
+  <h2 id="marche">Ce qui marche vraiment</h2>
+  <div class="grid">
+    <div class="card"><h3>Le portique</h3><p>Trois contrôles réels : catégories d'actions (texte de la tâche), chemin (le diff est ouvert, symlinks résolus), hôte réseau (net-guard). Une évasion → tâche <code>blocking</code>, pause humaine, zéro appel LLM gaspillé.</p></div>
+    <div class="card"><h3>La mémoire</h3><p>Convoyeur (URL, YouTube, docx, pptx) → fiches distillées → juge Opus → registres. 391 fiches, 12/12 au golden set. Elle peut <em>manger tes vidéos</em> dès maintenant.</p></div>
+    <div class="card"><h3>La qualité</h3><p>Six contrôles bloquants dont couverture (≥ 92 % lignes) et Sonar strict (0 issue, 0 hotspot). Un fichier ne peut plus dépasser 800 lignes.</p></div>
+  </div>
+
+  <h2 id="reste">Ce qui reste (et ce que ça pèse)</h2>
+  <table>
+    <tr><th>Sujet</th><th>État</th><th>Taille</th><th>Où c'est écrit</th></tr>
+    <tr><td>Chat live branché sur le vrai pipeline</td><td><span class="chip todo">à faire</span></td><td>L</td><td>BACKLOG P2-8</td></tr>
+    <tr><td>Graphe / visualisation de la mémoire</td><td><span class="chip todo">à faire</span></td><td>L</td><td>ADR 0010 (Proposed)</td></tr>
+    <tr><td>Éditeur + terminal (coder comme VS Code)</td><td><span class="chip todo">nouveau</span></td><td>XL</td><td>VISION §3.2</td></tr>
+    <tr><td>Ton MCP intégré</td><td><span class="chip todo">à recevoir</span></td><td>M</td><td>VISION §5</td></tr>
+    <tr><td>Configs centralisées, minimum par projet</td><td><span class="chip todo">nouveau</span></td><td>M</td><td>VISION §3.4</td></tr>
+    <tr><td>Écritures directes du moteur (hook outil §5)</td><td><span class="chip warn">reste de §5</span></td><td>M</td><td>perms-category-matcher-brittleness.md</td></tr>
+    <tr><td>Rapports C3…C13 (Phase 9)</td><td><span class="chip todo">à faire</span></td><td>M×7</td><td>BACKLOG P2-1…7</td></tr>
+    <tr><td>Design premium</td><td><span class="chip todo">pas prioritaire</span></td><td>L</td><td>règle de travail n°5</td></tr>
+  </table>
+
+  <h2 id="vision">La vision du 25/09, en dix thèmes</h2>
+  <div class="card">
+    <p>Le détail, les changements vis-à-vis d'avant et les questions d'interview sont dans <code>docs/VISION.md</code>.</p>
+    <div class="row warn">1 · Agents + conversation multi-LLM, LLM local <span class="chip warn">partiel</span></div>
+    <div class="row todo">2 · Coder comme VS Code dans MAOS <span class="chip todo">nouveau</span></div>
+    <div class="row warn">3 · Mémoire cerveau, visualisable en graphe <span class="chip warn">partiel</span></div>
+    <div class="row todo">4 · Configs centralisées, minimum par projet <span class="chip todo">nouveau</span></div>
+    <div class="row warn">5 · Connecteurs et MCP (le tien, Jarvis, finance) <span class="chip warn">partiel</span></div>
+    <div class="row warn">6 · Gouvernance §5 → proxy de règles entreprise <span class="chip warn">partiel</span></div>
+    <div class="row warn">7 · Suivi de l'avancée (cette page · Notion ?) <span class="chip warn">partiel</span></div>
+    <div class="row todo">8 · Design premium <span class="chip todo">à décider</span></div>
+    <div class="row todo">9 · L'IA pilote l'interface, présentations <span class="chip todo">nouveau</span></div>
+    <div class="row todo">10 · Tranche vendable entreprise <span class="chip todo">nouveau</span></div>
+  </div>
+
+  <h2 id="valider">À valider par toi</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><strong>Merger #82</strong> (garde chemin §5, six contrôles verts, draft depuis dix jours) — oui / non ?</li>
+      <li><strong>Retirer l'exception <code>dispatch.ts</code></strong> des deux scripts de garde, maintenant qu'il est sous 800 lignes — oui / non ?</li>
+      <li><strong>Suivi</strong> : cette page vivante suffit-elle, ou tu veux un miroir Notion (nécessite un connecteur MCP) ?</li>
+      <li><strong>Réécrire le non-goal « pas un chat UI »</strong> de PRODUCT_SPEC en « pas seulement un chat » — oui / non ?</li>
+      <li><strong>Première session d'interview</strong> : les 12 questions de VISION §6 — quand ?</li>
+    </ol>
+  </div>
+
+  <h2 id="reprise">Règles de reprise</h2>
+  <div class="card">
+    <div class="row ok">Une session = un projet ; une branche = un sujet, <strong>toujours depuis <code>main</code></strong> (<code>git switch -c X --no-track origin/main</code>).</div>
+    <div class="row ok">PR en draft, six contrôles verts, Sonar strict ; merge = Melvyn. Pousser avant de fermer.</div>
+    <div class="row ok">Cette page se met à jour à chaque jalon — jamais une nouvelle page par étape.</div>
+    <div class="row ok">Pour me transmettre vidéos, docs, MCP : <code>docs/resources/inbox/</code> + <code>mas capture</code> (VISION §5).</div>
+  </div>
+
+  <footer>Sources : <code>docs/VISION.md</code> · <code>docs/BACKLOG.md</code> · <code>ROADMAP.md</code> · PR #79 #81 #82 · mémoire de session. Page précédente : <code>etat-maos-2026-08-25.html</code> (archivée).</footer>
+</main>
+</body>
+</html>
