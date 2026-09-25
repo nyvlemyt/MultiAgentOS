@@ -1,5 +1,7 @@
 # Backlog MAOS — plan de travail priorisé
 
+> **État au 2026-09-25.** Le P0 d'août est **entièrement fait** (brique-1 fusionnée dans `main` par #79, #69 mergée, worktrees triés, dette docs commitée). Le P1 a livré P1-3/4/6/13/14 ; P2-9 (split `dispatch.ts`) et P2-10 (couverture 6ᵉ check) sont faits (#82, #74). La vision reguidée vit dans `docs/VISION.md` ; l'état visuel dans `docs/resources/dashboards/etat-maos.html` (page vivante). Le prochain plan priorisé se construit **après** la première session d'interview (VISION §6).
+
 > Généré par l'audit d'orchestration du 2026-08-25 (Phase 2). Ce fichier est la **source de
 > vérité des priorités** ; le détail de chaque carte vit dans `docs/backlog/<fiche>.md`.
 > Règle de priorité (mandat) : **(1)** finaliser l'inachevé des dernières sessions,
