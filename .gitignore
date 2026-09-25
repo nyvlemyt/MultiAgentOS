@@ -1,3 +1,7 @@
+# --- Python ---
+__pycache__/
+*.pyc
+
 # --- Node / TS ---
 node_modules/
 .pnpm-store/

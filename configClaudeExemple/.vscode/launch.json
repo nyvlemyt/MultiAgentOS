@@ -1,0 +1,18 @@
+{
+    // Config reprise du poste de Tania (EVE_old), inchangée :
+    // F5 lance le serveur Django avec le débogueur attaché.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Django",
+            "type": "debugpy",
+            "request": "launch",
+            "args": [
+                "runserver"
+            ],
+            "django": true,
+            "autoStartBrowser": false,
+            "program": "${workspaceFolder}\\manage.py"
+        }
+    ]
+}

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schéma de la base EVE</title>
+<style>
+  :root {
+    --ink:   #0b0b0b;
+    --paper: #f7f2e7;
+    --jump:    #2563eb;
+    --iss:     #0d9488;
+    --idl:     #7c3aed;
+    --snp:     #dc2626;
+    --trucost: #16a34a;
+    --cdc:     #65a30d;
+    --msci:    #d97706;
+    --sust:    #db2777;
+    --bdfg:    #0f172a;
+    --hub:     #facc15;
+    --quality: #94a3b8;
+    --serif: Bahnschrift, "Segoe UI Semibold", "Segoe UI", sans-serif;
+    --sans:  "Segoe UI", Calibri, system-ui, sans-serif;
+    --mono:  Consolas, "Cascadia Code", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background-color: var(--paper);
+    background-image: radial-gradient(circle, rgba(11,11,11,0.14) 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: var(--sans);
+    padding: 40px 20px 70px;
+  }
+
+  .wrap { max-width: 1620px; margin: 0 auto; }
+
+  .masthead {
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 7px 7px 0 var(--ink);
+    padding: 22px 28px;
+    margin-bottom: 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 32px;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .masthead p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    max-width: 76ch;
+    margin: 0;
+  }
+  .masthead p b { background: var(--hub); padding: 0 4px; border: 2px solid var(--ink); }
+  .draft-tag {
+    font-family: var(--serif);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--ink);
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  .stage {
+    position: relative;
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 9px 9px 0 var(--ink);
+    overflow: auto;
+    margin-bottom: 28px;
+  }
+  .canvas {
+    position: relative;
+    width: 1560px;
+    height: 1440px;
+  }
+
+  .box {
+    position: absolute;
+    border: 3px solid var(--ink);
+    background: #fff;
+    box-shadow: 5px 5px 0 var(--ink);
+    overflow: hidden;
+  }
+  .box .head {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    border-bottom: 3px solid var(--ink);
+    padding: 9px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .box .head .db { font-family: var(--mono); font-size: 10.5px; font-weight: 400; opacity: 0.9; }
+  .box .body { padding: 0; }
+  .box .t-row {
+    padding: 8px 14px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .box .t-row:last-child { border-bottom: none; }
+  .box .t-row .name { font-weight: 700; font-size: 12.5px; }
+  .box .t-row .db { display: block; font-family: var(--mono); font-size: 10px; color: #444; }
+  .box .t-row .keys { font-family: var(--mono); font-size: 10px; color: #444; text-align: right; white-space: nowrap; }
+
+  .hub-box { background: var(--hub); }
+  .hub-box .head { color: var(--ink); border-bottom-color: var(--ink); font-size: 20px; }
+  .hub-box .desc { padding: 10px 14px; font-size: 12px; line-height: 1.5; }
+  .hub-box .desc code { font-family: var(--mono); background: #fff; border: 1px solid var(--ink); padding: 0 3px; }
+
+  .quality-box {
+    border-style: dashed;
+    box-shadow: none;
+    background: #f1f0ec;
+    color: #444;
+  }
+  .quality-box .head { background: var(--quality); border-bottom-style: dashed; color: #1f1f1f; }
+  .quality-box .desc { padding: 10px 14px; font-size: 12px; line-height: 1.55; }
+
+  svg.wires { position: absolute; top: 0; left: 0; overflow: visible; }
+  .wire { fill: none; stroke: var(--ink); stroke-width: 3; stroke-dasharray: 9 6; }
+  .stem { fill: none; stroke: var(--ink); stroke-width: 3; }
+
+  .legend {
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    padding: 16px 22px;
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+  .legend b { font-family: var(--serif); }
+  .legend code { font-family: var(--mono); background: #f1f0ec; border: 1px solid var(--ink); padding: 0 4px; }
+  .legend .swatch { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--ink); vertical-align: -1px; margin-right: 3px; }
+
+  .scope {
+    background: #fff;
+    border: 3px solid var(--ink);
+    padding: 16px 22px;
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+  .scope ul { margin: 0; padding-left: 18px; }
+  .scope code { font-family: var(--mono); background: #f1f0ec; border: 1px solid var(--ink); padding: 0 4px; }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 56px 0 34px;
+  }
+  .part-divider .line { flex: 1; height: 4px; background: var(--ink); }
+  .part-divider .lbl {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 14px;
+    background: var(--ink);
+    color: #fff;
+    padding: 6px 16px;
+    white-space: nowrap;
+  }
+
+  .gate {
+    background: var(--ink);
+    color: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 7px 7px 0 var(--quality);
+    padding: 14px 22px;
+    margin-bottom: 30px;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .gate b { font-family: var(--serif); font-size: 15px; }
+  .gate code { font-family: var(--mono); background: #fff; color: var(--ink); padding: 0 4px; }
+
+  .stack { max-width: 900px; margin: 0 auto 20px; }
+  .stg {
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    margin-bottom: 6px;
+  }
+  .stg .head {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    padding: 10px 16px;
+    border-bottom: 3px solid var(--ink);
+  }
+  .stg .head .verb { background: rgba(255,255,255,0.25); padding: 1px 7px; margin-right: 8px; }
+  .stg ol { margin: 0; padding: 12px 16px 12px 34px; font-size: 12.5px; line-height: 1.65; }
+  .stg ol li { margin-bottom: 5px; }
+  .stg .cap { padding: 0 16px 12px; font-size: 12px; font-style: italic; color: #444; }
+  .stg code { font-family: var(--mono); background: #f1f0ec; border: 1px solid var(--ink); padding: 0 4px; }
+
+  .arrow-down { text-align: center; font-size: 26px; line-height: 1; margin: 2px 0 10px; font-weight: 700; }
+
+  .on-demand-hdr {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 18px;
+    text-align: center;
+    margin: 40px 0 22px;
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto 24px;
+  }
+  @media (max-width: 820px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .bonus {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--quality);
+    border: 3px dashed var(--ink);
+    padding: 12px 18px;
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .bonus code { font-family: var(--mono); background: #fff; border: 1px solid var(--ink); padding: 0 4px; }
+
+  .cover {
+    background: var(--bdfg);
+    color: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 9px 9px 0 var(--hub);
+    padding: 30px 34px;
+    margin-bottom: 40px;
+  }
+  .cover .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    color: var(--hub);
+    margin-bottom: 6px;
+  }
+  .cover h1 {
+    font-size: 30px;
+    margin: 0 0 14px;
+  }
+  .cover p {
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 88ch;
+    margin: 0 0 16px;
+    color: #f1f0ec;
+  }
+  .cover p:last-child { margin-bottom: 0; }
+  .cover b { color: #fff; background: rgba(250,204,21,0.25); padding: 0 3px; }
+  .cover .nums {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 2px solid rgba(255,255,255,0.25);
+  }
+  .cover .nums .num { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--hub); }
+  .cover .nums .lbl { font-size: 11.5px; color: #d8d6cd; max-width: 15ch; line-height: 1.35; }
+
+  .fields-section { margin-bottom: 40px; }
+  .barlist {
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    padding: 18px 22px;
+  }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 210px 1fr 46px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+    font-size: 11.5px;
+  }
+  .bar-row .lbl { font-family: var(--mono); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-row .track { background: #f1f0ec; border: 1px solid var(--ink); height: 15px; position: relative; }
+  .bar-row .fill { position: absolute; top: 0; left: 0; bottom: 0; }
+  .bar-row .val { font-weight: 700; }
+
+  .fact-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 18px;
+  }
+  @media (max-width: 900px) { .fact-grid { grid-template-columns: 1fr 1fr; } }
+  .fact {
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 12px 14px;
+  }
+  .fact .n { font-family: var(--serif); font-size: 24px; font-weight: 700; }
+  .fact .l { font-size: 11px; color: #444; line-height: 1.4; margin-top: 2px; }
+
+  .asides { margin-top: 18px; }
+  .aside {
+    background: #fff;
+    border: 3px solid var(--ink);
+    padding: 10px 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .aside b { font-family: var(--serif); }
+  .aside code { font-family: var(--mono); background: #f1f0ec; border: 1px solid var(--ink); padding: 0 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="cover">
+    <div class="kicker">BDF GESTION / EVE</div>
+    <h1>Le socle de données ESG et financières de BDF Gestion</h1>
+    <p>EVE reçoit les fichiers de <b>8 fournisseurs de données extra-financières</b> (JUMP, ISS, IDL, S&amp;P,
+    Trucost, CDC Biodiversité, MSCI, Sustainalytics), les vérifie, et les range de façon organisée et
+    historisée, sans jamais rien écraser. <b>EVE calcule aussi certaines données propriétaires de BDF
+    Gestion</b> (notes ESG, controverses) ; les indicateurs financiers, eux, restent calculés en aval par
+    DEMAIN. JUMP et l'Infocentre, les deux sources historiques, doivent être décommissionnés début 2027.</p>
+    <div class="nums">
+      <div><div class="num">24</div><div class="lbl">tables en base</div></div>
+      <div><div class="num">21</div><div class="lbl">flux actifs, un par fournisseur et par type de donnée</div></div>
+      <div><div class="num">623</div><div class="lbl">champs rien que sur les 18 schémas émetteurs</div></div>
+      <div><div class="num">42%</div><div class="lbl">de ces champs alimentent DEMAIN directement</div></div>
+      <div><div class="num">2027</div><div class="lbl">décommissionnement prévu de JUMP et de l'Infocentre</div></div>
+    </div>
+  </div>
+
+  <div class="masthead">
+    <div>
+      <h1>Schéma de la base EVE : les tables de données</h1>
+      <p>21 flux fournisseurs organisés autour de deux référentiels pivots, <b>Issuer</b> et <b>Asset</b>.
+      Le lien entre les deux n'est jamais une contrainte de base : il est <b>calculé</b>, sur isin, lei ou
+      code_issuer_jump, d'où le trait en pointillé plutôt qu'un trait plein.</p>
+    </div>
+    <span class="draft-tag">PARTIE 1 / 2</span>
+  </div>
+
+  <div class="legend">
+    <b>Comment lire ce schéma.</b>
+    <span class="swatch" style="background:var(--hub)"></span> jaune = les deux référentiels pivots, versionnés par date de construction &nbsp;
+    <span class="swatch" style="background:var(--quality)"></span> gris pointillé = table isolée, sans lien, pas encore alimentée &nbsp;
+    chaque bloc coloré = un fournisseur, une table par ligne (son nom technique, son nom en base en <code>police mono</code>, sa clé de rapprochement à droite).
+    Le trait noir pointillé relie chaque groupe au référentiel : c'est un rapprochement <b>calculé</b> par le code
+    à la construction du référentiel ou à l'export, aucune règle automatique de la base ne l'impose.
+  </div>
+
+  <div class="stage">
+    <div class="canvas">
+
+      <svg class="wires" width="1560" height="1440">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="8" orient="auto">
+            <path d="M0,0 L5,9 L10,0 Z" fill="#0b0b0b"/>
+          </marker>
+        </defs>
+
+        <!-- rail + stems (solid: internal wiring of the pivot itself) -->
+        <path class="stem" d="M20,250 L950,250" />
+        <path class="stem" d="M610,250 L610,205" marker-end="url(#arrow)" />
+        <path class="stem" d="M950,250 L950,205" marker-end="url(#arrow)" />
+        <path class="stem" d="M20,250 L20,1095" />
+
+        <!-- computed matches: one dashed connector per provider group -->
+        <path class="wire" d="M235,290 L235,270 L20,270" />
+        <path class="wire" d="M605,290 L605,270 L20,270" />
+        <path class="wire" d="M975,290 L975,270 L20,270" />
+        <path class="wire" d="M1345,290 L1345,270 L20,270" />
+        <path class="wire" d="M420,470 L420,455 L20,455" />
+        <path class="wire" d="M1160,470 L1160,455 L20,455" />
+        <path class="wire" d="M420,720 L420,705 L20,705" />
+        <path class="wire" d="M1160,720 L1160,705 L20,705" />
+        <path class="wire" d="M790,1110 L790,1095 L20,1095" />
+      </svg>
+
+      <!-- pivot: Issuer -->
+      <div class="box hub-box" style="left:470px; top:30px; width:280px; height:170px;">
+        <div class="head">Issuer<span class="db">issuer_referential</span></div>
+        <div class="desc">Identité pivot des émetteurs. <code>code_issuer</code>, <code>lei</code>,
+        <code>code_issuer_jump</code>, parents ESG/capital. Une version par date de construction, jamais écrasée.</div>
+      </div>
+
+      <!-- pivot: Asset -->
+      <div class="box hub-box" style="left:810px; top:30px; width:280px; height:170px;">
+        <div class="head">Asset<span class="db">asset_referential</span></div>
+        <div class="desc">Identité pivot des actifs. <code>code_asset</code>, <code>isin</code>,
+        <code>code_issuer</code>, type d'actif. Même principe de versionnement que Issuer.</div>
+      </div>
+
+      <!-- isolated: quality -->
+      <div class="box quality-box" style="left:1170px; top:30px; width:350px; height:170px;">
+        <div class="head">Qualité (isolée)</div>
+        <div class="desc"><b>QualityCheckResult</b><br>Modèle défini, <b>pas encore alimenté</b>. Aucun lien
+        avec les référentiels ni les tables de flux : pas de trait sur ce schéma, volontairement.</div>
+      </div>
+
+      <!-- row 1 : single-table providers -->
+      <div class="box" style="left:60px; top:290px; width:350px; height:150px;">
+        <div class="head" style="background:var(--idl)">IDL<span class="db">idl_issuer_data</span></div>
+        <div class="body">
+          <div class="t-row"><span class="name">IDLIssuerData<span class="db">idl_issuer_data</span></span><span class="keys">isin, lei</span></div>
+        </div>
+      </div>
+
+      <div class="box" style="left:430px; top:290px; width:350px; height:150px;">
+        <div class="head" style="background:var(--snp)">S&amp;P (SNP)<span class="db">snp_issuer_data</span></div>
+        <div class="body">
+          <div class="t-row"><span class="name">SNPIssuerData<span class="db">snp_issuer_data</span></span><span class="keys">isin</span></div>
+        </div>
+      </div>
+
+      <div class="box" style="left:800px; top:290px; width:350px; height:150px;">
+        <div class="head" style="background:var(--cdc)">CDC Biodiversité<span class="db">cdc_biodiversite_...</span></div>
+        <div class="body">
+          <div class="t-row"><span class="name">CDCBiodiversiteQualitativeIssuerData<span class="db">cdc_biodiversite_qualitative_issuer_data</span></span><span class="keys">isin</span></div>
+        </div>
+      </div>
+
+      <div class="box" style="left:1170px; top:290px; width:350px; height:150px;">
+        <div class="head" style="background:var(--sust)">Sustainalytics<span class="db">sustainalytics_...</span></div>
+        <div class="body">
+          <div class="t-row"><span class="name">SustainalyticsEquityControversyIssuerData<span class="db">sustainalytics_equity_controversy_issuer_data</span></span><span class="keys">isin</span></div>
+        </div>
+      </div>
+
+      <!-- row 2 : two-table providers -->
+      <div class="box" style="left:60px; top:470px; width:720px; height:220px;">
+        <div class="head" style="background:var(--jump)">JUMP (PMS, source historique)</div>
+        <div class="body">
+          <div class="t-row"><span class="name">JumpIssuerData<span class="db">jump_issuer_data</span></span><span class="keys">code_issuer_jump, lei</span></div>
+          <div class="t-row"><span class="name">JumpAssetData<span class="db">jump_asset_data</span></span><span class="keys">isin_jump, code_issuer_jump</span></div>
+        </div>
+      </div>
+
+      <div class="box" style="left:800px; top:470px; width:720px; height:220px;">
+        <div class="head" style="background:var(--msci)">MSCI</div>
+        <div class="body">
+          <div class="t-row"><span class="name">MSCIEquityEsgIssuerData<span class="db">msci_equity_esg_issuer_data</span></span><span class="keys">issuer_isin, issuer_lei</span></div>
+          <div class="t-row"><span class="name">MSCIControversyEsgIssuerData<span class="db">msci_controversy_esg_asset_data</span></span><span class="keys">issuer_isin</span></div>
+        </div>
+      </div>
+
+      <!-- row 3 : four-table providers -->
+      <div class="box" style="left:60px; top:720px; width:720px; height:360px;">
+        <div class="head" style="background:var(--iss)">ISS</div>
+        <div class="body">
+          <div class="t-row"><span class="name">ISSAssetData<span class="db">iss_asset_data</span></span><span class="keys">isin, lei</span></div>
+          <div class="t-row"><span class="name">ISSEquityEsgIssuerData<span class="db">iss_equity_esg_issuer_data</span></span><span class="keys">isin</span></div>
+          <div class="t-row"><span class="name">ISSControversyEsgIssuerData<span class="db">iss_controversy_esg_issuer_data</span></span><span class="keys">isin</span></div>
+          <div class="t-row"><span class="name">ISSBondEsgIssuerData<span class="db">iss_bond_esg_issuer_data</span></span><span class="keys">isin, issuer_lei</span></div>
+        </div>
+      </div>
+
+      <div class="box" style="left:800px; top:720px; width:720px; height:360px;">
+        <div class="head" style="background:var(--trucost)">Trucost</div>
+        <div class="body">
+          <div class="t-row"><span class="name">TrucostTaxonomyIssuerData<span class="db">trucost_taxonomy_issuer_data</span></span><span class="keys">isin</span></div>
+          <div class="t-row"><span class="name">TrucostCoalIssuerData<span class="db">trucost_coal_issuer_data</span></span><span class="keys">isin</span></div>
+          <div class="t-row"><span class="name">TrucostFossilIssuerData<span class="db">trucost_fossil_issuer_data</span></span><span class="keys">isin</span></div>
+          <div class="t-row"><span class="name">TrucostParisAlignmentIssuerData<span class="db">trucost_paris_alignment_issuer_data</span></span><span class="keys">isin</span></div>
+        </div>
+      </div>
+
+      <!-- row 4 : BDFG, five tables, full width -->
+      <div class="box" style="left:60px; top:1110px; width:1460px; height:290px;">
+        <div class="head" style="background:var(--bdfg)">BDFG (propriété BDF Gestion)</div>
+        <div class="body">
+          <div class="t-row"><span class="name">BDFGIssuerData<span class="db">bdfg_issuer_data</span></span><span class="keys">code_issuer_jump, code_issuer_jump_parent</span></div>
+          <div class="t-row"><span class="name">BDFGBondTotalDebtIssuerData<span class="db">bdfg_bond_total_debt_issuer_data</span></span><span class="keys">isin</span></div>
+          <div class="t-row"><span class="name">BDFGProprietaryEsgIssuerData<span class="db">bdfg_proprietary_esg_issuer_data</span></span><span class="keys">isin</span></div>
+          <div class="t-row"><span class="name">BDFGEquityControversyIssuerData<span class="db">bdfg_equity_controversy_issuer_data</span></span><span class="keys">calculée depuis les controverses providers</span></div>
+          <div class="t-row"><span class="name">BDFGAssetData<span class="db">bdfg_asset_data</span></span><span class="keys">bdfg_isin_asset, code_issuer_jump</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="scope">
+    <b>Ce que ce schéma ne montre pas, et pourquoi.</b>
+    <ul>
+      <li>Les tables techniques Django (<code>auth_user</code>, <code>django_migrations</code>, <code>django_session</code>...)
+      et l'authentification (<code>users_permanenttoken</code>) existent dans EveDev mais ne portent aucune donnée ESG : hors sujet ici.</li>
+      <li>Le code de cette branche nomme la table Sustainalytics <code>sustainalytics_equity_controversy_issuer_data</code> (avec un s) ;
+      sur EveDev, elle s'appelle encore <code>sustainalytic_equity_controversy_issuer_data</code> (sans le s) : la migration de
+      renommage n'a probablement pas encore été jouée.</li>
+      <li>Le contenu du dossier <code>Vues</code> d'EveDev reste à confirmer : rien dans le code n'en parle,
+      ce sont probablement des vues SQL Server créées hors Django.</li>
+    </ul>
+  </div>
+
+  <div class="fields-section">
+    <h2 style="font-family:var(--serif); font-weight:700; font-size:21px; margin:44px 0 6px;">Ce que contiennent les 18 flux émetteurs : 623 champs, très inégalement répartis</h2>
+    <p style="font-size:13px; color:#444; max-width:80ch; margin:0 0 18px;">D'après l'export de
+    <code style="font-family:var(--mono); background:#f1f0ec; border:1px solid var(--ink); padding:0 4px;">GET /issuer_schemas_xlsx</code>
+    (18 onglets, un par schéma émetteur ; les schémas actifs et les référentiels n'ont pas cet export).</p>
+
+    <div class="barlist">
+      <div class="bar-row"><span class="lbl">trucost_paris_alignment</span><span class="track"><span class="fill" style="width:100%; background:var(--trucost)"></span></span><span class="val">165</span></div>
+      <div class="bar-row"><span class="lbl">iss_equity_esg</span><span class="track"><span class="fill" style="width:87%; background:var(--iss)"></span></span><span class="val">143</span></div>
+      <div class="bar-row"><span class="lbl">trucost_taxonomy</span><span class="track"><span class="fill" style="width:40%; background:var(--trucost)"></span></span><span class="val">66</span></div>
+      <div class="bar-row"><span class="lbl">iss_bond_esg</span><span class="track"><span class="fill" style="width:34%; background:var(--iss)"></span></span><span class="val">56</span></div>
+      <div class="bar-row"><span class="lbl">msci_equity_esg</span><span class="track"><span class="fill" style="width:21%; background:var(--msci)"></span></span><span class="val">35</span></div>
+      <div class="bar-row"><span class="lbl">iss_controversy_esg</span><span class="track"><span class="fill" style="width:21%; background:var(--iss)"></span></span><span class="val">34</span></div>
+      <div class="bar-row"><span class="lbl">msci_controversy_esg</span><span class="track"><span class="fill" style="width:15%; background:var(--msci)"></span></span><span class="val">25</span></div>
+      <div class="bar-row"><span class="lbl">trucost_fossil</span><span class="track"><span class="fill" style="width:13%; background:var(--trucost)"></span></span><span class="val">22</span></div>
+      <div class="bar-row"><span class="lbl">idl</span><span class="track"><span class="fill" style="width:9%; background:var(--idl)"></span></span><span class="val">15</span></div>
+      <div class="bar-row"><span class="lbl">bdfg_proprietary_esg</span><span class="track"><span class="fill" style="width:8%; background:var(--bdfg)"></span></span><span class="val">13</span></div>
+      <div class="bar-row"><span class="lbl">bdfg_equity_controversy</span><span class="track"><span class="fill" style="width:6%; background:var(--bdfg)"></span></span><span class="val">10</span></div>
+      <div class="bar-row"><span class="lbl">trucost_coal</span><span class="track"><span class="fill" style="width:5%; background:var(--trucost)"></span></span><span class="val">8</span></div>
+      <div class="bar-row"><span class="lbl">jump_issuer</span><span class="track"><span class="fill" style="width:4%; background:var(--jump)"></span></span><span class="val">7</span></div>
+      <div class="bar-row"><span class="lbl">snp</span><span class="track"><span class="fill" style="width:4%; background:var(--snp)"></span></span><span class="val">6</span></div>
+      <div class="bar-row"><span class="lbl">bdfg_bond_total_debt</span><span class="track"><span class="fill" style="width:3%; background:var(--bdfg)"></span></span><span class="val">5</span></div>
+      <div class="bar-row"><span class="lbl">sustainalytics</span><span class="track"><span class="fill" style="width:3%; background:var(--sust)"></span></span><span class="val">5</span></div>
+      <div class="bar-row"><span class="lbl">bdfg_issuer</span><span class="track"><span class="fill" style="width:2%; background:var(--bdfg)"></span></span><span class="val">4</span></div>
+      <div class="bar-row"><span class="lbl">cdc_biodiversite</span><span class="track"><span class="fill" style="width:2%; background:var(--cdc)"></span></span><span class="val">4</span></div>
+    </div>
+
+    <div class="fact-grid">
+      <div class="fact"><div class="n">308</div><div class="l">champs pour 2 flux seulement (Trucost Paris Alignment + ISS Equity ESG) sur 623 au total : presque la moitié du volume tient dans 2 flux sur 18</div></div>
+      <div class="fact"><div class="n">262</div><div class="l">champs (42%) marqués pour alimenter DEMAIN</div></div>
+      <div class="fact"><div class="n">99</div><div class="l">champs (16%) suivis dans le rapport de qualité de données</div></div>
+      <div class="fact"><div class="n">611</div><div class="l">champs sur 623 sont optionnels ; seuls 12 sont obligatoires, presque tous des identifiants techniques (isin, tcuid, client_id, code_issuer_jump)</div></div>
+    </div>
+
+    <div class="asides">
+      <div class="aside"><b>Un piège de vocabulaire.</b> La colonne <code>is_in</code> de cet export porte soit une liste de valeurs autorisées
+      (ex. <code>['Green','Amber','RED']</code>), soit une plage numérique (ex. <code>min 1, max 10</code>) : c'est une règle de
+      validation du champ. Rien à voir avec le code ISIN d'un titre financier, la coïncidence de nom est involontaire.</div>
+      <div class="aside"><b>Un champ retiré sans bruit.</b> <code>type_schema.py</code> porte un champ de métadonnée <code>is_critical</code>
+      marqué d'un commentaire non résolu (« à retirer ? ») ; il n'apparaît déjà plus dans cet export : cohérent avec l'intention du commentaire.</div>
+      <div class="aside"><b>Des noms d'onglet tronqués.</b> Excel limite un nom d'onglet à 31 caractères : 7 des 18 onglets ne sont plus
+      identiques au <code>data_key</code> exact (ex. <code>trucost_paris_alignment_issuer_</code> au lieu de
+      <code>trucost_paris_alignment_issuer_data</code>). Sans conséquence pour lire le fichier, à savoir si quelqu'un cherche un onglet par son nom complet.</div>
+    </div>
+  </div>
+
+  <div class="part-divider">
+    <span class="line"></span>
+    <span class="lbl">PARTIE 2 / 2 : CE QUI SE PASSE AVEC UNE URL</span>
+    <span class="line"></span>
+  </div>
+
+  <div class="masthead">
+    <div>
+      <h1>Schéma de la base EVE : le trajet d'une requête</h1>
+      <p>Sept routes au total. Six touchent les données, dans un <b>ordre imposé</b> pour la construction
+      initiale puis <b>libre</b> ensuite ; une septième n'est qu'un export de documentation.
+      Source : <code>data/api.py</code> et <code>users/api.py</code>.</p>
+    </div>
+    <span class="draft-tag">PARTIE 2 / 2</span>
+  </div>
+
+  <div class="gate">
+    <b>Avant toute route : POST /auth/login</b><br>
+    Authentifie un compte Django (<code>username</code>/<code>password</code>) et renvoie son
+    <code>PermanentToken</code> (un jeton par utilisateur, lien un-à-un avec <code>User</code>). Ce jeton
+    sert de clé d'accès sur chacune des six routes ci-dessous : aucune ne s'appelle sans elle, mais aucune ne
+    la redemande non plus une fois obtenue.
+  </div>
+
+  <div class="stack">
+
+    <div class="stg">
+      <div class="head" style="background:var(--jump)"><span class="verb">POST</span>/insert_data/{data_key}</div>
+      <ol>
+        <li>Le <code>data_key</code> doit correspondre à un flux existant et connu du système, sinon rejet.</li>
+        <li><code>integration_process_id</code> (l'identifiant du lot envoyé) doit être unique et supérieur à tous les précédents pour ce flux, sinon la demande est refusée.</li>
+        <li>Lecture du fichier envoyé : CSV ou parquet uniquement ; tout le reste, y compris xlsx, est refusé.</li>
+        <li>Nettoyage puis validation complète du contrat de données ; toute ligne qui ne respecte pas ce contrat fait échouer l'appel entier, rien n'est inséré à moitié.</li>
+        <li>Insertion en base : un nouveau lot, identifié par ce <code>integration_process_id</code>. Rien n'écrase les lots précédents.</li>
+        <li>Un rapport de qualité est calculé tout de suite sur ce nouveau lot et renvoyé en réponse, en xlsx (pas un simple message de succès).</li>
+      </ol>
+      <div class="cap">Cette même route sert pour les 21 flux : seul le <code>data_key</code> change.</div>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="stg">
+      <div class="head" style="background:var(--hub); color:var(--ink); border-bottom-color:var(--ink)"><span class="verb" style="background:rgba(0,0,0,0.12)">POST</span>/build_referential/issuer</div>
+      <ol>
+        <li>Appelable une fois <code>jump_issuer_data</code> et <code>bdfg_issuer_data</code> en base (les deux s'insèrent en parallèle par la route au-dessus).</li>
+        <li>Reconstruit tout le référentiel Issuer à partir de JUMP, de BDFG et de sa propre version précédente : ce n'est jamais un ajout, toujours un recalcul complet.</li>
+        <li>Référentiel vide -> réponse succès immédiate, rien d'inséré.</li>
+        <li>Sinon, validation complète puis insertion : pour un référentiel, seule la date de construction identifie la version, pas de numéro de lot.</li>
+      </ol>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="stg">
+      <div class="head" style="background:var(--jump)"><span class="verb">POST</span>/insert_data/jump_asset_data</div>
+      <ol>
+        <li>Même mécanique que la première route. Doit passer avant l'étape suivante : le référentiel Asset a besoin de JUMP comme source technique primaire.</li>
+      </ol>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="stg">
+      <div class="head" style="background:var(--hub); color:var(--ink); border-bottom-color:var(--ink)"><span class="verb" style="background:rgba(0,0,0,0.12)">POST</span>/build_referential/asset</div>
+      <ol>
+        <li>Identité d'un actif : c'est l'identifiant JUMP qui fait foi, pas le code ISIN, car un même actif peut être coté sur plusieurs places ; le code ISIN reste informatif.</li>
+        <li>Enrichissement en couches : JUMP (technique) puis BDFG (correction fonctionnelle) puis le référentiel Issuer déjà construit.</li>
+        <li>Même règle de remplacement complet que pour Issuer, sans numéro de lot non plus.</li>
+      </ol>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="stg">
+      <div class="head" style="background:var(--jump)"><span class="verb">POST</span>/insert_data/{les 19 autres flux}</div>
+      <ol>
+        <li>Toujours la même route, la même mécanique que la première : c'est seulement à partir d'ici que l'ordre entre flux n'est plus imposé par le code.</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <div class="on-demand-hdr">Ensuite, à la demande, dans n'importe quel ordre</div>
+
+  <div class="grid2">
+
+    <div class="stg" style="margin-bottom:0;">
+      <div class="head" style="background:var(--iss)"><span class="verb">GET</span>/export/last/{data_key}</div>
+      <ol>
+        <li>Un flux inconnu est refusé. Les colonnes demandées en option sont aussi vérifiées : une colonne qui n'existe pas fait refuser la demande.</li>
+        <li>Lit le <b>dernier lot</b> seulement, filtré et limité directement en base, avant tout traitement supplémentaire.</li>
+        <li>Par défaut, rapproche avec le référentiel avant de répondre (<code>apply_referential_matching</code>, désactivable).</li>
+        <li>Réponse JSON, streamée. Aucun calcul financier : ce qui est stocké, tel quel.</li>
+      </ol>
+    </div>
+
+    <div class="stg" style="margin-bottom:0;">
+      <div class="head" style="background:var(--iss)"><span class="verb">GET</span>/export/demain/{data_key}</div>
+      <ol>
+        <li><code>demain_effect_date</code> par défaut aujourd'hui ; <code>date_eve_import_max</code> optionnel restreint aux lots importés à cette date ou avant.</li>
+        <li>Construit le jeu DEMAIN selon une règle propre à chaque flux : si le flux ne prévoit pas ce calcul, la demande est refusée (tous les flux ne le prévoient pas).</li>
+        <li><b>Dépivote</b> le résultat en lignes <code>date_effect, source, issuer_id, variable, value</code> : un format long, différent du format large stocké en base.</li>
+        <li>Réponse JSON, streamée.</li>
+      </ol>
+    </div>
+
+    <div class="stg" style="margin-bottom:0;">
+      <div class="head" style="background:var(--bdfg)"><span class="verb">POST</span>/build/proprietary/{data_key}</div>
+      <ol>
+        <li>Calcule un jeu propriétaire BDFG pour ce <code>data_key</code> ; vide -> succès immédiat, rien d'inséré.</li>
+        <li>Le code ne vérifie pas encore que le flux demandé est bien un flux propriétaire : un point de vigilance connu, laissé en l'état pour l'instant. Un flux qui ne prévoit pas ce calcul est refusé au moment de l'exécuter, pas avant.</li>
+        <li>Sinon, validation puis insertion d'un nouveau lot, avec l'identifiant fourni par l'appelant.</li>
+      </ol>
+    </div>
+
+    <div class="stg" style="margin-bottom:0;">
+      <div class="head" style="background:var(--trucost)"><span class="verb">GET</span>/data_quality_assessment_report/{data_key}</div>
+      <ol>
+        <li>Un flux inconnu est refusé.</li>
+        <li>Calcule le rapport qualité sur le dernier lot en base, sans paramètre pour en choisir un autre.</li>
+        <li>Réponse en xlsx. Ne modifie rien en base : c'est une lecture seule, contrairement au même calcul lancé automatiquement dans <code>/insert_data</code>.</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <div class="bonus">
+    <b>Une septième route, à part :</b> <code>GET /issuer_schemas_xlsx</code> exporte la définition de tous
+    les schémas issuer (un onglet par flux, jamais les flux actifs ni les référentiels) en un classeur Excel.
+    18 onglets, 623 champs au total, avec pour chacun son alias source, sa nullabilité, ses valeurs ou plage
+    autorisées, et ses métadonnées (DEMAIN, qualité, controverse propriétaire). Un outil d'introspection pour
+    explorer les contraintes de chaque flux, pas une route de données. Détail complet dans la partie 1.
+  </div>
+
+  <div style="margin-top:40px; padding-top:14px; border-top:2px solid var(--ink); font-size:11px; color:#666; line-height:1.7;">
+    Sources : code du dépôt EveBackEnd (modèles, schémas et routes API des applications <code style="font-family:var(--mono);">data</code>
+    et <code style="font-family:var(--mono);">users</code>), export <code style="font-family:var(--mono);">GET /issuer_schemas_xlsx</code>
+    du 18/09/2026, et l'état de la base EveDev. Relu et corrigé par Edmond Gerard.
+  </div>
+
+</div>
+</body>
+</html>

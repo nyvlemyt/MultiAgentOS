@@ -1,0 +1,14 @@
+{
+    // Interpréteur = venv local du projet (créé le 13/08/2026)
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+    ],
+    // Volontairement désactivé : ne jamais reformater un fichier du dépôt par accident
+    // (conventions et fins de ligne CRLF du dépôt, voir .claude/rules/qualite.md).
+    "[python]": {
+        "editor.formatOnSave": false
+    },
+    "todo-tree.tree.scanMode": "workspace only"
+}

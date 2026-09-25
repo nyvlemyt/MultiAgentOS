@@ -1,0 +1,133 @@
+diff --git a/data/tests/e2e/test_export_last.py b/data/tests/e2e/test_export_last.py
+index d19ccd1..7505c4b 100644
+--- a/data/tests/e2e/test_export_last.py
++++ b/data/tests/e2e/test_export_last.py
+@@ -123,3 +123,22 @@ class ExportLastDataRejectionTests(ApiE2ETestCase):
+         response = self.anonymous.get("/export/last/jump_issuer_data")
+ 
+         self.assertEqual(401, response.status_code)
++class ExportLastDateValueTests(ApiE2ETestCase):
++    """
++    A `date` field leaves the export as ISO text, whatever the source wrote.
++
++    `iss_esg_rating_last_modification` used to be stored as the source text and streamed
++    out verbatim. It is now parsed on integration, so this endpoint, the second consumer
++    of the field next to the DEMAIN export, sees a normalised value.
++    """
++
++    def test_a_date_is_exported_as_iso_text_whatever_the_source_format(self) -> None:
++        self.seed("iss_equity_esg_issuer_data", [
++            {"ISIN": "FR0000000001", "CountryOfIncorporation": "FR",
++             "ISSESGRatingLastmodification": "31/12/2024"},
++        ])
++
++        rows = json_of(self.api.get("/export/last/iss_equity_esg_issuer_data"))
++
++        self.assertEqual(1, len(rows))
++        self.assertEqual("2024-12-31", rows[0]["iss_esg_rating_last_modification"])
+diff --git a/data/tests/e2e/test_insert_data.py b/data/tests/e2e/test_insert_data.py
+index 572ccdb..33cf7e3 100644
+--- a/data/tests/e2e/test_insert_data.py
++++ b/data/tests/e2e/test_insert_data.py
+@@ -6,6 +6,7 @@ lands in the database is checked: values, model column names, typing, and the in
+ stamps.
+ """
+ import io
++from datetime import date
+ from decimal import Decimal
+ 
+ import polars as pl
+@@ -13,6 +14,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
+ 
+ from data.models.asset_data import ISSAssetData, JumpAssetData
+ from data.models.issuer_data import (
++    ISSEquityEsgIssuerData,
+     JumpIssuerData,
+     MSCIControversyEsgIssuerData,
+     SNPIssuerData,
+@@ -188,3 +190,85 @@ class MsciControversyUploadTests(ApiE2ETestCase):
+         self.assertEqual(200, response.status_code)
+         self.assertEqual(1, MSCIControversyEsgIssuerData.objects.count())
+         self.assertEqual(4, MSCIControversyEsgIssuerData.objects.get().controversy_case_score)
++
++
++class IssRatingLastModificationUploadTests(ApiE2ETestCase):
++    """
++    `iss_esg_rating_last_modification` is declared `date` by pandera and stored in a
++    `DateField`: whatever format the source writes the value in, what the database gives
++    back is a `date`, parsed once at integration time.
++
++    It used to be a `CharField` fed by the string branch of the cast, which stored the
++    source text verbatim and left every reader to parse it again. The freshness sheet of
++    the quality report already parsed it on the fly.
++
++    These tests read the stored value because that is where the change acts. The export
++    tests in `test_export_demain.py` cover the contract with DEMAIN, one layer further
++    down: a value already in ISO would come out of the export unchanged even if the field
++    went back to a `CharField`.
++    """
++
++    def stored_rating_date(self, isin: str) -> date | None:
++        """The rating date as the database gives it back, for the issuer holding `isin`."""
++        return ISSEquityEsgIssuerData.objects.get(isin=isin).iss_esg_rating_last_modification
++
++    def test_a_source_date_written_in_another_format_is_stored_as_a_date(self) -> None:
++        """The normalisation case: a European form is parsed, not kept as text."""
++        response = self.post_insert("iss_equity_esg_issuer_data", [
++            {"ISIN": "FR0000000001", "ISSESGRatingLastmodification": "31/12/2024"},
++        ])
++
++        self.assertEqual(200, response.status_code)
++        self.assertEqual(date(2024, 12, 31), self.stored_rating_date("FR0000000001"))
++
++    def test_a_source_date_already_in_iso_is_stored_as_a_date(self) -> None:
++        """
++        The typing case: the value comes back as a `date`, not as the ISO text it was
++        written in. This is what a return to a `CharField` would break, and what the
++        export test on the same value cannot see.
++        """
++        response = self.post_insert("iss_equity_esg_issuer_data", [
++            {"ISIN": "FR0000000001", "ISSESGRatingLastmodification": "2024-12-31"},
++        ])
++
++        self.assertEqual(200, response.status_code)
++        self.assertEqual(date(2024, 12, 31), self.stored_rating_date("FR0000000001"))
++
++    def test_a_sentinel_value_is_stored_as_null(self) -> None:
++        """
++        ISS writes `Not Collected` and `Not Applicable` where it has no date. The
++        preprocessing turns them into nulls before any cast, so the date branch never
++        sees them and the row is kept.
++        """
++        response = self.post_insert("iss_equity_esg_issuer_data", [
++            {"ISIN": "FR0000000001", "ISSESGRatingLastmodification": "Not Collected"},
++            {"ISIN": "FR0000000002", "ISSESGRatingLastmodification": "Not Applicable"},
++            {"ISIN": "FR0000000003", "ISSESGRatingLastmodification": "2024-12-31"},
++        ])
++
++        self.assertEqual(200, response.status_code)
++        self.assertIsNone(self.stored_rating_date("FR0000000001"))
++        self.assertIsNone(self.stored_rating_date("FR0000000002"))
++        # The third issuer is the control: without it, a column left entirely null for
++        # any other reason would satisfy the two assertions above. It also covers the
++        # production case, where one upload carries both sentinels and real dates.
++        self.assertEqual(date(2024, 12, 31), self.stored_rating_date("FR0000000003"))
++
++    def test_a_date_in_an_unsupported_format_is_stored_as_null_known_defect(self) -> None:
++        """
++        known_defect: a format none of the sixteen patterns of `parse_date_expr` covers is
++        stored as NULL, silently. The row survives, the date is lost, and nothing in the
++        response says so.
++
++        This is a loss introduced by the typing: the string branch used to store the text
++        verbatim and hand it over to the DEMAIN export as it was. No value in EveDev was
++        concerned on 07/09/2026 (0 out of 12 366 non-null values). The test pins the
++        behaviour so a change of source format is noticed here rather than downstream.
++        """
++        response = self.post_insert("iss_equity_esg_issuer_data", [
++            {"ISIN": "FR0000000001", "ISSESGRatingLastmodification": "31.12.2024"},
++        ])
++
++        self.assertEqual(200, response.status_code)
++        self.assertEqual(1, ISSEquityEsgIssuerData.objects.count())
++        self.assertIsNone(self.stored_rating_date("FR0000000001"))

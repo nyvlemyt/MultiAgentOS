@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Socle de travail : tableau de bord</title>
+<style>
+  :root { --papier:#FAF9F6; --encre:#26242E; --accent:#C8405F; --structure:#55527E; --ok:#2F7D4F; --attention:#A96F14; --muet:#8A8794; --bord:#E6E3DC; --sombre:#141B23; --clair:#DCE4EC; --ambre:#E8B34B; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--papier); color:var(--encre); font: 16px/1.55 Georgia, "Times New Roman", serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 2.3rem; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 8px; }
+  h2 { font-size: 1.35rem; margin: 40px 0 12px; color: var(--structure); }
+  .these { font-size: 1.2rem; margin: 0 0 24px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; color: var(--structure); font-family: system-ui, sans-serif; }
+  nav a { margin-right: 14px; color: var(--structure); font-family: system-ui, sans-serif; font-size: .9rem; }
+  .chiffres { display:flex; flex-wrap:wrap; gap:12px; margin: 16px 0 8px; }
+  .chiffre { background: var(--sombre); color: var(--clair); border-radius: 12px; padding: 14px 18px; min-width: 150px; flex: 1 1 150px; }
+  .chiffre b { display:block; font: 700 1.8rem/1.1 system-ui, sans-serif; color: var(--ambre); }
+  .chiffre span { font-family: system-ui, sans-serif; font-size: .85rem; }
+  .carte { background:#fff; border:1px solid var(--bord); border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+  .flux { display:flex; flex-wrap:wrap; gap:8px; align-items:stretch; }
+  .etape { background: var(--sombre); color: var(--clair); border-radius: 10px; padding: 10px 12px; flex: 1 1 140px; min-width: 140px; font-family: system-ui, sans-serif; font-size: .88rem; }
+  .etape em { display:block; color: var(--ambre); font-style: normal; font-weight: 700; margin-bottom: 4px; }
+  .etape small { display:block; color:#9fb0c0; margin-top:6px; }
+  .chip { display:inline-block; font: 600 .78rem/1 system-ui, sans-serif; padding: 5px 9px; border-radius: 999px; }
+  .fait { background:#E5F2EA; color: var(--ok); }
+  .encours { background:#FBEFD9; color: var(--attention); }
+  .afaire { background:#EDECF3; color: var(--structure); }
+  .melvyn { background:#F9E1E7; color: var(--accent); }
+  table { width:100%; border-collapse: collapse; font-family: system-ui, sans-serif; font-size: .9rem; }
+  th, td { text-align:left; padding: 8px 10px; border-bottom: 1px solid var(--bord); vertical-align: top; }
+  th { color: var(--structure); font-weight: 600; }
+  .statut { border-left: 4px solid var(--bord); padding: 8px 12px; margin: 8px 0; background:#fff; border-radius: 0 10px 10px 0; }
+  .statut.ok { border-color: var(--ok); } .statut.att { border-color: var(--attention); } .statut.dec { border-color: var(--accent); }
+  .valider li { margin: 8px 0; }
+  code { font: .88em ui-monospace, Consolas, monospace; background:#F1EFE9; color:#16181d; padding: 1px 5px; border-radius: 5px; }
+  footer { margin-top: 48px; background: var(--sombre); color: var(--clair); border-radius: 12px; padding: 16px 18px; font-family: system-ui, sans-serif; font-size: .85rem; }
+  footer b { color: var(--ambre); }
+  .analogie { color: var(--muet); font-style: italic; }
+  .barre { display:flex; height:26px; border-radius:8px; overflow:hidden; font: 600 .75rem/26px system-ui, sans-serif; color:#fff; margin:10px 0 4px; }
+  .barre span { text-align:center; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Chantier 2026-09-10-socle-de-travail, niveau structurant, spec revisee le 11/09/2026, suspendu en attendant l'audit CSDR</p>
+  <h1>Le premier etage du processus final</h1>
+  <p class="these">EVE s'alimente aujourd'hui a la main, un appel Swagger apres l'autre, et personne ne peut rejouer un passage complet. Ce chantier lui donne un vrai module d'integration : une app <code>integration/</code>, une commande unique appelable par une tache planifiee, et non pas une liste de 23 etapes mais un <b>graphe de dependances</b> dont le premier import n'est qu'un parcours. C'est ce qui permettra a l'import regulier de n'en rejouer qu'une partie, sans reecrire quoi que ce soit.</p>
+  <nav><a href="#principe">Le principe</a><a href="#decisions">Les decisions</a><a href="#modes">Les trois modes</a><a href="#ordre">Le parcours bootstrap</a><a href="#perimetre">Le perimetre</a><a href="#connu">Ce qui est prouve</a><a href="#etat">Ou on en est</a><a href="#valider">A valider par toi</a><a href="#suite">La suite</a></nav>
+
+  <div class="chiffres">
+    <div class="chiffre"><b>23</b><span>etapes dans l'ordre reel, etabli par le code</span></div>
+    <div class="chiffre"><b>20</b><span>cles alimentees par fichier, sur 21. Une seule est calculee</span></div>
+    <div class="chiffre"><b>2</b><span>omissions dans l'ordre de <code>CLAUDE.md</code>, corrigees</span></div>
+    <div class="chiffre"><b>1</b><span>flux sur 21 dont le circuit est documente</span></div>
+    <div class="chiffre"><b>0</b><span>migration a l'etape 1, et 0 dependance nouvelle</span></div>
+  </div>
+
+  <h2 id="principe">Le principe en une image</h2>
+  <div class="carte">
+    <p class="analogie">L'analogie : une recette ecrite. Aujourd'hui le plat se refait de memoire, dans un ordre que seul celui qui l'a deja fait connait. Une recette ecrite, c'est le droit de rater, de recommencer, et de confier le plat a quelqu'un d'autre.</p>
+    <div class="flux">
+      <div class="etape"><em>Le manifeste</em>la connaissance<small>quel dossier source sert quelle cle, quelles extensions, comment choisir le fichier, a quelle frequence il arrive</small></div>
+      <div class="etape"><em>Le plan</em>l'ordre<small>les 23 etapes, figees dans le code, testees sans base ni fichier</small></div>
+      <div class="etape"><em>La commande</em>le point d'entree<small><code>manage.py run_integration</code>, a la main aujourd'hui, par tache planifiee demain, comme CSDR</small></div>
+      <div class="etape"><em>L'API, en direct</em>sans serveur<small><code>django.test.Client</code> traverse routage, auth, validation, endpoint et pandera contre la base configuree</small></div>
+      <div class="etape"><em>La base</em><code>EveDevMel</code><small>sur le serveur, meme collation qu'<code>EveDev</code>. Un garde refuse toute base hors liste blanche</small></div>
+      <div class="etape"><em>Le compte rendu</em>une ligne par etape<small>cle, fichier, statut, duree. Jamais une valeur de donnee. Un echec n'arrete pas le passage</small></div>
+    </div>
+    <p>Le point dur n'est pas technique, il est de methode : <b>l'assistant ne lit aucune donnee</b>. Le manifeste est donc une declaration que <b>toi seul</b> peux remplir, ligne par ligne, relue dans un diff. C'est le travail long du chantier, et il est incontournable.</p>
+  </div>
+
+  <h2 id="decisions">Les sept decisions prises le 10/09</h2>
+  <div class="carte">
+    <p>Fiche complete avec les alternatives ecartees et leurs motifs : <code>chantiers/_decisions/0002-module-integration-eve.md</code>.</p>
+    <table>
+      <tr><th>Sujet</th><th>Decision</th><th>Ce qui a ete ecarte, et pourquoi</th></tr>
+      <tr><td>La forme</td><td>Une app Django <code>integration/</code>, en couches, calquee sur <code>C:\dev\CSDR\ingestion\</code></td><td>La commande unique de 200 lignes : elle melange orchestration, fichiers, transport et compte rendu, donc a rechanger a l'etape 2. C'est ton critere qui a tranche</td></tr>
+      <tr><td>La base</td><td><code>EveDevMel</code> sur <code>BDFG-SRV-DEV1</code>, creee par toi</td><td>LocalDB et sqlite sur la VM : « pas de local sur la VM, ca sera pas realiste ». <code>EveDev</code> : un detruire-refaire y effacerait le travail d'Edmond</td></tr>
+      <tr><td>Le transport</td><td>Intra processus, une seule classe <code>EveApi</code></td><td>Le port a deux adaptateurs : la seconde cible n'existe pas encore, et l'architecte lui-meme conseillait de couper la</td></tr>
+      <tr><td>Le manifeste</td><td>Structure dans le depot, typee et verifiee contre <code>DataKey</code>. Racine machine dans <code>.env</code></td><td>Hors depot : la connaissance derive en silence, sans relecture en diff ni verification des cles</td></tr>
+      <tr><td>L'emplacement</td><td>App separee, pas un sous-paquet de <code>data/</code></td><td><code>data/integration/</code> : l'etape 2 a besoin d'une table, elle atterrirait dans les migrations de <code>data</code>, melee aux 21 flux</td></tr>
+      <tr><td>L'ordonnanceur</td><td>Etape 2, pas maintenant</td><td>Non par prudence, par fait : le calendrier n'est pas connu. On n'encode pas des regles qu'on ignore</td></tr>
+      <tr><td>La documentation</td><td>Deux corrections roulent avec le chantier</td><td>Les laisser au chantier <code>.md</code> : l'une des deux est pile le sujet du script, un futur lecteur se tromperait comme nous avons failli le faire</td></tr>
+    </table>
+  </div>
+
+  <h2 id="modes">Les trois modes, et pourquoi ce n'est pas une liste</h2>
+  <div class="carte">
+    <p>Point souleve par Melvyn le 11/09 : il ne faut pas melanger le premier import et les imports reguliers. <b>CSDR apporte une reponse meilleure que deux programmes separes : le mode tombe d'un etat en base.</b> Une table retient ce qui a deja ete ingere, et le mode complet retraite tout simplement parce que cette table est vide. Un seul code, un seul ordre.</p>
+    <table>
+      <tr><th>Mode</th><th>Quand</th><th>Ce qu'il joue</th><th>Etape</th></tr>
+      <tr><td><b>Bootstrap</b></td><td>base vide</td><td>les 23 etapes, parcours complet du graphe</td><td><span class="chip encours">etape 1</span></td></tr>
+      <tr><td><b>Incremental</b></td><td>un flux a un fichier neuf</td><td>l'insertion, puis <b>seulement l'aval necessaire</b>. Inserer <code>trucost_coal_issuer_data</code> ne rejoue aucun referentiel ; inserer <code>jump_issuer_data</code> rejoue issuer, puis asset, puis le proprietaire</td><td><span class="chip afaire">etape 2</span></td></tr>
+      <tr><td><b>Rejeu</b></td><td>un fichier etait faux</td><td>ce flux et son aval, rien d'autre</td><td><span class="chip afaire">etape 2</span></td></tr>
+    </table>
+    <p><b>La consequence est structurante</b> : le plan n'est pas une liste plate de 23 etapes mais un graphe avec ses aretes, et l'ordre du bootstrap n'en est qu'un parcours. L'incremental, c'est le meme graphe restreint a la fermeture transitive de ce qui a bouge. Une liste plate aurait oblige a reecrire l'orchestration a l'etape 2 : exactement le truc a la va-vite que tu refuses. L'etape 1 livre le graphe et le bootstrap ; l'etape 2 branche la table de trace et le declencheur, et le graphe les attend deja.</p>
+  </div>
+
+  <h2 id="ordre">Le parcours bootstrap : 23 etapes, et les deux omissions de CLAUDE.md</h2>
+  <div class="carte">
+    <div class="barre">
+      <span style="flex:3;background:#55527E">3 inserts</span>
+      <span style="flex:1;background:#C8405F">ref. issuer</span>
+      <span style="flex:2;background:#55527E">2 inserts</span>
+      <span style="flex:1;background:#C8405F">ref. asset</span>
+      <span style="flex:15;background:#2F7D4F">15 flux providers</span>
+      <span style="flex:1;background:#A96F14">calcul</span>
+    </div>
+    <table>
+      <tr><th>Rang</th><th>Etape</th><th>Pourquoi la</th></tr>
+      <tr><td>1, 2</td><td><code>jump_issuer_data</code>, <code>bdfg_issuer_data</code></td><td>sources primaires du referentiel issuer</td></tr>
+      <tr><td><b>3</b></td><td><b><code>iss_asset_data</code></b></td><td><b>source secondaire de LEI du referentiel issuer. Omise par <code>CLAUDE.md</code></b> (<code>data/models/referential.py:305-315</code>)</td></tr>
+      <tr><td>4</td><td><code>build_referential issuer</code></td><td>lit les trois precedents, plus sa propre version precedente</td></tr>
+      <tr><td>5</td><td><code>jump_asset_data</code></td><td>source primaire du referentiel asset</td></tr>
+      <tr><td><b>6</b></td><td><b><code>bdfg_asset_data</code></b></td><td><b>source du referentiel asset. Omise par <code>CLAUDE.md</code></b> (<code>data/models/referential.py:588-595</code>)</td></tr>
+      <tr><td>7</td><td><code>build_referential asset</code></td><td>lit les deux precedents et le referentiel issuer</td></tr>
+      <tr><td>8 a 22</td><td>les 15 flux providers restants</td><td>aucune dependance entre eux, mais l'ordre reste fige pour que deux passages soient comparables</td></tr>
+      <tr><td>23</td><td><code>build_proprietary bdfg_equity_controversy_issuer_data</code></td><td>la seule cle calculee du depot (<code>data/schemas/issuer_data.py:5813</code>, seule surcharge de <code>build_proprietary_data</code>)</td></tr>
+    </table>
+  </div>
+
+  <h2 id="perimetre">Le perimetre : ce que l'etape 1 livre, et ce qui attend</h2>
+  <div class="carte">
+    <table>
+      <tr><th>Bloc</th><th>Ce que ca produit</th><th>Statut</th></tr>
+      <tr><td><b>Le module</b></td><td>L'app <code>integration/</code>, la commande, le plan des 23 etapes, le manifeste, le compte rendu, le garde de base cible, et quatre familles de tests</td><td><span class="chip afaire">spec ecrite</span></td></tr>
+      <tr><td><b>La base</b></td><td><code>EveDevMel</code> sur le serveur, meme collation et meme niveau de compatibilite qu'<code>EveDev</code>, procedure de creation ecrite et rejouable</td><td><span class="chip afaire">spec ecrite</span></td></tr>
+      <tr><td><b>Le passage reel</b></td><td>Un passage complet joue par toi, compte rendu au journal, echecs attendus identifies comme tels</td><td><span class="chip afaire">spec ecrite</span></td></tr>
+      <tr><td><b>Le memo</b></td><td>Les environnements et les bases (bloc 1), le circuit d'arrivee des fichiers et leurs frequences (bloc 2), chaque ligne sourcee ou marquee non verifiee</td><td><span class="chip afaire">spec ecrite</span></td></tr>
+      <tr><td><b>Etape 2</b><br>chantiers ulterieurs</td><td>L'ordonnanceur portant le calendrier reel, la trace des passages pour l'idempotence, la reprise du module mail de CSDR, le client API JUMP, la conversion des <code>xlsx</code></td><td><span class="chip afaire">accroches prevues</span></td></tr>
+      <tr><td><b>Hors perimetre</b><br>propose, jamais fait</td><td>Alimenter <code>EveDev</code> ou tout serveur partage ; <code>snp_issuer_data</code> qui tronque les decimales ; l'incoherence <code>requirements.txt</code> contre venv sur <code>polars-runtime-32</code> ; la remise en etat des autres <code>.md</code></td><td><span class="chip afaire">consigne au journal</span></td></tr>
+    </table>
+  </div>
+
+  <h2 id="connu">Ce qui est prouve, et ce qui ne l'est pas</h2>
+  <div class="carte">
+    <table>
+      <tr><th>Question</th><th>Etabli, avec sa source</th><th>Ce qui manque</th></tr>
+      <tr><td>Le circuit des fichiers</td><td>Le partage reel est <code>\\BDFG-SRV-FILER1\Echange\PROJETS\Data Management\Eve\Providers</code>, dont le dossier local est le miroir. <b>Les depots sont manuels</b> : un humain se connecte chez le provider, cherche, telecharge, depose. Procedure connue pour <code>Trucost_Paris_Alignment</code> (plateforme EDX de S&amp;P). Source : ta lecture du modop</td><td><b>Le modop ne couvre que 1 flux sur 21.</b> Les 20 autres s'etablissent par l'inventaire des noms et des dates, plus des questions a Edmond et a Gaetan</td></tr>
+      <tr><td>Comment lire une frequence sans ouvrir un fichier</td><td>Verifie sur un dossier : les noms portent la date, et il existe des sous-dossiers de periode. <b>Les dates systeme ne sont pas les dates de livraison</b> : un fichier nomme <code>30032026</code> porte une date systeme du 12/06/2026. La date du nom est celle qui compte</td><td>L'inventaire des 20 autres dossiers</td></tr>
+      <tr><td>La conversion des <code>xlsx</code></td><td><b>Prouvee, pas supposee</b> : un <code>.xlsx</code> de 50 Mo coexiste avec son homologue <code>.parquet</code> de meme nom, alors que <code>insert_data</code> n'accepte que CSV <code>;</code> et parquet</td><td>Le sujet part au chantier providers. L'etape 1 refuse <code>xlsx</code> et prefere <code>parquet</code></td></tr>
+      <tr><td>Le procede final de CSDR</td><td><b>Une tache planifiee Windows appelle <code>python manage.py run_ingestion</code></b> (<code>C:\dev\CSDR\ingestion\readme2.md</code>). Aucun service, aucun demon. C'est le motif repris</td><td>Sur quel serveur tournera celle d'EVE. Question a Edmond</td></tr>
+      <tr><td>Le client API de CSDR</td><td>2 440 lignes : sessions synchrone et asynchrone, authentification par cookies avec expiration, retry par decorateur. Notions manipulees : portefeuilles, ordres, brokers, FX</td><td><b>Aucune occurrence du mot jump dans tout CSDR.</b> Que ce soit le client JUMP est une hypothese forte, non verifiee. Tu le sais, moi non</td></tr>
+      <tr><td><code>test1</code></td><td>C'est une <b>branche git</b> (<code>origin/test1</code>), dite version de test par Tania</td><td>Le lien entre cette branche et un site deploye n'est prouve nulle part. Question a Edmond</td></tr>
+      <tr><td><code>bdfg-srv-app1</code></td><td>Figure dans les <code>ALLOWED_HOSTS</code></td><td>Ce qui tourne dessus n'est documente nulle part. Question a Edmond</td></tr>
+      <tr><td>Le premier passage sur base vide</td><td>Construire un referentiel lit <b>sa propre version precedente</b>, qui n'existe pas sur une base neuve. Chemin corrige tout recemment par Edmond, commit <code>d17cde8</code></td><td>C'est le cas le plus expose du chantier. A jouer explicitement et a couvrir par un test</td></tr>
+    </table>
+  </div>
+
+  <h2 id="etat">Ou on en est</h2>
+  <div class="statut ok"><span class="chip fait">fait</span> 10/09 : chantier ouvert, niveau <b>structurant</b> confirme par toi. Arbre propre, aucun stash, <code>develop</code> et <code>origin/develop</code> alignes sur <code>d17cde8</code></div>
+  <div class="statut ok"><span class="chip fait">fait</span> 10/09 : deux <code>architecte-eve</code> lances en concurrence. Cinq faits qu'ils etablissent ensemble, dont <b>la decision d'alimenter par l'API etait deja prise et ecrite dans le depot</b> (<code>data/tests/e2e/base.py:1-7</code>)</div>
+  <div class="statut dec"><span class="chip fait">fait</span> 10/09, par toi : le cadre est recuse. « Le process final, pas un truc a la va vite », et <b>la base sur le serveur, pas de local sur la VM</b>. LocalDB sort, la these du chantier est reecrite</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 10/09 : le blocage tombe. Tu crees <code>EveDevMel</code> toi-meme, donc rien n'attend Edmond</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 10/09 : fiche de decision <code>0002-module-integration-eve.md</code> ecrite, sept decisions, alternatives ecartees et motifs</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 10/09 : ordre des 23 etapes <b>verifie par moi dans le code</b>, pas relaye. Deux omissions de <code>CLAUDE.md</code> etablies</div>
+  <div class="statut dec"><span class="chip fait">fait</span> 11/09, <b>erreur de source corrigee</b> : le cadrage du 10/09 a lu <code>C:\dev\CSDR</code>, une copie figee au 20/08. Le projet vivant est <code>c:\dev\csdr_codex</code>, avec 37 documents, <code>deploy/iis</code>, pre-commit et <code>uv</code>. Premier degat connu : le module mail est passe a Microsoft Graph, pas EWS. Le recensement des autres conclusions perimees est confie a l'audit</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 11/09 : <code>design.md</code> revise sur ton point des modes. <code>Step</code> recoit un <code>depends_on</code>, le plan devient <code>INTEGRATION_GRAPH</code> avec <code>bootstrap_order()</code> et <code>downstream_of()</code>, et le test d'ordre couvre la fermeture transitive</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 11/09 : chantier <b>audit CSDR vers EVE</b> ouvert, son prompt d'execution ecrit, sept axes, lecture seule. <code>chantiers/2026-09-11-audit-csdr-vers-eve/prompt.md</code></div>
+  <div class="statut att"><span class="chip encours">suspendu</span> Ce chantier attend les conclusions de l'audit. Son ossature reste valable : l'ordre des 23 etapes, le garde de base cible, le transport intra processus, le manifeste. C'est le detail des reprises de CSDR qui attend</div>
+  <div class="statut att"><span class="chip afaire">a faire</span> Apres l'audit : <code>plan.md</code> avec <code>superpowers:writing-plans</code>, chaque tache avec sa verification</div>
+
+  <h2 id="valider">A valider par toi</h2>
+  <div class="carte valider">
+    <ol>
+      <li><b>Lance l'audit CSDR.</b> C'est le prochain travail, et il conditionne la suite de ce chantier. Prompt pret dans <code>chantiers/2026-09-11-audit-csdr-vers-eve/prompt.md</code>, a coller dans une session neuve.</li>
+      <li><b>Relis <code>design.md</code></b> quand tu veux, en sachant qu'il bougera avec l'audit. Les sections qui meritent ton oeil des maintenant : les modes (section 3), l'ordre des 23 etapes (section 5), les criteres d'acceptation (section 12).</li>
+      <li><b>La branche</b> <code>features/melvyn/socle-de-travail</code> : pas maintenant. L'audit n'ecrit rien dans le depot, donc rien a creer avant que l'implementation demarre.</li>
+      <li><b>Le client API de CSDR est-il bien le client JUMP ?</b> Aucune occurrence du mot jump dans tout CSDR. Ta reponse change le chantier JUMP, pas celui-ci.</li>
+      <li><b>Decide le 10/09</b> : niveau structurant, manifeste dans le depot avec la racine dans <code>.env</code>, app <code>integration/</code> separee, et les deux corrections documentaires roulent avec le chantier.</li>
+      <li><b>A savoir avant la PR</b> : des noms de dossiers providers vont entrer dans le depot par le manifeste, ce qui n'avait jamais ete fait. Et a l'etape 2, la table de trace produira une migration qui s'appliquera a <b>tous</b> les environnements au deploiement. Les deux sont a annoncer a Edmond.</li>
+    </ol>
+  </div>
+
+  <h2 id="suite">La suite, dans l'ordre</h2>
+  <div class="carte">
+    <ol>
+      <li><b>Tu lances l'audit CSDR</b>, dans une session neuve. Le prompt est pret : <code>chantiers/2026-09-11-audit-csdr-vers-eve/prompt.md</code>. Aucune branche, lecture seule, il ne peut rien casser.</li>
+      <li>Tu lis ses livrables et tu tranches ses questions fermees. Elles diront ce qu'EVE reprend de CSDR, et donc ce que ce chantier-ci implemente vraiment.</li>
+      <li>Ce chantier reprend : <code>design.md</code> revise avec les conclusions, puis <code>plan.md</code> avec <code>superpowers:writing-plans</code>. Tu dis a ce moment-la si je cree la branche <code>features/melvyn/socle-de-travail</code>.</li>
+      <li>Implementation sur ton mot, en TDD, journal tenu au fil de l'eau. Le remplissage du manifeste est ta part, et c'est la plus longue.</li>
+      <li>Puis <code>/gate</code>, <code>/security-review</code> (obligatoire au niveau structurant), <code>/revue</code>, la page explain-diff et son quiz, <code>/pr</code>, et <code>/fin-session</code>.</li>
+    </ol>
+  </div>
+
+  <footer>
+    <b>Fichiers du chantier</b> : journal.md, design.md, dashboard.html. A venir : plan.md, memo-socle.md.
+    <b>Decision</b> : chantiers/_decisions/0002-module-integration-eve.md.
+    <b>Depot</b> : rien de touche, rien de committe, aucune branche creee. Arbre propre, stash vide. Le dossier <code>chantiers/</code> est exclu de git : Edmond ne voit rien de cette page.
+    <b>Source de la file d'attente</b> : chantiers/_missions/2026-09-10-missions.md.
+  </footer>
+</main>
+</body>
+</html>

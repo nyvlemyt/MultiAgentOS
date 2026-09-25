@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dispositif Claude Code pour EVE : tableau de bord</title>
+<style>
+  :root { --papier:#FAF9F6; --encre:#26242E; --accent:#C8405F; --structure:#55527E; --ok:#2F7D4F; --attention:#A96F14; --muet:#8A8794; --bord:#E6E3DC; --sombre:#141B23; --clair:#DCE4EC; --ambre:#E8B34B; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--papier); color:var(--encre); font: 16px/1.55 Georgia, "Times New Roman", serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 2.3rem; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 8px; }
+  h2 { font-size: 1.35rem; margin: 40px 0 12px; color: var(--structure); }
+  .these { font-size: 1.2rem; margin: 0 0 24px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; color: var(--structure); font-family: system-ui, sans-serif; }
+  nav a { margin-right: 14px; color: var(--structure); font-family: system-ui, sans-serif; font-size: .9rem; }
+  .chiffres { display:flex; flex-wrap:wrap; gap:12px; margin: 16px 0 8px; }
+  .chiffre { background: var(--sombre); color: var(--clair); border-radius: 12px; padding: 14px 18px; min-width: 150px; flex: 1 1 150px; }
+  .chiffre b { display:block; font: 700 1.8rem/1.1 system-ui, sans-serif; color: var(--ambre); }
+  .chiffre span { font-family: system-ui, sans-serif; font-size: .85rem; }
+  .carte { background:#fff; border:1px solid var(--bord); border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+  .flux { display:flex; flex-wrap:wrap; gap:8px; align-items:stretch; }
+  .etape { background: var(--sombre); color: var(--clair); border-radius: 10px; padding: 10px 12px; flex: 1 1 140px; min-width: 140px; font-family: system-ui, sans-serif; font-size: .88rem; }
+  .etape em { display:block; color: var(--ambre); font-style: normal; font-weight: 700; margin-bottom: 4px; }
+  .etape small { display:block; color:#9fb0c0; margin-top:6px; }
+  .chip { display:inline-block; font: 600 .78rem/1 system-ui, sans-serif; padding: 5px 9px; border-radius: 999px; }
+  .fait { background:#E5F2EA; color: var(--ok); }
+  .encours { background:#FBEFD9; color: var(--attention); }
+  .afaire { background:#EDECF3; color: var(--structure); }
+  .melvyn { background:#F9E1E7; color: var(--accent); }
+  table { width:100%; border-collapse: collapse; font-family: system-ui, sans-serif; font-size: .9rem; }
+  th, td { text-align:left; padding: 8px 10px; border-bottom: 1px solid var(--bord); vertical-align: top; }
+  th { color: var(--structure); font-weight: 600; }
+  .statut { border-left: 4px solid var(--bord); padding: 8px 12px; margin: 8px 0; background:#fff; border-radius: 0 10px 10px 0; }
+  .statut.ok { border-color: var(--ok); } .statut.att { border-color: var(--attention); } .statut.dec { border-color: var(--accent); }
+  .valider li { margin: 8px 0; }
+  code { font: .88em ui-monospace, Consolas, monospace; background:#F1EFE9; padding: 1px 5px; border-radius: 5px; }
+  footer { margin-top: 48px; background: var(--sombre); color: var(--clair); border-radius: 12px; padding: 16px 18px; font-family: system-ui, sans-serif; font-size: .85rem; }
+  footer b { color: var(--ambre); }
+  .analogie { color: var(--muet); font-style: italic; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Chantier 2026-09-08-init-claude-eve, niveau structurant, mis a jour le 08/09/2026 19:10</p>
+  <h1>Un poste de travail ou l'assistant ne peut pas faire n'importe quoi</h1>
+  <p class="these">Des verrous qui refusent les erreurs connues avant qu'elles arrivent, un pipeline ou Melvyn valide a sept moments, et une trace complete par chantier : rien n'entre dans le depot sans avoir ete lu, teste et compris.</p>
+  <nav><a href="#principe">Le principe</a><a href="#pipeline">Le pipeline</a><a href="#etat">Etat des pieces</a><a href="#valider">A valider par toi</a><a href="#suite">La suite</a></nav>
+
+  <div class="chiffres">
+    <div class="chiffre"><b>5</b><span>verrous actifs (donnees, git, perimetre, forme, doctor)</span></div>
+    <div class="chiffre"><b>33</b><span>tests unitaires des verrous</span></div>
+    <div class="chiffre"><b>7</b><span>points de validation par Melvyn dans le pipeline</span></div>
+    <div class="chiffre"><b>0</b><span>fichier du depot modifie par l'installation</span></div>
+    <div class="chiffre"><b>892</b><span>noeuds dans le graphe de code graphify</span></div>
+  </div>
+
+  <h2 id="principe">Le principe en une image</h2>
+  <div class="carte">
+    <p class="analogie">L'analogie : un atelier avec des portes qui ne s'ouvrent pas (les verrous), un chef d'atelier qui signe chaque etape (Melvyn), et un cahier ou tout est ecrit (le chantier).</p>
+    <div class="flux">
+      <div class="etape"><em>Demande</em>ce que Melvyn veut, rien de plus<small>constats en chemin : proposes, jamais faits</small></div>
+      <div class="etape"><em>Verrous</em>avant chaque action de l'assistant<small>donnees jamais lues, git jamais destructeur, ecriture bornee, forme controlee</small></div>
+      <div class="etape"><em>Preuves</em>gate, revue, quiz<small>sorties de commandes, pas d'adjectifs</small></div>
+      <div class="etape"><em>Melvyn</em>relit dans VS Code, arbre de travail<small>aucun commit sans son mot</small></div>
+      <div class="etape"><em>Edmond</em>PR avec contexte, verifications, risques<small>fiche par decision structurante</small></div>
+    </div>
+  </div>
+
+  <h2 id="pipeline">Le pipeline et les sept validations</h2>
+  <div class="carte">
+    <table>
+      <tr><th>Etape</th><th>Ce que produit l'assistant</th><th>Ce que valide Melvyn</th></tr>
+      <tr><td><code>/chantier</code></td><td>dossier, niveau, dashboard, brainstorm</td><td>1. la spec</td></tr>
+      <tr><td>plan</td><td><code>plan.md</code></td><td>2. le plan</td></tr>
+      <tr><td>implementation</td><td>code dans l'arbre de travail, <code>journal.md</code></td><td>3. le diff dans VS Code</td></tr>
+      <tr><td><code>/gate</code></td><td>ruff, pyright, forme, tests, couverture</td><td>4. un PASS montre</td></tr>
+      <tr><td><code>/revue</code></td><td>findings verifies, correctifs, guide de lecture</td><td>5. findings et suites</td></tr>
+      <tr><td>explain-diff</td><td>page pedagogique, cinq questions</td><td>6. le quiz</td></tr>
+      <tr><td><code>/pr</code></td><td>description Azure DevOps avec preuves</td><td>7. relecture, puis commit et push sur son mot</td></tr>
+    </table>
+    <p>Trois niveaux de rigueur, decides a l'entree : leger, standard, structurant. En cas de doute, on monte.</p>
+  </div>
+
+  <h2 id="etat">Etat des pieces</h2>
+  <div class="statut ok"><span class="chip fait">fait</span> Travail DateField mis de cote : stash, patch et migration copies, <code>develop</code> propre</div>
+  <div class="statut ok"><span class="chip fait">fait</span> Exclusions locales (<code>.git/info/exclude</code>), outils du poste (ruff 0.16.6, coverage 7.16.0, pyright 1.1.413), configs</div>
+  <div class="statut ok"><span class="chip fait">fait</span> Verrous ecrits en TDD, 33 tests le 08/09 (38 le 09/09) ; actifs a chaud dans la session d'installation</div>
+  <div class="statut ok"><span class="chip fait">fait</span> Regles (5), <code>CLAUDE.md</code>, <code>CONTEXT.md</code> (11 termes), <code>settings.json</code></div>
+  <div class="statut ok"><span class="chip fait">fait</span> Skills : graphify, 9 de Pocock (lus integralement), explain-diff adapte, registre</div>
+  <div class="statut ok"><span class="chip fait">fait</span> Agents (4), commandes (6), manuel, cadre pour Edmond, fiche de decision 0001, index des chantiers</div>
+  <div class="statut ok"><span class="chip fait">fait</span> Graphe graphify construit, hook post-commit local, PATH utilisateur mis a jour</div>
+  <div class="statut ok"><span class="chip fait">fait</span> Memoire fusionnee dans <code>c--dev-Eve-EveBackEnd</code> (9 fiches), doublons superpowers retires des skills globaux</div>
+  <div class="statut ok"><span class="chip fait">fait</span> Gate de bout en bout : FAIL attendu sur un fichier d'essai (3 findings), puis PASS sur develop (157 tests, 82 s) ; <code>doctor --complet</code> 10 OK</div>
+  <div class="statut ok"><span class="chip fait">fait</span> <code>.gitattributes</code> cree par le hook graphify deplace dans <code>.git/info/attributes</code> : le depot reste intact</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 09/09, par Melvyn : lanceur <code>eve.cmd</code> corrige et ancien bucket memoire reduit a une redirection (<code>a_lancer_par_melvyn.ps1 -Apply</code>) ; redemarrage OK, ligne <code>doctor EVE</code> vue</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 09/09 : <code>verif_style</code> en logique delta stricte (base lue avec les filtres git, defauts preexistants en information), marqueurs de travail non termine ajoutes et tournures anglaises d'assistant detectes ; <code>garde_git</code> accepte <code>git config --get</code> et <code>--list</code> ; 38 tests</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 09/09 : caracteres caches bloques par <code>verif_style</code> (huit familles Unicode, classification par categorie, tolerance des sequences emoji de la documentation) et nettoyeur <code>nettoyer_caracteres.py</code> (rapport, puis <code>--appliquer</code>) ; 47 tests ; aucun caractere cache dans les fichiers texte suivis du depot</div>
+
+  <h2 id="valider">A valider par toi</h2>
+  <div class="carte valider">
+    <ol>
+      <li>Decide le 09/09 : les exemptions de <code>verif_style</code> (fixtures des tests des verrous, dossier memoire gere par l'outil) sont conservees.</li>
+      <li>Decide le 09/09 : la limite de <code>garde_perimetre</code> (chemin derriere une variable de shell) est acceptee et documentee ; la regle <code>securite.md</code> couvre le reste.</li>
+      <li>Decide le 09/09 : graphify reste entierement local (hooks dans <code>.git/hooks</code>, driver dans <code>.git/config</code>, sorties exclues), rien n'est versionne tant que Melvyn ne le decide pas.</li>
+      <li>Le cadre pour Edmond (<code>chantiers/_cadre/Cadre_assistant_IA_EVE.md</code>) : a relire dans ton style avant de l'utiliser.</li>
+    </ol>
+  </div>
+
+  <h2 id="suite">La suite, dans l'ordre</h2>
+  <div class="carte">
+    <ol>
+      <li>Reprise du chantier DateField (recommande d'abord : il attend une relecture depuis le 08/09 et il eprouve tout le pipeline) : <code>git switch features/melvyn/esgRatingLastModif</code>, <code>git stash pop</code>, relecture, gate, revue, quiz, PR.</li>
+      <li>Chantier 2, via <code>/chantier comprehension-projet</code> : comprendre le projet (fichiers, ordre d'integration, serveur de test, <code>CONTEXT.md</code>). Livrable : des documents, pas de code.</li>
+      <li>Relecture du cadre pour Edmond (<code>chantiers/_cadre/Cadre_assistant_IA_EVE.md</code>), seule question encore ouverte ci-dessus.</li>
+    </ol>
+  </div>
+
+  <footer>
+    <b>Fichiers du chantier</b> : design.md, plan.md, journal.md, dashboard.html, a_lancer_par_melvyn.ps1.
+    <b>Dispositif</b> : CLAUDE.md, CONTEXT.md, .claude/ (settings, README, rules x5, hooks x7 + tests, commands x6, skills x11 + REGISTRE, agents x4), ruff.toml, pyrightconfig.json, .graphifyignore, graphify-out/.
+    <b>Depot</b> : aucun fichier suivi modifie. Branche develop, 1 stash en attente (DateField).
+  </footer>
+</main>
+</body>
+</html>

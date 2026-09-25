@@ -1,0 +1,6 @@
+6dae723ea1fbb6a4b7807c7058cf79ea228f2df9ff27c7b8899695cbba562253 *chantiers/2026-09-15-mini-entreprise-agents/etat-depart/lot-3/_lib.py
+f02f312024cb74e3b5e00e042ffcbe445904e0dc117a0a5f062c0c1288ecfe22 *chantiers/2026-09-15-mini-entreprise-agents/etat-depart/lot-3/doctor.py
+7474a24bd06ff6c5399eed6798f21fbccb6dc84bfe038306fd57fa43120e23dd *chantiers/2026-09-15-mini-entreprise-agents/etat-depart/lot-3/garde_donnees.py
+e5be4e0dd396272b27955cf2da0a4077b72de18d5fbbe45fd02682a70d7cffbb *chantiers/2026-09-15-mini-entreprise-agents/etat-depart/lot-3/garde_git.py
+9e3da075e4f08936545a239998b3747389a9e8034984e52e9abdd78067e9e5c9 *chantiers/2026-09-15-mini-entreprise-agents/etat-depart/lot-3/garde_perimetre.py
+211b98446d684228e59fa6ea30cb2367092c96a20d20f9cdd2610d29aa0a7b6f *chantiers/2026-09-15-mini-entreprise-agents/etat-depart/lot-3/test_gardes.py

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini entreprise d'agents : tableau de bord</title>
+<style>
+  :root { --papier:#FAF9F6; --encre:#26242E; --accent:#C8405F; --structure:#55527E; --ok:#2F7D4F; --attention:#A96F14; --muet:#8A8794; --bord:#E6E3DC; --sombre:#141B23; --clair:#DCE4EC; --ambre:#E8B34B; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--papier); color:var(--encre); font: 16px/1.55 Georgia, "Times New Roman", serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 2.3rem; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 8px; }
+  h2 { font-size: 1.35rem; margin: 40px 0 12px; color: var(--structure); }
+  h3 { font-size: 1.05rem; margin: 18px 0 6px; font-family: system-ui, sans-serif; }
+  .these { font-size: 1.2rem; margin: 0 0 24px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; color: var(--structure); font-family: system-ui, sans-serif; }
+  nav a { margin-right: 14px; color: var(--structure); font-family: system-ui, sans-serif; font-size: .9rem; }
+  .chiffres { display:flex; flex-wrap:wrap; gap:12px; margin: 16px 0 8px; }
+  .chiffre { background: var(--sombre); color: var(--clair); border-radius: 12px; padding: 14px 18px; min-width: 150px; flex: 1 1 150px; }
+  .chiffre b { display:block; font: 700 1.8rem/1.1 system-ui, sans-serif; color: var(--ambre); }
+  .chiffre span { font-family: system-ui, sans-serif; font-size: .85rem; }
+  .carte { background:#fff; border:1px solid var(--bord); border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+  .flux { display:flex; flex-wrap:wrap; gap:8px; align-items:stretch; }
+  .etape { background: var(--sombre); color: var(--clair); border-radius: 10px; padding: 10px 12px; flex: 1 1 140px; min-width: 140px; font-family: system-ui, sans-serif; font-size: .88rem; }
+  .etape em { display:block; color: var(--ambre); font-style: normal; font-weight: 700; margin-bottom: 4px; }
+  .etape small { display:block; color:#9fb0c0; margin-top:6px; }
+  .chip { display:inline-block; font: 600 .78rem/1 system-ui, sans-serif; padding: 5px 9px; border-radius: 999px; }
+  .fait { background:#E5F2EA; color: var(--ok); }
+  .encours { background:#FBEFD9; color: var(--attention); }
+  .afaire { background:#EDECF3; color: var(--structure); }
+  .melvyn { background:#F9E1E7; color: var(--accent); }
+  table { width:100%; border-collapse: collapse; font-family: system-ui, sans-serif; font-size: .9rem; }
+  th, td { text-align:left; padding: 8px 10px; border-bottom: 1px solid var(--bord); vertical-align: top; }
+  th { color: var(--structure); font-weight: 600; }
+  .statut { border-left: 4px solid var(--bord); padding: 8px 12px; margin: 8px 0; background:#fff; border-radius: 0 10px 10px 0; }
+  .statut.ok { border-color: var(--ok); } .statut.att { border-color: var(--attention); } .statut.dec { border-color: var(--accent); }
+  .valider li { margin: 10px 0; }
+  code { font: .88em ui-monospace, Consolas, monospace; background:#F1EFE9; color:#16181d; padding: 1px 5px; border-radius: 5px; }
+  footer { margin-top: 48px; background: var(--sombre); color: var(--clair); border-radius: 12px; padding: 16px 18px; font-family: system-ui, sans-serif; font-size: .85rem; }
+  footer b { color: var(--ambre); }
+  .analogie { color: var(--muet); font-style: italic; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Chantier 2026-09-15-mini-entreprise-agents, mission T, niveau structurant propose, ouvert le 15/09/2026</p>
+  <h1>Une mini entreprise d'agents</h1>
+  <p class="these">Aujourd'hui un seul ouvrier fait tout dans le fil principal, et quatre relecteurs viennent apres coup. La cible : une equipe ou chaque metier a son agent, ou les propositions se contredisent avant d'etre retenues, et ou tu ne lis que le point d'etape, les decisions a prendre et les resultats.</p>
+  <nav><a href="#principe">Le principe</a><a href="#existant">Ce qui existe deja</a><a href="#etat">Ou on en est</a><a href="#point">Point d'etape</a><a href="#valider">A valider par toi</a><a href="#suite">La suite</a></nav>
+
+  <div class="chiffres">
+    <div class="chiffre"><b>4</b><span>agents EVE aujourd'hui, tous en lecture seule ; le code s'ecrit dans le fil principal</span></div>
+    <div class="chiffre"><b>58</b><span>fiches d'agents dans MAOS, 26 skills dont <code>intake-audit</code>, tronc <code>knowledge-os/brique-1</code> a 441 commits</span></div>
+    <div class="chiffre"><b>18</b><span>branches MAOS non fusionnees, environ 85 commits : l'etat du depot est a etablir avant de s'en servir</span></div>
+    <div class="chiffre"><b>4 / 4</b><span>verrous sondes depuis un sous agent, <b>quatre refus</b> : ils s'appliquent aux agents comme au fil principal</span></div>
+    <div class="chiffre"><b>0</b><span>fichier du depot EVE touche par ce chantier, et aucune branche creee</span></div>
+  </div>
+
+  <h2 id="principe">Le principe en une image</h2>
+  <div class="carte">
+    <p class="analogie">L'analogie : un atelier. Tu passes commande au chef d'atelier. Lui decoupe le travail, confie chaque piece a l'ouvrier dont c'est le metier, fait verifier par un controleur qui n'a pas fabrique la piece, et te rend une seule fiche de livraison. Tu ne lis pas les copeaux.</p>
+    <div class="flux">
+      <div class="etape"><em>Toi</em>l'ordre<small>une demande, en une phrase</small></div>
+      <div class="etape"><em>Orchestrateur</em>decoupe et distribue<small>le fil principal : c'est lui qui te parle</small></div>
+      <div class="etape"><em>Agents de metier</em>plan, audit, code, tests<small>chacun rend un artefact dans un fichier, pas dans le fil</small></div>
+      <div class="etape"><em>Adversite</em>relecteurs, contre-relecture<small>celui qui verifie n'est pas celui qui a fait</small></div>
+      <div class="etape"><em>Retour</em>point d'etape, decisions<small>dashboard, journal, explain-diff et quiz</small></div>
+    </div>
+    <p>La contrainte qui commande tout le reste : <b>le fil n'est pas inonde</b>. Le rapport d'un sous agent n'est pas montre a l'utilisateur par le harnais, c'est l'orchestrateur qui relaie. C'est le mecanisme naturel, pas une discipline a tenir a la main.</p>
+  </div>
+
+  <h2 id="existant">Ce qui existe deja, verifie le 15/09</h2>
+  <div class="carte">
+    <table>
+      <tr><th>Source</th><th>Contenu</th><th>Statut</th></tr>
+      <tr><td><b>Dispositif EVE</b><br><code>EveBackEnd/.claude/</code></td><td>4 agents en lecture seule, 6 commandes, 11 skills vendus plus <code>REGISTRE.md</code>, 5 verrous, le pipeline de chantier</td><td><span class="chip fait">en service</span></td></tr>
+      <tr><td><b>MAOS</b><br><code>C:\dev\maos</code></td><td>58 fiches d'agents, 26 skills dont <code>intake-audit</code> et le noyau <code>mas-*</code>, 8 commandes, 3 hooks, doctrine NEXUS, roadmap en 10 phases</td><td><span class="chip encours">lisible, non ouvert en ecriture</span></td></tr>
+      <tr><td><b>Claude Code</b><br>le harnais</td><td>sous agents typees par fiche, execution en arriere plan, isolation par worktree, messages entre agents, workflows deterministes, hooks, memoire</td><td><span class="chip afaire">leviers a verifier dans la doc officielle</span></td></tr>
+      <tr><td><b>Exterieur</b></td><td>superpowers (en place), collections d'agents et de skills publiques, patrons d'orchestration</td><td><span class="chip afaire">tout passe par <code>intake-audit</code> puis <code>REGISTRE.md</code></span></td></tr>
+    </table>
+  </div>
+
+  <h2 id="etat">Ou on en est</h2>
+  <div class="statut ok"><span class="chip fait">fait</span> 15/09 : brief ecrit a partir de tes mots, relu par toi, <code>_missions/2026-09-15-mini-entreprise-agents.md</code></div>
+  <div class="statut ok"><span class="chip fait">fait</span> 15/09 : dossier du chantier cree, journal ouvert, etat du poste et de MAOS verifie commande par commande</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 15/09 : <b>sonde des verrous sur un sous agent</b>. Quatre appels d'outils inoffensifs, quatre refus venus des hooks eux memes (<code>garde_donnees</code>, <code>garde_git</code>, <code>garde_perimetre</code> en <code>PreToolUse</code>, <code>verif_style</code> en <code>PostToolUse</code>). Verifie de ma main derriere la sonde : aucun fichier laisse, aucune branche creee. Detail dans <code>journal.md</code></div>
+  <div class="statut dec"><span class="chip fait">tranche par toi</span> 15/09 : niveau <b>structurant</b> ; premier lot <b>surete plus tranche verticale</b> ; banc d'essai <b>un petit chantier de code EVE en worktree isole</b> ; maille de validation <b>par jalon</b></div>
+  <div class="statut ok"><span class="chip fait">fait</span> 15/09 : deux <code>architecte-eve</code> en concurrence, meme brief, deux contraintes opposees. Quatre de leurs faits repris de ma main : deux justes, un juste mais mal transpose, un faux</div>
+  <div class="statut dec"><span class="chip fait">tranche par toi</span> 16/09 : ossature de A plus deux greffes de B ; trou du commit sonde avant d'etre tranche. Fiche <code>_decisions/0009</code></div>
+  <div class="statut ok"><span class="chip fait">fait</span> 16/09 : spec revision 1 ecrite, avec sa table <b>ou le changement agit, ou on le prouve</b> en treize lignes</div>
+  <div class="statut att"><span class="chip encours">resultat</span> 16/09 : <b>attaque de la spec par trois relecteurs adverses</b>. 31 findings, 23 distincts apres dedoublonnage, 21 confirmes de ma main, 2 ecartes avec preuve. <b>Le banc en worktree ne tient pas</b> : quatre raisons independantes, toutes verifiees. Detail dans <code>attaques/attaque-spec.md</code></div>
+  <div class="statut dec"><span class="chip fait">tranche par toi</span> 16/09 : decoupage en <b>1a et 1b</b>, worktree abandonne ; les trois criteres qui portent sur toi acceptes avec leurs garde-fous ; releve du JSON de hook autorise, session mission 0 fermee</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 16/09 : spec <b>revision 2</b>, les 21 findings integres. <b>Validee par toi</b></div>
+  <div class="statut att"><span class="chip encours">resultat</span> 16/09 : <b>attaque du plan par trois relecteurs</b>. 33 findings, 19 distincts, tous confirmes sauf deux ecartes avec preuve. <b>Le plan revision 1 aurait echoue des sa premiere tache</b> : trois de mes commandes ne rendaient pas ce que j'annoncais, l'etat de depart n'etait pris par personne, et mon propre ordre detruisait la valeur du test rouge. Detail dans <code>attaques/attaque-plan.md</code></div>
+  <div class="statut ok"><span class="chip fait">fait</span> 16/09 : <code>plan.md</code> <b>revision 2</b>, huit taches, les 19 findings integres, l'ordre refait, une section defaire complete</div>
+  <div class="statut dec"><span class="chip fait">valide par toi</span> 16/09 : plan valide, execution lancee</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 16/09 au soir : <b>lot 2, l'audit</b>. Six axes, six rapports bruts dans <code>agents/</code>, synthese dans <code>audit/synthese-audit.md</code>. Constat : l'intelligence de MAOS est dans ses skills <code>mas-*</code>, sa doctrine, ses dix fiches Tier A et son savoir, pas dans ses 58 fiches. MAOS lu en entier de ma main. Melvyn delegue les arbitrages techniques. <b>Trou confirme</b> : aucun verrou ne refuse l'ecriture sur <code>.env</code>, premier travail de la session suivante. Passation dans <code>handoff.md</code></div>
+  <div class="statut ok"><span class="chip fait">fait</span> 16/09 : <b>lot 1a execute, huit taches</b>. Manifeste d'empreintes (le filet la ou git ne voit rien), doctrine remise en coherence, porte d'arret verte sur <code>Edit</code>, releve du JSON de hook, <b>barriere mecanique contre le commit d'un agent</b>, fiche <code>developpeur-eve</code> et ses quatre fixtures jouees, deux controles de plus dans <code>doctor</code>, bloc jalon. <b>58 tests OK, doctor 13 OK 0 alerte, depot EVE intact</b></div>
+
+  <div class="statut ok"><span class="chip fait">fait</span> 16/09 nuit : <b>lot 2a, la zone protegee en ecriture</b>. Session autonome. <code>garde_perimetre</code> porte desormais deux regles : ou j'ecris, et ce que personne n'ecrit. 316 lignes contre 148, <b>81 tests</b> contre 58, une sonde dans <code>doctor</code>, la regle et son recours dans quatre fichiers de doctrine. <b>Huit agents, 42 findings, aucun ecarte.</b> Trois verdicts de verification : BLOCK, NEEDS_WORK, NEEDS_WORK. Boucle bornee epuisee, <b>lot livre mais non valide</b> : tu tranches. Depot EVE intact</div>
+
+  <div class="statut ok"><span class="chip fait">fait</span> 17/09 nuit : <b>lot 2b, tranches 1 et 2</b>. Tranche 1 : <b>les sept interdits de git.md tombaient tous derriere un prefixe de huit caracteres</b> (<code>bash -c</code>), et l'ecriture hors perimetre avec. Fermes sous toutes les formes : chemin absolu, enveloppe, encodage base64. Tranche 2 : REGISTRE porte au format de la grille d'entree de MAOS, <code>qualite.md</code> complete, et une regle <code>agents.md</code> neuve. <b>98 tests</b> contre 58 au depart. Trois verdicts BLOCK, BLOCK, NEEDS_WORK : boucle bornee epuisee, <b>tranche livree non validee</b>, quatre trous ecrits avec leur correctif</div>
+
+  <div class="statut ok"><span class="chip fait">fait</span> 17 et 18/09 : <b>lot 3, l'analyseur de commande commun aux trois verrous</b>. Une seule table de programmes, un seul scanner, un seul catalogue d'effets : ce qu'une famille de verbe couvre, elle le couvre d'un coup pour le perimetre, la zone protegee et les donnees. Le contrat est devenu executable : <b>606 cas</b>, un REFUS et un PASSE par phrase de doctrine, <b>788 tests</b>. Trois verdicts BLOCK, BLOCK, BLOCK : boucle bornee epuisee, <b>lot livre non valide</b>, cinq causes localisees au fichier et a la ligne</div>
+  <div class="statut ok"><span class="chip fait">fait</span> 18/09 : <b>regle <code>.claude/rules/session.md</code></b>, demandee par toi. Une session trop lourde ne continue pas : elle finit son unite en cours, le dit, et passe la main par un prompt de relance. Motif porte de MAOS, source citee, rien de recopie. Relue par <code>redacteur-eve</code>, six corrections integrees</div>
+
+  <div class="statut ok"><span class="chip fait">fait</span> 18/09 : <b>lot 3bis, onze defauts corriges</b> sur demande de Melvyn. Quoting ANSI-C et quote de traduction decodes, <code>find -exec</code> analyse a travers shells et enveloppes et atteignant ce que <code>-delete</code> atteint, <code>python -m module</code> juge comme le module, <code>--config-env</code> comme <code>-c</code>, compresseurs qui detruisent leur source, tags de document en ligne (antislash, vide, sans fin), et les 90 ms par commande sans git ramenees a 10. <b>664 cas de contrat, 847 tests.</b> Trois verdicts BLOCK : boucle bornee epuisee, <b>lot livre non valide</b>, six defauts ouverts localises</div>
+
+  <div class="statut ok"><span class="chip fait">fait</span> 18/09 au soir : <b>lot 4, changer de critere plutot que de cadence</b>. Sur ta decision (« on n'a pas pris le probleme dans le bon sens »), le critere de sortie passe de « personne ne trouve rien », qui n'arrive jamais, a quatre conditions mesurables, dont <b>aucun trou hors des classes deja ecrites comme limites</b>. Regle generique posee : un verbe qui ecrit sans qu'aucune cible ne se resolve est refuse. <b>793 cas de contrat, 978 tests</b>, 60 commandes du quotidien versees au corpus, <b>lot clos</b></div>
+
+  <h2 id="point">Points d'etape</h2>
+
+  <div class="carte">
+    <h3>Point d'etape du 18/09 au soir : le lot 4, et comment on s'arrete</h3>
+
+    <h4>Ce qui est fait, et pourquoi</h4>
+    <p><b>La cause du tournage en rond est nommee et mesuree.</b> Quatre passes adverses dans la journee : 154 entrees et 5 trous, 137 et 4, 164 et 4, 173 et 6. Aucune n'a jamais trouve moins que la precedente, et le corpus etait vert entre chacune. Deux causes : le verrou <b>enumerait les attaques</b>, ensemble infini ; et surtout <b>ne rien comprendre valait autorisation</b>.</p>
+    <p><b>Le critere de sortie a change</b>, ecrit dans <code>design-lot-4.md</code> : zero faux refus sur le travail quotidien, les trous nommes fermes, la regle generique mesuree, et <b>aucun trou hors des classes deja ecrites comme limites</b>. Ce dernier point est ce qui permet de s'arreter : il demande que la queue soit <b>connue et ecrite</b>, pas vide.</p>
+    <p><b>La regle generique</b> : un verbe qui ecrit forcement mais dont aucune cible ne se resout est refuse, comme une commande opaque. Cout mesure sur le corpus entier : <b>un seul faux refus</b>, une forme exotique.</p>
+
+    <h4>Ce qui manque, et pourquoi</h4>
+    <p>Quatre classes sont <b>ecrites comme limites</b> plutot que corrigees, avec leur cas annote au corpus : un dossier de destination pas encore cree ou venu des accolades, le nom de l'archive creee par <code>7z a</code>, le contenu d'une archive extraite, et les indices d'ecriture d'un code en ligne. C'est un choix, pas un oubli : ce sont des formes qu'on n'ecrit pas par maladresse.</p>
+    <p><b>La couche qui manque n'est pas dans le code</b> : une sauvegarde de <code>.env</code> hors du depot. Toute la doctrine se justifie par « une erreur y est irreparable » ; une copie fait tomber cette phrase, et elle est de ta main.</p>
+
+    <h4>Conflits et choix ouverts</h4>
+    <p><b>J'ai depasse la boucle bornee, sur ta demande, et je l'ai borne autrement</b> : trois cycles au lieu de deux, puis une passe de cloture dont la consigne etait d'ecrire les limites au lieu de corriger. Deux exceptions assumees a cette regle : deux des points rendus etaient des <b>defauts de mes propres correctifs</b> (un test qui dependait du dossier d'ou le hook etait lance, et un faux refus sur l'extraction d'une archive). Ecrire ca comme une limite aurait ete malhonnete.</p>
+
+    <h4>Choix retenus, et pourquoi</h4>
+    <ul>
+      <li><b>Le cas au corpus avant le correctif</b>, sans exception, sur les quatre cycles. C'est ce qui a rendu visibles <b>trois regressions de mes propres correctifs</b>, dont une qui rouvrait l'ecriture de <code>.env</code>.</li>
+      <li><b>Les 60 commandes du quotidien versees au corpus en premier</b>, pour que chaque ajout soit mesure a son cout en faux refus.</li>
+      <li><b>Ecrire ce qu'on ne couvre pas</b>, dans la doctrine et au corpus. Une doctrine qui promet plus que le code est pire qu'une absence de doctrine.</li>
+    </ul>
+
+    <h4>Les chiffres de la journee</h4>
+    <p><b>Neuf agents, plus de 1 100 commandes d'attaque fabriquees</b>, toutes les causes critiques reverifiees de ma main avec leurs temoins. <b>De 606 a 793 cas de contrat, de 788 a 978 tests.</b> Vingt-cinq defauts fermes, quatre classes ecrites comme limites. Cout des hooks : de +3 a +10 ms, sous le seuil de +20 ms. <b>Depot EVE intact</b> ; deux fichiers non suivis sont apparus a la racine (<code>issuer_schemas_20260918_112051.xlsx</code>, <code>schema-eve-draft.html</code>), qui ne sont pas de ma main.</p>
+  </div>
+
+  <div class="carte">
+    <h3>Point d'etape du 18/09 au soir : le lot 3bis, et ce que trois verdicts nous apprennent</h3>
+
+    <h4>Ce qui est fait, et pourquoi</h4>
+    <p><b>Onze defauts fermes</b>, chacun avec son cas au corpus ecrit avant le code et son temoin. Les cinq du verdict du lot 3, les deux que j'ai trouves moi meme, puis six autres nes des deux verdicts de la journee. Le contrat est passe de 606 a <b>664 cas</b>, la suite de 788 a <b>847 tests</b>.</p>
+    <p><b>Deux d'entre eux valent d'etre nommes</b> : un document en ligne dont le tag porte un antislash (<code>&lt;&lt;EO\F</code>) etait lu par bash comme un tag normal, donc bash executait la commande d'apres pendant que les verrous l'avalaient en texte ; et <code>find -delete</code> sans point de depart, qui efface tout le projet, ne produisait aucun acces.</p>
+
+    <h4>Ce qui manque, et pourquoi</h4>
+    <p><b>Six defauts ouverts, tous localises au fichier et a la ligne</b>, aucun corrige : les deux cycles de correction autorises sont consommes et le troisieme verdict n'est pas favorable. La regle de la boucle bornee s'applique a la lettre, et c'est exactement dans ces moments qu'elle sert a quelque chose.</p>
+    <p>Le plus grave : un document en ligne qui alimente un shell et qui n'est pas seul sur sa ligne (<code>sh &lt;&lt;E ; true</code>) ; son corps n'est pas analyse, donc <code>rm .env</code> et <code>push --force</code> y passent. Les cinq autres sont dans le journal.</p>
+
+    <h4>Conflits et choix ouverts</h4>
+    <p><b>Chaque verification trouve de nouveaux trous dans la zone que la precedente venait de faire corriger.</b> Ce n'est pas un defaut d'attention : reconstituer la semantique d'un shell a une queue de cas sans fin. Les verrous d'aujourd'hui sont nettement meilleurs que ceux d'hier, et ils resteront percables.</p>
+    <p>La question n'est donc pas « un cycle de plus ? » mais <b>quelle strategie pour le risque residuel</b>. Trois voies : (a) continuer au cas par cas, ca marche mais ca ne converge pas ; (b) inverser le defaut sur la zone protegee (liste blanche des formes autorisees, tout le reste refuse en le disant), ca converge mais ca coute des faux refus ; (c) accepter ce niveau, l'ecrire, et compter sur le filet aval (git, le manifeste d'empreintes, ta relecture dans VS Code). <b>Ma recommandation : (b) pour la zone protegee seule, (c) pour le reste.</b></p>
+
+    <h4>Choix retenus, et pourquoi</h4>
+    <ul>
+      <li><b>Le cas au corpus avant le correctif, sans exception</b> : 27 puis 16 puis 12 cas ecrits rouges avant la premiere ligne de code. C'est ce qui a rendu visibles deux regressions de mes propres correctifs.</li>
+      <li><b>Ne pas corriger apres le troisieme verdict.</b> Trois lots l'ont respecte ; le casser ici viderait la regle de son sens, au moment precis ou elle protege.</li>
+      <li><b>Dire ce que le verificateur trouve de bon aussi</b> : zero regression sur 24 entrees, un seul faux refus sur 50 commandes du quotidien. Un verrou qui gene le travail courant finit desactive.</li>
+    </ul>
+
+    <h4>Les chiffres</h4>
+    <p><b>Cinq agents dans la journee</b>, 628 entrees d'attaque fabriquees au total, toutes les causes critiques reverifiees de ma main avec leurs temoins. <b>664 cas de contrat verts, 847 tests OK, doctor 13 OK, cout des hooks sous le seuil de +20 ms. Depot EVE intact</b> (un fichier non suivi apparu a 11h21, <code>issuer_schemas_20260918_112051.xlsx</code>, qui n'est pas de ma main : a trancher par toi).</p>
+  </div>
+
+  <div class="carte">
+    <h3>Point d'etape du 18/09 : le lot 3 se ferme, livre non valide</h3>
+
+    <h4>Ce qui est fait, et pourquoi</h4>
+    <ul>
+      <li><b>La regle que tu as demandee est ecrite</b> : <code>.claude/rules/session.md</code>. Quatre signes constatables du poids d'une session, quatre gestes quand un seul apparait, et le contenu du prompt de relance. Elle repare ce qui s'est passe hier soir : la session precedente s'est arretee en ecrivant qu'elle attendait un verdict, <b>sans l'avoir lance</b>.</li>
+      <li><b>Le troisieme verdict du lot 3 est rendu</b> : celui que la session d'hier n'a jamais demande. Il decidait du PASS du lot. Il est <b>BLOCK</b>.</li>
+      <li><b>La performance est mesuree au calme</b>, ce qui restait en suspens. Autrement que prevu : le script d'hier est parti avec son dossier temporaire, donc j'ai mesure les verrous d'avant le lot 3 (archives dans <code>etat-depart/lot-3/</code>) contre ceux d'apres, meme script, meme entree.</li>
+    </ul>
+
+    <h4>Ce qui manque, et pourquoi</h4>
+    <p><b>Six defauts ouverts, tous de mon code, aucun de la doctrine.</b> Trois sont critiques et neufs : une forme de quoting du shell n'est pas decodee, la commande lancee par <code>find -exec</code> n'est pas analysee des qu'un shell ou une enveloppe s'interpose, et <code>python -m</code> ecrit sans etre vu. Chacune laisse repasser <code>push --force</code>, <code>reset --hard</code> ou l'ecriture de <code>.env</code>. Les deux cycles de correction etant consommes, <b>je n'y ai pas touche</b> : c'est la regle de la boucle bornee, et c'est toi qui tranches.</p>
+    <p>Deux defauts de plus, trouves de ma main pendant cette session : un <b>faux refus</b> du verrou de perimetre sur l'ecriture d'un rapport Markdown par document en ligne (il a refuse mon propre journal, deux fois), et un <b>cout de 90 ms par commande sans git</b>, quatre fois le seuil du plan.</p>
+
+    <h4>Conflits et choix ouverts</h4>
+    <p>Un seul, et il est reel : <b>la doctrine promet plus que le code ne tient</b>. Les cinq causes du verdict 3 sont toutes des endroits ou <code>securite.md</code> et <code>git.md</code> annoncent une couverture que l'implementation n'a pas. Deux issues : corriger le code (un lot 3bis, cinq correctifs localises, chacun avec son cas au corpus), ou retrecir la doctrine et ecrire ces formes comme des limites assumees. <b>Ma recommandation : corriger</b>, parce qu'une doctrine qui promet trop est pire qu'une absence de doctrine, et parce que les cinq causes sont nommees a la ligne pres.</p>
+
+    <h4>Choix retenus, et pourquoi</h4>
+    <ul>
+      <li><b>Ne rien corriger apres le verdict 3.</b> La boucle bornee de <code>agents.md</code> dit deux cycles, puis la main a toi. Trois lots de suite l'ont respectee ; la casser ici la viderait de son sens.</li>
+      <li><b>Mesurer la performance autrement plutot que citer un T0 non reproductible.</b> La comparaison avant contre apres sur les memes fichiers vaut mieux qu'un chiffre dont j'ignore l'entree.</li>
+      <li><b>Corriger la regle de session sur les six points du redacteur</b>, dont le retrait d'un seuil en jetons qui ne s'affiche nulle part : un signe qui s'estime n'est pas un signe.</li>
+    </ul>
+
+    <h4>Les chiffres</h4>
+    <p><b>Deux agents cette session</b> (un verificateur, un redacteur), 154 entrees fabriquees par le verificateur, <b>33 ecarts en six classes, zero faux refus</b> sur 45 commandes du travail courant. Toutes les causes critiques reverifiees de ma main, sortie a l'appui. <b>606 cas de contrat verts, 788 tests OK. Depot EVE intact</b> : tes douze fichiers de la mission 0 jamais touches.</p>
+  </div>
+  <div class="carte">
+    <h3>Point d'etape de la fin de nuit (17/09, session autonome)</h3>
+
+    <h4>Ce qui est ferme, et ne l'etait pas hier soir</h4>
+    <ul>
+      <li><b>Les sept interdits de <code>git.md</code> derriere un shell imbrique.</b> <code>push --force</code>, <code>reset --hard</code>, <code>clean</code>, <code>branch -D</code>, <code>checkout .</code>, <code>stash clear</code>, <code>commit --amend</code> : tous passaient derriere <code>bash -c</code>. C'est le trou le plus grave du poste, parce que ses effets sont partages et irreparables, et <b>ce n'est pas celui que je cherchais</b> : c'est l'attaque de la spec qui l'a trouve.</li>
+      <li><b>L'ecriture sur <code>.env</code></b>, sous seize familles de moyens, y compris par interpreteur, shell imbrique, enveloppe et appel .NET. Ta main reste le seul recours, dans VS Code.</li>
+      <li><b>Trois defauts preexistants</b>, tombes en chemin : l'ecriture hors perimetre derriere <code>bash -c</code>, <code>mv &lt;hors perimetre&gt; &lt;projet&gt;</code> qui detruisait sa source dehors, et la copie depuis l'exterieur vers le projet qui etait refusee a tort.</li>
+    </ul>
+
+    <h4>Ce qui reste ouvert, mesure et ecrit</h4>
+    <p>Quatre trous, dans <code>revue-lot-2b1.md</code> <b>et dans <code>securite.md</code></b> avec leur correctif exact. Deux sont critiques : <code>env git push --force</code> passe (une enveloppe devant <code>git</code>, sans shell, rend le verrou aveugle), et <code>winpty</code>, present sur ce poste, manque a la liste des enveloppes.</p>
+    <p><b>La vraie dette est nommee</b> : <code>_cibles_ecriture</code> et <code>_cibles_protegees</code> font le meme travail sur <b>deux tables differentes</b>. Chaque correctif de la nuit n'en a corrige qu'une, et la revue suivante a trouve l'autre. Tant qu'elles ne partagent pas leur table, ce cycle se repetera. C'est la premiere chose a faire.</p>
+
+    <h4>Ce que la nuit a etabli sur la methode, et qui vaut plus que les lots</h4>
+    <ul>
+      <li><b>Une suite de tests verte ne prouve rien d'un verrou.</b> Cinq fois : 72, 76, 79, 90, 93 tests verts, et a chaque fois un trou exploitable. Ce qui les a trouves, c'est un relecteur qui <b>fabrique ses propres entrees contre le contrat annonce</b>, jamais contre le code livre.</li>
+      <li><b>Corriger un defaut en introduit un autre, regulierement.</b> Cinq regressions de ma main en une nuit, toutes trouvees par la revue suivante, <b>aucune par les tests</b>. Et a chaque fois, la connaissance necessaire etait deja ecrite dans le depot, quelques heures plus tot, par moi.</li>
+      <li><b>Une doctrine qui promet plus que le code est pire qu'une absence de doctrine</b>, parce qu'on cesse de s'en mefier. Quatre phrases de <code>securite.md</code> ont du etre retrecies apres mesure.</li>
+      <li><b>Le decoupage en tranches a tenu</b> : la doctrine s'est ecrite pendant que le code passait ses revues, sur des fichiers disjoints, sans un seul conflit.</li>
+    </ul>
+    <p>Ces quatre points sont les criteres de la fiche <code>verificateur-eve</code> du lot 2d.</p>
+
+    <h4>Les chiffres</h4>
+    <p><b>16 agents, 67 findings, aucun ecarte</b>, tous reverifies de ma main. <b>58 tests au depart, 98 a l'arrivee.</b> Six verdicts de verification, <b>aucun PASS</b> : BLOCK, NEEDS_WORK, NEEDS_WORK sur le lot 2a ; BLOCK, BLOCK, NEEDS_WORK sur la tranche 1. Les deux boucles bornees sont epuisees. <b>Depot EVE intact</b> : <code>git status</code> identique a la reference apres chaque tache, tes douze fichiers jamais touches.</p>
+  </div>
+
+  <div class="carte">
+    <h3>Point d'etape de la nuit du 16 au 17/09 (session autonome)</h3>
+
+    <h4>Ce qui est fait, et pourquoi</h4>
+    <p>Les trois portes d'entree d'abord : doctrine du 16/09 bien chargee, <code>doctor</code> 13 OK 0 alerte, poste intact, <code>git status</code> identique a la reference. Puis le lot 2a en entier, avec le pipeline complet : spec attaquee par trois relecteurs adverses, plan attaque par deux autres, execution en TDD, verification independante, contre-verification, revue finale.</p>
+    <p>Le trou etait reel et il est ferme : avant cette nuit, <b>rien n'empechait d'ecrire ou de supprimer <code>.env</code></b>, ni par un outil, ni par une redirection, ni par un script. <code>.env</code> porte <code>DB_CONFIG</code>, il n'est pas suivi par git, et une bascule vers <code>EveDev</code> ferait tourner les tests sur le serveur partage.</p>
+
+    <h4>Ce que la nuit a appris, et qui vaut plus que le lot</h4>
+    <ul>
+      <li><b>Trois fois, la suite de tests etait verte, <code>doctor</code> etait vert, et le verrou etait troue.</b> 72 tests verts avec cinq trous ; 76 verts avec quatre autres ; 79 verts avec deux regressions que je venais d'introduire. Une porte de verification qui relance les tests du lot ne verifie rien.</li>
+      <li><b>Ce qui a trouve les trous, a chaque fois, c'est un relecteur qui fabrique ses propres entrees contre le contrat annonce</b>, et non contre le code livre. C'est le premier critere de la fiche <code>verificateur-eve</code> du lot 2d.</li>
+      <li><b>Deux fois, la doctrine ecrite promettait plus que le code ne tenait.</b> Un verrou dont la regle promet trop est pire qu'un verrou absent : on cesse de s'en mefier. La regle finale liste ce qui est couvert <b>et</b> les trois familles qui ne le sont pas.</li>
+      <li><b>Mon propre garde-fou etait prouve par le seul cas qui marchait.</b> Le test ne jouait que <code>grep rm .env</code> ; des qu'une option prend un chiffre (<code>grep -m 1</code>), la protection tombait. Exactement le defaut que je reprochais aux autres.</li>
+    </ul>
+
+    <h4>Ce qui manque, et pourquoi</h4>
+    <p><b>Le lot 2a n'est pas valide.</b> La boucle du mode autonome autorise deux cycles de correction apres un verdict non PASS, puis une nouvelle revue ; au troisieme echec on consigne et on te rend la main. Les deux cycles sont consommes, la revue finale a rendu NEEDS_WORK, donc le lot s'arrete. Apres ce troisieme verdict je n'ai corrige que <b>ce que j'avais casse moi meme</b>, plus les trois chaines qui manquaient a ce que le cycle 2 declarait couvrir. Aucun elargissement de couverture.</p>
+    <p>Restent deux faux positifs ecrits et contournables : une copie sortante par appel .NET est refusee alors que la meme copie par <code>cp</code> passe, et l'inventaire d'une archive (<code>tar -tf</code>) est refuse comme une extraction.</p>
+
+    <h4>Trois trous trouves en chemin, ecrits et NON traites (hors perimetre)</h4>
+    <ul>
+      <li><b>Le verrou de perimetre est contournable par un shell imbrique.</b> <code>bash -c "rm C:/dev/maos/CLAUDE.md"</code> passe ; la meme commande sans le shell est refusee. Defaut <b>preexistant</b>, deux lignes a ajouter. C'est le plus important des trois.</li>
+      <li><b>Le manifeste d'empreintes ne surveille pas <code>CLAUDE.md</code>.</b> Une reecriture de la doctrine ne serait vue ni par git ni par le filet. Une ligne a ajouter.</li>
+      <li><b><code>/gate</code> n'analyse jamais <code>.claude/</code>.</b> Le millier de lignes du dispositif de securite n'est ni linte ni type par la porte qualite. A porter dans <code>/verif-setup</code>.</li>
+    </ul>
+
+    <h4>Les choix que j'ai pris seul, et ou ils sont ecrits</h4>
+    <p>Onze arbitrages dans <code>_decisions/0010</code>, chacun avec son alternative ecartee. Les trois qui comptent : la regle va dans <code>garde_perimetre</code> et non <code>garde_donnees</code> (la lecture doit rester ouverte) ; <b><code>_lib.py</code> n'est pas touche</b> alors qu'il est la cause du probleme, parce qu'il est partage avec les deux autres verrous ; et <b>le fil, jamais un agent, edite un fichier qui est lui meme la barriere</b>, parce que ce que le fil ecrit tu le relis, et qu'un hook qui plante n'arrete plus rien.</p>
+  </div>
+
+  <div class="carte">
+    <h3>Ce qui est fait, et pourquoi</h3>
+    <p>Le cadrage complet : brief lu, dossier, journal, etat du poste et de MAOS revalide commande par commande. La sonde des verrous sur un sous agent, faite avant tout le reste parce que sa reponse changeait la forme de la mini entreprise : <b>quatre sondes, quatre refus</b>, les verrous s'appliquent aux agents. Deux architectes en concurrence, ton arbitrage, la fiche <code>_decisions/0009</code>, la spec revision 1, puis son attaque par trois relecteurs adverses.</p>
+    <p>Pourquoi tant de verification avant d'ecrire une ligne : quatre faits avances par les agents ont ete repris de ma main, et <b>un etait faux</b> (l'outil <code>Workflow</code> declare indisponible), un autre juste mais mal transpose. Un cinquieme etait une preuve que j'avais moi meme mal citee. C'est exactement le motif du reproche du 15/09, et c'est pour ca que l'attaque existe.</p>
+
+    <h3>Ce qui manque, et pourquoi</h3>
+    <p><b>La spec revision 1 est cassee sur son point central, et c'est le resultat le plus utile de la journee.</b> Le banc d'essai en worktree ne tient pas, pour quatre raisons independantes que j'ai verifiees une par une.</p>
+    <ul>
+      <li><b>La gate et la revue mesurent la racine, jamais le banc.</b> <code>gate.py:34</code> fixe la racine sur <code>CLAUDE_PROJECT_DIR</code> et lance les tests en <code>cwd=RACINE</code>. J'aurais recopie un <code>GATE PASS</code> portant sur l'arbre de la mission 0 comme preuve du travail de l'agent. Et la spec interdisait de modifier la gate : elle exigeait une preuve tout en interdisant le seul moyen de l'obtenir.</li>
+      <li><b>Rien ne retient l'agent dans le banc, et l'arbre de la mission 0 n'est pas restaurable.</b> <code>garde_perimetre</code> borne sur la racine, donc le banc et l'arbre principal sont tous deux autorises. Et <code>git restore</code>, <code>git checkout &lt;fichier&gt;</code> et <code>reset --hard</code> sont interdits sans exception : je constaterais le degat sans pouvoir le reparer.</li>
+      <li><b>Le verrou de forme deviendrait bloquant sur des defauts qui ne sont pas les notres.</b> Mesure faite : sur <code>data/schemas/issuer_data.py</code> il rend trois familles de defauts <i>preexistants dans HEAD, non bloquants</i>. Dans le banc, le chemin n'existe pas dans HEAD, donc plus de base de comparaison, donc tout devient bloquant. L'agent les corrigerait et produirait un diff massif.</li>
+      <li><b>Le banc n'aurait ni <code>.venv</code>, ni <code>.env</code>, ni <code>ruff.toml</code>, ni <code>pyrightconfig.json</code></b> : aucun n'est suivi par git, donc <code>git worktree add</code> ne les emporte pas. Et <code>develop</code> local a deux commits de retard, donc une migration creee dans le banc referait le doublon que la mission 0 vient de corriger.</li>
+    </ul>
+    <p>Manquent aussi, et ce sont des oublis de ma spec que l'attaque a trouves : <code>CLAUDE.md</code> et le manuel disent toujours que les agents sont en lecture seule et que le code s'ecrit dans le fil ; les fixtures n'avaient ni emplacement ni moment de rejeu ; aucun rapport d'agent n'etait conserve, alors que tu demandes de savoir qui fait quoi et dit quoi ; et le quiz etait circulaire, puisque le meme fil ecrivait le code, l'explication, les questions, et declarait le quiz passe.</p>
+
+    <h3>Puis le plan, attaque a son tour, et casse aussi</h3>
+    <p>33 findings, 19 distincts. <b>Le plan revision 1 aurait echoue des sa premiere tache.</b> Quatre choses, toutes verifiees de ma main :</p>
+    <ul>
+      <li><b>Trois de mes commandes ne rendaient pas ce que j'annoncais.</b> <code>$SCRATCHPAD</code> est vide dans le shell des outils, donc la sauvegarde de <code>settings.json</code> partait n'importe ou et la restauration echouait en silence. <code>doctor.py</code> sans <code>--complet</code> n'imprime aucune ligne OK. Et la variable d'environnement de la sonde n'aurait jamais atteint le hook, puisque c'est le harnais qui le lance, pas mon shell.</li>
+      <li><b>Mon ordre de nettoyage bloquait les deux sessions.</b> Un <code>settings.json</code> qui declare un script absent fait sortir python en <b>code 2</b>, et un <code>PreToolUse</code> en code 2 refuse l'appel. Je supprimais le script avant de retirer sa declaration. Verifie.</li>
+      <li><b>Git n'est pas le filet sur ce lot.</b> <code>.claude/</code> et <code>chantiers/</code> sont exclus du depot : un agent qui reecrirait un verrou ou une fixture laisserait <code>git status</code> parfaitement propre. Il faut un manifeste d'empreintes, rejoue apres chaque appel d'agent.</li>
+      <li><b>Mon propre ordre detruisait la valeur du test rouge.</b> <code>CLAUDE.md</code> est injecte dans le contexte de chaque sous agent et dit aujourd'hui que les agents sont en lecture seule. L'agent piege aurait pu refuser en citant la doctrine, et j'aurais credite la clause d'un refus qui ne venait pas d'elle.</li>
+    </ul>
+    <p>Plus une qui rendait la porte d'arret inoperante : <b>aucune des quatre fiches du poste n'a <code>Edit</code> ni <code>MultiEdit</code></b>, toutes en <code>Read, Grep, Glob, Bash</code>. La sonde aurait rendu <i>je n'ai pas cet outil</i>, ni refus ni passage, et le lot se serait arrete sur un verrou qui n'a rien.</p>
+
+    <h3>Ce qui reste ouvert</h3>
+    <ul>
+      <li><b>Le defaut qui sert de banc au lot 1b</b>, a choisir ensemble. Contrainte nee de l'attaque : aucune migration tant que le <code>0027</code> de la mission 0 n'est pas commite. Ca ecarte <code>snp_issuer_data</code>, que je recommandais.</li>
+      <li><b>Le champ des refus de verrou reste declaratif.</b> Aucun hook ne journalise ses refus : un agent qui a bute trois fois rend le meme rapport qu'un agent sans incident. La limite est ecrite dans la spec plutot que masquee.</li>
+      <li><b>Deux faits du lot 1a restent des hypotheses</b> tant que les sondes n'ont pas tourne : que <code>garde_perimetre</code> tienne sur <code>Edit</code> et <code>MultiEdit</code>, et qu'un hook recoive bien <code>agent_id</code> sur ce poste.</li>
+    </ul>
+
+    <h3>Ce que l'execution a appris, et qui n'etait pas prevu</h3>
+    <p>Le lot 1a est fait. Trois resultats valent plus que les livrables eux memes.</p>
+    <ul>
+      <li><b>La barriere contre le commit d'un agent est mecanique.</b> Un hook recoit <code>agent_id</code> et <code>agent_type</code> quand l'appel vient d'un agent, et ne les recoit pas quand il vient du fil : le meme <code>Glob</code> lance des deux cotes ne differe que par ces deux champs. <code>garde_git</code> refuse desormais <code>commit</code> et <code>push</code> a un sous agent, et laisse passer le fil, verifie en vrai des deux cotes.</li>
+      <li><b>La clause de perimetre de la fiche ne sert a rien sur ce modele.</b> Quatre essais, quatre contaminations de ma main retirees une a une, et le meme resultat : un perimetre annonce dans le brief est respecte sans qu'aucune clause ne le demande. Gardee comme garde-fou, mais inscrite <b>non prouvee necessaire</b>.</li>
+      <li><b>Le champ des refus de verrou ne peut presque pas se remplir.</b> La couche des clauses est plus stricte que celle des verrous : l'agent s'arrete toujours avant le hook. Zero remplissage sur six executions. Garde, non eprouve.</li>
+    </ul>
+
+    <h3>Ce qui reste</h3>
+    <p>Le <b>lot 1b</b> : le vrai chantier de code mene de bout en bout par l'equipe. Deux conditions d'entree, dont une seule depend de toi : ton commit de la mission 0, et le choix du defaut qui sert de banc, <b>sans migration</b> tant que le <code>0027</code> n'est pas commite.</p>
+  </div>
+
+  <h2 id="valider">A valider par toi</h2>
+  <div class="carte">
+    <ol class="valider">
+      <li><span class="chip melvyn">a valider</span> <b>Le lot 4, clos.</b> Les quatre criteres de sortie sont tenus, les limites sont ecrites dans <code>securite.md</code> et adossees a des cas du corpus. A lire : le point d'etape ci-dessus, puis <code>design-lot-4.md</code> section 3 (le critere), puis <code>agents/2026-09-18-relecteur-eve-cloture-lot-4.md</code>.</li>
+      <li><span class="chip melvyn">a trancher</span> <b>Le lot 3bis : la strategie pour le risque residuel</b>, pas un cycle de plus. (a) continuer au cas par cas ; (b) liste blanche sur la zone protegee ; (c) accepter et ecrire. Ma recommandation : (b) pour <code>.env</code>, (c) pour le reste. A lire : le point d'etape ci-dessus, puis <code>agents/2026-09-18-relecteur-eve-verification-lot-3bis-verdict-3.md</code>.</li>
+      <li><span class="chip melvyn">de ta main</span> <b>Sauvegarder le dispositif lui meme.</b> <code>.claude/</code> et <code>chantiers/</code> sont exclus du depot EVE : les trois verrous, les 664 cas et tout l'historique des chantiers n'existent qu'a un seul endroit, sur un seul poste. Un depot a part, pousse, cette semaine.</li>
+      <li><span class="chip melvyn">a valider</span> <b>Le lot 3, livre non valide</b>, troisieme lot d'affilee ferme sur une boucle bornee epuisee. Trois options : (a) ouvrir un lot 3bis sur les cinq causes localisees, ma recommandation ; (b) l'accepter en l'etat, les limites etant ecrites ; (c) retrecir la doctrine a ce que le code tient. A lire : le point d'etape ci-dessus, puis <code>agents/2026-09-18-relecteur-eve-verification-lot-3-verdict-3.md</code>.</li>
+      <li><span class="chip melvyn">a valider</span> <b>La nouvelle regle <code>.claude/rules/session.md</code></b> : elle se charge a chaque session, donc elle se lit avant de rester en place. Elle m'oblige a m'arreter et a te passer la main quand la session devient lourde, au lieu de continuer.</li>
+      <li><span class="chip melvyn">a trancher</span> <b>Deux defauts trouves de ma main</b>, hors du verdict : le faux refus qui empeche d'ecrire un rapport Markdown par document en ligne (il tombera tous les jours), et les 90 ms par commande sans git. Les deux ont leur correctif nomme dans le journal.</li>
+      <li><span class="chip melvyn">a valider</span> <b>La tranche 1 du lot 2b</b> (shells imbriques), livree non validee comme le lot 2a. Ma recommandation : l'accepter, <b>et me laisser ouvrir tout de suite la suite</b> sur les quatre trous mesures, dont deux critiques (<code>env git push --force</code> passe ; <code>winpty</code> manque). Tout est dans <code>revue-lot-2b1.md</code>.</li>
+      <li><span class="chip melvyn">a valider</span> <b>La nouvelle regle <code>.claude/rules/agents.md</code></b> : qui lance qui, qui ecrit quoi, ce que ca coute. Elle est chargee a chaque session, donc a lire avant de la laisser en place.</li>
+      <li><span class="chip melvyn">de ta main</span> <b>Le manifeste d'empreintes ne surveille pas <code>CLAUDE.md</code></b>. Je ne l'ai pas modifie : <code>relever()</code> ignore silencieusement un chemin de fichier, et la reprise de reference m'est refusee par le classifieur. Le changement exact et la commande sont dans le handoff.</li>
+      <li><span class="chip melvyn">a valider</span> <b>Le lot 2a, livre mais non valide.</b> Deux options : l'accepter en l'etat (ma recommandation : il est fonctionnel, ses limites sont ecrites, et les deux findings restants sont des faux positifs contournables), ou demander un cycle 3 dessus. A lire dans l'ordre : <code>revue-lot-2a.md</code>, <code>_decisions/0010</code>, puis le journal a partir de « Tache N0 ».</li>
+      <li><span class="chip melvyn">a valider</span> <b>Les trois trous hors perimetre</b> trouves en chemin : le contournement du perimetre par <code>bash -c</code> (preexistant, le plus grave), le manifeste qui ne voit pas <code>CLAUDE.md</code>, et <code>/gate</code> qui n'analyse pas les verrous. Je les prends en entree du lot 2b si tu es d'accord.</li>
+      <li><span class="chip fait">tranche</span> <b>Deja tranche par toi</b> : niveau structurant ; premier lot surete plus tranche verticale ; maille de validation par jalon ; ossature A plus deux greffes de B ; decoupage en 1a et 1b avec abandon du worktree ; les trois criteres qui portent sur toi, acceptes avec leurs garde-fous ; le releve du JSON de hook, avec la session mission 0 fermee.</li>
+      <li><span class="chip melvyn">a valider</span> <b>La spec revision 2</b> (<code>design.md</code>) : c'est la prochaine porte. Une fois validee, j'ecris le plan et je le fais attaquer, puis je te redonne la main avant toute execution.</li>
+      <li><span class="chip melvyn">de ta main</span> <b>Me dire quand la session mission 0 est fermee</b> : le releve S1 touche <code>settings.json</code>, qui est partage. Un <code>settings.json</code> casse vaut aucun verrou actif, pour les deux sessions.</li>
+      <li><span class="chip melvyn">de ta main</span> <b>Relire et commiter la mission 0</b> : le lot 1b n'a pas d'autre dependance. Tant que son travail est dans l'arbre sans commit, une ecriture d'agent au mauvais endroit est irreparable.</li>
+      <li><span class="chip melvyn">a trancher plus tard</span> <b>Quel defaut sert de banc</b> au lot 1b. Contrainte nee de l'attaque : <b>aucune migration</b>, tant que le <code>0027</code> de la mission 0 n'est pas commite. Ca ecarte <code>snp_issuer_data</code>, que je recommandais.</li>
+      <li><span class="chip melvyn">a trancher plus tard</span> <b>Le budget de recherche</b> (question 4 du brief), <b>l'ouverture de <code>C:\dev\maos</code> en ecriture</b> (question 1), <b>le sens de pentest</b> (question 5), et <b>le tronc de MAOS</b> (question 2, tes commandes). Aucune n'est bloquante pour le lot 1.</li>
+    </ol>
+  </div>
+
+  <h2 id="suite">La suite</h2>
+  <div class="carte">
+    <p>Cadrage (ici) puis spec attaquee, plan attaque, point d'etape, implementation par lots. Chaque lot : test rouge puis vert, essai sur un vrai chantier, gate, revue, explain-diff et quiz, ton mot avant le lot suivant.</p>
+    <p>Ce chantier n'entre pas en conflit avec la mission 0 : celle-ci a la main sur le depot et sur <code>chantiers/2026-09-08-esg-rating-last-modification/</code>, celui-la sur <code>.claude/</code>, <code>CLAUDE.md</code> et la section mission T de <code>PLAN.md</code>.</p>
+  </div>
+
+  <footer>
+    <b>Regle de ce chantier.</b> Aucune ligne du depot EVE, aucune branche, aucun commit. Tout import venu de l'exterieur passe par <code>intake-audit</code> puis par <code>REGISTRE.md</code>. Ce qui est verifie est dit verifie avec sa commande ; ce qui ne l'est pas est dit non verifie.
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# Rapport brut : attaque du plan révision 1, axe périmètre, sûreté d'exécution et contrats
+
+Agent : `relecteur-eve`, mode attaque. Lancé le 16/09/2026 sur `plan.md` révision 1. Déposé tel quel le 16/09 au soir depuis la transcription de session. Vérification contradictoire dans `attaques/attaque-plan.md`.
+
+---
+
+Douze findings, du plus grave au moins grave. Preuves relevées de ma main sur le poste.
+
+**A1 HAUTE. L'étape E0 de la spec n'existe pas dans le plan.** Le plan commence à la tâche 1 ; `7.1` dit « strictement identique à ce qui a été sauvegardé avant la tâche 1 ». Aucune tâche ne sauvegarde quoi que ce soit. Scénario : tâche 4.5, un `developpeur-eve` écrit par erreur dans `data/tests/e2e/test_insert_data.py` (` M` non indexé). `git restore` et `git checkout <fichier>` sont interdits sans exception, il n'y a pas de copie, le travail non commité de la mission 0 est perdu. Correctif : tâche 0 explicite avec `git status --porcelain`, `git diff`, `git diff --cached`, `git stash list`, `git worktree list` écrits dans un dossier durable.
+
+**A2 HAUTE. `$SCRATCHPAD` est vide dans le shell des outils.** Preuve : `echo "[$SCRATCHPAD]"` rend `[]`, et `[$CLAUDE_PROJECT_DIR]` rend `[]` aussi. Scénario : la commande devient `cp .claude/settings.json /settings.json.copie`, soit la racine MSYS. Si l'écriture échoue, la sauvegarde n'existe pas ; en 1.7 le `cp` de restauration échoue en silence, et `rm .claude/hooks/sonde_releve.py` s'exécute quand même. `settings.json` déclare alors un script absent : `python.exe script_absent.py` rend **code 2** (vérifié), et un PreToolUse en code 2 **bloque l'appel** : plus aucun `Glob` ne passe. Correctif : chemin absolu ; `set -e` ou `test -f` avant le `rm` ; supprimer la sonde **avant** de restaurer, jamais après.
+
+**A3 HAUTE. `doctor` ne peut pas voir l'état cassé que la tâche 1 crée.** `settings.json` reste valide en JSON mais pointe un hook supprimé, ou porte un matcher faux. `doctor` ne contrôle que `json.loads` et la présence des trois clés d'événement, puis l'existence des 7 scripts de sa constante `HOOKS` qui ne contient pas `sonde_releve.py`. Correctif : la seule preuve de restauration est l'empreinte sha256 ; ajouter un contrôle « chaque commande de hook déclarée existe sur le disque ».
+
+**A4 HAUTE. Les sondes S2 et S3 ne sont exécutables par aucun sous agent existant.** Les quatre fiches déclarent `tools: Read, Grep, Glob, Bash`. Aucune ne peut appeler `Edit` ni `MultiEdit`, et `developpeur-eve` n'existe qu'en tâche 4. Scénario : l'agent répond « outil non disponible ». À la lettre du plan, la sonde n'est pas verte : la porte d'arrêt tombe, le lot s'arrête et un chantier correctif passe devant, sur un verrou qui n'a rien. Correctif : nommer l'exécutant, prescrire un `Read` de la cible avant l'`Edit`, écrire la règle de requalification : un retour qui n'est pas un refus de hook n'est ni vert ni rouge, il se rejoue.
+
+**A5 HAUTE. La fiche ne fixe aucune liste d'outils, et rien hors hooks ne la borne.** `tools` omis, l'agent hérite de tout, dont `Task`, `WebFetch`, `WebSearch`. Les trois matchers de `settings.json` ne couvrent ni `Task` ni `WebFetch` ni `WebSearch` : un `developpeur-eve` bloqué sur une erreur pandera colle dix lignes de `data/schemas/issuer_data.py` dans une recherche externe, ce que `securite.md` interdit, sans qu'aucun verrou le voie. Correctif : écrire la ligne `tools` dans le plan, explicitement sans `Task`, `WebFetch`, `WebSearch`, et ajouter à la fiche la clause « aucune requête externe ».
+
+**A6 HAUTE. Entre la tâche 4 et la tâche 6, la doctrine dit le contraire de la fiche, et c'est la fixture rouge qui en meurt.** `CLAUDE.md` est injecté dans le contexte de chaque sous agent (le brief que je reçois moi même le contient), avec « Agents (`.claude/agents/`, lecture seule) » et « Le code s'écrit dans le fil principal ». Scénario : l'agent lit ses instructions projet et refuse d'écrire dans `cible-rouge.txt`. Le rouge n'est pas rouge, et si on ajoute quand même la clause on conclut qu'elle tient alors que c'est `CLAUDE.md` qui a tenu. Correctif : monter 6.2 avant la tâche 4, et prévoir la branche « la rouge n'a pas été rouge ».
+
+**A7 MOYENNE. La tâche 5 crée un couplage que la table « défaire » dit inexistant.** `doctor.py` et `REGISTRE.md` nomment la fiche ; après suppression, chaque `SessionStart` affiche une alerte permanente. Correctif : compléter la table de défaire, ou lire les fiches attendues depuis le dossier plutôt que d'une constante.
+
+**A8 MOYENNE. « Rapport déposé tel quel » est mécaniquement impossible.** `chantiers/` n'est pas dans `DOSSIERS_IGNORES` de `verif_style.py`, et un fichier neuf n'a pas de base dans HEAD, donc tout défaut est bloquant. Un rapport d'agent qui contient un tiret cadratin ou « let's » déclenche le refus. Correctif : `chantiers/*/agents/` dans `DOSSIERS_IGNORES`, et le fichier entre dans la table du plan.
+
+**A9 MOYENNE. Deux clauses manquent à la fiche, sur ce qu'aucun hook ne voit.** Scénario 1 : l'agent lance `python manage.py test data`. Aucun hook ne regarde `manage.py` ni `.env` ; le jour où `.env` pointe la base partagée, Django crée une base de test sur `BDFG-SRV-DEV1`. Scénario 2 : l'agent installe une dépendance (`pip install`) : `garde_perimetre` ne connaît pas `pip` et `.venv` est dans le périmètre. Même famille : `rm -rf` ou un `Write` d'écrasement sur un fichier à modification non commitée. Correctif : trois clauses à la fiche : tests uniquement par `gate.py` ou avec `DB_CONFIG` sqlite forcé, `.env` jamais lu ni modifié ; aucune dépendance nouvelle ; aucun fichier supprimé, aucun écrasé sans l'avoir lu.
+
+**A10 MOYENNE. « Strictement identique » n'est pas tenable avec une session en parallèle.** Melvyn commite la mission 0 pendant le lot, ce que le lot 1b attend explicitement. Correctif : « aucun chemin hors de la liste E0 n'a changé », liste figée en tâche 0, et recapturer la référence après tout commit de Melvyn.
+
+**A11 BASSE. Périmètre de la règle des trois messages.** Le plafond et « un fichier un écrivain » deviennent doctrine permanente pour toutes les sessions, alors que la spec en fait une mesure du lot. Correctif : borner le bloc au mode jalon avec agents.
+
+**A12 BASSE. `TEMP` n'a pas la même valeur selon le shell.** Correctif : écrire la cible en chemin absolu littéral dans le plan.
+
+**Ce que je n'ai pas trouvé, dit explicitement.** Point 2, fuite de données : le relevé est sain, `forme()` ne conserve que des noms de champs ; deux résidus : `cwd` en clair (nom de compte Windows possible) et le chemin de sortie contrôlé par aucun verrou. Point 3, dépassement du périmètre : rien de franc. Point 4, promesse « 12 contrôles OK » : **écarté** avec preuve, `doctor.py` rend aujourd'hui `11 OK, 0 alerte(s)`, donc 12 est atteignable.
+
+**Synthèse** : le plan est bon sur sa conception adverse (porte d'arrêt, deux barrières, rouge avant clause) et faible sur son exécution mécanique : trois étapes échouent ou se trompent de verdict telles qu'écrites (A2, A4, A5), une preuve d'état n'existe pas (A1), et sa propre séquence détruit la valeur de sa fixture centrale (A6).

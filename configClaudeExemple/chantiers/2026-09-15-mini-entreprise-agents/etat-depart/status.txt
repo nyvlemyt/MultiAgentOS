@@ -1,0 +1,12 @@
+M  data/functions.py
+A  data/migrations/0025_alter_isscontroversyesgissuerdata_case_end_date_and_more.py
+A  data/migrations/0026_rename_sustainanalyticequitycontroversyissuerdata_sustainalyticsequitycontroversyissuerdata_and_more.py
+R  data/migrations/0025_alter_issequityesgissuerdata_iss_esg_rating_last_modification.py -> data/migrations/0027_alter_issequityesgissuerdata_iss_esg_rating_last_modification.py
+M  data/models/issuer_data.py
+M  data/schemas/issuer_data.py
+ M data/tests/e2e/test_export_last.py
+MM data/tests/e2e/test_insert_data.py
+M  data/type_schema.py
+M  documentation/API_REFERENCE.md
+M  documentation/DATA_INTEGRATION.md
+M  documentation/DATA_MODELS.md
