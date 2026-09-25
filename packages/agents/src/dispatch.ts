@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -29,7 +27,9 @@ import {
 import { selectLibrarySkills } from '@mas/skills';
 import { type MemoryContext } from '@mas/memory';
 import { delegateWithDiff } from './delegate';
-import { reviewProducedDiff, type ReviewGateResult } from './review-gate';
+import { type ReviewGateResult } from './review-gate';
+import { OUTPUTS_DIR, gateProducedDiff, refineUntilApproved } from './diff-gate';
+import { pauseForRiskGate, pauseForPathEscape, type RiskGatePause } from './risk-gate';
 import { realSecReviewer } from './reviewers';
 import { TIER_B_DELEGATION_MAP, domainScopeFor, loadAgentLibraryIndex, type AgentLibraryMeta } from './library';
 import { scoreColdAgentSuggestion } from './cold-agent-suggest';
@@ -46,10 +46,6 @@ import { runReviewPhase } from './review-phase';
 
 // Re-exported for './dispatch' importers (router-persist.test.ts, package index).
 export { loadBlockedWindows, type Db };
-
-// All MultiAgentOS-produced task artifacts land here (CLAUDE.md §8: never
-// data/memory/). Hoisted to one literal (S1192).
-const OUTPUTS_DIR = 'data/outputs';
 
 function repoRootDir(): string {
   const here = fileURLToPath(new URL('.', import.meta.url));
@@ -325,33 +321,6 @@ async function selectRunnableTasks(db: Db, missionId: string): Promise<Task[]> {
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
-async function pauseForRiskGate(
-  db: Db,
-  m: Mission,
-  next: Task,
-): Promise<{ kind: 'paused_for_validation'; taskId: string }> {
-  await db
-    .update(tasks)
-    .set({ status: 'needs_validation', updatedAt: new Date() })
-    .where(eq(tasks.id, next.id));
-  await db.insert(validations).values({
-    id: `val_${randomUUID()}`,
-    taskId: next.id,
-    requestedByAgent: next.agentId ?? 'dispatcher',
-    actionSummary: `Run high-risk task: ${next.title}`,
-    status: 'pending',
-    payloadJson: JSON.stringify({ risk: next.risk }),
-  });
-  await logEvent(db, {
-    missionId: m.id,
-    taskId: next.id,
-    type: 'validation_requested',
-    risk: next.risk,
-    payload: { reason: 'risk gate' },
-  });
-  return { kind: 'paused_for_validation', taskId: next.id };
-}
-
 // Shared finalize step for a completed task (raw + delegated paths): persist the
 // session id on first call, mark the task done + spend, bump mission spend, and
 // log the single task_done event. extraPayload carries path-specific telemetry.
@@ -407,78 +376,13 @@ interface DelegationContext {
   agentId: string;
 }
 
-// Runs the §5 review gate on a produced diff: write it under data/outputs, check
-// it applies + collect the real Code-Reviewer (LLM) + deterministic Reality-Checker
-// verdicts, log the result. The Reality Checker derives evidence from the diff +
-// producer output (plan §2.5) — never auto-approves an unsubstantiated diff
-// (CLAUDE.md §11.bis r4).
-interface GateArgs {
-  db: Db;
-  m: Mission;
-  next: Task;
-  repoDir: string;
-  diff: string;
-  fiche: string;
-  llm: LLMClient;
-  lastMessage: string;
-}
-
-async function gateProducedDiff(
-  args: GateArgs,
-): Promise<{ outputPath: string; review: ReviewGateResult }> {
-  const { db, m, next, repoDir, diff, fiche, llm, lastMessage } = args;
-  const patchPath = `${OUTPUTS_DIR}/${next.id}.patch`;
-  const absDir = resolve(repoRootDir(), OUTPUTS_DIR);
-  mkdirSync(absDir, { recursive: true });
-  // git apply rejects a patch with no trailing newline ("corrupt patch"); the
-  // extracted diff body is trimmed, so re-add one before writing/validating.
-  const patch = diff.endsWith('\n') ? diff : `${diff}\n`;
-  writeFileSync(resolve(repoRootDir(), patchPath), patch, 'utf-8');
-
-  const review = await reviewProducedDiff({
-    taskId: next.id,
-    diff: patch,
-    repoDir,
-    llm,
-    taskBrief: { title: next.title, description: next.description },
-    lastMessage,
-    taskRisk: next.risk,
-  });
-  await logEvent(db, {
-    missionId: m.id,
-    taskId: next.id,
-    agentId: next.agentId ?? undefined,
-    type: 'tier_b_review',
-    risk: next.risk,
-    payload: { verdicts: review.verdicts, approved: review.approved, diffValid: review.diffValid, fiche },
-  });
-  return { outputPath: patchPath, review };
-}
-
-// Evaluator-Optimizer (anthropic-ecosystem.md:170): a produced diff that the gate
-// does not approve gets ONE bounded re-attempt cycle. Bounded by both the
-// iteration cap AND the task budget (production-patterns.md:101 circuit breaker) —
-// an unbounded "loop until satisfied" is a KILL criterion (plan §1). Default 2.
-const MAX_REVIEW_ITERATIONS = 2;
-
-// Findings the next producer attempt must address, as a prompt block. Hoisted
-// literal (S1192).
-const FINDINGS_HEADER = '### Reviewer findings to address:';
-function findingsBlock(review: ReviewGateResult): string {
-  const lines = review.verdicts
-    .flatMap((v) => v.findings)
-    .filter((f) => f.severity !== 'info')
-    .map((f) => `- [${f.severity}] ${f.message}`);
-  return lines.length > 0 ? `${FINDINGS_HEADER}\n${lines.join('\n')}` : FINDINGS_HEADER;
-}
-
 async function runDelegatedTask(
   db: Db,
   m: Mission,
   next: Task,
   ctx: DelegationContext,
   taskSkillIds: string[],
-): Promise<{ kind: 'task_done'; taskId: string }> {
+): Promise<{ kind: 'task_done'; taskId: string } | RiskGatePause> {
   const { proj, llm, skillContext, memCtx, upstream, delegation, agentId } = ctx;
   // Prompt chaining: the delegated path carries upstream output in skillContext
   // (the producer/critic system prompt), since the user prompt is the task brief.
@@ -517,48 +421,13 @@ async function runDelegatedTask(
 
   if (outcome.diff && proj?.path) {
     const gated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
-    outputPath = gated.outputPath;
-    review = gated.review;
-
-    // Bounded correction loop: re-invoke the producer with the prior findings
-    // injected, re-gate, until approved OR the cap OR the budget is reached.
-    for (let iteration = 1; iteration <= MAX_REVIEW_ITERATIONS && review && !review.approved; iteration++) {
-      // Project the next retry's cost as ≈ the last iteration's spend and bail
-      // BEFORE incurring it: delegateWithDiff bills the moment it returns, so the
-      // bounded loop must stop here or it could overrun next.budgetTokens.
-      const lastSpend = outcome.response.inputTokens + outcome.response.outputTokens;
-      if (spentTokens + lastSpend > (next.budgetTokens ?? Number.MAX_SAFE_INTEGER)) break;
-
-      const retrySkillContext = [chainedSkillContext, findingsBlock(review)].filter(Boolean).join('\n\n');
-      outcome = await delegateWithDiff({ ...baseInput, skillContext: retrySkillContext });
-      spentTokens += outcome.response.inputTokens + outcome.response.outputTokens;
-
-      if (!outcome.diff) {
-        // Optimizer regression: an earlier iteration produced a diff, this retry
-        // produced none. Keep the prior (unapproved) gate and stop — re-gating
-        // nothing would falsely "approve" by absence. Surfaced for the daily report.
-        await logEvent(db, {
-          missionId: m.id,
-          taskId: next.id,
-          agentId: next.agentId ?? undefined,
-          type: 'producer_regressed_no_diff',
-          risk: next.risk,
-          payload: { iteration },
-        });
-        break;
-      }
-      const reGated = await gateProducedDiff({ db, m, next, repoDir: proj.path, diff: outcome.diff, fiche: delegation.fiche, llm, lastMessage: outcome.response.text });
-      outputPath = reGated.outputPath;
-      review = reGated.review;
-      await logEvent(db, {
-        missionId: m.id,
-        taskId: next.id,
-        agentId: next.agentId ?? undefined,
-        type: 'review_iteration',
-        risk: next.risk,
-        payload: { iteration, approved: review.approved, verdicts: review.verdicts },
-      });
-    }
+    if (gated.kind === 'path_escape') return pauseForPathEscape(db, m, next, gated.escape, gated.outputPath, spentTokens);
+    const refined = await refineUntilApproved(
+      { db, m, next, repoDir: proj.path, fiche: delegation.fiche, llm, producerInput: baseInput, chainedSkillContext },
+      { outcome, spentTokens, outputPath: gated.outputPath, review: gated.review },
+    );
+    if (refined.kind === 'paused_for_validation') return refined;
+    ({ outcome, spentTokens, outputPath, review } = refined);
   }
 
   // Single bill: charge the SUM of producer iterations (each bounded). Mirrors the
@@ -611,7 +480,7 @@ async function executeTaskWithLLM(
   m: Mission,
   next: Task,
   missionId: string,
-): Promise<{ kind: 'task_done'; taskId: string }> {
+): Promise<{ kind: 'task_done'; taskId: string } | RiskGatePause> {
   // Look up project to build the real LLM client.
   const [proj] = await db
     .select({

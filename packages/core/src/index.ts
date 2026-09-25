@@ -5,6 +5,7 @@ export * from './llm.real';
 export * from './llm.router';
 export * from './permissions';
 export * from './risk-classifier';
+export * from './path-guard';
 export * from './providers/types';
 export * from './providers/credentials';
 export * from './providers/config';
