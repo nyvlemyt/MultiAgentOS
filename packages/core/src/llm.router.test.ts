@@ -33,9 +33,12 @@ function coded(status: number): Error {
   return Object.assign(new Error(`HTTP ${status}`), { status });
 }
 
+// Exact key set (not `string`) so `clients.x` is never `undefined` under noUncheckedIndexedAccess.
+type SourceId = 'claude' | 'gemini-free' | 'openai' | 'perplexity';
+
 interface Harness {
   router: RouterLLMClient;
-  clients: Record<string, ReturnType<typeof okClient>>;
+  clients: Record<SourceId, ReturnType<typeof okClient>>;
   events: RouterEvent[];
 }
 
@@ -58,7 +61,7 @@ function makeRouter(opts: { paid?: boolean; geminiKey?: boolean } = {}): Harness
 }
 
 describe('domain resolution (paid OFF — defaults per §11.bis)', () => {
-  const expected: Record<string, string> = {
+  const expected: Record<string, SourceId> = {
     // paid primaries disabled ⇒ chain walks to first enabled source
     search: 'gemini-free',
     research: 'gemini-free',

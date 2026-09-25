@@ -103,8 +103,8 @@ describe('prompt chaining (executeTaskWithLLM)', () => {
 
     // First producer call (t1) carries no upstream context; second (t2) does.
     expect(calls).toHaveLength(2);
-    expect(calls[0].user).not.toContain(T1_MARKER);
-    expect(calls[1].user).toContain(T1_MARKER);
-    expect(calls[1].user).toContain('Research'); // upstream task title labelled
+    expect(calls[0]!.user).not.toContain(T1_MARKER);
+    expect(calls[1]!.user).toContain(T1_MARKER);
+    expect(calls[1]!.user).toContain('Research'); // upstream task title labelled
   });
 });
