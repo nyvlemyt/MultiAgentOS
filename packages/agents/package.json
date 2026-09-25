@@ -9,6 +9,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "lint": "tsc --noEmit",
     "test": "vitest run",
     "build-library-index": "tsx src/build-library-index.ts"
   },
