@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { LLMClient, LLMRequest, LLMResponse } from '../llm.js';
+import type { FetchLike } from './http.js';
 import { claudeAccountLLM } from './claude-account.js';
 import { geminiLLM } from './gemini.js';
 import { openaiLLM } from './openai.js';
@@ -48,7 +49,7 @@ describe('claudeAccountLLM', () => {
 
 describe('geminiLLM', () => {
   it('calls the Gemini generateContent endpoint and maps usage — no real network', async () => {
-    const fetchImpl = vi.fn(async () =>
+    const fetchImpl = vi.fn<FetchLike>(async () =>
       new Response(
         JSON.stringify({
           candidates: [{ content: { parts: [{ text: 'gemini says hi' }] } }],
@@ -75,7 +76,7 @@ describe('geminiLLM', () => {
   });
 
   it('throws a coded error on 429 so the router can classify it', async () => {
-    const fetchImpl = vi.fn(async () => new Response('quota', { status: 429 }));
+    const fetchImpl = vi.fn<FetchLike>(async () => new Response('quota', { status: 429 }));
     const llm = geminiLLM(
       { id: 'gemini-free', kind: 'gemini', model: 'gemini-2.0-flash' },
       'k',
@@ -95,7 +96,7 @@ describe('openaiLLM / perplexityLLM', () => {
   );
 
   it('openaiLLM posts to chat/completions with bearer auth', async () => {
-    const fetchImpl = vi.fn(async () => chatResponse.clone());
+    const fetchImpl = vi.fn<FetchLike>(async () => chatResponse.clone());
     const llm = openaiLLM(
       { id: 'openai', kind: 'openai', model: 'gpt-4o', paid: true },
       'sk-test',
@@ -112,7 +113,7 @@ describe('openaiLLM / perplexityLLM', () => {
   });
 
   it('perplexityLLM targets the perplexity base URL', async () => {
-    const fetchImpl = vi.fn(async () => chatResponse.clone());
+    const fetchImpl = vi.fn<FetchLike>(async () => chatResponse.clone());
     const llm = perplexityLLM(
       { id: 'perplexity', kind: 'perplexity', model: 'sonar', paid: true },
       'pplx-test',
@@ -149,7 +150,7 @@ describe('openaiCompatLLM fallback branches', () => {
 
   it('throws a coded error when the API responds non-2xx', async () => {
     const def: ProviderDef = { id: 'openai', kind: 'openai', model: 'gpt-4o', paid: true };
-    const fetchImpl = vi.fn(async () => new Response('nope', { status: 500 }));
+    const fetchImpl = vi.fn<FetchLike>(async () => new Response('nope', { status: 500 }));
     const llm = openaiCompatLLM(def, 'sk', 'https://x/v1', 'fallback-model', fetchImpl);
     await expect(
       llm.call({ system: '', user: 'hi', model: 'm', mode: 'eco' }),

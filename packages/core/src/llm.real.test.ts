@@ -30,7 +30,8 @@ vi.mock('@anthropic-ai/claude-agent-sdk', () => ({
   },
 }));
 
-const REQ = { user: 'hi', model: 'claude-x', mode: 'eco' } as const;
+// system: '' is falsy → exercises the no-append branch of the systemPrompt ternary.
+const REQ = { system: '', user: 'hi', model: 'claude-x', mode: 'eco' } as const;
 
 afterEach(() => {
   delete process.env.ANTHROPIC_API_KEY;

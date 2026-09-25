@@ -12,6 +12,7 @@
     "./testing": "./src/testing.ts"
   },
   "scripts": {
+    "lint": "tsc --noEmit",
     "migrate": "drizzle-kit migrate",
     "generate": "drizzle-kit generate",
     "test": "vitest run",
