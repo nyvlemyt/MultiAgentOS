@@ -130,28 +130,31 @@ describe('diffTargetPaths', () => {
     expect(diffTargetPaths(diff).sort((x, y) => x.localeCompare(y))).toEqual(['a.ts', 'b.ts']);
   });
 
-  it('unquotes a C-quoted path with spaces', () => {
-    expect(diffTargetPaths('--- "a/my file.ts"\n+++ "b/my file.ts"\n@@ -1 +1 @@\n-a\n+b')).toEqual(['my file.ts']);
-  });
-
-  it('decodes git octal escapes as UTF-8 bytes (non-ASCII filenames must resolve to the real on-disk entry)', () => {
-    expect(diffTargetPaths('--- "a/caf\\303\\251.ts"\n+++ "b/caf\\303\\251.ts"\n@@ -1 +1 @@\n-a\n+b')).toEqual(['café.ts']);
-  });
-
-  it('unescapes \\t and \\n inside a quoted path', () => {
-    expect(diffTargetPaths('--- "a/we\\tird.ts"\n+++ "b/we\\tird.ts"\n@@ -1 +1 @@\n-a\n+b')).toEqual(['we\tird.ts']);
-  });
-
-  it('strips a GNU-diff tab timestamp suffix', () => {
-    expect(diffTargetPaths('--- a/x.ts\t2024-01-01 00:00:00\n+++ b/x.ts\t2024-01-02 00:00:00\n@@ -1 +1 @@\n-a\n+b')).toEqual(['x.ts']);
-  });
-
-  it('handles --no-prefix headers', () => {
-    expect(diffTargetPaths('--- x.ts\n+++ x.ts\n@@ -1 +1 @@\n-a\n+b')).toEqual(['x.ts']);
-  });
-
-  it('covers a binary change via the diff --git line', () => {
-    expect(diffTargetPaths('diff --git a/img.png b/img.png\nBinary files a/img.png and b/img.png differ')).toEqual(['img.png']);
+  it.each<[string, string, string[]]>([
+    ['unquotes a C-quoted path with spaces', '--- "a/my file.ts"\n+++ "b/my file.ts"\n@@ -1 +1 @@\n-a\n+b', ['my file.ts']],
+    [
+      'decodes git octal escapes as UTF-8 bytes (non-ASCII filenames must resolve to the real on-disk entry)',
+      '--- "a/caf\\303\\251.ts"\n+++ "b/caf\\303\\251.ts"\n@@ -1 +1 @@\n-a\n+b',
+      ['café.ts'],
+    ],
+    [
+      'unescapes \\t and \\n inside a quoted path',
+      '--- "a/we\\tird.ts"\n+++ "b/we\\tird.ts"\n@@ -1 +1 @@\n-a\n+b',
+      ['we\tird.ts'],
+    ],
+    [
+      'strips a GNU-diff tab timestamp suffix',
+      '--- a/x.ts\t2024-01-01 00:00:00\n+++ b/x.ts\t2024-01-02 00:00:00\n@@ -1 +1 @@\n-a\n+b',
+      ['x.ts'],
+    ],
+    ['handles --no-prefix headers', '--- x.ts\n+++ x.ts\n@@ -1 +1 @@\n-a\n+b', ['x.ts']],
+    [
+      'covers a binary change via the diff --git line',
+      'diff --git a/img.png b/img.png\nBinary files a/img.png and b/img.png differ',
+      ['img.png'],
+    ],
+  ])('%s', (_name, diff, expected) => {
+    expect(diffTargetPaths(diff)).toEqual(expected);
   });
 
   it('does not mistake a removed "-- comment" hunk line for a --- header', () => {
