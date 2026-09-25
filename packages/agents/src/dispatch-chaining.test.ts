@@ -1,66 +1,35 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { useDispatchHarness } from './testing';
 
 // Capture every producer LLM request so we can assert t2's prompt carries t1's
 // output (prompt chaining, plan §2.9). t1 returns a distinctive marker.
 const T1_MARKER = 'UPSTREAM-OUTPUT-MARKER-7f3a';
 const calls: { system: string; user: string }[] = [];
 
+// Shared Tier-B mock (testing.ts): critics get a parseable verdict; the producer
+// callback records each request (critics never reach it) and answers the first
+// one with the marker. Dynamic import — the factory is hoisted.
 vi.mock('@mas/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@mas/core')>();
-  let n = 0;
-  return {
-    ...actual,
-    claudeCodeLLM: vi.fn(() => ({
-      call: vi.fn(async (req: import('@mas/core').LLMRequest) => {
-        if (req.reviewKind) {
-          return {
-            text: actual.mockVerdictText(req.reviewKind, req.user),
-            inputTokens: 10, outputTokens: 10, cacheReadTokens: 0, cacheCreationTokens: 0,
-            quotaUnits: 0, model: 'claude-haiku-4-5',
-          };
-        }
-        calls.push({ system: req.system, user: req.user });
-        n += 1;
-        return {
-          text: n === 1 ? `Result: ${T1_MARKER}` : 'Result: t2 done',
-          inputTokens: 100, outputTokens: 50, cacheReadTokens: 0, cacheCreationTokens: 0,
-          quotaUnits: 0, model: 'claude-haiku-4-5', sessionId: 'sess',
-        };
-      }),
-    })),
-  };
+  const { mockTierBCore } = await import('./testing');
+  return mockTierBCore(actual, (req) => {
+    calls.push({ system: req.system, user: req.user });
+    return calls.length === 1 ? `Result: ${T1_MARKER}` : 'Result: t2 done';
+  });
 });
 
-import { unlinkSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { getDb, closeDb, projects, agents, missions, tasks } from '@mas/db';
+import { getDb, projects, agents, missions, tasks } from '@mas/db';
 import { executeNextTask, runMission } from './dispatch';
 
 const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../../db/migrations');
 const PROJECT_ID = 'chain-proj';
 
-let dbPath: string;
-
-beforeEach(async () => {
+useDispatchHarness(MIGRATIONS_FOLDER);
+beforeEach(() => {
   calls.length = 0;
-  delete process.env.MAS_MOCK_LLM;
-  process.env.MAS_ROUTING_CONFIG = '/nonexistent/model-routing.json';
-  const dir = join(tmpdir(), 'mas-test');
-  mkdirSync(dir, { recursive: true });
-  dbPath = join(dir, `${randomUUID()}.db`);
-  process.env.MAS_DB_PATH = dbPath;
-  migrate(getDb(), { migrationsFolder: MIGRATIONS_FOLDER });
-});
-
-afterEach(() => {
-  closeDb();
-  try { unlinkSync(dbPath); } catch { /* ignore */ }
-  delete process.env.MAS_DB_PATH;
-  delete process.env.MAS_ROUTING_CONFIG;
 });
 
 async function seedChain(missionId: string) {

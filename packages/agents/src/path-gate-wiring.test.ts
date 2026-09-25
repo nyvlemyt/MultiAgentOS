@@ -30,7 +30,7 @@ const PAUSED = 'paused_for_validation';
 const TRAVERSAL_TARGET = '../outside.txt';
 const SYMLINK_TARGET = 'link/evil.txt';
 
-const h = useDispatchHarness(MIGRATIONS_FOLDER, 'mas-pathgate-');
+const h = useDispatchHarness(MIGRATIONS_FOLDER, { repoPrefix: 'mas-pathgate-' });
 let outsideDir: string;
 beforeEach(() => {
   outsideDir = mkdtempSync(join(tmpdir(), 'mas-outside-'));

@@ -31,7 +31,7 @@ const MIGRATIONS_FOLDER = resolve(dirname(fileURLToPath(import.meta.url)), '../.
 const PROJECT_ID = 'loop-break-proj';
 const DELEGATION_AGENT = 'design-ui-designer';
 
-const h = useDispatchHarness(MIGRATIONS_FOLDER, 'mas-loop-break-');
+const h = useDispatchHarness(MIGRATIONS_FOLDER, { repoPrefix: 'mas-loop-break-' });
 beforeEach(() => {
   state.producerCalls = 0;
 });

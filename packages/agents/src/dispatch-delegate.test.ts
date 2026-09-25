@@ -22,7 +22,7 @@ const PROJECT_ID = 'deleg-proj';
 const DELEGATION_AGENT = 'design-ui-designer';
 const AGENT_IDS = [DELEGATION_AGENT, 'reviewer', 'quality-controller', 'sec-reviewer'];
 
-const h = useDispatchHarness(MIGRATIONS_FOLDER, 'mas-deleg-');
+const h = useDispatchHarness(MIGRATIONS_FOLDER, { repoPrefix: 'mas-deleg-' });
 
 // Description names file.txt (the file the CLEAN_TEST_DIFF edits) so the diff
 // covers the request → Reality Checker has evidence → gate approves on the
